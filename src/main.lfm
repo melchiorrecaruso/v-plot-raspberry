@@ -1,0 +1,113 @@
+object Form1: TForm1
+  Left = 347
+  Height = 494
+  Top = 205
+  Width = 400
+  Caption = 'VPlot Driver'
+  ClientHeight = 494
+  ClientWidth = 400
+  Color = clMenu
+  Constraints.MinWidth = 400
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  LCLVersion = '1.9.0.0'
+  object gcodelist: TListBox
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Bevel
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 0
+    Height = 449
+    Top = 45
+    Width = 400
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderStyle = bsNone
+    Columns = 1
+    Font.Height = -11
+    Font.Name = 'Roboto Mono'
+    ItemHeight = 0
+    ParentFont = False
+    ScrollWidth = 400
+    TabOrder = 0
+    TopIndex = -1
+  end
+  object OpenBitBtn: TBitBtn
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    Left = 5
+    Height = 33
+    Top = 5
+    Width = 120
+    BorderSpacing.Left = 5
+    BorderSpacing.Top = 5
+    Caption = 'Open'
+    Default = True
+    OnClick = OpenBitBtnClick
+    TabOrder = 1
+  end
+  object startbitbtn: TBitBtn
+    AnchorSideLeft.Control = OpenBitBtn
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = Owner
+    Left = 130
+    Height = 33
+    Top = 5
+    Width = 72
+    BorderSpacing.Left = 5
+    BorderSpacing.Top = 5
+    Caption = 'Start'
+    OnClick = startbitbtnClick
+    TabOrder = 2
+  end
+  object stopbitbtn: TBitBtn
+    AnchorSideLeft.Control = startbitbtn
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = Owner
+    Left = 207
+    Height = 33
+    Top = 5
+    Width = 72
+    BorderSpacing.Left = 5
+    BorderSpacing.Top = 5
+    Caption = 'Stop'
+    OnClick = stopbitbtnClick
+    TabOrder = 3
+  end
+  object BitBtn1: TBitBtn
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 314
+    Height = 33
+    Top = 5
+    Width = 81
+    Anchors = [akTop, akRight]
+    BorderSpacing.Top = 5
+    BorderSpacing.Right = 5
+    Caption = 'Option'
+    OnClick = BitBtn1Click
+    TabOrder = 4
+  end
+  object Bevel: TBevel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = OpenBitBtn
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 0
+    Height = 1
+    Top = 44
+    Width = 400
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 6
+    Shape = bsBottomLine
+    Style = bsRaised
+  end
+  object OpenDialog: TOpenDialog
+    left = 32
+    top = 80
+  end
+end
