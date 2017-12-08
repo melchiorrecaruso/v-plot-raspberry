@@ -10,9 +10,9 @@ uses
 
 type
 
-  { tform1 }
+  { TMainForm }
 
-  tform1 = class(tform)
+  TMainForm = class(tform)
     bevel: tbevel;
     bitbtn1: tbitbtn;
     openbitbtn: tbitbtn;
@@ -36,7 +36,7 @@ type
   end;
 
 var
-  form1: tform1;
+  MainForm: TMainForm;
 
 
 implementation
@@ -47,9 +47,9 @@ uses
 
 {$r *.lfm}
 
-{ tform1 }
+{ TMainForm }
 
-procedure tform1.formcreate(sender: tobject);
+procedure TMainForm.formcreate(sender: tobject);
 begin
   vplotinterface := tvplotinterface.create;
   vplotinterface.code      := '';
@@ -60,13 +60,13 @@ begin
   vplotdriver := tvplotdriver.create(vplotinterface);
 end;
 
-procedure tform1.formdestroy(sender: tobject);
+procedure TMainForm.formdestroy(sender: tobject);
 begin
   vplotinterface.suspended := true;
   vplotinterface.destroy;
 end;
 
-procedure tform1.formsync1;
+procedure TMainForm.formsync1;
 begin
   vplotinterface.code := '';
   if not vplotinterface.suspended then
@@ -79,12 +79,12 @@ begin
   end;
 end;
 
-procedure tform1.formsync2;
+procedure TMainForm.formsync2;
 begin
   with vplotinterface do
   begin
-    viewfrm.image.canvas.brush.color:= clblack;
-    viewfrm.image.canvas.rectangle(
+    viewform.image.canvas.brush.color:= clblack;
+    viewform.image.canvas.rectangle(
       round(point.y),
       round(point.x),
       round(point.y + 1),
@@ -92,34 +92,37 @@ begin
   end;
 end;
 
-procedure tform1.coolbar1change(sender: tobject);
+procedure TMainForm.coolbar1change(sender: tobject);
 begin
 
 end;
 
-procedure tform1.stopbitbtnclick(sender: tobject);
+procedure TMainForm.stopbitbtnclick(sender: tobject);
 begin
   vplotinterface.suspended := true;
 end;
 
-procedure tform1.bevel1changebounds(sender: tobject);
+procedure TMainForm.bevel1changebounds(sender: tobject);
 begin
 
 end;
 
-procedure tform1.bitbtn1click(sender: tobject);
+procedure TMainForm.bitbtn1click(sender: tobject);
 begin
   vplotdriver.initialize;
 end;
 
-procedure tform1.startbitbtnclick(sender: tobject);
+procedure TMainForm.startbitbtnclick(sender: tobject);
 begin
-  viewfrm.show;
+  viewform.top  := top;
+  viewform.left := left + width + 5;
+
+  viewform.show;
   if gcodelist.itemindex > -1 then
     vplotinterface.suspended := false;
 end;
 
-procedure tform1.openbitbtnclick(sender: tobject);
+procedure TMainForm.openbitbtnclick(sender: tobject);
 begin
   if opendialog.execute then
   begin

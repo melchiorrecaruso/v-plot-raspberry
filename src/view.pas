@@ -9,9 +9,9 @@ uses
 
 type
 
-  { tviewfrm }
+  { Tviewform }
 
-  tviewfrm = class(tform)
+  Tviewform = class(tform)
     image: timage;
   private
 
@@ -20,13 +20,13 @@ type
   end;
 
 var
-  viewfrm: tviewfrm;
+  viewform: Tviewform;
 
 implementation
 
 {$r *.lfm}
 
-{ tviewfrm }
+{ Tviewform }
 
 
 end.
