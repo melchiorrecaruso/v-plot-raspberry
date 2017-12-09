@@ -94,8 +94,8 @@ begin
     viewform.image.canvas.rectangle(
       round(point.y),
       round(point.x),
-      round(point.y + 1),
-      round(point.x + 1));
+      round(point.y + 2),
+      round(point.x + 2));
   end;
 end;
 
