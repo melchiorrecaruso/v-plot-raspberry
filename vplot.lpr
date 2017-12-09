@@ -5,13 +5,13 @@ program vplot;
 uses
   {$ifdef unix} cthreads, {$endif} interfaces, forms, lazcontrols, main, view;
 
-{$r *.res}
+{$R *.res}
 
 begin
   application.title := 'VPlot Driver';
   requirederivedformresource := true;
   application.initialize;
-  Application.CreateForm(TMainForm, MainForm);
+  Application.CreateForm(Tmainform, mainform);
   Application.CreateForm(Tviewform, viewform);
   application.run;
 end.

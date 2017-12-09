@@ -6,28 +6,31 @@ interface
 
 uses
   classes, sysutils, forms, controls, graphics, dialogs, extctrls, stdctrls,
-  comctrls, buttons, menus, dividerbevel;
+  comctrls, buttons, menus;
 
 type
 
-  { TMainForm }
+  { tmainform }
 
-  TMainForm = class(tform)
-    bevel: tbevel;
-    bitbtn1: tbitbtn;
-    openbitbtn: tbitbtn;
-    startbitbtn: tbitbtn;
-    stopbitbtn: tbitbtn;
+  tmainform = class(tform)
+    bevel0: tbevel;
+    bevel1: TMenuItem;
+    aboutvplot: TMenuItem;
+    showviewform: TMenuItem;
+    morebtn: tbitbtn;
+    loadbtn: tbitbtn;
+    playbtn: tbitbtn;
+    moremenu: TPopupMenu;
+    stopbtn: tbitbtn;
     gcodelist: tlistbox;
     opendialog: topendialog;
-    procedure bevel1changebounds(sender: tobject);
-    procedure bitbtn1click(sender: tobject);
-    procedure startbitbtnclick(sender: tobject);
     procedure formcreate(sender: tobject);
     procedure formdestroy(sender: tobject);
-    procedure openbitbtnclick(sender: tobject);
-    procedure coolbar1change(sender: tobject);
-    procedure stopbitbtnclick(sender: tobject);
+    procedure loadbtnclick(sender: tobject);
+    procedure playbtnclick(sender: tobject);
+    procedure showviewformClick(Sender: TObject);
+    procedure stopbtnclick(sender: tobject);
+    procedure morebtnclick(sender: tobject);
   private
     procedure formsync1;
     procedure formsync2;
@@ -36,21 +39,23 @@ type
   end;
 
 var
-  MainForm: TMainForm;
+  mainform: Tmainform;
 
 
 implementation
 
 uses
-  libvplot,
-  view;
+  libvplot, view;
 
-{$r *.lfm}
+{$R *.lfm}
 
-{ TMainForm }
+{ tmainform }
 
-procedure TMainForm.formcreate(sender: tobject);
+procedure tmainform.formcreate(sender: tobject);
 begin
+  playbtn.enabled := false;
+  stopbtn .enabled := false;
+
   vplotinterface := tvplotinterface.create;
   vplotinterface.code      := '';
   vplotinterface.sync1     := @formsync1;
@@ -60,30 +65,32 @@ begin
   vplotdriver := tvplotdriver.create(vplotinterface);
 end;
 
-procedure TMainForm.formdestroy(sender: tobject);
+procedure tmainform.formdestroy(sender: tobject);
 begin
   vplotinterface.suspended := true;
   vplotinterface.destroy;
 end;
 
-procedure TMainForm.formsync1;
+procedure tmainform.formsync1;
 begin
   vplotinterface.code := '';
   if not vplotinterface.suspended then
   begin
     vplotinterface.code := gcodelist.items[gcodelist.itemindex];
     if gcodelist.itemindex = gcodelist.count - 1 then
-      stopbitbtn.click
+      stopbtn.click
     else
       gcodelist.itemindex := gcodelist.itemindex + 1;
   end;
 end;
 
-procedure TMainForm.formsync2;
+procedure Tmainform.formsync2;
 begin
   with vplotinterface do
   begin
-    viewform.image.canvas.brush.color:= clblack;
+    viewform.image.canvas.pen.color   := clblack;
+    viewform.image.canvas.brush.color := clblack;
+    viewform.image.canvas.brush.style := bssolid;
     viewform.image.canvas.rectangle(
       round(point.y),
       round(point.x),
@@ -92,46 +99,41 @@ begin
   end;
 end;
 
-procedure TMainForm.coolbar1change(sender: tobject);
+procedure tmainform.stopbtnclick(sender: tobject);
 begin
-
-end;
-
-procedure TMainForm.stopbitbtnclick(sender: tobject);
-begin
-  viewform.top    := top;
-  viewform.left   := left + width + 5;
-  viewform.height := height;
-
-  viewform.show;
   vplotinterface.suspended := true;
+
+  playbtn.enabled :=     vplotinterface.suspended;
+  stopbtn .enabled := not vplotinterface.suspended;
 end;
 
-procedure TMainForm.bevel1changebounds(sender: tobject);
+procedure tmainform.morebtnclick(sender: tobject);
+var
+  x, y: longint;
 begin
+  x := left + morebtn.left;
+  y := top  + bevel0.top + 28;
+
+  moremenu.popup(x, y);
+
 
 end;
 
-procedure TMainForm.bitbtn1click(sender: tobject);
+procedure tmainform.playbtnclick(sender: tobject);
 begin
-  vplotdriver.initialize;
-  viewform.image.canvas.brush.color := clwhite;
-  viewform.image.canvas.brush.style := bsclear;
-  viewform.image.canvas.rectangle(0, 0, 1500, 1500);
-end;
-
-procedure TMainForm.startbitbtnclick(sender: tobject);
-begin
-  viewform.top    := top;
-  viewform.left   := left + width + 5;
-  viewform.height := height;
-
-  viewform.show;
   if gcodelist.itemindex > -1 then
     vplotinterface.suspended := false;
+
+  playbtn.enabled :=     vplotinterface.suspended;
+  stopbtn .enabled := not vplotinterface.suspended;
 end;
 
-procedure TMainForm.openbitbtnclick(sender: tobject);
+procedure tmainform.showviewformClick(Sender: TObject);
+begin
+  viewform.show;
+end;
+
+procedure tmainform.loadbtnclick(sender: tobject);
 begin
   if opendialog.execute then
   begin
@@ -139,6 +141,10 @@ begin
     gcodelist.items.loadfromfile(opendialog.filename);
     if gcodelist.count > 0 then
       gcodelist.itemindex := 0;
+    playbtn.enabled := true;
+
+    vplotdriver.initialize;
+    viewform.clear;
   end;
 end;
 
