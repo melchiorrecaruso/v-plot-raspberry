@@ -99,6 +99,11 @@ end;
 
 procedure TMainForm.stopbitbtnclick(sender: tobject);
 begin
+  viewform.top    := top;
+  viewform.left   := left + width + 5;
+  viewform.height := height;
+
+  viewform.show;
   vplotinterface.suspended := true;
 end;
 
@@ -110,12 +115,16 @@ end;
 procedure TMainForm.bitbtn1click(sender: tobject);
 begin
   vplotdriver.initialize;
+  viewform.image.canvas.brush.color := clwhite;
+  viewform.image.canvas.brush.style := bsclear;
+  viewform.image.canvas.rectangle(0, 0, 1500, 1500);
 end;
 
 procedure TMainForm.startbitbtnclick(sender: tobject);
 begin
-  viewform.top  := top;
-  viewform.left := left + width + 5;
+  viewform.top    := top;
+  viewform.left   := left + width + 5;
+  viewform.height := height;
 
   viewform.show;
   if gcodelist.itemindex > -1 then
