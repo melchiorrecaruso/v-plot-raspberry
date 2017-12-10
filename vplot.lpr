@@ -11,8 +11,8 @@ begin
   application.title := 'VPlot Driver';
   requirederivedformresource := true;
   application.initialize;
-  Application.CreateForm(Tmainform, mainform);
-  Application.CreateForm(Tviewform, viewform);
+  application.createform(tmainform, mainform);
+  application.createform(tviewform, viewform);
   application.run;
 end.
 

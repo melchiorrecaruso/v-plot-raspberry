@@ -16,6 +16,8 @@ type
     bevel0: tbevel;
     bevel1: TMenuItem;
     aboutvplot: TMenuItem;
+    bevel2: TBevel;
+    label1: TLabel;
     showviewform: TMenuItem;
     morebtn: tbitbtn;
     loadbtn: tbitbtn;
@@ -24,6 +26,8 @@ type
     stopbtn: tbitbtn;
     gcodelist: tlistbox;
     opendialog: topendialog;
+    timer: TTimer;
+    TrackBar1: TTrackBar;
     procedure formcreate(sender: tobject);
     procedure formdestroy(sender: tobject);
     procedure loadbtnclick(sender: tobject);
@@ -31,16 +35,19 @@ type
     procedure showviewformClick(Sender: TObject);
     procedure stopbtnclick(sender: tobject);
     procedure morebtnclick(sender: tobject);
+    procedure timerTimer(Sender: TObject);
   private
     procedure formsync1;
     procedure formsync2;
+    procedure formsync3;
+    procedure formsync4;
   public
 
   end;
 
 var
+  x:        longword;
   mainform: Tmainform;
-
 
 implementation
 
@@ -54,12 +61,14 @@ uses
 procedure tmainform.formcreate(sender: tobject);
 begin
   playbtn.enabled := false;
-  stopbtn .enabled := false;
+  stopbtn.enabled := false;
 
   vplotinterface := tvplotinterface.create;
   vplotinterface.code      := '';
   vplotinterface.sync1     := @formsync1;
   vplotinterface.sync2     := @formsync2;
+  vplotinterface.sync3     := @formsync3;
+  vplotinterface.sync4     := @formsync4;
   vplotinterface.suspended := true;
 
   vplotdriver := tvplotdriver.create(vplotinterface);
@@ -73,14 +82,11 @@ end;
 
 procedure tmainform.formsync1;
 begin
+  sleep(trackbar1.Position);
   vplotinterface.code := '';
   if not vplotinterface.suspended then
   begin
     vplotinterface.code := gcodelist.items[gcodelist.itemindex];
-    if gcodelist.itemindex = gcodelist.count - 1 then
-      stopbtn.click
-    else
-      gcodelist.itemindex := gcodelist.itemindex + 1;
   end;
 end;
 
@@ -88,48 +94,82 @@ procedure Tmainform.formsync2;
 begin
   with vplotinterface do
   begin
+    viewform.image.canvas.pen.color   := clred;
+    viewform.image.canvas.brush.color := clred;
+    viewform.image.canvas.brush.style := bssolid;
+    viewform.image.canvas.Line(
+      round(point1.y),
+      round(point1.x),
+      round(point2.y),
+      round(point2.x));
+  end;
+end;
+
+procedure Tmainform.formsync3;
+begin
+  with vplotinterface do
+  begin
     viewform.image.canvas.pen.color   := clblack;
     viewform.image.canvas.brush.color := clblack;
     viewform.image.canvas.brush.style := bssolid;
-    viewform.image.canvas.rectangle(
-      round(point.y),
-      round(point.x),
-      round(point.y + 2),
-      round(point.x + 2));
+    viewform.image.canvas.Line(
+      round(point1.y),
+      round(point1.x),
+      round(point2.y),
+      round(point2.x));
   end;
+end;
+
+procedure Tmainform.formsync4;
+begin
+  if gcodelist.itemindex = gcodelist.count - 1 then
+  begin
+    stopbtn.click;
+  end else
+    gcodelist.itemindex := gcodelist.itemindex + 1;
+end;
+
+
+procedure tmainform.playbtnclick(sender: tobject);
+begin
+  if gcodelist.itemindex > -1 then
+  begin
+    vplotinterface.suspended := false;
+  end;
+
+  timer  .enabled := not vplotinterface.suspended;
+  playbtn.enabled :=     vplotinterface.suspended;
+  stopbtn.enabled := not vplotinterface.suspended;
 end;
 
 procedure tmainform.stopbtnclick(sender: tobject);
 begin
   vplotinterface.suspended := true;
 
+  timer.enabled   := not vplotinterface.suspended;
   playbtn.enabled :=     vplotinterface.suspended;
-  stopbtn .enabled := not vplotinterface.suspended;
+  stopbtn.enabled := not vplotinterface.suspended;
 end;
 
 procedure tmainform.morebtnclick(sender: tobject);
-var
-  x, y: longint;
 begin
-  x := left + morebtn.left;
-  y := top  + bevel0.top + 28;
-
-  moremenu.popup(x, y);
-
-
+  moremenu.popup(left + morebtn.left, top + bevel0.top + 28);
 end;
 
-procedure tmainform.playbtnclick(sender: tobject);
+procedure tmainform.timerTimer(Sender: TObject);
 begin
-  if gcodelist.itemindex > -1 then
-    vplotinterface.suspended := false;
-
-  playbtn.enabled :=     vplotinterface.suspended;
-  stopbtn .enabled := not vplotinterface.suspended;
+  inc(x);
+  label1.caption := 'Time elapsed ' + inttostr(x) + ' secs';
 end;
+
+
 
 procedure tmainform.showviewformClick(Sender: TObject);
 begin
+  viewform.top    := top;
+  viewform.left   := left + width + 16;
+  viewform.height := height;
+  viewform.width  := width;
   viewform.show;
 end;
 
@@ -145,6 +185,7 @@ begin
 
     vplotdriver.initialize;
     viewform.clear;
+    x := 0;
   end;
 end;
 

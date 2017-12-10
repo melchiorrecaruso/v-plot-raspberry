@@ -1,11 +1,11 @@
 object mainform: Tmainform
-  Left = 414
+  Left = 461
   Height = 450
-  Top = 192
-  Width = 450
+  Top = 184
+  Width = 553
   Caption = 'VPlot Driver'
   ClientHeight = 450
-  ClientWidth = 450
+  ClientWidth = 553
   Color = clMenu
   Constraints.MinHeight = 450
   Constraints.MinWidth = 450
@@ -18,12 +18,11 @@ object mainform: Tmainform
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = Owner
-    AnchorSideBottom.Side = asrBottom
+    AnchorSideBottom.Control = bevel2
     Left = 0
-    Height = 378
+    Height = 351
     Top = 72
-    Width = 450
+    Width = 553
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderStyle = bsNone
     Columns = 1
@@ -31,7 +30,7 @@ object mainform: Tmainform
     Font.Name = 'DejaVu Sans Mono'
     ItemHeight = 0
     ParentFont = False
-    ScrollWidth = 450
+    ScrollWidth = 553
     TabOrder = 4
     TopIndex = -1
   end
@@ -955,7 +954,7 @@ object mainform: Tmainform
     AnchorSideTop.Control = Owner
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 365
+    Left = 468
     Height = 60
     Top = 5
     Width = 80
@@ -1266,11 +1265,57 @@ object mainform: Tmainform
     Left = 0
     Height = 1
     Top = 71
-    Width = 450
+    Width = 553
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 6
+    Constraints.MaxHeight = 1
+    Constraints.MinHeight = 1
     Shape = bsBottomLine
     Style = bsRaised
+  end
+  object bevel2: TBevel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = gcodelist
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = label1
+    Left = 0
+    Height = 1
+    Top = 423
+    Width = 553
+    Anchors = [akLeft, akRight, akBottom]
+    Constraints.MaxHeight = 1
+    Constraints.MinHeight = 1
+    Shape = bsBottomLine
+    Style = bsRaised
+  end
+  object label1: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 0
+    Height = 26
+    Top = 424
+    Width = 553
+    Alignment = taCenter
+    Anchors = [akLeft, akRight, akBottom]
+    Caption = '---'
+    Constraints.MinHeight = 26
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object TrackBar1: TTrackBar
+    Left = 328
+    Height = 60
+    Top = 5
+    Width = 113
+    Max = 1000
+    Position = 0
+    TabOrder = 5
   end
   object opendialog: TOpenDialog
     left = 40
@@ -1289,5 +1334,11 @@ object mainform: Tmainform
     object aboutvplot: TMenuItem
       Caption = 'About'
     end
+  end
+  object timer: TTimer
+    Enabled = False
+    OnTimer = timerTimer
+    left = 200
+    top = 88
   end
 end

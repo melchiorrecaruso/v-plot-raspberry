@@ -1,10 +1,9 @@
 object viewform: Tviewform
-  Left = 867
+  Left = 804
   Height = 450
-  Top = 191
+  Top = 190
   Width = 450
-  BorderStyle = bsSingle
-  Caption = 'View'
+  Caption = 'Preview'
   ClientHeight = 450
   ClientWidth = 450
   Color = clMenu
@@ -12,15 +11,31 @@ object viewform: Tviewform
   Constraints.MinWidth = 450
   LCLVersion = '1.9.0.0'
   object image: TImage
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 450
     Top = 0
     Width = 450
-    Align = alClient
+    Anchors = [akTop, akLeft, akRight, akBottom]
     AutoSize = True
     Center = True
+    PopupMenu = popup
     Proportional = True
     Stretch = True
     StretchOutEnabled = False
+  end
+  object popup: TPopupMenu
+    left = 81
+    top = 70
+    object Scrat: TMenuItem
+      Caption = 'Stetch preview'
+      Checked = True
+      OnClick = ScratClick
+    end
   end
 end
