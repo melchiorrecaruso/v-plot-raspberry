@@ -12,7 +12,7 @@ begin
   requirederivedformresource := true;
   application.initialize;
   application.createform(tmainform, mainform);
-  application.createform(tviewform, viewform);
+  Application.CreateForm(Tpreviewform, previewform);
   application.run;
 end.
 

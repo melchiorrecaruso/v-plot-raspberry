@@ -27,12 +27,12 @@
         <PackageName Value="LCL"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="18">
+    <Units Count="20">
       <Unit0>
         <Filename Value="vplot.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="31" Y="11"/>
-        <UsageCount Value="106"/>
+        <CursorPos Y="17"/>
+        <UsageCount Value="122"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -42,50 +42,47 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="59"/>
-        <CursorPos X="75" Y="71"/>
-        <FoldState Value=" T3iX04013n"/>
-        <UsageCount Value="106"/>
+        <TopLine Value="152"/>
+        <CursorPos X="22" Y="159"/>
+        <UsageCount Value="122"/>
         <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="src/libvplot.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="382"/>
-        <CursorPos X="15" Y="388"/>
-        <FoldState Value=" T3j40BA piXjR04111%"/>
-        <UsageCount Value="106"/>
+        <TopLine Value="401"/>
+        <CursorPos X="12" Y="429"/>
+        <FoldState Value=" T3jG0BA33116"/>
+        <UsageCount Value="122"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="src/view.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="viewform"/>
+        <ComponentName Value="previewform"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="24"/>
-        <CursorPos X="5" Y="45"/>
-        <UsageCount Value="50"/>
+        <TopLine Value="19"/>
+        <CursorPos X="12" Y="56"/>
+        <UsageCount Value="66"/>
         <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="../fpc/source/rtl/objpas/classes/classesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="2063"/>
         <CursorPos X="10" Y="2085"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit4>
       <Unit5>
         <Filename Value="../fpc/source/rtl/inc/objpash.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="185"/>
         <CursorPos X="23" Y="193"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit5>
       <Unit6>
         <Filename Value="../lazarus/lcl/stdctrls.pp"/>
@@ -93,14 +90,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="568"/>
         <CursorPos X="28" Y="577"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="3"/>
       </Unit6>
       <Unit7>
         <Filename Value="../lazarus/lcl/include/customlistbox.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="176"/>
         <CursorPos X="25" Y="196"/>
-        <UsageCount Value="4"/>
+        <UsageCount Value="3"/>
       </Unit7>
       <Unit8>
         <Filename Value="../lazarus/lcl/lclproc.pas"/>
@@ -108,27 +105,27 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="898"/>
         <CursorPos X="13" Y="912"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="5"/>
       </Unit8>
       <Unit9>
         <Filename Value="../fpc/source/rtl/inc/mathh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="72"/>
         <CursorPos X="14" Y="96"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit9>
       <Unit10>
         <Filename Value="../fpc/source/rtl/objpas/objpas.pp"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="8" Y="33"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit10>
       <Unit11>
         <Filename Value="../fpc/source/rtl/inc/systemh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="555"/>
         <CursorPos X="26" Y="576"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit11>
       <Unit12>
         <Filename Value="../fpc/source/packages/fcl-base/src/inifiles.pp"/>
@@ -136,7 +133,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="145"/>
         <CursorPos X="24" Y="173"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit12>
       <Unit13>
         <Filename Value="../lazarus/lcl/graphics.pp"/>
@@ -144,7 +141,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="1186"/>
         <CursorPos X="24" Y="1205"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit13>
       <Unit14>
         <Filename Value="../fpc/source/packages/fcl-image/src/fpcanvas.pp"/>
@@ -152,150 +149,163 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="330"/>
         <CursorPos X="15" Y="349"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit14>
       <Unit15>
         <Filename Value="../fpc/source/rtl/inc/typshrdh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="54"/>
         <CursorPos X="3" Y="62"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit15>
       <Unit16>
         <Filename Value="../lazarus/lcl/include/canvas.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1153"/>
         <CursorPos X="3" Y="1161"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit16>
       <Unit17>
         <Filename Value="../fpc/source/rtl/inc/innr.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="91"/>
         <CursorPos X="4" Y="112"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="7"/>
       </Unit17>
+      <Unit18>
+        <Filename Value="../fpc/source/packages/numlib/src/numlib.pas"/>
+        <UnitName Value="NumLib"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="166"/>
+        <CursorPos X="109" Y="37"/>
+        <UsageCount Value="12"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="../fpc/source/tests/bench/shootout/obsolete/matrix.pp"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit19>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="src/main.pas"/>
-        <Caret Line="47" Column="4" TopLine="34"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="340" Column="35" TopLine="232"/>
       </Position1>
       <Position2>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="67" Column="43" TopLine="49"/>
+        <Caret Line="336" Column="27" TopLine="310"/>
       </Position2>
       <Position3>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="386" TopLine="187"/>
+        <Caret Line="349" Column="32" TopLine="310"/>
       </Position3>
       <Position4>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="67" Column="41" TopLine="56"/>
+        <Caret Line="355" Column="63" TopLine="335"/>
       </Position4>
       <Position5>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="389" Column="7" TopLine="351"/>
+        <Caret Line="367" Column="31" TopLine="235"/>
       </Position5>
       <Position6>
-        <Filename Value="src/main.pas"/>
-        <Caret Line="90" TopLine="52"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="380" Column="5" TopLine="332"/>
       </Position6>
       <Position7>
-        <Filename Value="src/main.pas"/>
-        <Caret Line="88" Column="24" TopLine="50"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="231" Column="3" TopLine="169"/>
       </Position7>
       <Position8>
-        <Filename Value="src/main.pas"/>
-        <Caret Line="86" Column="35" TopLine="59"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="232" TopLine="210"/>
       </Position8>
       <Position9>
-        <Filename Value="src/main.pas"/>
-        <Caret Line="116" Column="52" TopLine="91"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="14" Column="27" TopLine="10"/>
       </Position9>
       <Position10>
-        <Filename Value="src/main.pas"/>
-        <Caret Line="115" Column="49" TopLine="94"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="219" Column="35" TopLine="164"/>
       </Position10>
       <Position11>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="390" Column="41" TopLine="365"/>
+        <Caret Line="344" Column="32" TopLine="163"/>
       </Position11>
       <Position12>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="37" Column="5" TopLine="16"/>
+        <Caret Line="218" Column="47" TopLine="163"/>
       </Position12>
       <Position13>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="46" Column="44" TopLine="16"/>
+        <Caret Line="346" Column="34" TopLine="240"/>
       </Position13>
       <Position14>
-        <Filename Value="src/main.pas"/>
-        <Caret Line="52" Column="12" TopLine="46"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="230" Column="37" TopLine="170"/>
       </Position14>
       <Position15>
-        <Filename Value="src/view.pas"/>
-        <Caret Line="13" Column="23" TopLine="5"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="219" Column="54" TopLine="163"/>
       </Position15>
       <Position16>
-        <Filename Value="src/view.pas"/>
-        <Caret Line="41" Column="33" TopLine="8"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="345" Column="36" TopLine="318"/>
       </Position16>
       <Position17>
-        <Filename Value="src/view.pas"/>
-        <Caret Line="27" Column="40" TopLine="10"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="216" Column="61" TopLine="196"/>
       </Position17>
       <Position18>
-        <Filename Value="src/view.pas"/>
-        <Caret Line="28" Column="40" TopLine="10"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="348" Column="41" TopLine="243"/>
       </Position18>
       <Position19>
-        <Filename Value="src/view.pas"/>
-        <Caret Line="27" Column="40" TopLine="10"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="349" Column="51" TopLine="318"/>
       </Position19>
       <Position20>
-        <Filename Value="src/view.pas"/>
-        <Caret Line="28" Column="40" TopLine="10"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="223" Column="23" TopLine="196"/>
       </Position20>
       <Position21>
-        <Filename Value="src/view.pas"/>
-        <Caret Line="27" Column="40" TopLine="10"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="387" Column="54" TopLine="364"/>
       </Position21>
       <Position22>
-        <Filename Value="src/view.pas"/>
-        <Caret Line="28" Column="40" TopLine="10"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="386" Column="11" TopLine="346"/>
       </Position22>
       <Position23>
-        <Filename Value="src/view.pas"/>
-        <Caret Line="29" Column="40" TopLine="10"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="374" Column="3" TopLine="355"/>
       </Position23>
       <Position24>
-        <Filename Value="src/view.pas"/>
-        <Caret Line="30" Column="40" TopLine="10"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="235" Column="52" TopLine="198"/>
       </Position24>
       <Position25>
-        <Filename Value="src/view.pas"/>
-        <Caret Line="29" Column="40" TopLine="10"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="239" Column="21" TopLine="176"/>
       </Position25>
       <Position26>
-        <Filename Value="src/view.pas"/>
-        <Caret Line="30" Column="40" TopLine="10"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="379" Column="7" TopLine="339"/>
       </Position26>
       <Position27>
-        <Filename Value="src/view.pas"/>
-        <Caret Line="57" Column="42" TopLine="20"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="387" Column="69" TopLine="343"/>
       </Position27>
       <Position28>
-        <Filename Value="src/view.pas"/>
-        <Caret Line="47" Column="5" TopLine="24"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="381" Column="32" TopLine="342"/>
       </Position28>
       <Position29>
-        <Filename Value="src/view.pas"/>
-        <Caret Line="43" Column="24" TopLine="23"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="230" Column="16" TopLine="205"/>
       </Position29>
       <Position30>
-        <Filename Value="src/view.pas"/>
-        <Caret Line="44" Column="24" TopLine="23"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="427" Column="10" TopLine="396"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

@@ -13,6 +13,12 @@ type
     y: double;
   end;
 
+  tvplotline = record
+    a: double;
+    b: double;
+    c: double;
+  end;
+
   tvplotposition = record
     m: array[0..1] of longint;
     p: tvplotpoint;
@@ -25,6 +31,10 @@ type
     z: double;
     f: double;
     e: double;
+    i: double;
+    j: double;
+    k: double;
+    r: double;
   end;
 
 type
@@ -65,10 +75,12 @@ type
     fvplotinterface: tvplotinterface;
     fvplotposition: tvplotposition;
     fvplotratio: double;
-    procedure linearinterpolation(const point: tvplotpoint);
+    procedure interpolate_line(const p0, p1: tvplotpoint);
+    procedure interpolate_arc (const p0, p1, cc: tvplotpoint);
+
     procedure optimize(var position: tvplotposition);
     procedure moveto(var position: tvplotposition);
-    procedure draw(const x,y,z: double);
+    procedure draw(const code: tvplotcode);
   protected
     procedure execute; override;
   public
@@ -123,24 +135,42 @@ begin
     result := 0;
 end;
 
-procedure parse_g00(const gcode: rawbytestring; var vcode: tvplotcode);
+procedure parse_gxx(const gcode: rawbytestring; var vcode: tvplotcode);
 begin
-  vcode.c  := 'G00';
+  vcode.c  := '';
   vcode.x  := parse_prefix('X', gcode);
   vcode.y  := parse_prefix('Y', gcode);
   vcode.z  := parse_prefix('Z', gcode);
   vcode.f  := parse_prefix('F', gcode);
   vcode.e  := parse_prefix('E', gcode);
+  vcode.i  := parse_prefix('I', gcode);
+  vcode.j  := parse_prefix('J', gcode);
+  vcode.k  := parse_prefix('K', gcode);
+  vcode.r  := parse_prefix('R', gcode);
+end;
+
+procedure parse_g00(const gcode: rawbytestring; var vcode: tvplotcode);
+begin
+  parse_gxx(gcode, vcode);
+  vcode.c := 'G00';
 end;
 
 procedure parse_g01(const gcode: rawbytestring; var vcode: tvplotcode);
 begin
+  parse_gxx(gcode, vcode);
   vcode.c := 'G01';
-  vcode.x  := parse_prefix('X', gcode);
-  vcode.y  := parse_prefix('Y', gcode);
-  vcode.z  := parse_prefix('Z', gcode);
-  vcode.f  := parse_prefix('F', gcode);
-  vcode.e  := parse_prefix('E', gcode);
+end;
+
+procedure parse_g02(const gcode: rawbytestring; var vcode: tvplotcode);
+begin
+  parse_gxx(gcode, vcode);
+  vcode.c := 'G02';
+end;
+
+procedure parse_g03(const gcode: rawbytestring; var vcode: tvplotcode);
+begin
+  parse_gxx(gcode, vcode);
+  vcode.c := 'G03';
 end;
 
 procedure parse_line(const gcode: rawbytestring; var vcode: tvplotcode);
@@ -153,44 +183,62 @@ begin
   vcode.e  := 0;
   if length(gcode) <> 0 then
   begin
-    if pos('G0',  gcode) = 1 then parse_g00(gcode, vcode) else
-    if pos('G1',  gcode) = 1 then parse_g01(gcode, vcode) else
-    if pos('G00', gcode) = 1 then parse_g00(gcode, vcode) else
-    if pos('G01', gcode) = 1 then parse_g01(gcode, vcode) else
-    if pos('G21', gcode) = 1 then vcode.c := 'G21'        else
-    if pos('G28', gcode) = 1 then vcode.c := 'G28';
+    if pos('G0 ',  gcode) = 1 then parse_g00(gcode, vcode) else
+    if pos('G00 ', gcode) = 1 then parse_g00(gcode, vcode) else
+    if pos('G1 ',  gcode) = 1 then parse_g01(gcode, vcode) else
+    if pos('G01 ', gcode) = 1 then parse_g01(gcode, vcode) else
+    if pos('G02 ', gcode) = 1 then parse_g02(gcode, vcode) else
+    if pos('G03 ', gcode) = 1 then parse_g03(gcode, vcode) else
+    if pos('G21 ', gcode) = 1 then vcode.c := 'G21'        else
+    if pos('G28 ', gcode) = 1 then vcode.c := 'G28';
   end;
 end;
 
 // routines //
 
-function translatepoint(base, p: tvplotpoint): tvplotpoint; inline;
+function translatepoint(const cc, p: tvplotpoint): tvplotpoint; inline;
 begin
-  result.x := base.x + p.x;
-  result.y := base.y + p.y;
+  result.x := cc.x + p.x;
+  result.y := cc.y + p.y;
 end;
 
-function rotatepoint(p: tvplotpoint; alfa: double): tvplotpoint; inline;
+function rotatepoint(const p: tvplotpoint; const alpha: double): tvplotpoint; inline;
 begin
-  result.x := p.x * cos(alfa) - p.y * sin(alfa);
-  result.y := p.x * sin(alfa) + p.y * cos(alfa);
+  result.x := p.x * cos(alpha) - p.y * sin(alpha);
+  result.y := p.x * sin(alpha) + p.y * cos(alpha);
 end;
 
-function distancebetween(p1, p2: tvplotpoint): double; inline;
+function distancebetween(const p0, p1: tvplotpoint): double; inline;
 begin
-  result := sqrt(sqr(p2.x - p1.x) + sqr(p2.y - p1.y));
+  result := sqrt(sqr(p1.x - p0.x) + sqr(p1.y - p0.y));
 end;
 
-procedure linebetween(p1, p2: tvplotpoint; var m, q: double); inline;
+function linebetween(const p0, p1: tvplotpoint): tvplotline; inline;
 begin
-  m := (p2.y - p1.y) / (p2.x - p1.x);
-  q :=  p2.y - (m * p2.x);
+  result.a :=  p1.y - p0.y;
+  result.b :=  p0.x - p1.x;
+  result.c := (p1.x - p0.x) * p0.y - (p1.y - p0.y) * p0.x;
 end;
 
-function intersectlines(m1, q1, m2, q2: double): tvplotpoint; inline;
+function lineangle(var line: tvplotline): double; inline;
 begin
-  result.x := -((q2 - q1) / (m2 - m1));
-  result.y := m2 * result.x + q2;
+  if line.b = 0 then
+  begin
+    if line.a > 0 then result := +pi / 2 else
+    if line.a < 0 then result := -pi / 2 else result := 0;
+  end else
+    result := arctan2(line.a, -line.b);
+end;
+
+function intersectlines(const l0, l1: tvplotline; var p: tvplotpoint) :boolean; inline;
+begin
+  if (l0.a * l1.b) <> (l0.b * l1.a) then
+  begin
+    result := true;
+    p.x := (-l0.c * l1.b + l0.b * l1.c) / (l0.a * l1.b - l0.b * l1.a);
+    p.y := (-l0.c - l0.a * p.x) / (l0.b);
+  end else
+    result := false;
 end;
 
 // vplotserver //
@@ -270,15 +318,15 @@ begin
   optimize(fvplotposition);
 end;
 
-procedure tvplotdriver.linearinterpolation(const point: tvplotpoint);
+procedure tvplotdriver.interpolate_line(const p0, p1: tvplotpoint);
 var
   dx: double;
   dy: double;
   i: longint;
   j: longint;
 begin
-  dx := point.x - fvplotposition.p.x;
-  dy := point.y - fvplotposition.p.y;
+  dx := p1.x - p0.x;
+  dy := p1.y - p0.y;
 
   i   := 1;
   while (abs(dx / i) > 0.25) or
@@ -287,78 +335,108 @@ begin
   setlength(fvplotpath, i + 1);
   for j := 0 to i do
   begin
-    fvplotpath[j].p.x := fvplotposition.p.x + (j * (dx / i));
-    fvplotpath[j].p.y := fvplotposition.p.y + (j * (dy / i));
+    fvplotpath[j].p.x := p0.x + (j * (dx / i));
+    fvplotpath[j].p.y := p0.y + (j * (dy / i));
+  end;
+end;
+
+procedure tvplotdriver.interpolate_arc(const p0, p1, cc: tvplotpoint);
+var
+  line0: tvplotline;
+  line1: tvplotline;
+  alpha: double;
+  i, j: longint;
+begin
+  line0 := linebetween(cc, p0);
+  line1 := linebetween(cc, p1);
+
+  writeln('alpha0 = ', radtodeg(lineangle(line0)):2:2);
+  writeln('alpha1 = ', radtodeg(lineangle(line1)):2:2);
+
+  alpha := lineangle(line1) - lineangle(line0);
+
+  i := round(alpha * distancebetween(cc, p1) / 0.2);
+
+  setlength(fvplotpath, i + 1);
+  for j := 0 to i do
+  begin
+    fvplotpath[j].p.x := p1.x - cc.x;
+    fvplotpath[j].p.y := p1.y - cc.y;
+
+    fvplotpath[j].p := rotatepoint(fvplotpath[j].p, (j * (alpha / i)));
+    fvplotpath[j].p := translatepoint(cc, fvplotpath[j].p);
   end;
 end;
 
 procedure tvplotdriver.optimize(var position: tvplotposition);
 var
-    alfa: double;
-   error: double;
-     tmp: array[0..6] of tvplotpoint;
-  m1, m2: double;
-  q1, q2: double;
+  alpha: double;
+  error: double;
+    tmp: array[0..6] of tvplotpoint;
+  line0: tvplotline;
+  line1: tvplotline;
 begin
-  alfa := 0;
+  alpha := 0;
   repeat
     // absolute coordinates
     tmp[0] := fvplot[0];
     tmp[1] := fvplot[1];
-    tmp[2] := translatepoint(position.p, rotatepoint(fvplot[2], alfa));
-    tmp[3] := translatepoint(position.p, rotatepoint(fvplot[3], alfa));
-    tmp[4] := translatepoint(position.p, rotatepoint(fvplot[4], alfa));
-    tmp[5] := translatepoint(position.p, rotatepoint(fvplot[5], alfa));
-    linebetween(tmp[0], tmp[3], m1, q1);
-    linebetween(tmp[1], tmp[4], m2, q2);
-    tmp[6] := intersectlines(m1, q1, m2, q2);
+    tmp[2] := translatepoint(position.p, rotatepoint(fvplot[2], alpha));
+    tmp[3] := translatepoint(position.p, rotatepoint(fvplot[3], alpha));
+    tmp[4] := translatepoint(position.p, rotatepoint(fvplot[4], alpha));
+    tmp[5] := translatepoint(position.p, rotatepoint(fvplot[5], alpha));
+    line0  := linebetween(tmp[0], tmp[3]);
+    line1  := linebetween(tmp[1], tmp[4]);
+
+    if not intersectlines(line0, line1, tmp[6]) then
+      raise exception.create('C0257');
+
+    writeln('[optimize]');
+    writeln(   'R=', fvplotratio:2:6);
+    writeln('ALFA=', radtodeg(alpha):2:6);
+    writeln(' 0.X=', tmp[0].x:6:2);
+    writeln(' 0.Y=', tmp[0].y:6:2);
+    writeln(' 1.X=', tmp[1].x:6:2);
+    writeln(' 1.Y=', tmp[1].y:6:2);
+    writeln(' 2.X=', tmp[2].x:6:2);
+    writeln(' 2.Y=', tmp[2].y:6:2);
+    writeln(' 3.X=', tmp[3].x:6:2);
+    writeln(' 3.Y=', tmp[3].y:6:2);
+    writeln(' 4.X=', tmp[4].x:6:2);
+    writeln(' 4.Y=', tmp[4].y:6:2);
+    writeln(' 5.X=', tmp[5].x:6:2);
+    writeln(' 5.Y=', tmp[5].y:6:2);
+    writeln(' 6.X=', tmp[6].x:6:2);
+    writeln(' 6.Y=', tmp[6].y:6:2);
+
+    writeln('  03=', distancebetween(tmp[0], tmp[3]):6:2);
+    writeln('  14=', distancebetween(tmp[1], tmp[4]):6:2);
+    writeln;
 
     error := abs(tmp[6].y - tmp[5].y);
     if  error > 0.001 then
     begin
       if tmp[6].y < tmp[5].y then
-        alfa := alfa - (error / 100)
+        alpha := alpha - (error / 100)
       else
       if tmp[6].y > tmp[5].y then
-        alfa := alfa + (error / 100);
+        alpha := alpha + (error / 100);
     end else
       break;
+
+
+
+    readln;
+
   until false;
 
   position.m[0] := round(distancebetween(tmp[0], tmp[3]) / fvplotratio);
   position.m[1] := round(distancebetween(tmp[1], tmp[4]) / fvplotratio);
-  (*
-  writeln('[optimize]');
-  writeln(   'R=', fvplotratio:2:6);
-  writeln('ALFA=', radtodeg(alfa):2:6);
-  writeln(' 0.X=', tmp[0].x:6:2);
-  writeln(' 0.Y=', tmp[0].y:6:2);
-  writeln(' 1.X=', tmp[1].x:6:2);
-  writeln(' 1.Y=', tmp[1].y:6:2);
-  writeln(' 2.X=', tmp[2].x:6:2);
-  writeln(' 2.Y=', tmp[2].y:6:2);
-  writeln(' 3.X=', tmp[3].x:6:2);
-  writeln(' 3.Y=', tmp[3].y:6:2);
-  writeln(' 4.X=', tmp[4].x:6:2);
-  writeln(' 4.Y=', tmp[4].y:6:2);
-  writeln(' 5.X=', tmp[5].x:6:2);
-  writeln(' 5.Y=', tmp[5].y:6:2);
-  writeln(' 6.X=', tmp[6].x:6:2);
-  writeln(' 6.Y=', tmp[6].y:6:2);
 
-  writeln('  03=', distancebetween(tmp[0], tmp[3]):6:2);
-  writeln('  14=', distancebetween(tmp[1], tmp[4]):6:2);
-  writeln;
-  *)
 end;
 
 procedure tvplotdriver.moveto(var position: tvplotposition);
 begin
-  if position.p.x < ((1 * fvplot[1].y) / 6) then exit;
-  if position.p.x > ((5 * fvplot[1].y) / 6) then exit;
-  if position.p.y < ((1 * fvplot[1].y) / 6) then exit;
-  if position.p.y > ((5 * fvplot[1].y) / 6) then exit;
-
   optimize(position);
 
   (*
@@ -371,32 +449,49 @@ begin
   fvplotposition := position;
 end;
 
-procedure tvplotdriver.draw(const x, y, z: double);
+procedure tvplotdriver.draw(const code: tvplotcode);
 var
-  i, j: longint;
-  p: tvplotpoint;
+   i,  j: longint;
+  p1, p2, cc: tvplotpoint;
 begin
-  p.x := x;
-  p.y := y;
+  if code.x < ((1 * fvplot[1].y) / 6) then exit;
+  if code.x > ((5 * fvplot[1].y) / 6) then exit;
+  if code.y < ((1 * fvplot[1].y) / 6) then exit;
+  if code.y > ((5 * fvplot[1].y) / 6) then exit;
 
-  if (x > 0) and (y > 0) then
+  setlength(fvplotpath, 0);
+  if (code.c ='G00') or (code.c =  'G0') or
+     (code.c ='G01') or (code.c =  'G1') then
   begin
-    linearinterpolation(p);
-    i := length(fvplotpath);
-    if i > 0 then
-    begin
-      fvplotinterface.point1 := fvplotpath[0].p;
-      fvplotinterface.point2 := fvplotpath[i - 1].p;
-
-      synchronize(fvplotinterface.fsync2);
-      for j := 0 to i do
-        moveto(fvplotpath[j]);
-
-      if z < 0 then
-        synchronize(fvplotinterface.fsync3);
-    end;
+    p1.x := fvplotposition.p.x;
+    p1.y := fvplotposition.p.y;
+    p2.x := code.x;
+    p2.y := code.y;
+    interpolate_line(p1, p2);
+  end else
+  if (code.c ='G02') or (code.c = 'G03') then
+  begin
+    p1.x := fvplotposition.p.x;
+    p1.y := fvplotposition.p.y;
+    p2.x := code.x;
+    p2.y := code.y;
+    cc.x := p1.x + code.i;
+    cc.y := p1.y + code.j;
+    interpolate_arc(p1, p2, cc);
   end;
 
+  i := length(fvplotpath);
+  if i > 0 then
+  begin
+    fvplotinterface.point1 := fvplotpath[0].p;
+    fvplotinterface.point2 := fvplotpath[i - 1].p;
+    synchronize(fvplotinterface.fsync2);
+    for j := 0 to i do
+      moveto(fvplotpath[j]);
+
+    if code.z < 0 then
+      synchronize(fvplotinterface.fsync3);
+  end;
 end;
 
 procedure tvplotdriver.execute;
@@ -408,11 +503,9 @@ begin
     if not fvplotinterface.suspended then
     begin
       parse_line(parse_comment(fvplotinterface.code), code);
-      if (code.c ='G00') or (code.c = 'G0') then
-        draw(code.x, code.y, code.z)
-      else
-      if (code.c ='G01') or (code.c = 'G1') then
-        draw(code.x, code.y, code.z);
+      if (code.c ='G00') or (code.c =  'G0') then draw(code) else
+      if (code.c ='G01') or (code.c =  'G1') then draw(code) else
+      if (code.c ='G02') or (code.c = 'G03') then draw(code);
       synchronize(fvplotinterface.fsync4);
     end;
     sleep(100);

@@ -94,10 +94,10 @@ procedure Tmainform.formsync2;
 begin
   with vplotinterface do
   begin
-    viewform.image.canvas.pen.color   := clred;
-    viewform.image.canvas.brush.color := clred;
-    viewform.image.canvas.brush.style := bssolid;
-    viewform.image.canvas.Line(
+    previewform.image.canvas.pen.color   := clred;
+    previewform.image.canvas.brush.color := clred;
+    previewform.image.canvas.brush.style := bssolid;
+    previewform.image.canvas.Line(
       round(point1.y),
       round(point1.x),
       round(point2.y),
@@ -109,10 +109,10 @@ procedure Tmainform.formsync3;
 begin
   with vplotinterface do
   begin
-    viewform.image.canvas.pen.color   := clblack;
-    viewform.image.canvas.brush.color := clblack;
-    viewform.image.canvas.brush.style := bssolid;
-    viewform.image.canvas.Line(
+    previewform.image.canvas.pen.color   := clblack;
+    previewform.image.canvas.brush.color := clblack;
+    previewform.image.canvas.brush.style := bssolid;
+    previewform.image.canvas.Line(
       round(point1.y),
       round(point1.x),
       round(point2.y),
@@ -166,11 +166,11 @@ end;
 
 procedure tmainform.showviewformClick(Sender: TObject);
 begin
-  viewform.top    := top;
-  viewform.left   := left + width + 16;
-  viewform.height := height;
-  viewform.width  := width;
-  viewform.show;
+  previewform.top    := top;
+  previewform.left   := left + width + 16;
+  previewform.height := height;
+  previewform.width  := width;
+  previewform.show;
 end;
 
 procedure tmainform.loadbtnclick(sender: tobject);
@@ -184,7 +184,7 @@ begin
     playbtn.enabled := true;
 
     vplotdriver.initialize;
-    viewform.clear;
+    previewform.clear;
     x := 0;
   end;
 end;

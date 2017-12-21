@@ -1,4 +1,4 @@
-object viewform: Tviewform
+object previewform: Tpreviewform
   Left = 804
   Height = 450
   Top = 190

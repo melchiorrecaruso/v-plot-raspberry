@@ -9,9 +9,9 @@ uses
 
 type
 
-  { tviewform }
+  { tpreviewform }
 
-  tviewform = class(tform)
+  tpreviewform = class(tform)
     image: timage;
     scrat: tmenuitem;
     popup: tpopupmenu;
@@ -23,15 +23,15 @@ type
   end;
 
 var
-  viewform: tviewform;
+  previewform: tpreviewform;
 
 implementation
 
 {$R *.lfm}
 
-{ tviewform }
+{ Tpreviewform }
 
-procedure tviewform.scratclick(sender: tobject);
+procedure tpreviewform.scratclick(sender: tobject);
 begin
   scrat.checked:= not scrat.checked;
 
@@ -53,7 +53,7 @@ begin
   image.align:= alclient
 end;
 
-procedure tviewform.clear;
+procedure tpreviewform.clear;
 begin
   image.picture.bitmap.setsize(1500, 1500);
 
