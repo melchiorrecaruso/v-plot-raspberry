@@ -316,8 +316,6 @@ begin
   freeandnil(ini);
   // ---
   fvplotposition.p   := fvplot[6];
-  fvplotposition.p.x := 250;
-  fvplotposition.p.y := 850;
   optimize(fvplotposition);
 end;
 
@@ -349,6 +347,7 @@ var
   line1: tvplotline;
   alpha: double;
   i, j: longint;
+  cc2: tvplotpoint;
 begin
   line0 := linebetween(cc, p0);
   line1 := linebetween(cc, p1);
@@ -358,16 +357,19 @@ begin
 
   alpha := lineangle(line1) - lineangle(line0);
 
-  i := round(alpha * distancebetween(cc, p1) / 0.2);
+  i := round(alpha * distancebetween(cc, p1) / 0.25);
 
   setlength(fvplotpath, i + 1);
   for j := 0 to i do
   begin
-    fvplotpath[j].p.x := p1.x - cc.x;
-    fvplotpath[j].p.y := p1.y - cc.y;
+    cc2.x := p0.x - cc.x;
+    cc2.y := p0.y - cc.y;
 
-    fvplotpath[j].p := rotatepoint(fvplotpath[j].p, (j * (alpha / i)));
-    fvplotpath[j].p := translatepoint(cc, fvplotpath[j].p);
+    fvplotpath[j].p.x := - cc.x;
+    fvplotpath[j].p.y := - cc.y;
+
+    fvplotpath[j].p := rotatepoint(fvplotpath[j], (j * (alpha / i)));
+    fvplotpath[j].p := translatepoint(cc2, fvplotpath[j].p);
   end;
 end;
 
@@ -390,6 +392,7 @@ begin
     tmp[5] := translatepoint(position.p, rotatepoint(fvplot[5], alpha));
     line0  := linebetween(tmp[0], tmp[3]);
     line1  := linebetween(tmp[1], tmp[4]);
+
     intersectlines(line0, line1, tmp[6]);
 
     (*
@@ -427,31 +430,27 @@ begin
     end else
       break;
 
-
   until false;
 
   position.m[0] := round(distancebetween(tmp[0], tmp[3]) / fvplotratio);
   position.m[1] := round(distancebetween(tmp[1], tmp[4]) / fvplotratio);
-
 end;
 
 procedure tvplotdriver.moveto(var position: tvplotposition);
 begin
   optimize(position);
-
   (*
   writeln('[moveto]');
   writeln('DELTA STEPS M1 = ', ds1, '(', fvplotposition.m1, ')');
   writeln('DELTA STEPS M2 = ', ds2, '(', fvplotposition.m2, ')');
   writeln;
   *)
-
   fvplotposition := position;
 end;
 
 procedure tvplotdriver.draw(const code: tvplotcode);
 var
-   i,  j: longint;
+  i, j: longint;
   p1, p2, cc: tvplotpoint;
 begin
   if code.x < ((1 * fvplot[1].y) / 6) then exit;
@@ -508,7 +507,7 @@ begin
       if (code.c ='G02') or (code.c = 'G03') then draw(code);
       synchronize(fvplotinterface.fsync4);
     end;
-    // sleep(100);
+
   until false;
 end;
 
