@@ -181,6 +181,10 @@ begin
   vcode.z  := 0;
   vcode.f  := 0;
   vcode.e  := 0;
+  vcode.i  := 0;
+  vcode.j  := 0;
+  vcode.k  := 0;
+  vcode.r  := 0;
   if length(gcode) <> 0 then
   begin
     if pos('G0 ',  gcode) = 1 then parse_g00(gcode, vcode) else
@@ -230,15 +234,14 @@ begin
     result := arctan2(line.a, -line.b);
 end;
 
-function intersectlines(const l0, l1: tvplotline; var p: tvplotpoint) :boolean; inline;
+procedure intersectlines(const l0, l1: tvplotline; var p: tvplotpoint); inline;
 begin
   if (l0.a * l1.b) <> (l0.b * l1.a) then
   begin
-    result := true;
     p.x := (-l0.c * l1.b + l0.b * l1.c) / (l0.a * l1.b - l0.b * l1.a);
     p.y := (-l0.c - l0.a * p.x) / (l0.b);
   end else
-    result := false;
+    raise exception.create('C0257');
 end;
 
 // vplotserver //
@@ -312,9 +315,9 @@ begin
   // ---
   freeandnil(ini);
   // ---
-  fvplotposition.p := fvplot[6];
+  fvplotposition.p   := fvplot[6];
   fvplotposition.p.x := 250;
-  fvplotposition.p.y := 250;
+  fvplotposition.p.y := 850;
   optimize(fvplotposition);
 end;
 
@@ -350,8 +353,8 @@ begin
   line0 := linebetween(cc, p0);
   line1 := linebetween(cc, p1);
 
-  writeln('alpha0 = ', radtodeg(lineangle(line0)):2:2);
-  writeln('alpha1 = ', radtodeg(lineangle(line1)):2:2);
+  //writeln('alpha0 = ', radtodeg(lineangle(line0)):2:2);
+  //writeln('alpha1 = ', radtodeg(lineangle(line1)):2:2);
 
   alpha := lineangle(line1) - lineangle(line0);
 
@@ -387,10 +390,9 @@ begin
     tmp[5] := translatepoint(position.p, rotatepoint(fvplot[5], alpha));
     line0  := linebetween(tmp[0], tmp[3]);
     line1  := linebetween(tmp[1], tmp[4]);
+    intersectlines(line0, line1, tmp[6]);
 
-    if not intersectlines(line0, line1, tmp[6]) then
-      raise exception.create('C0257');
-
+    (*
     writeln('[optimize]');
     writeln(   'R=', fvplotratio:2:6);
     writeln('ALFA=', radtodeg(alpha):2:6);
@@ -412,6 +414,7 @@ begin
     writeln('  03=', distancebetween(tmp[0], tmp[3]):6:2);
     writeln('  14=', distancebetween(tmp[1], tmp[4]):6:2);
     writeln;
+    *)
 
     error := abs(tmp[6].y - tmp[5].y);
     if  error > 0.001 then
@@ -424,9 +427,6 @@ begin
     end else
       break;
 
-
-
-    readln;
 
   until false;
 
@@ -477,17 +477,17 @@ begin
     p2.y := code.y;
     cc.x := p1.x + code.i;
     cc.y := p1.y + code.j;
-    interpolate_arc(p1, p2, cc);
+    // interpolate_arc(p1, p2, cc);
   end;
 
-  i := length(fvplotpath);
-  if i > 0 then
+  j := length(fvplotpath);
+  if j > 0 then
   begin
     fvplotinterface.point1 := fvplotpath[0].p;
-    fvplotinterface.point2 := fvplotpath[i - 1].p;
+    fvplotinterface.point2 := fvplotpath[j - 1].p;
     synchronize(fvplotinterface.fsync2);
-    for j := 0 to i do
-      moveto(fvplotpath[j]);
+    for i := 0 to j - 1 do
+      moveto(fvplotpath[i]);
 
     if code.z < 0 then
       synchronize(fvplotinterface.fsync3);
@@ -508,7 +508,7 @@ begin
       if (code.c ='G02') or (code.c = 'G03') then draw(code);
       synchronize(fvplotinterface.fsync4);
     end;
-    sleep(100);
+    // sleep(100);
   until false;
 end;
 
