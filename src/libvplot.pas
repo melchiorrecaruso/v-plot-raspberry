@@ -315,29 +315,26 @@ begin
   // ---
   freeandnil(ini);
   // ---
-  fvplotposition.p   := fvplot[6];
+  fvplotposition.p := fvplot[6];
   optimize(fvplotposition);
 end;
 
 procedure tvplotdriver.interpolate_line(const p0, p1: tvplotpoint);
 var
-  dx: double;
-  dy: double;
-  i: longint;
-  j: longint;
+  dx, dy: double;
+  i, j: longint;
 begin
-  dx := p1.x - p0.x;
-  dy := p1.y - p0.y;
+  i := round(abs(distancebetween(p0, p1) / 0.25));
 
-  i   := 1;
-  while (abs(dx / i) > 0.25) or
-        (abs(dy / i) > 0.25) do inc(i);
+  dx := (p1.x - p0.x) / i;
+  dy := (p1.y - p0.y) / i;
 
   setlength(fvplotpath, i + 1);
   for j := 0 to i do
   begin
-    fvplotpath[j].p.x := p0.x + (j * (dx / i));
-    fvplotpath[j].p.y := p0.y + (j * (dy / i));
+    fvplotpath[j].p.x := j * dx;
+    fvplotpath[j].p.y := j * dy;
+    fvplotpath[j].p   := translatepoint(p0, fvplotpath[j].p);
   end;
 end;
 
@@ -347,29 +344,32 @@ var
   line1: tvplotline;
   alpha: double;
   i, j: longint;
-  cc2: tvplotpoint;
+  tmp: array[0..3] of tvplotpoint;
 begin
-  line0 := linebetween(cc, p0);
-  line1 := linebetween(cc, p1);
+  tmp[0].x := 0;
+  tmp[0].y := 0;
+  tmp[1].x := -cc.x;
+  tmp[1].y := -cc.y;
+  tmp[2].x := (p1.x - p0.x) - cc.x;
+  tmp[2].y := (p1.y - p0.y) - cc.y;
+  tmp[3].x := p0.x + cc.x;
+  tmp[3].y := p0.y + cc.y;
 
-  //writeln('alpha0 = ', radtodeg(lineangle(line0)):2:2);
-  //writeln('alpha1 = ', radtodeg(lineangle(line1)):2:2);
-
+  line0 := linebetween(tmp[0], tmp[1]);
+  line1 := linebetween(tmp[0], tmp[2]);
   alpha := lineangle(line1) - lineangle(line0);
 
-  i := round(alpha * distancebetween(cc, p1) / 0.25);
+  writeln('alpha0 = ', radtodeg(lineangle(line0)):2:2);
+  writeln('alpha1 = ', radtodeg(lineangle(line1)):2:2);
+  writeln('alpha  = ', radtodeg(alpha):2:2);
+
+  i := round(alpha * distancebetween(tmp[0], tmp[1]) / 0.25);
 
   setlength(fvplotpath, i + 1);
   for j := 0 to i do
   begin
-    cc2.x := p0.x - cc.x;
-    cc2.y := p0.y - cc.y;
-
-    fvplotpath[j].p.x := - cc.x;
-    fvplotpath[j].p.y := - cc.y;
-
-    fvplotpath[j].p := rotatepoint(fvplotpath[j], (j * (alpha / i)));
-    fvplotpath[j].p := translatepoint(cc2, fvplotpath[j].p);
+    fvplotpath[j].p := rotatepoint(tmp[1], (j * (alpha / i)));
+    fvplotpath[j].p := translatepoint(tmp[3], fvplotpath[j].p);
   end;
 end;
 
@@ -417,6 +417,7 @@ begin
     writeln('  03=', distancebetween(tmp[0], tmp[3]):6:2);
     writeln('  14=', distancebetween(tmp[1], tmp[4]):6:2);
     writeln;
+    readln;
     *)
 
     error := abs(tmp[6].y - tmp[5].y);

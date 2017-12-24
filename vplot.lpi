@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="10"/>
+    <Version Value="11"/>
     <General>
       <MainUnit Value="0"/>
       <Title Value="VPlot Driver"/>
-      <UseXPManifest Value="True"/>
+      <UseAppBundle Value="False"/>
       <Icon Value="0"/>
     </General>
     <BuildModes Count="1" Active="Default">
@@ -15,9 +15,10 @@
       <Version Value="2"/>
     </PublishOptions>
     <RunParams>
-      <local>
-        <FormatVersion Value="1"/>
-      </local>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default"/>
+      </Modes>
     </RunParams>
     <RequiredPackages Count="2">
       <Item1>
@@ -32,7 +33,7 @@
         <Filename Value="vplot.lpr"/>
         <IsPartOfProject Value="True"/>
         <CursorPos Y="17"/>
-        <UsageCount Value="128"/>
+        <UsageCount Value="133"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -42,9 +43,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="152"/>
-        <CursorPos X="22" Y="159"/>
-        <UsageCount Value="128"/>
+        <TopLine Value="151"/>
+        <CursorPos X="42" Y="183"/>
+        <UsageCount Value="133"/>
         <Loaded Value="True"/>
       </Unit1>
       <Unit2>
@@ -52,10 +53,10 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="318"/>
-        <CursorPos X="33" Y="365"/>
-        <FoldState Value=" T3jG0B9 piajQ0303211\"/>
-        <UsageCount Value="128"/>
+        <TopLine Value="391"/>
+        <CursorPos X="7" Y="421"/>
+        <FoldState Value=" T3jG0B8131212m"/>
+        <UsageCount Value="133"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
@@ -66,8 +67,8 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="2"/>
         <TopLine Value="19"/>
-        <CursorPos X="12" Y="56"/>
-        <UsageCount Value="72"/>
+        <CursorPos Y="57"/>
+        <UsageCount Value="77"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
@@ -196,119 +197,119 @@
     <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="348" Column="41" TopLine="243"/>
+        <Caret Line="316" TopLine="260"/>
       </Position1>
       <Position2>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="349" Column="51" TopLine="318"/>
+        <Caret Line="73" Column="5" TopLine="52"/>
       </Position2>
       <Position3>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="223" Column="23" TopLine="196"/>
+        <Caret Line="211" TopLine="204"/>
       </Position3>
       <Position4>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="387" Column="54" TopLine="364"/>
+        <Caret Line="396" Column="7" TopLine="333"/>
       </Position4>
       <Position5>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="386" Column="11" TopLine="346"/>
+        <Caret Line="245" Column="38" TopLine="215"/>
       </Position5>
       <Position6>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="374" Column="3" TopLine="355"/>
+        <Caret Line="240" Column="8" TopLine="220"/>
       </Position6>
       <Position7>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="235" Column="52" TopLine="198"/>
+        <Caret Line="356" Column="3" TopLine="28"/>
       </Position7>
       <Position8>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="239" Column="21" TopLine="176"/>
+        <Caret Line="357" Column="5" TopLine="322"/>
       </Position8>
       <Position9>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="379" Column="7" TopLine="339"/>
+        <Caret Line="356" Column="5" TopLine="322"/>
       </Position9>
       <Position10>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="387" Column="69" TopLine="343"/>
+        <Caret Line="357" Column="5" TopLine="323"/>
       </Position10>
       <Position11>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="381" Column="32" TopLine="342"/>
+        <Caret Line="396" Column="5" TopLine="376"/>
       </Position11>
       <Position12>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="230" Column="16" TopLine="205"/>
+        <Caret Line="397" Column="5" TopLine="376"/>
       </Position12>
       <Position13>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="427" Column="10" TopLine="396"/>
+        <Caret Line="416" Column="5" TopLine="383"/>
       </Position13>
       <Position14>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="316" TopLine="260"/>
+        <Caret Line="443" Column="3" TopLine="422"/>
       </Position14>
       <Position15>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="73" Column="5" TopLine="52"/>
+        <Caret Line="444" Column="3" TopLine="422"/>
       </Position15>
       <Position16>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="211" TopLine="204"/>
+        <Caret Line="445" Column="3" TopLine="422"/>
       </Position16>
       <Position17>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="396" Column="7" TopLine="333"/>
+        <Caret Line="360" Column="40" TopLine="322"/>
       </Position17>
       <Position18>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="245" Column="38" TopLine="215"/>
+        <Caret Line="357" Column="25" TopLine="348"/>
       </Position18>
       <Position19>
-        <Filename Value="src/libvplot.pas"/>
-        <Caret Line="240" Column="8" TopLine="220"/>
+        <Filename Value="src/main.pas"/>
+        <Caret Line="159" Column="10" TopLine="152"/>
       </Position19>
       <Position20>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="356" Column="3" TopLine="28"/>
+        <Caret Line="328" Column="25" TopLine="312"/>
       </Position20>
       <Position21>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="357" Column="5" TopLine="322"/>
+        <Caret Line="329" Column="29" TopLine="316"/>
       </Position21>
       <Position22>
-        <Filename Value="src/libvplot.pas"/>
-        <Caret Line="356" Column="5" TopLine="322"/>
+        <Filename Value="vplot.lpr"/>
+        <Caret Line="17"/>
       </Position22>
       <Position23>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="357" Column="5" TopLine="323"/>
+        <Caret Line="337" Column="43" TopLine="243"/>
       </Position23>
       <Position24>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="396" Column="5" TopLine="376"/>
+        <Caret Line="339" Column="60" TopLine="261"/>
       </Position24>
       <Position25>
-        <Filename Value="src/libvplot.pas"/>
-        <Caret Line="397" Column="5" TopLine="376"/>
+        <Filename Value="src/main.pas"/>
+        <Caret Line="159" TopLine="152"/>
       </Position25>
       <Position26>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="416" Column="5" TopLine="383"/>
+        <Caret Line="324" Column="33" TopLine="247"/>
       </Position26>
       <Position27>
-        <Filename Value="src/libvplot.pas"/>
-        <Caret Line="443" Column="3" TopLine="422"/>
+        <Filename Value="src/main.pas"/>
+        <Caret Line="158" TopLine="152"/>
       </Position27>
       <Position28>
         <Filename Value="src/libvplot.pas"/>
-        <Caret Line="444" Column="3" TopLine="422"/>
+        <Caret Line="351" Column="33" TopLine="335"/>
       </Position28>
       <Position29>
-        <Filename Value="src/libvplot.pas"/>
-        <Caret Line="445" Column="3" TopLine="422"/>
+        <Filename Value="src/view.pas"/>
+        <Caret Line="57" TopLine="19"/>
       </Position29>
     </JumpHistory>
   </ProjectOptions>
@@ -333,7 +334,7 @@
     <CodeGeneration>
       <SmartLinkUnit Value="True"/>
       <Optimizations>
-        <OptimizationLevel Value="4"/>
+        <OptimizationLevel Value="3"/>
       </Optimizations>
     </CodeGeneration>
     <Linking>
