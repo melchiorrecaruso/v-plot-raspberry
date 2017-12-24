@@ -228,8 +228,7 @@ function lineangle(var line: tvplotline): double; inline;
 begin
   if line.b = 0 then
   begin
-    if line.a > 0 then result := +pi / 2 else
-    if line.a < 0 then result := -pi / 2 else result := 0;
+    result := pi / 2;
   end else
     result := arctan2(line.a, -line.b);
 end;
@@ -241,7 +240,7 @@ begin
     p.x := (-l0.c * l1.b + l0.b * l1.c) / (l0.a * l1.b - l0.b * l1.a);
     p.y := (-l0.c - l0.a * p.x) / (l0.b);
   end else
-    raise exception.create('C0257');
+    writeln('C0257');
 end;
 
 // vplotserver //
@@ -316,8 +315,6 @@ begin
   freeandnil(ini);
   // ---
   fvplotposition.p := fvplot[6];
-  fvplotposition.p.x := 250;
-  fvplotposition.p.y := 250;
   optimize(fvplotposition);
 end;
 
@@ -326,7 +323,7 @@ var
   dx, dy: double;
   i, j: longint;
 begin
-  i := round(abs(distancebetween(p0, p1) / 0.25));
+  i := max(1, round(abs(distancebetween(p0, p1) / 0.25)));
 
   dx := (p1.x - p0.x) / i;
   dy := (p1.y - p0.y) / i;
@@ -346,32 +343,33 @@ var
   line1: tvplotline;
   alpha: double;
   i, j: longint;
-  tmp: array[0..3] of tvplotpoint;
+  tmp: array[0..2] of tvplotpoint;
 begin
-  tmp[0].x := 0;
-  tmp[0].y := 0;
-  tmp[1].x := -cc.x;
-  tmp[1].y := -cc.y;
-  tmp[2].x := (p1.x - p0.x) - cc.x;
-  tmp[2].y := (p1.y - p0.y) - cc.y;
-  tmp[3].x := p0.x + cc.x;
-  tmp[3].y := p0.y + cc.y;
+  tmp[0].x := p0.x - cc.x;
+  tmp[0].y := p0.y - cc.y;
+  tmp[1].x := p1.x - cc.x;
+  tmp[1].y := p1.y - cc.y;
+  tmp[2].x := 0;
+  tmp[2].y := 0;
 
-  line0 := linebetween(tmp[0], tmp[1]);
-  line1 := linebetween(tmp[0], tmp[2]);
+  line0 := linebetween(tmp[2], tmp[0]);
+  line1 := linebetween(tmp[2], tmp[1]);
   alpha := lineangle(line1) - lineangle(line0);
+
+
+  if alpha = 0 then alpha := 2 * pi;
 
   writeln('alpha0 = ', radtodeg(lineangle(line0)):2:2);
   writeln('alpha1 = ', radtodeg(lineangle(line1)):2:2);
   writeln('alpha  = ', radtodeg(alpha):2:2);
 
-  i := round(alpha * distancebetween(tmp[0], tmp[1]) / 0.25);
+  i := max(1, round(alpha * distancebetween(tmp[2], tmp[0]) / 0.25));
 
   setlength(fvplotpath, i + 1);
   for j := 0 to i do
   begin
-    fvplotpath[j].p := rotatepoint(tmp[1], (j * (alpha / i)));
-    fvplotpath[j].p := translatepoint(tmp[3], fvplotpath[j].p);
+    fvplotpath[j].p := rotatepoint(tmp[0], (j * (alpha / i)));
+    fvplotpath[j].p := translatepoint(cc, fvplotpath[j].p);
   end;
 end;
 
@@ -462,8 +460,8 @@ begin
   if code.y > ((5 * fvplot[1].y) / 6) then exit;
 
   setlength(fvplotpath, 0);
-  if (code.c ='G00') or (code.c =  'G0') or
-     (code.c ='G01') or (code.c =  'G1') then
+  if (code.c ='G00') or (code.c = 'G0') or
+     (code.c ='G01') or (code.c = 'G1') then
   begin
     p1.x := fvplotposition.p.x;
     p1.y := fvplotposition.p.y;
@@ -479,7 +477,7 @@ begin
     p2.y := code.y;
     cc.x := p1.x + code.i;
     cc.y := p1.y + code.j;
-    // interpolate_arc(p1, p2, cc);
+    interpolate_arc(p1, p2, cc);
   end;
 
   j := length(fvplotpath);
@@ -501,7 +499,6 @@ var
   code: tvplotcode;
 begin
   repeat
-    sleep(100);
     synchronize(fvplotinterface.fsync1);
     if not fvplotinterface.suspended then
     begin
@@ -511,6 +508,7 @@ begin
       if (code.c ='G02') or (code.c = 'G03') then draw(code);
       synchronize(fvplotinterface.fsync4);
     end;
+    sleep(100);
   until false;
 end;
 

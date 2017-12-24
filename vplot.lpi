@@ -34,12 +34,12 @@
         <PackageName Value="LCL"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="22">
+    <Units Count="23">
       <Unit0>
         <Filename Value="vplot.lpr"/>
         <IsPartOfProject Value="True"/>
         <CursorPos X="13" Y="18"/>
-        <UsageCount Value="134"/>
+        <UsageCount Value="136"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -49,9 +49,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="58"/>
+        <TopLine Value="101"/>
         <CursorPos X="27" Y="56"/>
-        <UsageCount Value="134"/>
+        <UsageCount Value="136"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -60,10 +60,10 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="397"/>
-        <CursorPos X="7" Y="423"/>
-        <FoldState Value=" T3jG0B811112]3h"/>
-        <UsageCount Value="134"/>
+        <TopLine Value="213"/>
+        <CursorPos X="32" Y="233"/>
+        <FoldState Value=" T3jG0B81141g"/>
+        <UsageCount Value="136"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
@@ -75,7 +75,7 @@
         <EditorIndex Value="2"/>
         <TopLine Value="25"/>
         <CursorPos X="39" Y="28"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="80"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
@@ -207,8 +207,15 @@
         <CursorPos X="17" Y="1667"/>
         <UsageCount Value="10"/>
       </Unit21>
+      <Unit22>
+        <Filename Value="../../fpc/source/rtl/inc/mathh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="73"/>
+        <CursorPos X="14" Y="93"/>
+        <UsageCount Value="10"/>
+      </Unit22>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="src/libvplot.pas"/>
         <Caret Line="240" Column="8" TopLine="220"/>
@@ -325,6 +332,10 @@
         <Filename Value="src/libvplot.pas"/>
         <Caret Line="389" Column="71" TopLine="252"/>
       </Position29>
+      <Position30>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="233" Column="15" TopLine="213"/>
+      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
