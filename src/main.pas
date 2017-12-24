@@ -54,7 +54,7 @@ implementation
 uses
   libvplot, view;
 
-{$R *.lfm}
+{$R main.lfm}
 
 { tmainform }
 

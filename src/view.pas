@@ -27,7 +27,7 @@ var
 
 implementation
 
-{$R *.lfm}
+{$R view.lfm}
 
 { Tpreviewform }
 

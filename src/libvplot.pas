@@ -248,8 +248,8 @@ end;
 
 constructor tvplotdriver.create(vplotinterface: tvplotinterface);
 begin
-  inherited create(false);
   fvplotinterface := vplotinterface;
+  inherited create(false);
 end;
 
 destructor tvplotdriver.destroy;
@@ -316,6 +316,8 @@ begin
   freeandnil(ini);
   // ---
   fvplotposition.p := fvplot[6];
+  fvplotposition.p.x := 250;
+  fvplotposition.p.y := 250;
   optimize(fvplotposition);
 end;
 
@@ -411,13 +413,13 @@ begin
     writeln(' 4.Y=', tmp[4].y:6:2);
     writeln(' 5.X=', tmp[5].x:6:2);
     writeln(' 5.Y=', tmp[5].y:6:2);
+
     writeln(' 6.X=', tmp[6].x:6:2);
     writeln(' 6.Y=', tmp[6].y:6:2);
 
     writeln('  03=', distancebetween(tmp[0], tmp[3]):6:2);
     writeln('  14=', distancebetween(tmp[1], tmp[4]):6:2);
     writeln;
-    readln;
     *)
 
     error := abs(tmp[6].y - tmp[5].y);
@@ -483,7 +485,7 @@ begin
   j := length(fvplotpath);
   if j > 0 then
   begin
-    fvplotinterface.point1 := fvplotpath[0].p;
+    fvplotinterface.point1 := fvplotpath[    0].p;
     fvplotinterface.point2 := fvplotpath[j - 1].p;
     synchronize(fvplotinterface.fsync2);
     for i := 0 to j - 1 do
@@ -499,6 +501,7 @@ var
   code: tvplotcode;
 begin
   repeat
+    sleep(100);
     synchronize(fvplotinterface.fsync1);
     if not fvplotinterface.suspended then
     begin
@@ -508,7 +511,6 @@ begin
       if (code.c ='G02') or (code.c = 'G03') then draw(code);
       synchronize(fvplotinterface.fsync4);
     end;
-
   until false;
 end;
 

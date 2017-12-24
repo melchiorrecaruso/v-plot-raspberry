@@ -1,7 +1,7 @@
 object mainform: Tmainform
-  Left = 461
+  Left = 489
   Height = 450
-  Top = 184
+  Top = 192
   Width = 553
   Caption = 'VPlot Driver'
   ClientHeight = 450
