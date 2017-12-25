@@ -76,7 +76,7 @@ type
     fvplotposition: tvplotposition;
     fvplotratio: double;
     procedure interpolate_line(const p0, p1: tvplotpoint);
-    procedure interpolate_arc (const p0, p1, cc: tvplotpoint);
+    procedure interpolate_arc (const p0, p1, cc: tvplotpoint; clockwise: boolean);
 
     procedure optimize(var position: tvplotposition);
     procedure moveto(var position: tvplotposition);
@@ -228,7 +228,10 @@ function lineangle(var line: tvplotline): double; inline;
 begin
   if line.b = 0 then
   begin
-    result := pi / 2;
+    if line.a > 0 then
+      result := +pi / 2
+    else
+      result := -pi / 2;
   end else
     result := arctan2(line.a, -line.b);
 end;
@@ -337,7 +340,7 @@ begin
   end;
 end;
 
-procedure tvplotdriver.interpolate_arc(const p0, p1, cc: tvplotpoint);
+procedure tvplotdriver.interpolate_arc(const p0, p1, cc: tvplotpoint; clockwise: boolean);
 var
   line0: tvplotline;
   line1: tvplotline;
@@ -352,20 +355,41 @@ begin
   tmp[2].x := 0;
   tmp[2].y := 0;
 
+  writeln('p0.x ', p0.x:2:2);
+  writeln('p0.y ', p0.y:2:2);
+  writeln('p1.x ', p1.x:2:2);
+  writeln('p1.y ', p1.y:2:2);
+
   line0 := linebetween(tmp[2], tmp[0]);
   line1 := linebetween(tmp[2], tmp[1]);
   alpha := lineangle(line1) - lineangle(line0);
 
+  if alpha = 0 then
+    alpha := 2 * pi;
 
-  if alpha = 0 then alpha := 2 * pi;
+  if clockwise then
+    alpha := -abs(alpha)
+  else
+    alpha := +abs(alpha);
+
+
 
   writeln('alpha0 = ', radtodeg(lineangle(line0)):2:2);
   writeln('alpha1 = ', radtodeg(lineangle(line1)):2:2);
   writeln('alpha  = ', radtodeg(alpha):2:2);
 
-  i := max(1, round(alpha * distancebetween(tmp[2], tmp[0]) / 0.25));
+
+
+
+
+
+  i := max(1, round(abs(alpha) * distancebetween(tmp[2], tmp[0]) / 0.25));
 
   setlength(fvplotpath, i + 1);
+
+  writeln('i ', i);
+
+
   for j := 0 to i do
   begin
     fvplotpath[j].p := rotatepoint(tmp[0], (j * (alpha / i)));
@@ -440,19 +464,21 @@ end;
 procedure tvplotdriver.moveto(var position: tvplotposition);
 begin
   optimize(position);
+
   (*
   writeln('[moveto]');
   writeln('DELTA STEPS M1 = ', ds1, '(', fvplotposition.m1, ')');
   writeln('DELTA STEPS M2 = ', ds2, '(', fvplotposition.m2, ')');
   writeln;
   *)
+
   fvplotposition := position;
 end;
 
 procedure tvplotdriver.draw(const code: tvplotcode);
 var
   i, j: longint;
-  p1, p2, cc: tvplotpoint;
+  p0, p1, cc: tvplotpoint;
 begin
   if code.x < ((1 * fvplot[1].y) / 6) then exit;
   if code.x > ((5 * fvplot[1].y) / 6) then exit;
@@ -463,35 +489,36 @@ begin
   if (code.c ='G00') or (code.c = 'G0') or
      (code.c ='G01') or (code.c = 'G1') then
   begin
-    p1.x := fvplotposition.p.x;
-    p1.y := fvplotposition.p.y;
-    p2.x := code.x;
-    p2.y := code.y;
-    interpolate_line(p1, p2);
+    p0.x := fvplotposition.p.x;
+    p0.y := fvplotposition.p.y;
+    p1.x := code.x;
+    p1.y := code.y;
+    interpolate_line(p0, p1);
   end else
   if (code.c ='G02') or (code.c = 'G03') then
   begin
-    p1.x := fvplotposition.p.x;
-    p1.y := fvplotposition.p.y;
-    p2.x := code.x;
-    p2.y := code.y;
-    cc.x := p1.x + code.i;
-    cc.y := p1.y + code.j;
-    interpolate_arc(p1, p2, cc);
+    p0.x := fvplotposition.p.x;
+    p0.y := fvplotposition.p.y;
+    p1.x := code.x;
+    p1.y := code.y;
+    cc.x := p0.x + code.i;
+    cc.y := p0.y + code.j;
+    interpolate_arc(p0, p1, cc, code.c = 'G02');
   end;
 
   j := length(fvplotpath);
   if j > 0 then
-  begin
-    fvplotinterface.point1 := fvplotpath[    0].p;
-    fvplotinterface.point2 := fvplotpath[j - 1].p;
-    synchronize(fvplotinterface.fsync2);
     for i := 0 to j - 1 do
-      moveto(fvplotpath[i]);
+    begin
+      fvplotinterface.point1 := fvplotposition.p;
+      fvplotinterface.point2 := fvplotpath[i].p;
 
-    if code.z < 0 then
-      synchronize(fvplotinterface.fsync3);
-  end;
+      synchronize(fvplotinterface.fsync2);
+      moveto(fvplotpath[i]);
+      if code.z < 0 then
+        synchronize(fvplotinterface.fsync3);
+
+    end;
 end;
 
 procedure tvplotdriver.execute;
