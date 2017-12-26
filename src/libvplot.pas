@@ -344,7 +344,9 @@ procedure tvplotdriver.interpolate_arc(const p0, p1, cc: tvplotpoint; clockwise:
 var
   line0: tvplotline;
   line1: tvplotline;
-  alpha: double;
+  angle0: double;
+  angle1: double;
+  sweep:  double;
   i, j: longint;
   tmp: array[0..2] of tvplotpoint;
 begin
@@ -355,44 +357,24 @@ begin
   tmp[2].x := 0;
   tmp[2].y := 0;
 
-  writeln('p0.x ', p0.x:2:2);
-  writeln('p0.y ', p0.y:2:2);
-  writeln('p1.x ', p1.x:2:2);
-  writeln('p1.y ', p1.y:2:2);
+  line0  := linebetween(tmp[2], tmp[0]);
+  line1  := linebetween(tmp[2], tmp[1]);
+  angle0 := lineangle(line0);
+  angle1 := lineangle(line1);
+  sweep  := angle1 - angle0;
 
-  line0 := linebetween(tmp[2], tmp[0]);
-  line1 := linebetween(tmp[2], tmp[1]);
-  alpha := lineangle(line1) - lineangle(line0);
-
-  if alpha = 0 then
-    alpha := 2 * pi;
-
-  if clockwise then
-    alpha := -abs(alpha)
+  if clockwise and (sweep > 0) then
+    sweep := sweep - (2 * pi)
   else
-    alpha := +abs(alpha);
+    if not clockwise and (sweep < 0) then
+      sweep := sweep + (2 * pi);
 
-
-
-  writeln('alpha0 = ', radtodeg(lineangle(line0)):2:2);
-  writeln('alpha1 = ', radtodeg(lineangle(line1)):2:2);
-  writeln('alpha  = ', radtodeg(alpha):2:2);
-
-
-
-
-
-
-  i := max(1, round(abs(alpha) * distancebetween(tmp[2], tmp[0]) / 0.25));
+  i := max(1, round(abs(sweep) * distancebetween(tmp[2], tmp[0]) / 0.25));
 
   setlength(fvplotpath, i + 1);
-
-  writeln('i ', i);
-
-
   for j := 0 to i do
   begin
-    fvplotpath[j].p := rotatepoint(tmp[0], (j * (alpha / i)));
+    fvplotpath[j].p := rotatepoint(tmp[0], (j * (sweep / i)));
     fvplotpath[j].p := translatepoint(cc, fvplotpath[j].p);
   end;
 end;
