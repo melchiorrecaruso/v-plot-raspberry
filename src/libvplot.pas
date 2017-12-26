@@ -40,7 +40,7 @@ type
 type
   tvplotinterface = class
   private
-    fcode:      rawbytestring;
+    fgcode:     rawbytestring;
     fpoint1:    tvplotpoint;
     fpoint2:    tvplotpoint;
     fsync1:     tthreadmethod;
@@ -49,7 +49,7 @@ type
     fsync4:     tthreadmethod;
     fsuspended: boolean;
   public
-    property code:      rawbytestring read fcode      write fcode;
+    property gcode:     rawbytestring read fgcode     write fgcode;
     property point1:    tvplotpoint   read fpoint1    write fpoint1;
     property point2:    tvplotpoint   read fpoint2    write fpoint2;
     property sync1:     tthreadmethod read fsync1     write fsync1;
@@ -72,6 +72,7 @@ type
   private
     fvplot:     array[0..6] of tvplotpoint;
     fvplotpath: array of tvplotposition;
+    fvplotcode: tvplotcode;
     fvplotinterface: tvplotinterface;
     fvplotposition: tvplotposition;
     fvplotratio: double;
@@ -100,7 +101,7 @@ uses
 
 //  gcode parser //
 
-function parse_comment(const gcode: rawbytestring): rawbytestring;
+function  parse_comment(const gcode: rawbytestring): rawbytestring;
 var
   i, j: longint;
 begin
@@ -111,9 +112,13 @@ begin
     j := pos(')', result);
     delete(result, i, j - 1);
   end;
+
+  i := pos(';', result);
+  if i > 0 then
+    setlength(result, i - 1);
 end;
 
-function parse_prefix(const prefix, gcode: rawbytestring): extended;
+procedure parse_prefix(const prefix, gcode: rawbytestring; var value: double);
 var
   i: longint;
   s: rawbytestring = '';
@@ -130,71 +135,36 @@ begin
   end;
 
   if length(s) > 0 then
-    result := strtofloat(s)
-  else
-    result := 0;
+    value := strtofloat(s);
 end;
 
-procedure parse_gxx(const gcode: rawbytestring; var vcode: tvplotcode);
-begin
-  vcode.c  := '';
-  vcode.x  := parse_prefix('X', gcode);
-  vcode.y  := parse_prefix('Y', gcode);
-  vcode.z  := parse_prefix('Z', gcode);
-  vcode.f  := parse_prefix('F', gcode);
-  vcode.e  := parse_prefix('E', gcode);
-  vcode.i  := parse_prefix('I', gcode);
-  vcode.j  := parse_prefix('J', gcode);
-  vcode.k  := parse_prefix('K', gcode);
-  vcode.r  := parse_prefix('R', gcode);
-end;
-
-procedure parse_g00(const gcode: rawbytestring; var vcode: tvplotcode);
-begin
-  parse_gxx(gcode, vcode);
-  vcode.c := 'G00';
-end;
-
-procedure parse_g01(const gcode: rawbytestring; var vcode: tvplotcode);
-begin
-  parse_gxx(gcode, vcode);
-  vcode.c := 'G01';
-end;
-
-procedure parse_g02(const gcode: rawbytestring; var vcode: tvplotcode);
-begin
-  parse_gxx(gcode, vcode);
-  vcode.c := 'G02';
-end;
-
-procedure parse_g03(const gcode: rawbytestring; var vcode: tvplotcode);
-begin
-  parse_gxx(gcode, vcode);
-  vcode.c := 'G03';
-end;
-
-procedure parse_line(const gcode: rawbytestring; var vcode: tvplotcode);
+procedure parse_line(gcode: rawbytestring; var vcode: tvplotcode);
 begin
   vcode.c := '';
-  vcode.x  := 0;
-  vcode.y  := 0;
-  vcode.z  := 0;
-  vcode.f  := 0;
-  vcode.e  := 0;
-  vcode.i  := 0;
-  vcode.j  := 0;
-  vcode.k  := 0;
-  vcode.r  := 0;
-  if length(gcode) <> 0 then
+  gcode   := parse_comment(gcode);
+  if length(gcode) > 0 then
   begin
-    if pos('G0 ',  gcode) = 1 then parse_g00(gcode, vcode) else
-    if pos('G00 ', gcode) = 1 then parse_g00(gcode, vcode) else
-    if pos('G1 ',  gcode) = 1 then parse_g01(gcode, vcode) else
-    if pos('G01 ', gcode) = 1 then parse_g01(gcode, vcode) else
-    if pos('G02 ', gcode) = 1 then parse_g02(gcode, vcode) else
-    if pos('G03 ', gcode) = 1 then parse_g03(gcode, vcode) else
-    if pos('G21 ', gcode) = 1 then vcode.c := 'G21'        else
-    if pos('G28 ', gcode) = 1 then vcode.c := 'G28';
+    if pos('G0 ' , gcode) = 1 then vcode.c := 'G00 ' else
+    if pos('G00 ', gcode) = 1 then vcode.c := 'G00 ' else
+    if pos('G1 ' , gcode) = 1 then vcode.c := 'G01 ' else
+    if pos('G01 ', gcode) = 1 then vcode.c := 'G01 ' else
+    if pos('G2 ' , gcode) = 1 then vcode.c := 'G02 ' else
+    if pos('G02 ', gcode) = 1 then vcode.c := 'G02 ' else
+    if pos('G3 ' , gcode) = 1 then vcode.c := 'G03 ' else
+    if pos('G03 ', gcode) = 1 then vcode.c := 'G03 ';
+
+    if vcode.c <> '' then
+    begin
+      parse_prefix('X', gcode, vcode.x);
+      parse_prefix('Y', gcode, vcode.y);
+      parse_prefix('Z', gcode, vcode.z);
+      parse_prefix('F', gcode, vcode.f);
+      parse_prefix('E', gcode, vcode.e);
+      parse_prefix('I', gcode, vcode.i);
+      parse_prefix('J', gcode, vcode.j);
+      parse_prefix('K', gcode, vcode.k);
+      parse_prefix('R', gcode, vcode.r);
+    end;
   end;
 end;
 
@@ -317,6 +287,17 @@ begin
   // ---
   freeandnil(ini);
   // ---
+  fvplotcode.c := '';
+  fvplotcode.x  := 0;
+  fvplotcode.y  := 0;
+  fvplotcode.z  := 0;
+  fvplotcode.f  := 0;
+  fvplotcode.e  := 0;
+  fvplotcode.i  := 0;
+  fvplotcode.j  := 0;
+  fvplotcode.k  := 0;
+  fvplotcode.r  := 0;
+  // ---
   fvplotposition.p := fvplot[6];
   optimize(fvplotposition);
 end;
@@ -363,14 +344,13 @@ begin
   angle1 := lineangle(line1);
   sweep  := angle1 - angle0;
 
-  if clockwise and (sweep > 0) then
+  if (clockwise) and (sweep >= 0) then
     sweep := sweep - (2 * pi)
   else
-    if not clockwise and (sweep < 0) then
+    if (not clockwise) and (sweep <= 0) then
       sweep := sweep + (2 * pi);
 
   i := max(1, round(abs(sweep) * distancebetween(tmp[2], tmp[0]) / 0.25));
-
   setlength(fvplotpath, i + 1);
   for j := 0 to i do
   begin
@@ -468,8 +448,7 @@ begin
   if code.y > ((5 * fvplot[1].y) / 6) then exit;
 
   setlength(fvplotpath, 0);
-  if (code.c ='G00') or (code.c = 'G0') or
-     (code.c ='G01') or (code.c = 'G1') then
+  if (code.c ='G00 ') or (code.c = 'G01 ') then
   begin
     p0.x := fvplotposition.p.x;
     p0.y := fvplotposition.p.y;
@@ -477,7 +456,7 @@ begin
     p1.y := code.y;
     interpolate_line(p0, p1);
   end else
-  if (code.c ='G02') or (code.c = 'G03') then
+  if (code.c ='G02 ') or (code.c = 'G03 ') then
   begin
     p0.x := fvplotposition.p.x;
     p0.y := fvplotposition.p.y;
@@ -485,7 +464,7 @@ begin
     p1.y := code.y;
     cc.x := p0.x + code.i;
     cc.y := p0.y + code.j;
-    interpolate_arc(p0, p1, cc, code.c = 'G02');
+    interpolate_arc(p0, p1, cc, code.c = 'G02 ');
   end;
 
   j := length(fvplotpath);
@@ -497,28 +476,33 @@ begin
 
       synchronize(fvplotinterface.fsync2);
       moveto(fvplotpath[i]);
-      if code.z < 0 then
+      if (fvplotcode.c <> 'G00 ') and (code.z < 0) then
         synchronize(fvplotinterface.fsync3);
-
     end;
 end;
 
 procedure tvplotdriver.execute;
-var
-  code: tvplotcode;
 begin
   repeat
     synchronize(fvplotinterface.fsync1);
     if not fvplotinterface.suspended then
     begin
-      parse_line(parse_comment(fvplotinterface.code), code);
-      if (code.c ='G00') or (code.c =  'G0') then draw(code) else
-      if (code.c ='G01') or (code.c =  'G1') then draw(code) else
-      if (code.c ='G02') or (code.c = 'G03') then draw(code);
+
+      parse_line(fvplotinterface.gcode, fvplotcode);
+      if fvplotcode.c <> '' then
+      begin
+        writeln(parse_comment(fvplotinterface.gcode));
+        if (fvplotcode.c ='G00 ') then draw(fvplotcode) else
+        if (fvplotcode.c ='G01 ') then draw(fvplotcode) else
+        if (fvplotcode.c ='G02 ') then draw(fvplotcode) else
+        if (fvplotcode.c ='G03 ') then draw(fvplotcode);
+      end else
+        writeln('SKIP (', fvplotinterface.gcode,')');
       synchronize(fvplotinterface.fsync4);
     end;
-    sleep(100);
+    sleep(10);
   until false;
+
 end;
 
 end.

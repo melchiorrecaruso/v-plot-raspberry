@@ -64,7 +64,7 @@ begin
   stopbtn.enabled := false;
 
   vplotinterface := tvplotinterface.create;
-  vplotinterface.code      := '';
+  vplotinterface.gcode     := '';
   vplotinterface.sync1     := @formsync1;
   vplotinterface.sync2     := @formsync2;
   vplotinterface.sync3     := @formsync3;
@@ -82,11 +82,11 @@ end;
 
 procedure tmainform.formsync1;
 begin
-  sleep(trackbar1.Position);
-  vplotinterface.code := '';
+  sleep(trackbar1.position);
+  vplotinterface.gcode := '';
   if not vplotinterface.suspended then
   begin
-    vplotinterface.code := gcodelist.items[gcodelist.itemindex];
+    vplotinterface.gcode := gcodelist.items[gcodelist.itemindex];
   end;
 end;
 
