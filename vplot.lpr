@@ -3,7 +3,7 @@ program vplot;
 {$mode objfpc}{$h+}
 
 uses
-  {$ifdef unix} cthreads, {$endif} interfaces, forms, lazcontrols, main, view;
+  {$ifdef unix} cthreads, {$endif} interfaces, forms, lazcontrols, main;
 
 {$R *.res}
 
@@ -12,7 +12,6 @@ begin
   requirederivedformresource := true;
   application.initialize;
   application.createform(tmainform, mainform);
-  application.createform(tpreviewform, previewform);
   application.run;
 end.
 

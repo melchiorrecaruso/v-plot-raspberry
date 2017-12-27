@@ -47,6 +47,7 @@ type
     fsync2:     tthreadmethod;
     fsync3:     tthreadmethod;
     fsync4:     tthreadmethod;
+    fpreview:   boolean;
     fsuspended: boolean;
   public
     property gcode:     rawbytestring read fgcode     write fgcode;
@@ -56,6 +57,7 @@ type
     property sync2:     tthreadmethod read fsync2     write fsync2;
     property sync3:     tthreadmethod read fsync3     write fsync3;
     property sync4:     tthreadmethod read fsync4     write fsync4;
+    property preview:   boolean       read fpreview   write fpreview;
     property suspended: boolean       read fsuspended write fsuspended;
   end;
 
@@ -425,15 +427,16 @@ end;
 
 procedure tvplotdriver.moveto(var position: tvplotposition);
 begin
-  optimize(position);
-
-  (*
-  writeln('[moveto]');
-  writeln('DELTA STEPS M1 = ', ds1, '(', fvplotposition.m1, ')');
-  writeln('DELTA STEPS M2 = ', ds2, '(', fvplotposition.m2, ')');
-  writeln;
-  *)
-
+  if not fvplotinterface.fpreview then
+  begin
+    optimize(position);
+    (*
+    writeln('[moveto]');
+    writeln('DELTA STEPS M1 = ', ds1, '(', fvplotposition.m1, ')');
+    writeln('DELTA STEPS M2 = ', ds2, '(', fvplotposition.m2, ')');
+    writeln;
+    *)
+  end;
   fvplotposition := position;
 end;
 
@@ -487,22 +490,19 @@ begin
     synchronize(fvplotinterface.fsync1);
     if not fvplotinterface.suspended then
     begin
-
       parse_line(fvplotinterface.gcode, fvplotcode);
       if fvplotcode.c <> '' then
       begin
-        writeln(parse_comment(fvplotinterface.gcode));
         if (fvplotcode.c ='G00 ') then draw(fvplotcode) else
         if (fvplotcode.c ='G01 ') then draw(fvplotcode) else
         if (fvplotcode.c ='G02 ') then draw(fvplotcode) else
         if (fvplotcode.c ='G03 ') then draw(fvplotcode);
-      end else
-        writeln('SKIP (', fvplotinterface.gcode,')');
+      end;
+      sleep(2);
       synchronize(fvplotinterface.fsync4);
-    end;
-    sleep(10);
+    end else
+      sleep(100);
   until false;
-
 end;
 
 end.
