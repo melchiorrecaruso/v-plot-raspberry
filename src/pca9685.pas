@@ -1,3 +1,23 @@
+{ Description: PCA9685 Library.
+
+  Copyright (C) 2014-2017 Melchiorre Caruso <melchiorrecaruso@gmail.com>
+
+  This source is free software; you can redistribute it and/or modify it under
+  the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 2 of the License, or (at your option)
+  any later version.
+
+  This code is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+  details.
+
+  A copy of the GNU General Public License is available on the World Wide Web
+  at <http://www.gnu.org/copyleft/gpl.html>. You can also obtain it by writing
+  to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+  MA 02111-1307, USA.
+}
+
 unit pca9685;
 
 {$mode objfpc}
@@ -58,9 +78,19 @@ const
   PCA9685_PIN_BASE      = 300;
   PCA9685_MAX_PWM       = 4096;
 
-  function pca9685Setup(pinBase: longint; i2cAddress: longint; freq: longint): longint;
+ function pca9685Setup(pinBase: longint; i2cAddress: longint; freq: longint): longint;
+
+ function calcticks(impulseMs: double; freq: longint): longint;
 
 implementation
+
+function calcticks(impulseMs: double; freq: longint): longint;
+var
+  cycleMs: double;
+begin
+  cycleMs := 1000.0 / freq;
+  result  := trunc((PCA9685_MAX_PWM * impulseMs) / cycleMs + 0.5);
+end;
 
 procedure pca9685PwmWrite(node: pwiringPiNodeStruct; pin: longint; value: longint); cdecl;
 var
@@ -130,9 +160,6 @@ begin
     result := fd;
   end;
 end;
-
-
-
 
 end.
 
