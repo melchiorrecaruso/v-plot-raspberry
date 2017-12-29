@@ -1,3 +1,23 @@
+{ Description: vPlot driver.
+
+  Copyright (C) 2014-2017 Melchiorre Caruso <melchiorrecaruso@gmail.com>
+
+  This source is free software; you can redistribute it and/or modify it under
+  the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 2 of the License, or (at your option)
+  any later version.
+
+  This code is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+  details.
+
+  A copy of the GNU General Public License is available on the World Wide Web
+  at <http://www.gnu.org/copyleft/gpl.html>. You can also obtain it by writing
+  to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+  MA 02111-1307, USA.
+}
+
 unit libvplot;
 
 {$mode objfpc}{$h+}
@@ -20,8 +40,9 @@ type
   end;
 
   tvplotposition = record
-    m: array[0..1] of longint;
-    p: tvplotpoint;
+    m1: longint;
+    m2: longint;
+    p:  tvplotpoint;
   end;
 
   tvplotcode = record
@@ -62,14 +83,6 @@ type
   end;
 
 type
-  tvplotstepper = class (tthread)
-  private
-
-  public
-
-  end;
-
-type
   tvplotdriver = class (tthread)
   private
     fvplot:     array[0..6] of tvplotpoint;
@@ -92,14 +105,37 @@ type
     procedure initialize;
   end;
 
+
 var
   vplotinterface: tvplotinterface = nil;
   vplotdriver:    tvplotdriver    = nil;
+  vplotinit:      boolean;
+  vplotservo:     double;
 
 implementation
 
 uses
-  inifiles, math;
+  inifiles, math, pca9685, wiringpi;
+
+const
+  vplotservo_maxvalue = 2.50;
+  vplotservo_minvalue = 0.50;
+  vplotservo_rstvalue = 1.50;
+  vplotservo_incvalue = 0.10;
+  vplotservo_freq     = 50;
+
+  vplotmot1_step      = P38;
+  vplotmot1_dir       = P40;
+  vplotmot2_step      = P16;
+  vplotmot2_dir       = P18;
+
+  vplotmatrix : array [0..5, 0..8] of longint =
+    ((0, 0, 0, 0, 0, 0, 0, 0, 0),
+     (0, 0, 0, 0, 1, 0, 0, 0, 0),
+     (0, 0, 1, 0, 0, 0, 1, 0, 0),
+     (1, 0, 0, 0 ,1, 0, 0, 0, 1),
+     (0, 1, 0, 1, 0, 1, 0, 1, 0),
+     (1, 0, 1, 0, 1, 0, 1, 0, 1));
 
 //  gcode parser //
 
@@ -215,14 +251,48 @@ begin
     p.x := (-l0.c * l1.b + l0.b * l1.c) / (l0.a * l1.b - l0.b * l1.a);
     p.y := (-l0.c - l0.a * p.x) / (l0.b);
   end else
-    writeln('C0257');
+    raise exception.create('Intersectlines routine exception');
 end;
 
-// vplotserver //
+// vplotdriver //
 
 constructor tvplotdriver.create(vplotinterface: tvplotinterface);
 begin
+  // initializa wiringPI library
+  vplotinit := wiringPISetup <> -1;
+  if vplotinit then
+  begin
+    pinMode(P11, OUTPUT);
+    digitalwrite(P11, LOW);
+    // inizialize pca9685 library
+    vplotinit := pca9685Setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, vplotservo_freq) <> -1;
+    if vplotinit then
+    begin
+      pwmWrite(PCA9685_PIN_BASE + 0, calcTicks(vplotservo_minvalue, vplotservo_freq));
+      delay(2000);
+      pwmWrite(PCA9685_PIN_BASE + 0, calcTicks(vplotservo_maxvalue, vplotservo_freq));
+      delay(2000);
+      pwmWrite(PCA9685_PIN_BASE + 0, calcTicks(vplotservo_rstvalue, vplotservo_freq));
+      delay(2000);
+      vplotservo := 0;
+    end;
+    digitalwrite(P11, HIGH);
+    // initialize step motor1
+    pinMode(vplotmot1_dir, OUTPUT);
+    pinMode(vplotmot1_step, OUTPUT);
+    digitalwrite(vplotmot1_dir, LOW);
+    digitalwrite(vplotmot1_step, LOW);
+    // initializa step motor2
+    pinMode(vplotmot2_dir, OUTPUT);
+    pinMode(vplotmot2_step, OUTPUT);
+    digitalwrite(vplotmot2_dir, LOW);
+    digitalwrite(vplotmot2_step, LOW);
+  end;
+
+
+
   fvplotinterface := vplotinterface;
+  freeonterminate := true;
   inherited create(false);
 end;
 
@@ -383,31 +453,6 @@ begin
 
     intersectlines(line0, line1, tmp[6]);
 
-    (*
-    writeln('[optimize]');
-    writeln(   'R=', fvplotratio:2:6);
-    writeln('ALFA=', radtodeg(alpha):2:6);
-    writeln(' 0.X=', tmp[0].x:6:2);
-    writeln(' 0.Y=', tmp[0].y:6:2);
-    writeln(' 1.X=', tmp[1].x:6:2);
-    writeln(' 1.Y=', tmp[1].y:6:2);
-    writeln(' 2.X=', tmp[2].x:6:2);
-    writeln(' 2.Y=', tmp[2].y:6:2);
-    writeln(' 3.X=', tmp[3].x:6:2);
-    writeln(' 3.Y=', tmp[3].y:6:2);
-    writeln(' 4.X=', tmp[4].x:6:2);
-    writeln(' 4.Y=', tmp[4].y:6:2);
-    writeln(' 5.X=', tmp[5].x:6:2);
-    writeln(' 5.Y=', tmp[5].y:6:2);
-
-    writeln(' 6.X=', tmp[6].x:6:2);
-    writeln(' 6.Y=', tmp[6].y:6:2);
-
-    writeln('  03=', distancebetween(tmp[0], tmp[3]):6:2);
-    writeln('  14=', distancebetween(tmp[1], tmp[4]):6:2);
-    writeln;
-    *)
-
     error := abs(tmp[6].y - tmp[5].y);
     if  error > 0.001 then
     begin
@@ -421,21 +466,49 @@ begin
 
   until false;
 
-  position.m[0] := round(distancebetween(tmp[0], tmp[3]) / fvplotratio);
-  position.m[1] := round(distancebetween(tmp[1], tmp[4]) / fvplotratio);
+  position.m1 := round(distancebetween(tmp[0], tmp[3]) / fvplotratio);
+  position.m2 := round(distancebetween(tmp[1], tmp[4]) / fvplotratio);
 end;
 
 procedure tvplotdriver.moveto(var position: tvplotposition);
+var
+  i:      longint;
+  count1: longint;
+  count2: longint;
 begin
   if not fvplotinterface.fpreview then
   begin
     optimize(position);
-    (*
-    writeln('[moveto]');
-    writeln('DELTA STEPS M1 = ', ds1, '(', fvplotposition.m1, ')');
-    writeln('DELTA STEPS M2 = ', ds2, '(', fvplotposition.m2, ')');
-    writeln;
-    *)
+
+    count1 := position.m1 - fvplotposition.m1;
+    count2 := position.m2 - fvplotposition.m2;
+
+    if count1 > 0 then
+      digitalwrite(vplotmot1_dir, HIGH)
+    else
+      digitalwrite(vplotmot1_dir, LOW);
+
+    if count2 > 0 then
+      digitalwrite(vplotmot2_dir, LOW)
+    else
+      digitalwrite(vplotmot2_dir, HIGH);
+
+    count1 := abs(count1);
+    count2 := abs(count2);
+
+    if count1 > 5 then halt;
+    if count2 > 5 then halt;
+
+    for i := 0 to 8 do
+      if (count1 <> 0) or (count2 <> 0) then
+      begin
+        if vplotmatrix[i, count1] = 1 then digitalwrite(vplotmot1_step, HIGH);
+        if vplotmatrix[i, count2] = 1 then digitalwrite(vplotmot2_step, HIGH);
+        delay(20);
+        if vplotmatrix[i, count1] = 1 then digitalwrite(vplotmot1_step, LOW);
+        if vplotmatrix[i, count2] = 1 then digitalwrite(vplotmot2_step, LOW);
+        delay(20);
+      end;
   end;
   fvplotposition := position;
 end;
@@ -472,6 +545,18 @@ begin
 
   j := length(fvplotpath);
   if j > 0 then
+  begin
+    // move servo
+    if vplotservo <> code.z then
+    begin
+      vplotservo := code.z;
+      if vplotservo < 0 then
+        pwmWrite(PCA9685_PIN_BASE + 0, calcTicks(vplotservo_maxvalue, vplotservo_freq))
+      else
+        pwmWrite(PCA9685_PIN_BASE + 0, calcTicks(vplotservo_rstvalue, vplotservo_freq));
+      delay(1000);
+    end;
+    // move stepper
     for i := 0 to j - 1 do
     begin
       fvplotinterface.point1 := fvplotposition.p;
@@ -482,6 +567,7 @@ begin
       if (fvplotcode.c <> 'G00 ') and (code.z < 0) then
         synchronize(fvplotinterface.fsync3);
     end;
+  end;
 end;
 
 procedure tvplotdriver.execute;
@@ -490,6 +576,7 @@ begin
     synchronize(fvplotinterface.fsync1);
     if not fvplotinterface.suspended then
     begin
+      digitalwrite(P11, LOW);
       parse_line(fvplotinterface.gcode, fvplotcode);
       if fvplotcode.c <> '' then
       begin
@@ -501,8 +588,13 @@ begin
       sleep(2);
       synchronize(fvplotinterface.fsync4);
     end else
+    begin
       sleep(100);
-  until false;
+      vplotservo := 0;
+      pwmWrite(PCA9685_PIN_BASE + 0, calcTicks(vplotservo_rstvalue, vplotservo_freq));
+    end;
+    digitalwrite(P11, HIGH);
+  until terminated;
 end;
 
 end.
