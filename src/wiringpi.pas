@@ -113,7 +113,6 @@ const
   INT_EDGE_BOTH          =  3;
 
 type
-
   // wiringPiNodeStruct
 
   pwiringPiNodes = ^wiringPiNodeStruct;
@@ -212,6 +211,5 @@ type
   procedure softToneWrite (pin, freq: longint); cdecl; external;
 
 implementation
-
 
 end.

@@ -23,7 +23,7 @@ program vplot;
 {$mode objfpc}{$h+}
 
 uses
-  {$ifdef unix} cthreads, {$endif} interfaces, forms, lazcontrols, main;
+  {$ifdef unix} cthreads, {$endif} interfaces, forms, lazcontrols, main, initform;
 
 {$R *.res}
 
@@ -32,6 +32,7 @@ begin
   requirederivedformresource := true;
   application.initialize;
   application.createform(tmainform, mainform);
+  Application.CreateForm(TForm1, Form1);
   application.run;
 end.
 

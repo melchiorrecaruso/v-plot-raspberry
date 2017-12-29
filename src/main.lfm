@@ -648,22 +648,6 @@ object mainform: Tmainform
       OnClick = stopbtnClick
       TabOrder = 2
     end
-    object trackbar: TTrackBar
-      AnchorSideLeft.Control = btnpanel
-      AnchorSideRight.Control = loadbtn
-      AnchorSideRight.Side = asrBottom
-      AnchorSideBottom.Control = morebtn
-      Left = 5
-      Height = 60
-      Top = 322
-      Width = 140
-      Max = 1000
-      Position = 0
-      Anchors = [akLeft, akRight, akBottom]
-      BorderSpacing.Left = 5
-      BorderSpacing.Bottom = 5
-      TabOrder = 3
-    end
     object morebtn: TBitBtn
       AnchorSideLeft.Control = btnpanel
       AnchorSideRight.Control = loadbtn
@@ -970,7 +954,7 @@ object mainform: Tmainform
         0000000000000000000000000000000000000000000000000000
       }
       OnClick = morebtnClick
-      TabOrder = 4
+      TabOrder = 3
     end
     object loadbtn: TBitBtn
       AnchorSideLeft.Control = btnpanel
@@ -1293,6 +1277,22 @@ object mainform: Tmainform
       BorderSpacing.Left = 5
       Style = bsRaised
     end
+    object prvwbox: TCheckBox
+      AnchorSideLeft.Control = btnpanel
+      AnchorSideRight.Control = btnpanel
+      AnchorSideRight.Side = asrBottom
+      AnchorSideBottom.Control = morebtn
+      Left = 5
+      Height = 23
+      Top = 354
+      Width = 140
+      Anchors = [akLeft, akRight, akBottom]
+      BorderSpacing.Left = 5
+      BorderSpacing.Right = 10
+      BorderSpacing.Bottom = 10
+      Caption = 'Preview Only'
+      TabOrder = 4
+    end
   end
   object previewpanel: TPanel
     AnchorSideLeft.Control = btnpanel
@@ -1410,6 +1410,7 @@ object mainform: Tmainform
     top = 8
     object showviewform: TMenuItem
       Caption = 'Show View form'
+      OnClick = showviewformClick
     end
     object bevel1: TMenuItem
       Caption = '-'

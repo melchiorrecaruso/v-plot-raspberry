@@ -29,7 +29,6 @@ uses
   wiringPi;
 
 const
-
   // PCA9685 Registers
 
   PCA9685_MODE1         = $00;
@@ -78,9 +77,9 @@ const
   PCA9685_PIN_BASE      = 300;
   PCA9685_MAX_PWM       = 4096;
 
- function pca9685Setup(pinBase: longint; i2cAddress: longint; freq: longint): longint;
+function pca9685Setup(pinBase: longint; i2cAddress: longint; freq: longint): longint;
 
- function calcticks(impulseMs: double; freq: longint): longint;
+function calcticks(impulseMs: double; freq: longint): longint;
 
 implementation
 

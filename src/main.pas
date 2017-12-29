@@ -37,6 +37,7 @@ type
     bevel1: tmenuitem;
     aboutvplot: tmenuitem;
     bevel2: tbevel;
+    prvwbox: TCheckBox;
     panbtn: tbitbtn;
     previewimage: timage;
     loadbtn: tbitbtn;
@@ -50,7 +51,6 @@ type
     opendialog: topendialog;
     stopbtn: tbitbtn;
     timer: ttimer;
-    trackbar: ttrackbar;
     updownbtn: tupdown;
     leftrightbtn: tupdown;
     procedure panbtnclick(sender: tobject);
@@ -59,6 +59,7 @@ type
     procedure formdestroy(sender: tobject);
     procedure loadbtnclick(sender: tobject);
     procedure playbtnclick(sender: tobject);
+    procedure showviewformClick(Sender: TObject);
     procedure stopbtnclick(sender: tobject);
     procedure morebtnclick(sender: tobject);
     procedure timertimer(sender: tobject);
@@ -86,7 +87,7 @@ implementation
 {$R main.lfm}
 
 uses
-  libvplot, math;
+  initform, libvplot, math;
 
 { tmainform }
 
@@ -96,6 +97,7 @@ begin
   playbtn.enabled := false;
   stopbtn.enabled := false;
   morebtn.enabled := true;
+  prvwbox.enabled := false;
 
   vplotinterface := tvplotinterface.create;
   vplotinterface.gcode     := '';
@@ -180,20 +182,34 @@ end;
 procedure tmainform.playbtnclick(sender: tobject);
 begin
   if vplotlist.count > 0 then
+  begin
+    vplotinterface.preview   := prvwbox.checked;
     vplotinterface.suspended := false;
+  end;
 
   timer  .enabled := not vplotinterface.suspended;
   playbtn.enabled :=     vplotinterface.suspended;
   stopbtn.enabled := not vplotinterface.suspended;
+  prvwbox.enabled :=     vplotinterface.suspended;
+end;
+
+procedure tmainform.showviewformClick(Sender: TObject);
+begin
+  if form1.showmodal = mrOK then
+  begin
+    vplotdriver.initialize;
+  end;
 end;
 
 procedure tmainform.stopbtnclick(sender: tobject);
 begin
+  vplotinterface.preview   := prvwbox.checked;
   vplotinterface.suspended := true;
 
   timer.enabled   := not vplotinterface.suspended;
   playbtn.enabled :=     vplotinterface.suspended;
   stopbtn.enabled := not vplotinterface.suspended;
+  prvwbox.enabled :=     vplotinterface.suspended;
 end;
 
 procedure tmainform.morebtnclick(sender: tobject);
@@ -255,6 +271,7 @@ begin
     // ---
     vplotdriver.initialize;
     playbtn.enabled := true;
+    prvwbox.enabled := true;
 
     x := 0;
   end;
