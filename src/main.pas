@@ -153,8 +153,8 @@ begin
     previewimage.canvas.line(
       round(point1.x),
       round(point1.y),
-      round(point2.x),
-      round(point2.y));
+      round(point0.x),
+      round(point0.y));
 end;
 
 procedure Tmainform.formsync3;
@@ -166,8 +166,8 @@ begin
     previewimage.canvas.line(
       round(point1.x),
       round(point1.y),
-      round(point2.x),
-      round(point2.y));
+      round(point0.x),
+      round(point0.y));
 end;
 
 procedure Tmainform.formsync4;

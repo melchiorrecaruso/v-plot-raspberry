@@ -62,8 +62,9 @@ type
   tvplotinterface = class
   private
     fgcode:     rawbytestring;
+    fdelay:     longword;
+    fpoint0:    tvplotpoint;
     fpoint1:    tvplotpoint;
-    fpoint2:    tvplotpoint;
     fsync1:     tthreadmethod;
     fsync2:     tthreadmethod;
     fsync3:     tthreadmethod;
@@ -72,8 +73,9 @@ type
     fsuspended: boolean;
   public
     property gcode:     rawbytestring read fgcode     write fgcode;
+    property delay:     longword      read fdelay     write fdelay;
+    property point0:    tvplotpoint   read fpoint0    write fpoint0;
     property point1:    tvplotpoint   read fpoint1    write fpoint1;
-    property point2:    tvplotpoint   read fpoint2    write fpoint2;
     property sync1:     tthreadmethod read fsync1     write fsync1;
     property sync2:     tthreadmethod read fsync2     write fsync2;
     property sync3:     tthreadmethod read fsync3     write fsync3;
@@ -89,16 +91,14 @@ type
     fvplotpath: array of tvplotposition;
     fvplotcode: tvplotcode;
     fvplotinterface: tvplotinterface;
-    fvplotposition: tvplotposition;
+    fcurrposition: tvplotposition;
     fvplotratio: double;
-    fvplotcount: array[0..1] of longint;
-
 
     procedure interpolate_line(const p0, p1: tvplotpoint);
     procedure interpolate_arc (const p0, p1, cc: tvplotpoint; clockwise: boolean);
 
     procedure optimize(var position: tvplotposition);
-    procedure moveto(var position: tvplotposition);
+    procedure moveto(var nextposition: tvplotposition);
     procedure draw(const code: tvplotcode);
   protected
     procedure execute; override;
@@ -128,10 +128,10 @@ const
   vplotservo_incvalue = 0.10;
   vplotservo_freq     = 50;
 
-  vplotmot1_step      = P38;
-  vplotmot1_dir       = P40;
-  vplotmot2_step      = P16;
-  vplotmot2_dir       = P18;
+  vplotmot0_step      = P38;
+  vplotmot0_dir       = P40;
+  vplotmot1_step      = P16;
+  vplotmot1_dir       = P18;
 
   vplotmatrix : array [0..5, 0..8] of longint =
     ((0, 0, 0, 0, 0, 0, 0, 0, 0),
@@ -282,15 +282,15 @@ begin
     end;
     digitalwrite(P11, HIGH);
     // initialize step motor1
+    pinMode(vplotmot0_dir, OUTPUT);
+    pinMode(vplotmot0_step, OUTPUT);
+    digitalwrite(vplotmot0_dir, LOW);
+    digitalwrite(vplotmot0_step, LOW);
+    // initializa step motor2
     pinMode(vplotmot1_dir, OUTPUT);
     pinMode(vplotmot1_step, OUTPUT);
     digitalwrite(vplotmot1_dir, LOW);
     digitalwrite(vplotmot1_step, LOW);
-    // initializa step motor2
-    pinMode(vplotmot2_dir, OUTPUT);
-    pinMode(vplotmot2_step, OUTPUT);
-    digitalwrite(vplotmot2_dir, LOW);
-    digitalwrite(vplotmot2_step, LOW);
   end;
   fvplotinterface := vplotinterface;
   freeonterminate := true;
@@ -371,11 +371,10 @@ begin
   fvplotcode.k  := 0;
   fvplotcode.r  := 0;
   // ---
-  fvplotposition.p := fvplot[6];
-  optimize(fvplotposition);
+  fcurrposition.p := fvplot[6];
+  optimize(fcurrposition);
 
-  fvplotcount[0] := fvplotposition.m0;
-  fvplotcount[1] := fvplotposition.m1;
+  fvplotinterface.fdelay := 50;
 end;
 
 procedure tvplotdriver.interpolate_line(const p0, p1: tvplotpoint);
@@ -513,66 +512,75 @@ writeln('pos.count0 ', position.m0);
 writeln('pos.count1 ', position.m1);
 end;
 
-procedure tvplotdriver.moveto(var position: tvplotposition);
+procedure tvplotdriver.moveto(var nextposition: tvplotposition);
 var
-  i:      longint;
+       i: longint;
+    inc0: longint;
+    inc1: longint;
   count0: longint;
   count1: longint;
 begin
-  optimize(position);
+  optimize(nextposition);
 
-  count0 := position.m0 - fvplotposition.m0;
-  count1 := position.m1 - fvplotposition.m1;
-
+  count0 := nextposition.m0 - fcurrposition.m0;
   if count0 > 0 then
-    digitalwrite(vplotmot1_dir, HIGH)
-  else
-    digitalwrite(vplotmot1_dir, LOW);
+  begin
+    digitalwrite(vplotmot0_dir, HIGH);
+    inc0 := +1;
+  end else
+  begin
+    digitalwrite(vplotmot0_dir, LOW);
+    inc0 := -1;
+  end;
+  count0 := abs(count0);
 
+  count1 := nextposition.m1 - fcurrposition.m1;
   if count1 > 0 then
-    digitalwrite(vplotmot2_dir, LOW)
-  else
-    digitalwrite(vplotmot2_dir, HIGH);
+  begin
+    digitalwrite(vplotmot1_dir, LOW);
+    inc1 := +1;
+  end else
+  begin
+    digitalwrite(vplotmot1_dir, HIGH);
+    inc1 := -1;
+  end;
+  count1 := abs(count1);
+
+  assert(max(count0, count1) >= 0, 'min count error');
+  assert(max(count0, count1) <= 5, 'max count error');
+
+  if (count0 <> 0) or (count1 <> 0) then
+  begin
 
 
-  for i := 0 to 8 do
-    if (count0 <> 0) or (count1 <> 0) then
+    // move stepper
+    for i := 0 to 8 do
     begin
-      if vplotmatrix[abs(count0), i] = 1 then
+      if vplotmatrix[count0, i] = 1 then
+      begin
+        digitalwrite(vplotmot0_step, HIGH);
+        delay(vplotinterface.fdelay);
+        digitalwrite(vplotmot0_step, LOW);
+        delay(vplotinterface.fdelay);
+        fcurrposition.m0 := fcurrposition.m0 + inc0;
+      end;
+
+      if vplotmatrix[count1, i] = 1 then
       begin
         digitalwrite(vplotmot1_step, HIGH);
-
-        if count0 > 0 then
-          inc(fvplotcount[0])
-        else
-        if count0 < 0 then
-          dec(fvplotcount[0]) else writeln('ERROR');
+        delay(vplotinterface.fdelay);
+        digitalwrite(vplotmot1_step, LOW);
+        delay(vplotinterface.fdelay);
+        fcurrposition.m1 := fcurrposition.m1 + inc1;
       end;
-
-      if vplotmatrix[abs(count1), i] = 1 then
-      begin
-        digitalwrite(vplotmot2_step, HIGH);
-
-        if count1 > 0 then
-          inc(fvplotcount[1])
-        else
-        if count1 < 0 then
-          dec(fvplotcount[1]) else writeln('ERROR');
-      end;
-
-      delay(50);
-      if vplotmatrix[abs(count0), i] = 1 then digitalwrite(vplotmot1_step, LOW);
-      if vplotmatrix[abs(count1), i] = 1 then digitalwrite(vplotmot2_step, LOW);
-      delay(50);
     end;
+    fcurrposition.p := nextposition.p;
+  end;
 
-  writeln('count0 ', position.m0);
-  writeln('count1 ', position.m1);
-
-  writeln('count0 **', fvplotcount[0]);
-  writeln('count1 **', fvplotcount[1]);
-
-  fvplotposition := position;
+  writeln('next.count0 ',  nextposition.m0);
+  writeln('next.count1 ',  nextposition.m1);
+  writeln('curr.count0 ', fcurrposition.m0);
+  writeln('curr.count1 ', fcurrposition.m1);
 end;
 
 procedure tvplotdriver.move(motor, count: longint; cw: boolean);
@@ -580,28 +588,28 @@ begin
   if cw then
   begin
     if motor = 0 then
-      digitalwrite(vplotmot1_dir, HIGH)
+      digitalwrite(vplotmot0_dir, HIGH)
     else
-      digitalwrite(vplotmot2_dir, LOW);
+      digitalwrite(vplotmot1_dir, LOW);
   end else
   begin
     if motor = 0 then
-      digitalwrite(vplotmot1_dir, LOW)
+      digitalwrite(vplotmot0_dir, LOW)
     else
-      digitalwrite(vplotmot2_dir, HIGH);
+      digitalwrite(vplotmot1_dir, HIGH);
   end;
 
   while count > 0 do
   begin
     if motor = 0 then
-      digitalwrite(vplotmot1_step, HIGH)
+      digitalwrite(vplotmot0_step, HIGH)
     else
-      digitalwrite(vplotmot2_step, HIGH);
+      digitalwrite(vplotmot1_step, HIGH);
     delay(10);
     if motor = 0 then
-      digitalwrite(vplotmot1_step, LOW)
+      digitalwrite(vplotmot0_step, LOW)
     else
-      digitalwrite(vplotmot2_step, LOW);
+      digitalwrite(vplotmot1_step, LOW);
     delay(10);
     dec(count);
   end;
@@ -620,16 +628,16 @@ begin
   setlength(fvplotpath, 0);
   if (code.c ='G00 ') or (code.c = 'G01 ') then
   begin
-    p0.x := fvplotposition.p.x;
-    p0.y := fvplotposition.p.y;
+    p0.x := fcurrposition.p.x;
+    p0.y := fcurrposition.p.y;
     p1.x := code.x;
     p1.y := code.y;
     interpolate_line(p0, p1);
   end else
   if (code.c ='G02 ') or (code.c = 'G03 ') then
   begin
-    p0.x := fvplotposition.p.x;
-    p0.y := fvplotposition.p.y;
+    p0.x := fcurrposition.p.x;
+    p0.y := fcurrposition.p.y;
     p1.x := code.x;
     p1.y := code.y;
     cc.x := p0.x + code.i;
@@ -654,8 +662,8 @@ begin
     // move stepper
     for i := 0 to j - 1 do
     begin
-      fvplotinterface.point1 := fvplotposition.p;
-      fvplotinterface.point2 := fvplotpath[i].p;
+      fvplotinterface.point0 := fcurrposition.p;
+      fvplotinterface.point1 := fvplotpath[i].p;
 
       synchronize(fvplotinterface.fsync2);
       if not fvplotinterface.fpreview then
