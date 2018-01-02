@@ -46,22 +46,22 @@ uses
 
 procedure tform1.sxupbtnclick(sender: tobject);
 begin
-  vplotdriver.move(0, sxupspinedit.value, true);
+  vplotdriver.move(0, sxupspinedit.value, false);
 end;
 
 procedure tform1.sxdownbtnclick(sender: tobject);
 begin
-  vplotdriver.move(0, sxdownspinedit.value, false);
+  vplotdriver.move(0, sxdownspinedit.value, true);
 end;
 
 procedure tform1.dxupbtnclick(sender: tobject);
 begin
-  vplotdriver.move(1, dxupspinedit.value, true);
+  vplotdriver.move(1, dxupspinedit.value, false);
 end;
 
 procedure tform1.dxdownbtnclick(sender: tobject);
 begin
-  vplotdriver.move(1, dxdownspinedit.value, false);
+  vplotdriver.move(1, dxdownspinedit.value, true);
 end;
 
 

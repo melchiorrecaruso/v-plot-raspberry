@@ -193,12 +193,9 @@ begin
   prvwbox.enabled :=     vplotinterface.suspended;
 end;
 
-procedure tmainform.showviewformClick(Sender: TObject);
+procedure tmainform.showviewformclick(sender: tobject);
 begin
-  if form1.showmodal = mrOK then
-  begin
-    vplotdriver.initialize;
-  end;
+  form1.showmodal;
 end;
 
 procedure tmainform.stopbtnclick(sender: tobject);
@@ -251,11 +248,11 @@ begin
     vplotlist.loadfromfile(opendialog.filename);
     vplotlistindex := 0;
     // ---
-    previewimage.picture.bitmap.setsize(1500,1500);
+    previewimage.picture.bitmap.setsize(775,775);
     previewimage.canvas.pen.color   := clwhite;
     previewimage.canvas.brush.color := clwhite;
     previewimage.canvas.brush.style := bssolid;
-    previewimage.canvas.rectangle(0, 0, 1500, 1500);
+    previewimage.canvas.rectangle(0, 0, 775, 775);
 
     previewimage.anchors := [aktop, akleft, akright, akbottom];
     previewimage.anchors := [];

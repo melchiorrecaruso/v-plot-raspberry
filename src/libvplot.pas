@@ -40,8 +40,8 @@ type
   end;
 
   tvplotposition = record
+    m0: longint;
     m1: longint;
-    m2: longint;
     p:  tvplotpoint;
   end;
 
@@ -91,6 +91,9 @@ type
     fvplotinterface: tvplotinterface;
     fvplotposition: tvplotposition;
     fvplotratio: double;
+    fvplotcount: array[0..1] of longint;
+
+
     procedure interpolate_line(const p0, p1: tvplotpoint);
     procedure interpolate_arc (const p0, p1, cc: tvplotpoint; clockwise: boolean);
 
@@ -314,46 +317,46 @@ begin
   begin
     ini := tinifile.create(changefileext(paramstr(0),'.ini'));
     // absolute coordinates
-    ini.writeinteger(section1, '0.X',    0);
-    ini.writeinteger(section1, '0.Y',    0);
-    ini.writeinteger(section1, '1.X',    0);
-    ini.writeinteger(section1, '1.Y', 1500);
-    ini.writeinteger(section4, '6.X',  250);
-    ini.writeinteger(section4, '6.Y',  750);
+    ini.writefloat(section1, '0.X',    0);
+    ini.writefloat(section1, '0.Y',    0);
+    ini.writefloat(section1, '1.X',    0);
+    ini.writefloat(section1, '1.Y', 1500);
+    ini.writefloat(section4, '6.X',  250);
+    ini.writefloat(section4, '6.Y',  750);
     // relative coordinates
-    ini.writeinteger(section2, '2.X',    0);
-    ini.writeinteger(section2, '2.Y',    0);
-    ini.writeinteger(section2, '3.X',   30);
-    ini.writeinteger(section2, '3.Y',  -35);
-    ini.writeinteger(section2, '4.X',   30);
-    ini.writeinteger(section2, '4.Y',   35);
-    ini.writeinteger(section2, '5.X',   90);
-    ini.writeinteger(section2, '5.Y',    0);
+    ini.writefloat(section2, '2.X',    0);
+    ini.writefloat(section2, '2.Y',    0);
+    ini.writefloat(section2, '3.X',   30);
+    ini.writefloat(section2, '3.Y',  -35);
+    ini.writefloat(section2, '4.X',   30);
+    ini.writefloat(section2, '4.Y',   35);
+    ini.writefloat(section2, '5.X',   90);
+    ini.writefloat(section2, '5.Y',    0);
     // ---
-    ini.writefloat  (section3,   'R',    r);
+    ini.writefloat  (section3, 'R',    r);
     // ---
     freeandnil(ini);
   end;
 
   ini := tinifile.create(changefileext(paramstr(0),'.ini'));
   // absolute coordinates
-  fvplot[0].x := ini.readinteger(section1, '0.X', -1);
-  fvplot[0].y := ini.readinteger(section1, '0.Y', -1);
-  fvplot[1].x := ini.readinteger(section1, '1.X', -1);
-  fvplot[1].y := ini.readinteger(section1, '1.Y', -1);
-  fvplot[6].x := ini.readinteger(section4, '6.X', -1);
-  fvplot[6].y := ini.readinteger(section4, '6.Y', -1);
+  fvplot[0].x := ini.readfloat(section1, '0.X', -1);
+  fvplot[0].y := ini.readfloat(section1, '0.Y', -1);
+  fvplot[1].x := ini.readfloat(section1, '1.X', -1);
+  fvplot[1].y := ini.readfloat(section1, '1.Y', -1);
+  fvplot[6].x := ini.readfloat(section4, '6.X', -1);
+  fvplot[6].y := ini.readfloat(section4, '6.Y', -1);
   // relative coordinates
-  fvplot[2].x := ini.readinteger(section2, '2.X', -1);
-  fvplot[2].y := ini.readinteger(section2, '2.Y', -1);
-  fvplot[3].x := ini.readinteger(section2, '3.X', -1);
-  fvplot[3].y := ini.readinteger(section2, '3.Y', -1);
-  fvplot[4].x := ini.readinteger(section2, '4.X', -1);
-  fvplot[4].y := ini.readinteger(section2, '4.Y', -1);
-  fvplot[5].x := ini.readinteger(section2, '5.X', -1);
-  fvplot[5].y := ini.readinteger(section2, '5.Y', -1);
+  fvplot[2].x := ini.readfloat(section2, '2.X', -1);
+  fvplot[2].y := ini.readfloat(section2, '2.Y', -1);
+  fvplot[3].x := ini.readfloat(section2, '3.X', -1);
+  fvplot[3].y := ini.readfloat(section2, '3.Y', -1);
+  fvplot[4].x := ini.readfloat(section2, '4.X', -1);
+  fvplot[4].y := ini.readfloat(section2, '4.Y', -1);
+  fvplot[5].x := ini.readfloat(section2, '5.X', -1);
+  fvplot[5].y := ini.readfloat(section2, '5.Y', -1);
   // ---
-  fvplotratio := ini.readfloat(section3,     'R', -1);
+  fvplotratio := ini.readfloat(section3,   'R', -1);
   // ---
   freeandnil(ini);
   // ---
@@ -370,6 +373,9 @@ begin
   // ---
   fvplotposition.p := fvplot[6];
   optimize(fvplotposition);
+
+  fvplotcount[0] := fvplotposition.m0;
+  fvplotcount[1] := fvplotposition.m1;
 end;
 
 procedure tvplotdriver.interpolate_line(const p0, p1: tvplotpoint);
@@ -377,7 +383,7 @@ var
   dx, dy: double;
   i, j: longint;
 begin
-  i := max(1, round(abs(distancebetween(p0, p1) / 0.25)));
+  i := max(1, round(distancebetween(p0, p1) / 0.25));
 
   dx := (p1.x - p0.x) / i;
   dy := (p1.y - p0.y) / i;
@@ -433,9 +439,11 @@ procedure tvplotdriver.optimize(var position: tvplotposition);
 var
   alpha: double;
   error: double;
-    tmp: array[0..6] of tvplotpoint;
+    tmp: array[0..8] of tvplotpoint;
   line0: tvplotline;
   line1: tvplotline;
+  line2: tvplotline;
+  F0, F1, L0,L1: double;
 begin
   alpha := 0;
   repeat
@@ -464,47 +472,105 @@ begin
 
   until false;
 
-  position.m1 := round(distancebetween(tmp[0], tmp[3]) / fvplotratio);
-  position.m2 := round(distancebetween(tmp[1], tmp[4]) / fvplotratio);
+writeln('OPTIMIZED');
+writeln('alpha ', radtodeg(alpha):2:2);
+writeln('2.x ', tmp[2].x:2:2);
+writeln('2.y ', tmp[2].y:2:2);
+writeln('3.x ', tmp[3].x:2:2);
+writeln('3.y ', tmp[3].y:2:2);
+writeln('4.x ', tmp[4].x:2:2);
+writeln('4.y ', tmp[4].y:2:2);
+writeln('5.x ', tmp[5].x:2:2);
+writeln('5.y ', tmp[5].y:2:2);
+writeln('6.x ', tmp[6].x:2:2);
+writeln('6.y ', tmp[6].y:2:2);
+
+L0 := distancebetween(tmp[0], tmp[3]);
+L1 := distancebetween(tmp[1], tmp[4]);
+
+writeln('03  ', L0:2:2);
+writeln('14  ', L1:2:2);
+
+//tmp[7].x := 0;
+//tmp[7].y := tmp[3].y;
+//line2 := linebetween(tmp[7], tmp[3]);
+//intersectlines(line2, line1, tmp[8]);
+//F0 := (1.030 * 9.81) * distancebetween(tmp[3], tmp[6]) / distancebetween(tmp[3], tmp[8]);
+//F1 := (1.030 * 9.81) * distancebetween(tmp[6], tmp[8]) / distancebetween(tmp[3], tmp[8]);
+//writeln('F0 ', F0:2:2);
+//writeln('F1 ', F1:2:2);
+//L0 := L0 / (F0 / (0.19635 * 2500) + 1);
+//L1 := L1 / (F1 / (0.19635 * 2500) + 1);
+//writeln('03**  ', L0:2:2);
+//writeln('14**  ', L1:2:2);
+//position.m0 := round(L0 / fvplotratio);
+//position.m1 := round(L1 / fvplotratio);
+
+position.m0 := round(distancebetween(tmp[0], tmp[3]) / fvplotratio);
+position.m1 := round(distancebetween(tmp[1], tmp[4]) / fvplotratio);
+
+writeln('pos.count0 ', position.m0);
+writeln('pos.count1 ', position.m1);
 end;
 
 procedure tvplotdriver.moveto(var position: tvplotposition);
 var
   i:      longint;
+  count0: longint;
   count1: longint;
-  count2: longint;
 begin
   optimize(position);
 
+  count0 := position.m0 - fvplotposition.m0;
   count1 := position.m1 - fvplotposition.m1;
-  count2 := position.m2 - fvplotposition.m2;
 
-  if count1 > 0 then
+  if count0 > 0 then
     digitalwrite(vplotmot1_dir, HIGH)
   else
     digitalwrite(vplotmot1_dir, LOW);
 
-  if count2 > 0 then
+  if count1 > 0 then
     digitalwrite(vplotmot2_dir, LOW)
   else
     digitalwrite(vplotmot2_dir, HIGH);
 
-  count1 := abs(count1);
-  count2 := abs(count2);
-
-  if count1 > 5 then halt;
-  if count2 > 5 then halt;
 
   for i := 0 to 8 do
-    if (count1 <> 0) or (count2 <> 0) then
+    if (count0 <> 0) or (count1 <> 0) then
     begin
-      if vplotmatrix[i, count1] = 1 then digitalwrite(vplotmot1_step, HIGH);
-      if vplotmatrix[i, count2] = 1 then digitalwrite(vplotmot2_step, HIGH);
-      delay(5);
-      if vplotmatrix[i, count1] = 1 then digitalwrite(vplotmot1_step, LOW);
-      if vplotmatrix[i, count2] = 1 then digitalwrite(vplotmot2_step, LOW);
-      delay(5);
+      if vplotmatrix[abs(count0), i] = 1 then
+      begin
+        digitalwrite(vplotmot1_step, HIGH);
+
+        if count0 > 0 then
+          inc(fvplotcount[0])
+        else
+        if count0 < 0 then
+          dec(fvplotcount[0]) else writeln('ERROR');
+      end;
+
+      if vplotmatrix[abs(count1), i] = 1 then
+      begin
+        digitalwrite(vplotmot2_step, HIGH);
+
+        if count1 > 0 then
+          inc(fvplotcount[1])
+        else
+        if count1 < 0 then
+          dec(fvplotcount[1]) else writeln('ERROR');
+      end;
+
+      delay(50);
+      if vplotmatrix[abs(count0), i] = 1 then digitalwrite(vplotmot1_step, LOW);
+      if vplotmatrix[abs(count1), i] = 1 then digitalwrite(vplotmot2_step, LOW);
+      delay(50);
     end;
+
+  writeln('count0 ', position.m0);
+  writeln('count1 ', position.m1);
+
+  writeln('count0 **', fvplotcount[0]);
+  writeln('count1 **', fvplotcount[1]);
 
   fvplotposition := position;
 end;
@@ -531,12 +597,12 @@ begin
       digitalwrite(vplotmot1_step, HIGH)
     else
       digitalwrite(vplotmot2_step, HIGH);
-    delay(5);
+    delay(10);
     if motor = 0 then
       digitalwrite(vplotmot1_step, LOW)
     else
       digitalwrite(vplotmot2_step, LOW);
-    delay(5);
+    delay(10);
     dec(count);
   end;
 end;
@@ -615,7 +681,7 @@ begin
         if (fvplotcode.c ='G02 ') then draw(fvplotcode) else
         if (fvplotcode.c ='G03 ') then draw(fvplotcode);
       end;
-      sleep(2);
+      sleep(5);
       synchronize(fvplotinterface.fsync4);
     end else
     begin
