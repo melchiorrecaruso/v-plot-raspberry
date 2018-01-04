@@ -32,7 +32,7 @@ begin
   requirederivedformresource := true;
   application.initialize;
   application.createform(tmainform, mainform);
-  Application.CreateForm(TForm1, Form1);
+  Application.createForm(TForm1, Form1);
   application.run;
 end.
 

@@ -34,10 +34,8 @@ type
   { tmainform }
 
   tmainform = class(tform)
-    bevel1: tmenuitem;
-    aboutvplot: tmenuitem;
     bevel2: tbevel;
-    prvwbox: TCheckBox;
+    prvwbtn: TCheckBox;
     panbtn: tbitbtn;
     previewimage: timage;
     loadbtn: tbitbtn;
@@ -46,35 +44,27 @@ type
     previewpanel: tpanel;
     playbtn: tbitbtn;
     progressbar: tprogressbar;
-    showviewform: tmenuitem;
-    moremenu: tpopupmenu;
     opendialog: topendialog;
     stopbtn: tbitbtn;
     timer: ttimer;
     updownbtn: tupdown;
     leftrightbtn: tupdown;
-    procedure panbtnclick(sender: tobject);
-    procedure formclose(sender: tobject; var closeaction: tcloseaction);
+
     procedure formcreate(sender: tobject);
     procedure formdestroy(sender: tobject);
+    procedure formclose(sender: tobject; var closeaction: tcloseaction);
+    procedure leftrightbtnclick(sender: tobject; button: tudbtntype);
+
+    procedure updownbtnclick(sender: tobject; button: tudbtntype);
+    procedure panbtnclick(sender: tobject);
     procedure loadbtnclick(sender: tobject);
-    procedure playbtnclick(sender: tobject);
-    procedure showviewformClick(Sender: TObject);
-    procedure stopbtnclick(sender: tobject);
+    procedure playorstopbtnclick(sender: tobject);
+    procedure prvwbtnchange(sender: tobject);
     procedure morebtnclick(sender: tobject);
     procedure timertimer(sender: tobject);
-    procedure updownbtnclick(sender: tobject; button: tudbtntype);
-    procedure leftrightbtnclick(sender: tobject; button: tudbtntype);
   private
-    vplotlist :tstringlist;
-    vplotlistindex: longint;
-
-    procedure formsync1;
-    procedure formsync2;
-    procedure formsync3;
-    procedure formsync4;
-  public
-
+    procedure ondraw;
+    procedure ondrawn;
   end;
 
 
@@ -97,140 +87,27 @@ begin
   playbtn.enabled := false;
   stopbtn.enabled := false;
   morebtn.enabled := true;
-  prvwbox.enabled := false;
-
-  vplotinterface := tvplotinterface.create;
-  vplotinterface.gcode     := '';
-  vplotinterface.sync1     := @formsync1;
-  vplotinterface.sync2     := @formsync2;
-  vplotinterface.sync3     := @formsync3;
-  vplotinterface.sync4     := @formsync4;
-  vplotinterface.preview   := true;
-  vplotinterface.suspended := true;
-
-  vplotdriver := tvplotdriver.create(vplotinterface);
-  vplotlist   := tstringlist.create;
-end;
-
-procedure tmainform.formclose(sender: tobject; var closeaction: tcloseaction);
-begin
-  if vplotinterface.suspended = false then
-    closeaction := canone;
-end;
-
-procedure tmainform.panbtnClick(Sender: TObject);
-begin
-  previewimage.top  := (previewpanel.height - previewimage.height) div 2;
-  previewimage.left := (previewpanel.width  - previewimage.width)  div 2;
+  // ---
+  vplotdriver     := tvplotdriver.create;
 end;
 
 procedure tmainform.formdestroy(sender: tobject);
 begin
-  vplotdriver.terminate;
-  sleep(100);
-
-  vplotinterface.destroy;
-  vplotlist.destroy;
+  vplotdriver.destroy;
 end;
 
-procedure tmainform.formsync1;
+procedure tmainform.formclose(sender: tobject; var closeaction: tcloseaction);
 begin
-  vplotinterface.gcode := '';
-  if not vplotinterface.suspended then
-  begin
-    vplotinterface.gcode := vplotlist[vplotlistindex];
-    progressbar.stepit;
-  end;
-  application.processmessages;
-end;
+  if assigned(vplotcoder) then
+    vplotcoder.terminate;
 
-procedure Tmainform.formsync2;
-begin
-  previewimage.canvas.pen.color   := clred;
-  previewimage.canvas.brush.color := clred;
-  previewimage.canvas.brush.style := bssolid;
-  with vplotinterface do
-    previewimage.canvas.line(
-      round(point1.x),
-      round(point1.y),
-      round(point0.x),
-      round(point0.y));
-end;
-
-procedure Tmainform.formsync3;
-begin
-  previewimage.canvas.pen.color   := clblack;
-  previewimage.canvas.brush.color := clblack;
-  previewimage.canvas.brush.style := bssolid;
-  with vplotinterface do
-    previewimage.canvas.line(
-      round(point1.x),
-      round(point1.y),
-      round(point0.x),
-      round(point0.y));
-end;
-
-procedure Tmainform.formsync4;
-begin
-  if vplotlistindex = vplotlist.count - 1 then
-  begin
-    stopbtn.click;
-  end else
-    inc(vplotlistindex);
-end;
-
-procedure tmainform.playbtnclick(sender: tobject);
-begin
-  if vplotlist.count > 0 then
-  begin
-    vplotinterface.preview   := prvwbox.checked;
-    vplotinterface.suspended := false;
-  end;
-
-  timer  .enabled := not vplotinterface.suspended;
-  playbtn.enabled :=     vplotinterface.suspended;
-  stopbtn.enabled := not vplotinterface.suspended;
-  prvwbox.enabled :=     vplotinterface.suspended;
-end;
-
-procedure tmainform.showviewformclick(sender: tobject);
-begin
-  form1.showmodal;
-end;
-
-procedure tmainform.stopbtnclick(sender: tobject);
-begin
-  vplotinterface.preview   := prvwbox.checked;
-  vplotinterface.suspended := true;
-
-  timer.enabled   := not vplotinterface.suspended;
-  playbtn.enabled :=     vplotinterface.suspended;
-  stopbtn.enabled := not vplotinterface.suspended;
-  prvwbox.enabled :=     vplotinterface.suspended;
-end;
-
-procedure tmainform.morebtnclick(sender: tobject);
-begin
-  moremenu.popup(left + morebtn.left, top + 28);
-end;
-
-procedure tmainform.timertimer(Sender: TObject);
-begin
-  inc(x);
-  caption := 'VPlot - Time elapsed ' + inttostr(x) + ' secs';
-end;
-
-procedure tmainform.updownbtnClick(sender: tobject; button: tudbtntype);
-begin
-  if button = btnext then
-    previewimage.top := min(2, previewimage.top + 100)
+  if assigned(vplotcoder) then
+    closeaction := canone
   else
-    previewimage.top := max(previewpanel.height -
-                            previewimage.height - 2,
-                            previewimage.top    - 100);
+    closeaction := cafree;
 end;
 
-procedure tmainform.leftrightbtnClick(sender: tobject; button: tudbtntype);
+procedure tmainform.leftrightbtnclick(sender: tobject; button: tudbtntype);
 begin
   if button = btprev then
     previewimage.left := min(2, previewimage.left + 100)
@@ -240,14 +117,26 @@ begin
                              previewimage.left  - 100);
 end;
 
+procedure tmainform.updownbtnclick(sender: tobject; button: tudbtntype);
+begin
+  if button = btnext then
+    previewimage.top := min(2, previewimage.top + 100)
+  else
+    previewimage.top := max(previewpanel.height -
+                            previewimage.height - 2,
+                            previewimage.top    - 100);
+end;
+
+procedure tmainform.panbtnclick(sender: tobject);
+begin
+  previewimage.top  := (previewpanel.height - previewimage.height) div 2;
+  previewimage.left := (previewpanel.width  - previewimage.width)  div 2;
+end;
+
 procedure tmainform.loadbtnclick(sender: tobject);
 begin
   if opendialog.execute then
   begin
-    vplotlist.clear;
-    vplotlist.loadfromfile(opendialog.filename);
-    vplotlistindex := 0;
-    // ---
     previewimage.picture.bitmap.setsize(775,775);
     previewimage.canvas.pen.color   := clwhite;
     previewimage.canvas.brush.color := clwhite;
@@ -261,18 +150,95 @@ begin
     previewimage.stretchoutenabled := false;
     previewimage.stretch           := false;
 
-    progressbar.min      := 0;
-    progressbar.max      := vplotlist.count;
-    progressbar.position := 0;
-    progressbar.smooth   := true;
+    // progressbar.min      := 0;
+    // progressbar.max      := vplotlist.count;
+    // progressbar.position := 0;
+    // progressbar.smooth   := true;
     // ---
-    vplotdriver.initialize;
     playbtn.enabled := true;
-    prvwbox.enabled := true;
-
+    stopbtn.enabled := false;
+    // ---
+    vplotcoder          := tvplotcoder.create;
+    vplotcoder.ondraw   := @ondraw;
+    vplotcoder.ondrawn  := @ondrawn;
+    vplotcoder.filename := opendialog.filename;
+    vplotcoder.enabled  := false;
+    vplotcoder.start;
+    // ---
     x := 0;
   end;
 end;
+
+procedure tmainform.playorstopbtnclick(sender: tobject);
+begin
+  if assigned(vplotcoder) then
+  begin
+    if sender = playbtn then
+      vplotcoder.enabled := true
+    else
+    if sender = stopbtn then
+      vplotcoder.enabled := false;
+    // ---
+    timer  .enabled :=     vplotcoder.enabled;
+    playbtn.enabled := not vplotcoder.enabled;
+    stopbtn.enabled :=     vplotcoder.enabled;
+    prvwbtn.enabled := not vplotcoder.enabled;
+  end;
+end;
+
+procedure tmainform.prvwbtnchange(sender: tobject);
+begin
+  vplotdriver.enabled := not prvwbtn.checked;
+end;
+
+procedure tmainform.morebtnclick(sender: tobject);
+begin
+  form1.showmodal;
+end;
+
+procedure Tmainform.ondraw;
+var
+  p0, p1: tvplotpoint;
+begin
+  if assigned(vplotcoder) then
+  begin
+    previewimage.canvas.pen.color   := clred;
+    previewimage.canvas.brush.color := clred;
+    previewimage.canvas.brush.style := bssolid;
+
+    vplotcoder.drawn(p0, p1);
+    previewimage.canvas.line(
+      round(p1.x), round(p1.y),
+      round(p0.x), round(p0.y));
+  end;
+end;
+
+procedure Tmainform.ondrawn;
+var
+  p0, p1: tvplotpoint;
+begin
+  if assigned(vplotcoder) then
+  begin
+    previewimage.canvas.pen.color   := clblack;
+    previewimage.canvas.brush.color := clblack;
+    previewimage.canvas.brush.style := bssolid;
+
+    vplotcoder.drawn(p0, p1);
+    previewimage.canvas.line(
+      round(p1.x), round(p1.y),
+      round(p0.x), round(p0.y));
+  end;
+end;
+
+procedure tmainform.timertimer(Sender: TObject);
+begin
+  inc(x);
+  caption := 'VPlot - Time elapsed ' + inttostr(x) + ' secs';
+end;
+
+
+
+
 
 end.
 

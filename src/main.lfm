@@ -30,6 +30,7 @@ object mainform: Tmainform
     Color = clWhite
     ParentColor = False
     TabOrder = 0
+    OnClick = playorstopbtnclick
     object playbtn: TBitBtn
       AnchorSideLeft.Control = btnpanel
       AnchorSideTop.Control = loadbtn
@@ -336,7 +337,7 @@ object mainform: Tmainform
         FF00000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000
       }
-      OnClick = playbtnClick
+      OnClick = playorstopbtnclick
       TabOrder = 1
     end
     object stopbtn: TBitBtn
@@ -645,7 +646,7 @@ object mainform: Tmainform
         4800000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000
       }
-      OnClick = stopbtnClick
+      OnClick = playorstopbtnclick
       TabOrder = 2
     end
     object morebtn: TBitBtn
@@ -1277,20 +1278,22 @@ object mainform: Tmainform
       BorderSpacing.Left = 5
       Style = bsRaised
     end
-    object prvwbox: TCheckBox
+    object prvwbtn: TCheckBox
       AnchorSideLeft.Control = btnpanel
-      AnchorSideRight.Control = btnpanel
+      AnchorSideRight.Control = loadbtn
       AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Control = morebtn
       Left = 5
       Height = 23
-      Top = 354
+      Top = 359
       Width = 140
       Anchors = [akLeft, akRight, akBottom]
       BorderSpacing.Left = 5
-      BorderSpacing.Right = 10
-      BorderSpacing.Bottom = 10
+      BorderSpacing.Bottom = 5
       Caption = 'Preview Only'
+      Checked = True
+      OnChange = prvwbtnChange
+      State = cbChecked
       TabOrder = 4
     end
   end
@@ -1402,27 +1405,13 @@ object mainform: Tmainform
     end
   end
   object opendialog: TOpenDialog
-    left = 176
+    left = 184
     top = 8
-  end
-  object moremenu: TPopupMenu
-    left = 264
-    top = 8
-    object showviewform: TMenuItem
-      Caption = 'Show View form'
-      OnClick = showviewformClick
-    end
-    object bevel1: TMenuItem
-      Caption = '-'
-    end
-    object aboutvplot: TMenuItem
-      Caption = 'About'
-    end
   end
   object timer: TTimer
     Enabled = False
     OnTimer = timerTimer
-    left = 336
+    left = 264
     top = 8
   end
 end

@@ -14,24 +14,20 @@ type
 
   tform1 = class(tform)
     dxdownbtn: tbitbtn;
-    m1groupbox1: tgroupbox;
+    m1gb: tgroupbox;
     dxupspinedit: tspinedit;
     dxdownspinedit: tspinedit;
     sxupbtn: tbitbtn;
     sxdownbtn: tbitbtn;
-    onbtn: tbitbtn;
-    m1groupbox: tgroupbox;
+    okbtn: tbitbtn;
+    m0gb: tgroupbox;
     sxupspinedit: tspinedit;
     sxdownspinedit: tspinedit;
     dxupbtn: tbitbtn;
-    procedure dxupbtnclick(sender: tobject);
-    procedure sxdownbtnclick(sender: tobject);
-    procedure dxdownbtnclick(sender: tobject);
-    procedure sxupbtnclick(sender: tobject);
+    procedure updatebtn(value: boolean);
+    procedure btnclick(sender: tobject);
   private
-
   public
-
   end;
 
 var
@@ -44,26 +40,23 @@ uses
 
 { tform1 }
 
-procedure tform1.sxupbtnclick(sender: tobject);
+procedure tform1.updatebtn(value: boolean);
 begin
-  vplotdriver.move(0, sxupspinedit.value, false);
+  sxupbtn  .enabled := value;
+  sxdownbtn.enabled := value;
+  dxupbtn  .enabled := value;
+  dxdownbtn.enabled := value;
 end;
 
-procedure tform1.sxdownbtnclick(sender: tobject);
+procedure tform1.btnclick(sender: tobject);
 begin
-  vplotdriver.move(0, sxdownspinedit.value, true);
+  updatebtn(false);
+  if sender = sxupbtn   then vplotdriver.move4(-sxupspinedit  .value, 0, 0) else
+  if sender = sxdownbtn then vplotdriver.move4(+sxdownspinedit.value, 0, 0) else
+  if sender = dxupbtn   then vplotdriver.move4(0, -dxupspinedit  .value, 0) else
+  if sender = dxdownbtn then vplotdriver.move4(0, +dxdownspinedit.value, 0);
+  updatebtn(true);
 end;
-
-procedure tform1.dxupbtnclick(sender: tobject);
-begin
-  vplotdriver.move(1, dxupspinedit.value, false);
-end;
-
-procedure tform1.dxdownbtnclick(sender: tobject);
-begin
-  vplotdriver.move(1, dxdownspinedit.value, true);
-end;
-
 
 initialization
 

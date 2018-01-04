@@ -1,4 +1,4 @@
-{ Description: vPlot driver.
+{ Description: vPlot interface.
 
   Copyright (C) 2014-2017 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
@@ -20,7 +20,8 @@
 
 unit libvplot;
 
-{$mode objfpc}{$h+}
+{$mode objfpc}{$H+}
+{$define debug}
 
 interface
 
@@ -33,7 +34,7 @@ type
     y: double;
   end;
 
-  tvplotline = record
+  tvplotline = packed record
     a: double;
     b: double;
     c: double;
@@ -42,6 +43,7 @@ type
   tvplotposition = record
     m0: longint;
     m1: longint;
+    mz: longint;
     p:  tvplotpoint;
   end;
 
@@ -59,62 +61,63 @@ type
   end;
 
 type
-  tvplotinterface = class
+  tvplotdriver = class
   private
-    fgcode:     rawbytestring;
-    fdelay:     longword;
-    fpoint0:    tvplotpoint;
-    fpoint1:    tvplotpoint;
-    fsync1:     tthreadmethod;
-    fsync2:     tthreadmethod;
-    fsync3:     tthreadmethod;
-    fsync4:     tthreadmethod;
-    fpreview:   boolean;
-    fsuspended: boolean;
+    fcount0:  longint;
+    fcount1:  longint;
+    fcountz:  longint;
+    fdelayms: longword;
+    fenabled: boolean;
+    ffault:   longint;
   public
-    property gcode:     rawbytestring read fgcode     write fgcode;
-    property delay:     longword      read fdelay     write fdelay;
-    property point0:    tvplotpoint   read fpoint0    write fpoint0;
-    property point1:    tvplotpoint   read fpoint1    write fpoint1;
-    property sync1:     tthreadmethod read fsync1     write fsync1;
-    property sync2:     tthreadmethod read fsync2     write fsync2;
-    property sync3:     tthreadmethod read fsync3     write fsync3;
-    property sync4:     tthreadmethod read fsync4     write fsync4;
-    property preview:   boolean       read fpreview   write fpreview;
-    property suspended: boolean       read fsuspended write fsuspended;
+    constructor create;
+    destructor destroy; override;
+    procedure  init (cnt0, cnt1, cntz: longint);
+    procedure  move2(cnt0, cnt1, cntz: longint);
+    procedure  move4(cnt0, cnt1, cntz: longint);
+  published
+    property delayms: longword read fdelayms write fdelayms;
+    property fault:   longint  read ffault;
+    property enabled: boolean  read fenabled write fenabled;
   end;
 
 type
-  tvplotdriver = class (tthread)
+  tvplotcoder = class (tthread)
   private
-    fvplot:     array[0..6] of tvplotpoint;
-    fvplotpath: array of tvplotposition;
-    fvplotcode: tvplotcode;
-    fvplotinterface: tvplotinterface;
-    fcurrposition: tvplotposition;
-    fvplotratio: double;
-
+    ffilename:   rawbytestring;
+    fenabled:    boolean;
+    foffsetx:    longint;
+    foffsety:    longint;
+    fondraw:     tthreadmethod;
+    fondrawn:    tthreadmethod;
+    fpath:       array of tvplotposition;
+    fpoints:     array[0..6] of tvplotpoint;
+    fpoint0:     tvplotpoint;
+    fpoint1:     tvplotpoint;
+    fposition:   tvplotposition;
+    fgearratio:  double;
     procedure interpolate_line(const p0, p1: tvplotpoint);
     procedure interpolate_arc (const p0, p1, cc: tvplotpoint; clockwise: boolean);
-
-    procedure optimize(var position: tvplotposition);
-    procedure moveto(var nextposition: tvplotposition);
+    procedure optimizeposition(var position: tvplotposition);
     procedure draw(const code: tvplotcode);
   protected
     procedure execute; override;
   public
-    constructor create(vplotinterface: tvplotinterface);
+    constructor create;
     destructor destroy; override;
-    procedure initialize;
-    procedure move(motor, count: longint; cw: boolean);
+    procedure  drawn(var p0, p1: tvplotpoint);
+  published
+    property filename:   rawbytestring read ffilename   write ffilename;
+    property ondraw:     tthreadmethod read fondraw     write fondraw;
+    property ondrawn:    tthreadmethod read fondrawn    write fondrawn;
+    property offsetx:    longint       read foffsetx    write foffsetx;
+    property offsety:    longint       read foffsety    write foffsety;
+    property enabled:    boolean       read fenabled    write fenabled;
   end;
 
-
 var
-  vplotinterface: tvplotinterface = nil;
-  vplotdriver:    tvplotdriver    = nil;
-  vplotinit:      boolean;
-  vplotservo:     double;
+  vplotcoder:  tvplotcoder  = nil;
+  vplotdriver: tvplotdriver = nil;
 
 implementation
 
@@ -122,16 +125,17 @@ uses
   inifiles, math, pca9685, wiringpi;
 
 const
-  vplotservo_maxvalue = 2.50;
-  vplotservo_minvalue = 0.50;
-  vplotservo_rstvalue = 1.50;
-  vplotservo_incvalue = 0.10;
-  vplotservo_freq     = 50;
+  mot0_step      = P38;
+  mot0_dir       = P40;
+  mot1_step      = P16;
+  mot1_dir       = P18;
 
-  vplotmot0_step      = P38;
-  vplotmot0_dir       = P40;
-  vplotmot1_step      = P16;
-  vplotmot1_dir       = P18;
+  motz_maxvalue = 2.50;
+  motz_minvalue = 0.50;
+  motz_rstvalue = 1.50;
+  motz_incvalue = 0.10;
+  motz_freq     = 50;
+
 
   vplotmatrix : array [0..5, 0..8] of longint =
     ((0, 0, 0, 0, 0, 0, 0, 0, 0),
@@ -258,126 +262,24 @@ begin
     raise exception.create('Intersectlines routine exception');
 end;
 
-// vplotdriver //
+// tvplotcoder //
 
-constructor tvplotdriver.create(vplotinterface: tvplotinterface);
+constructor tvplotcoder.create;
 begin
-  // initializa wiringPI library
-  vplotinit := wiringPISetup <> -1;
-  if vplotinit then
-  begin
-    pinMode(P11, OUTPUT);
-    digitalwrite(P11, LOW);
-    // inizialize pca9685 library
-    vplotinit := pca9685Setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, vplotservo_freq) <> -1;
-    if vplotinit then
-    begin
-      pwmWrite(PCA9685_PIN_BASE + 0, calcTicks(vplotservo_minvalue, vplotservo_freq));
-      delay(2000);
-      pwmWrite(PCA9685_PIN_BASE + 0, calcTicks(vplotservo_maxvalue, vplotservo_freq));
-      delay(2000);
-      pwmWrite(PCA9685_PIN_BASE + 0, calcTicks(vplotservo_rstvalue, vplotservo_freq));
-      delay(2000);
-      vplotservo := 0;
-    end;
-    digitalwrite(P11, HIGH);
-    // initialize step motor1
-    pinMode(vplotmot0_dir, OUTPUT);
-    pinMode(vplotmot0_step, OUTPUT);
-    digitalwrite(vplotmot0_dir, LOW);
-    digitalwrite(vplotmot0_step, LOW);
-    // initializa step motor2
-    pinMode(vplotmot1_dir, OUTPUT);
-    pinMode(vplotmot1_step, OUTPUT);
-    digitalwrite(vplotmot1_dir, LOW);
-    digitalwrite(vplotmot1_step, LOW);
-  end;
-  fvplotinterface := vplotinterface;
+  fenabled := false;
+  foffsetx := 0;
+  foffsety := 0;
   freeonterminate := true;
-  inherited create(false);
+  inherited create(true);
 end;
 
-destructor tvplotdriver.destroy;
+destructor tvplotcoder.destroy;
 begin
-  fvplotinterface := nil;
+  vplotcoder := nil;
   inherited destroy;
 end;
 
-procedure tvplotdriver.initialize;
-const
-  section1 = 'Anchors';
-  section2 = 'Vplot';
-  section3 = 'Gear ratio';
-  section4 = 'Home';
-         r = (pi * 25) / 800;
-var
-  ini: tinifile;
-begin
-  if not fileexists(changefileext(paramstr(0),'.ini')) then
-  begin
-    ini := tinifile.create(changefileext(paramstr(0),'.ini'));
-    // absolute coordinates
-    ini.writefloat(section1, '0.X',    0);
-    ini.writefloat(section1, '0.Y',    0);
-    ini.writefloat(section1, '1.X',    0);
-    ini.writefloat(section1, '1.Y', 1500);
-    ini.writefloat(section4, '6.X',  250);
-    ini.writefloat(section4, '6.Y',  750);
-    // relative coordinates
-    ini.writefloat(section2, '2.X',    0);
-    ini.writefloat(section2, '2.Y',    0);
-    ini.writefloat(section2, '3.X',   30);
-    ini.writefloat(section2, '3.Y',  -35);
-    ini.writefloat(section2, '4.X',   30);
-    ini.writefloat(section2, '4.Y',   35);
-    ini.writefloat(section2, '5.X',   90);
-    ini.writefloat(section2, '5.Y',    0);
-    // ---
-    ini.writefloat  (section3, 'R',    r);
-    // ---
-    freeandnil(ini);
-  end;
-
-  ini := tinifile.create(changefileext(paramstr(0),'.ini'));
-  // absolute coordinates
-  fvplot[0].x := ini.readfloat(section1, '0.X', -1);
-  fvplot[0].y := ini.readfloat(section1, '0.Y', -1);
-  fvplot[1].x := ini.readfloat(section1, '1.X', -1);
-  fvplot[1].y := ini.readfloat(section1, '1.Y', -1);
-  fvplot[6].x := ini.readfloat(section4, '6.X', -1);
-  fvplot[6].y := ini.readfloat(section4, '6.Y', -1);
-  // relative coordinates
-  fvplot[2].x := ini.readfloat(section2, '2.X', -1);
-  fvplot[2].y := ini.readfloat(section2, '2.Y', -1);
-  fvplot[3].x := ini.readfloat(section2, '3.X', -1);
-  fvplot[3].y := ini.readfloat(section2, '3.Y', -1);
-  fvplot[4].x := ini.readfloat(section2, '4.X', -1);
-  fvplot[4].y := ini.readfloat(section2, '4.Y', -1);
-  fvplot[5].x := ini.readfloat(section2, '5.X', -1);
-  fvplot[5].y := ini.readfloat(section2, '5.Y', -1);
-  // ---
-  fvplotratio := ini.readfloat(section3,   'R', -1);
-  // ---
-  freeandnil(ini);
-  // ---
-  fvplotcode.c := '';
-  fvplotcode.x  := 0;
-  fvplotcode.y  := 0;
-  fvplotcode.z  := 0;
-  fvplotcode.f  := 0;
-  fvplotcode.e  := 0;
-  fvplotcode.i  := 0;
-  fvplotcode.j  := 0;
-  fvplotcode.k  := 0;
-  fvplotcode.r  := 0;
-  // ---
-  fcurrposition.p := fvplot[6];
-  optimize(fcurrposition);
-
-  fvplotinterface.fdelay := 50;
-end;
-
-procedure tvplotdriver.interpolate_line(const p0, p1: tvplotpoint);
+procedure tvplotcoder.interpolate_line(const p0, p1: tvplotpoint);
 var
   dx, dy: double;
   i, j: longint;
@@ -387,16 +289,16 @@ begin
   dx := (p1.x - p0.x) / i;
   dy := (p1.y - p0.y) / i;
 
-  setlength(fvplotpath, i + 1);
+  setlength(fpath, i + 1);
   for j := 0 to i do
   begin
-    fvplotpath[j].p.x := j * dx;
-    fvplotpath[j].p.y := j * dy;
-    fvplotpath[j].p   := translatepoint(p0, fvplotpath[j].p);
+    fpath[j].p.x := j * dx;
+    fpath[j].p.y := j * dy;
+    fpath[j].p   := translatepoint(p0, fpath[j].p);
   end;
 end;
 
-procedure tvplotdriver.interpolate_arc(const p0, p1, cc: tvplotpoint; clockwise: boolean);
+procedure tvplotcoder.interpolate_arc(const p0, p1, cc: tvplotpoint; clockwise: boolean);
 var
   line0: tvplotline;
   line1: tvplotline;
@@ -426,15 +328,15 @@ begin
       sweep := sweep + (2 * pi);
 
   i := max(1, round(abs(sweep) * distancebetween(tmp[2], tmp[0]) / 0.25));
-  setlength(fvplotpath, i + 1);
+  setlength(fpath, i + 1);
   for j := 0 to i do
   begin
-    fvplotpath[j].p := rotatepoint(tmp[0], (j * (sweep / i)));
-    fvplotpath[j].p := translatepoint(cc, fvplotpath[j].p);
+    fpath[j].p := rotatepoint(tmp[0], (j * (sweep / i)));
+    fpath[j].p := translatepoint(cc, fpath[j].p);
   end;
 end;
 
-procedure tvplotdriver.optimize(var position: tvplotposition);
+procedure tvplotcoder.optimizeposition(var position: tvplotposition);
 var
   alpha: double;
   error: double;
@@ -447,12 +349,12 @@ begin
   alpha := 0;
   repeat
     // absolute coordinates
-    tmp[0] := fvplot[0];
-    tmp[1] := fvplot[1];
-    tmp[2] := translatepoint(position.p, rotatepoint(fvplot[2], alpha));
-    tmp[3] := translatepoint(position.p, rotatepoint(fvplot[3], alpha));
-    tmp[4] := translatepoint(position.p, rotatepoint(fvplot[4], alpha));
-    tmp[5] := translatepoint(position.p, rotatepoint(fvplot[5], alpha));
+    tmp[0] := fpoints[0];
+    tmp[1] := fpoints[1];
+    tmp[2] := translatepoint(position.p, rotatepoint(fpoints[2], alpha));
+    tmp[3] := translatepoint(position.p, rotatepoint(fpoints[3], alpha));
+    tmp[4] := translatepoint(position.p, rotatepoint(fpoints[4], alpha));
+    tmp[5] := translatepoint(position.p, rotatepoint(fpoints[5], alpha));
     line0  := linebetween(tmp[0], tmp[3]);
     line1  := linebetween(tmp[1], tmp[4]);
 
@@ -502,142 +404,36 @@ writeln('14  ', L1:2:2);
 //L1 := L1 / (F1 / (0.19635 * 2500) + 1);
 //writeln('03**  ', L0:2:2);
 //writeln('14**  ', L1:2:2);
-//position.m0 := round(L0 / fvplotratio);
-//position.m1 := round(L1 / fvplotratio);
+//position.m0 := round(L0 / fratio);
+//position.m1 := round(L1 / fratio);
 
-position.m0 := round(distancebetween(tmp[0], tmp[3]) / fvplotratio);
-position.m1 := round(distancebetween(tmp[1], tmp[4]) / fvplotratio);
-
-writeln('pos.count0 ', position.m0);
-writeln('pos.count1 ', position.m1);
+  position.m0 := round(distancebetween(tmp[0], tmp[3]) / fgearratio);
+  position.m1 := round(distancebetween(tmp[1], tmp[4]) / fgearratio);
 end;
 
-procedure tvplotdriver.moveto(var nextposition: tvplotposition);
-var
-       i: longint;
-    inc0: longint;
-    inc1: longint;
-  count0: longint;
-  count1: longint;
-begin
-  optimize(nextposition);
-
-  count0 := nextposition.m0 - fcurrposition.m0;
-  if count0 > 0 then
-  begin
-    digitalwrite(vplotmot0_dir, HIGH);
-    inc0 := +1;
-  end else
-  begin
-    digitalwrite(vplotmot0_dir, LOW);
-    inc0 := -1;
-  end;
-  count0 := abs(count0);
-
-  count1 := nextposition.m1 - fcurrposition.m1;
-  if count1 > 0 then
-  begin
-    digitalwrite(vplotmot1_dir, LOW);
-    inc1 := +1;
-  end else
-  begin
-    digitalwrite(vplotmot1_dir, HIGH);
-    inc1 := -1;
-  end;
-  count1 := abs(count1);
-
-  assert(max(count0, count1) >= 0, 'min count error');
-  assert(max(count0, count1) <= 5, 'max count error');
-
-  if (count0 <> 0) or (count1 <> 0) then
-  begin
-
-
-    // move stepper
-    for i := 0 to 8 do
-    begin
-      if vplotmatrix[count0, i] = 1 then
-      begin
-        digitalwrite(vplotmot0_step, HIGH);
-        delay(vplotinterface.fdelay);
-        digitalwrite(vplotmot0_step, LOW);
-        delay(vplotinterface.fdelay);
-        fcurrposition.m0 := fcurrposition.m0 + inc0;
-      end;
-
-      if vplotmatrix[count1, i] = 1 then
-      begin
-        digitalwrite(vplotmot1_step, HIGH);
-        delay(vplotinterface.fdelay);
-        digitalwrite(vplotmot1_step, LOW);
-        delay(vplotinterface.fdelay);
-        fcurrposition.m1 := fcurrposition.m1 + inc1;
-      end;
-    end;
-    fcurrposition.p := nextposition.p;
-  end;
-
-  writeln('next.count0 ',  nextposition.m0);
-  writeln('next.count1 ',  nextposition.m1);
-  writeln('curr.count0 ', fcurrposition.m0);
-  writeln('curr.count1 ', fcurrposition.m1);
-end;
-
-procedure tvplotdriver.move(motor, count: longint; cw: boolean);
-begin
-  if cw then
-  begin
-    if motor = 0 then
-      digitalwrite(vplotmot0_dir, HIGH)
-    else
-      digitalwrite(vplotmot1_dir, LOW);
-  end else
-  begin
-    if motor = 0 then
-      digitalwrite(vplotmot0_dir, LOW)
-    else
-      digitalwrite(vplotmot1_dir, HIGH);
-  end;
-
-  while count > 0 do
-  begin
-    if motor = 0 then
-      digitalwrite(vplotmot0_step, HIGH)
-    else
-      digitalwrite(vplotmot1_step, HIGH);
-    delay(10);
-    if motor = 0 then
-      digitalwrite(vplotmot0_step, LOW)
-    else
-      digitalwrite(vplotmot1_step, LOW);
-    delay(10);
-    dec(count);
-  end;
-end;
-
-procedure tvplotdriver.draw(const code: tvplotcode);
+procedure tvplotcoder.draw(const code: tvplotcode);
 var
   i, j: longint;
   p0, p1, cc: tvplotpoint;
 begin
-  if code.x < ((1 * fvplot[1].y) / 6) then exit;
-  if code.x > ((5 * fvplot[1].y) / 6) then exit;
-  if code.y < ((1 * fvplot[1].y) / 6) then exit;
-  if code.y > ((5 * fvplot[1].y) / 6) then exit;
+  if code.x < ((1 * fpoints[1].y) / 6) then exit;
+  if code.x > ((5 * fpoints[1].y) / 6) then exit;
+  if code.y < ((1 * fpoints[1].y) / 6) then exit;
+  if code.y > ((5 * fpoints[1].y) / 6) then exit;
 
-  setlength(fvplotpath, 0);
+  setlength(fpath, 0);
   if (code.c ='G00 ') or (code.c = 'G01 ') then
   begin
-    p0.x := fcurrposition.p.x;
-    p0.y := fcurrposition.p.y;
+    p0.x := fposition.p.x;
+    p0.y := fposition.p.y;
     p1.x := code.x;
     p1.y := code.y;
     interpolate_line(p0, p1);
   end else
   if (code.c ='G02 ') or (code.c = 'G03 ') then
   begin
-    p0.x := fcurrposition.p.x;
-    p0.y := fcurrposition.p.y;
+    p0.x := fposition.p.x;
+    p0.y := fposition.p.y;
     p1.x := code.x;
     p1.y := code.y;
     cc.x := p0.x + code.i;
@@ -645,60 +441,233 @@ begin
     interpolate_arc(p0, p1, cc, code.c = 'G02 ');
   end;
 
-  j := length(fvplotpath);
+  j := length(fpath);
   if j > 0 then
   begin
-    // move servo
-    if not fvplotinterface.fpreview then
-      if vplotservo <> code.z then
-      begin
-        vplotservo := code.z;
-        if vplotservo < 0 then
-          pwmWrite(PCA9685_PIN_BASE + 0, calcTicks(vplotservo_maxvalue, vplotservo_freq))
-        else
-          pwmWrite(PCA9685_PIN_BASE + 0, calcTicks(vplotservo_rstvalue, vplotservo_freq));
-        delay(1000);
-      end;
-    // move stepper
+    // move vplot
+    for i := 0 to j - 1 do
+      fpath[i].mz := round(code.z);
+
     for i := 0 to j - 1 do
     begin
-      fvplotinterface.point0 := fcurrposition.p;
-      fvplotinterface.point1 := fvplotpath[i].p;
+      fpoint0 := fposition.p;
+      fpoint1 := fpath[i].p;
+      if assigned(fondraw) then
+        synchronize(fondraw);
 
-      synchronize(fvplotinterface.fsync2);
-      if not fvplotinterface.fpreview then
-        moveto(fvplotpath[i]);
-      if (fvplotcode.c <> 'G00 ') and (code.z < 0) then
-        synchronize(fvplotinterface.fsync3);
+      optimizeposition(fpath[i]);
+      with fpath[i] do
+        vplotdriver. move2(m0, m1, mz);
+      fposition := fpath[i];
+
+      if (code.c <> 'G00 ') and (code.z < 0) then
+        if assigned(fondrawn) then
+          synchronize(fondrawn);
     end;
   end;
 end;
 
-procedure tvplotdriver.execute;
+procedure tvplotcoder.drawn(var p0, p1: tvplotpoint);
 begin
-  repeat
-    synchronize(fvplotinterface.fsync1);
-    if not fvplotinterface.suspended then
+  p0 := fpoint0;
+  p1 := fpoint1;
+end;
+
+procedure tvplotcoder.execute;
+const
+  section = 'VPLOT layout';
+var
+  ini:  tinifile;
+  code: tvplotcode;
+  list: tstringlist;
+begin
+  // init coder
+  ini := tinifile.create(changefileext(paramstr(0), '.ini'));
+  fpoints[0].x := ini.readfloat(section, 'P0.X', -1);
+  fpoints[0].y := ini.readfloat(section, 'P0.Y', -1);
+  fpoints[1].x := ini.readfloat(section, 'P1.X', -1);
+  fpoints[1].y := ini.readfloat(section, 'P1.Y', -1);
+  fpoints[2].x := ini.readfloat(section, 'P2.X', -1);
+  fpoints[2].y := ini.readfloat(section, 'P2.Y', -1);
+  fpoints[3].x := ini.readfloat(section, 'P3.X', -1);
+  fpoints[3].y := ini.readfloat(section, 'P3.Y', -1);
+  fpoints[4].x := ini.readfloat(section, 'P4.X', -1);
+  fpoints[4].y := ini.readfloat(section, 'P4.Y', -1);
+  fpoints[5].x := ini.readfloat(section, 'P5.X', -1);
+  fpoints[5].y := ini.readfloat(section, 'P5.Y', -1);
+  fpoints[6].x := ini.readfloat(section, 'P6.X', -1);
+  fpoints[6].y := ini.readfloat(section, 'P6.Y', -1);
+  fgearratio   := ini.readfloat(section, 'R'   , -1);
+  freeandnil(ini);
+  {$ifdef debug}
+  writeln('vPlot debug: load layout routine');
+  writeln('P0.X = ', fpoints[0].x:2:2);
+  writeln('P0.Y = ', fpoints[0].y:2:2);
+  writeln('P1.X = ', fpoints[1].x:2:2);
+  writeln('P1.Y = ', fpoints[1].y:2:2);
+  writeln('P2.X = ', fpoints[2].x:2:2);
+  writeln('P2.Y = ', fpoints[2].y:2:2);
+  writeln('P3.X = ', fpoints[3].x:2:2);
+  writeln('P3.Y = ', fpoints[3].y:2:2);
+  writeln('P4.X = ', fpoints[4].x:2:2);
+  writeln('P4.Y = ', fpoints[4].y:2:2);
+  writeln('P5.X = ', fpoints[5].x:2:2);
+  writeln('P5.Y = ', fpoints[5].y:2:2);
+  writeln('P6.X = ', fpoints[6].x:2:2);
+  writeln('P6.Y = ', fpoints[6].y:2:2);
+  writeln('   R = ', fgearratio:2:2);
+  {$endif}
+  // ---
+  fposition.p := fpoints[6];
+  optimizeposition(fposition);
+  with fposition do
+    vplotdriver.init(m0, m1, 0);
+  // load gcode
+  list := tstringlist.create;
+  list.loadfromfile(filename);
+  // draw gcode
+  while list.count > 0 do
+  begin
+    if fenabled then
     begin
-      digitalwrite(P11, LOW);
-      parse_line(fvplotinterface.gcode, fvplotcode);
-      if fvplotcode.c <> '' then
+      parse_line(list[0], code);
+      if code.c <> '' then
       begin
-        if (fvplotcode.c ='G00 ') then draw(fvplotcode) else
-        if (fvplotcode.c ='G01 ') then draw(fvplotcode) else
-        if (fvplotcode.c ='G02 ') then draw(fvplotcode) else
-        if (fvplotcode.c ='G03 ') then draw(fvplotcode);
+        code.x := code.x + foffsetx;
+        code.y := code.y + foffsetx;
+        if (code.c ='G00 ') then draw(code) else
+        if (code.c ='G01 ') then draw(code) else
+        if (code.c ='G02 ') then draw(code) else
+        if (code.c ='G03 ') then draw(code);
       end;
+      list.delete(0);
       sleep(5);
-      synchronize(fvplotinterface.fsync4);
     end else
     begin
-      sleep(100);
-      vplotservo := 0;
-      pwmWrite(PCA9685_PIN_BASE + 0, calcTicks(vplotservo_rstvalue, vplotservo_freq));
+      with fposition do
+        vplotdriver.move2(m0, m1, 0);
+      sleep(250);
     end;
-    digitalwrite(P11, HIGH);
-  until terminated;
+
+    if terminated then break;
+  end;
+  // move to home
+  fposition.p := fpoints[6];
+  optimizeposition(fposition);
+  with fposition do
+    vplotdriver.move2(m0, m1, 0);
+  freeandnil(list);
+end;
+
+// tvplotdriver //
+
+constructor tvplotdriver.create;
+begin
+  inherited create;
+  // setup wiringpi library
+  ffault := wiringpisetup;
+  // setup pca9685 library
+  if ffault <> -1 then
+    ffault := pca9685setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, motz_freq);
+
+  if ffault <> -1 then
+  begin
+    // init servo
+    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_minvalue, motz_freq)); delay(2000);
+    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq)); delay(2000);
+    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq)); delay(2000);
+    // init step motor0
+    pinmode(mot0_dir,    OUTPUT);
+    pinmode(mot0_step,   OUTPUT);
+    digitalwrite(mot0_dir,  LOW);
+    digitalwrite(mot0_step, LOW);
+    // init step motor1
+    pinmode(mot1_dir,    OUTPUT);
+    pinmode(mot1_step,   OUTPUT);
+    digitalwrite(mot1_dir,  LOW);
+    digitalwrite(mot1_step, LOW);
+  end;
+  fdelayms := 15;
+  fenabled := false;
+end;
+
+destructor tvplotdriver.destroy;
+begin
+  vplotdriver := nil;
+  inherited destroy;
+end;
+
+procedure  tvplotdriver.init(cnt0, cnt1, cntz: longint);
+begin
+  fcount0  := cnt0;
+  fcount1  := cnt1;
+  fcountz  := cntz;
+end;
+
+procedure tvplotdriver.move2(cnt0, cnt1, cntz: longint);
+begin
+  move4(cnt0 - fcount0, cnt1 - fcount1, cntz - fcountz);
+end;
+
+procedure tvplotdriver.move4(cnt0, cnt1, cntz: longint);
+var
+  i: longint;
+begin
+  if not enabled  then exit;
+  if ffault  = -1 then exit;
+  // move pwm motz
+  if cntz <> 0 then
+  begin
+    fcountz := min(1, max(-1, fcountz + cntz));
+    if fcountz < 0 then
+      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq))
+    else
+    if fcountz > 0 then
+      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_minvalue, motz_freq))
+    else
+      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
+    delay(1000);
+  end;
+  // move step motor0
+  if cnt0 <> 0 then
+  begin
+    if cnt0 > 0 then
+      digitalwrite(mot0_dir, HIGH)
+    else
+      digitalwrite(mot0_dir,  LOW);
+
+    i := abs(cnt0);
+    while i > 0 do
+    begin
+      digitalwrite(mot0_step, HIGH);  delay(fdelayms);
+      digitalwrite(mot0_step,  LOW);  delay(fdelayms);
+      dec(i);
+    end;
+    inc(fcount0, cnt0);
+  end;
+  // move step motor1
+  if cnt1 <> 0 then
+  begin
+    if cnt1 > 0 then
+      digitalwrite(mot1_dir,  LOW)
+    else
+      digitalwrite(mot1_dir, HIGH);
+
+    i := abs(cnt1);
+    while i > 0 do
+    begin
+      digitalwrite(mot1_step, HIGH);  delay(fdelayms);
+      digitalwrite(mot1_step,  LOW);  delay(fdelayms);
+      dec(i);
+    end;
+    inc(fcount1, cnt1);
+  end;
+
+  {$ifdef debug}
+  writeln('fcountz = ', fcountz);
+  writeln('fcount1 = ', fcount0);
+  writeln('fcount1 = ', fcount1);
+  {$endif}
 end;
 
 end.
