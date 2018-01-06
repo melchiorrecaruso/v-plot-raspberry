@@ -21,7 +21,7 @@
 unit libvplot;
 
 {$mode objfpc}{$H+}
-{$define debug}
+//{$define debug}
 
 interface
 
@@ -60,7 +60,6 @@ type
     r: double;
   end;
 
-type
   tvplotdriver = class
   private
     fcount0:  longint;
@@ -69,6 +68,8 @@ type
     fdelayms: longword;
     fenabled: boolean;
     ffault:   longint;
+    procedure largedisplacements(cnt0, cnt1: longint);
+    procedure smalldisplacements(cnt0, cnt1: longint);
   public
     constructor create;
     destructor destroy; override;
@@ -88,6 +89,7 @@ type
     fenabled:    boolean;
     foffsetx:    longint;
     foffsety:    longint;
+    fmode:       longint;
     fondraw:     tthreadmethod;
     fondrawn:    tthreadmethod;
     fpath:       array of tvplotposition;
@@ -113,6 +115,7 @@ type
     property offsetx:    longint       read foffsetx    write foffsetx;
     property offsety:    longint       read foffsety    write foffsety;
     property enabled:    boolean       read fenabled    write fenabled;
+    property mode:       longint       read fmode       write fmode;
   end;
 
 var
@@ -137,13 +140,19 @@ const
   motz_freq     = 50;
 
 
-  vplotmatrix : array [0..5, 0..8] of longint =
-    ((0, 0, 0, 0, 0, 0, 0, 0, 0),
-     (0, 0, 0, 0, 1, 0, 0, 0, 0),
-     (0, 0, 1, 0, 0, 0, 1, 0, 0),
-     (1, 0, 0, 0 ,1, 0, 0, 0, 1),
-     (0, 1, 0, 1, 0, 1, 0, 1, 0),
-     (1, 0, 1, 0, 1, 0, 1, 0, 1));
+  vplotmatrix : array [0..10, 0..18] of longint = (
+    (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),  //  0
+    (0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),  //  1
+    (0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0),  //  2
+    (0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0),  //  3
+    (1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1),  //  4
+    (1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1),  //  5
+    (0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0),  //  6
+    (1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1),  //  7
+    (1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1),  //  8
+    (0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0),  //  9
+    (1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1)); // 10
+
 
 //  gcode parser //
 
@@ -266,6 +275,7 @@ end;
 
 constructor tvplotcoder.create;
 begin
+  fmode    := 4;
   fenabled := false;
   foffsetx := 0;
   foffsety := 0;
@@ -284,7 +294,7 @@ var
   dx, dy: double;
   i, j: longint;
 begin
-  i := max(1, round(distancebetween(p0, p1) / 0.25));
+  i := max(1, round(distancebetween(p0, p1) / 0.15));
 
   dx := (p1.x - p0.x) / i;
   dy := (p1.y - p0.y) / i;
@@ -327,7 +337,7 @@ begin
     if (not clockwise) and (sweep <= 0) then
       sweep := sweep + (2 * pi);
 
-  i := max(1, round(abs(sweep) * distancebetween(tmp[2], tmp[0]) / 0.25));
+  i := max(1, round(abs(sweep) * distancebetween(tmp[2], tmp[0]) / 0.15));
   setlength(fpath, i + 1);
   for j := 0 to i do
   begin
@@ -498,24 +508,21 @@ begin
   fpoints[6].x := ini.readfloat(section, 'P6.X', -1);
   fpoints[6].y := ini.readfloat(section, 'P6.Y', -1);
   fgearratio   := ini.readfloat(section, 'R'   , -1);
+
+  fgearratio := fgearratio / fmode;
+
+
   freeandnil(ini);
   {$ifdef debug}
   writeln('vPlot debug: load layout routine');
-  writeln('P0.X = ', fpoints[0].x:2:2);
-  writeln('P0.Y = ', fpoints[0].y:2:2);
-  writeln('P1.X = ', fpoints[1].x:2:2);
-  writeln('P1.Y = ', fpoints[1].y:2:2);
-  writeln('P2.X = ', fpoints[2].x:2:2);
-  writeln('P2.Y = ', fpoints[2].y:2:2);
-  writeln('P3.X = ', fpoints[3].x:2:2);
-  writeln('P3.Y = ', fpoints[3].y:2:2);
-  writeln('P4.X = ', fpoints[4].x:2:2);
-  writeln('P4.Y = ', fpoints[4].y:2:2);
-  writeln('P5.X = ', fpoints[5].x:2:2);
-  writeln('P5.Y = ', fpoints[5].y:2:2);
-  writeln('P6.X = ', fpoints[6].x:2:2);
-  writeln('P6.Y = ', fpoints[6].y:2:2);
-  writeln('   R = ', fgearratio:2:2);
+  writeln(format('PO.x = %-5.3f P1.x = %-5.3f', [fpoints[0].x, fpoints[1].x]));
+  writeln(format('PO.y = %-5.3f P1.y = %-5.3f', [fpoints[0].y, fpoints[1].y]));
+  writeln(format('P2.x = %-5.3f P3.x = %-5.3f P4.x = %-5.3f P5.x = %-5.3f', [fpoints[2].x, fpoints[3].x, fpoints[4].x, fpoints[5].x]));
+  writeln(format('P2.y = %-5.3f P3.y = %-5.3f P4.y = %-5.3f P5.y = %-5.3f', [fpoints[2].y, fpoints[3].y, fpoints[4].y, fpoints[5].y]));
+  writeln(format('P6.x = %-5.3f', [fpoints[6].x]));
+  writeln(format('P6.y = %-5.3f', [fpoints[6].y]));
+  writeln(format('R    = %-5.3f', [fgearratio]));
+
   {$endif}
   // ---
   fposition.p := fpoints[6];
@@ -587,7 +594,7 @@ begin
     digitalwrite(mot1_dir,  LOW);
     digitalwrite(mot1_step, LOW);
   end;
-  fdelayms := 15;
+  fdelayms := 10;
   fenabled := false;
 end;
 
@@ -609,9 +616,76 @@ begin
   move4(cnt0 - fcount0, cnt1 - fcount1, cntz - fcountz);
 end;
 
-procedure tvplotdriver.move4(cnt0, cnt1, cntz: longint);
+procedure tvplotdriver.largedisplacements(cnt0, cnt1: longint);
+begin
+  inc(fcount0, cnt0);
+  inc(fcount1, cnt1);
+
+  if cnt0 > 0 then
+    digitalwrite(mot0_dir, HIGH)
+  else
+    digitalwrite(mot0_dir,  LOW);
+
+  if cnt1 > 0 then
+    digitalwrite(mot1_dir,  LOW)
+  else
+    digitalwrite(mot1_dir, HIGH);
+
+  // move step motor0
+  cnt0 := abs(cnt0);
+  while cnt0 > 0 do
+  begin
+    digitalwrite(mot0_step, HIGH);  delay(fdelayms);
+    digitalwrite(mot0_step,  LOW);  delay(fdelayms);
+    dec(cnt0);
+  end;
+  // move step motor1
+  cnt1 := abs(cnt1);
+  while cnt1 > 0 do
+  begin
+    digitalwrite(mot1_step, HIGH);  delay(fdelayms);
+    digitalwrite(mot1_step,  LOW);  delay(fdelayms);
+    dec(cnt1);
+  end;
+end;
+
+procedure tvplotdriver.smalldisplacements(cnt0, cnt1: longint);
 var
   i: longint;
+begin
+  inc(fcount0, cnt0);
+  inc(fcount1, cnt1);
+
+  if cnt0 > 0 then
+    digitalwrite(mot0_dir, HIGH)
+  else
+    digitalwrite(mot0_dir,  LOW);
+
+  if cnt1 > 0 then
+    digitalwrite(mot1_dir,  LOW)
+  else
+    digitalwrite(mot1_dir, HIGH);
+
+  cnt0 := abs(cnt0);
+  cnt1 := abs(cnt1);
+  for i := 0 to 18 do
+  begin
+    // move step motor0
+    if vplotmatrix[cnt0, i] = 1 then
+    begin
+      digitalwrite(mot0_step, HIGH);  delay(fdelayms);
+      digitalwrite(mot0_step,  LOW);  delay(fdelayms);
+    end;
+    // move step motor1
+    if vplotmatrix[cnt1, i] = 1 then
+    begin
+      digitalwrite(mot1_step, HIGH);  delay(fdelayms);
+      digitalwrite(mot1_step,  LOW);  delay(fdelayms);
+    end;
+  end;
+end;
+
+procedure tvplotdriver.move4(cnt0, cnt1, cntz: longint);
 begin
   if not enabled  then exit;
   if ffault  = -1 then exit;
@@ -628,41 +702,16 @@ begin
       pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
     delay(1000);
   end;
-  // move step motor0
-  if cnt0 <> 0 then
+  // mode step motors
+  if (cnt0 <> 0) or
+     (cnt1 <> 0) then
   begin
-    if cnt0 > 0 then
-      digitalwrite(mot0_dir, HIGH)
+    if (abs(cnt0) < 11) and
+       (abs(cnt1) < 11) then
+      smalldisplacements(cnt0, cnt1)
     else
-      digitalwrite(mot0_dir,  LOW);
-
-    i := abs(cnt0);
-    while i > 0 do
-    begin
-      digitalwrite(mot0_step, HIGH);  delay(fdelayms);
-      digitalwrite(mot0_step,  LOW);  delay(fdelayms);
-      dec(i);
-    end;
-    inc(fcount0, cnt0);
+      largedisplacements(cnt0, cnt1);
   end;
-  // move step motor1
-  if cnt1 <> 0 then
-  begin
-    if cnt1 > 0 then
-      digitalwrite(mot1_dir,  LOW)
-    else
-      digitalwrite(mot1_dir, HIGH);
-
-    i := abs(cnt1);
-    while i > 0 do
-    begin
-      digitalwrite(mot1_step, HIGH);  delay(fdelayms);
-      digitalwrite(mot1_step,  LOW);  delay(fdelayms);
-      dec(i);
-    end;
-    inc(fcount1, cnt1);
-  end;
-
   {$ifdef debug}
   writeln('fcountz = ', fcountz);
   writeln('fcount1 = ', fcount0);

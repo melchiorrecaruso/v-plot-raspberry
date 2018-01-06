@@ -232,8 +232,12 @@ end;
 
 procedure tmainform.timertimer(Sender: TObject);
 begin
-  inc(x);
-  caption := 'VPlot - Time elapsed ' + inttostr(x) + ' secs';
+  if assigned(vplotcoder) then
+  begin
+    inc(x);
+    caption := 'VPlot - Time elapsed ' + inttostr(x) + ' secs';
+  end else
+    playorstopbtnclick(stopbtn);
 end;
 
 
