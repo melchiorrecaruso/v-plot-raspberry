@@ -1,0 +1,210 @@
+object initform: Tinitform
+  Left = 549
+  Height = 172
+  Top = 209
+  Width = 480
+  Align = alRight
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsDialog
+  Caption = 'Move vPlot'
+  ClientHeight = 172
+  ClientWidth = 480
+  Color = clWhite
+  LCLVersion = '1.9.0.0'
+  object okbtn: TBitBtn
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = m1gb
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 365
+    Height = 30
+    Top = 137
+    Width = 110
+    Anchors = [akRight, akBottom]
+    BorderSpacing.Top = 20
+    BorderSpacing.Bottom = 5
+    Caption = 'Close'
+    Constraints.MaxHeight = 30
+    Constraints.MaxWidth = 110
+    Constraints.MinHeight = 30
+    Constraints.MinWidth = 110
+    ModalResult = 11
+    TabOrder = 0
+  end
+  object m0gb: TGroupBox
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    Left = 5
+    Height = 119
+    Top = 5
+    Width = 225
+    BorderSpacing.Left = 5
+    BorderSpacing.Top = 5
+    Caption = 'SX Motor'
+    ClientHeight = 99
+    ClientWidth = 221
+    TabOrder = 1
+    object sxupbtn: TBitBtn
+      AnchorSideLeft.Control = m0gb
+      AnchorSideTop.Control = sxupspinedit
+      AnchorSideBottom.Control = sxupspinedit
+      AnchorSideBottom.Side = asrBottom
+      Left = 10
+      Height = 23
+      Top = 10
+      Width = 110
+      Anchors = [akTop, akLeft, akBottom]
+      BorderSpacing.Left = 10
+      BorderSpacing.Right = 10
+      Caption = 'Up'
+      Constraints.MaxWidth = 110
+      Constraints.MinWidth = 110
+      OnClick = btnclick
+      TabOrder = 0
+    end
+    object sxdownbtn: TBitBtn
+      AnchorSideLeft.Control = m0gb
+      AnchorSideTop.Control = sxdownspinedit
+      AnchorSideRight.Control = sxdownspinedit
+      AnchorSideBottom.Control = sxdownspinedit
+      AnchorSideBottom.Side = asrBottom
+      Left = 10
+      Height = 23
+      Top = 53
+      Width = 110
+      Anchors = [akTop, akLeft, akRight, akBottom]
+      BorderSpacing.Left = 10
+      BorderSpacing.Right = 10
+      Caption = 'Down'
+      Constraints.MaxWidth = 110
+      Constraints.MinWidth = 110
+      OnClick = btnclick
+      TabOrder = 1
+    end
+    object sxupspinedit: TSpinEdit
+      AnchorSideTop.Control = m0gb
+      AnchorSideRight.Control = m0gb
+      AnchorSideRight.Side = asrBottom
+      Left = 131
+      Height = 23
+      Top = 10
+      Width = 80
+      Anchors = [akTop, akRight]
+      BorderSpacing.Top = 10
+      BorderSpacing.Right = 10
+      Constraints.MaxWidth = 80
+      Constraints.MinWidth = 80
+      MaxValue = 0
+      TabOrder = 2
+      Value = 100
+    end
+    object sxdownspinedit: TSpinEdit
+      AnchorSideTop.Control = sxupspinedit
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = m0gb
+      AnchorSideRight.Side = asrBottom
+      Left = 131
+      Height = 23
+      Top = 53
+      Width = 80
+      Anchors = [akTop, akRight]
+      BorderSpacing.Top = 20
+      BorderSpacing.Right = 10
+      BorderSpacing.Bottom = 10
+      Constraints.MaxWidth = 80
+      Constraints.MinWidth = 80
+      MaxValue = 0
+      TabOrder = 3
+      Value = 100
+    end
+  end
+  object m1gb: TGroupBox
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 250
+    Height = 119
+    Top = 5
+    Width = 225
+    Anchors = [akTop, akRight]
+    BorderSpacing.Top = 5
+    BorderSpacing.Right = 5
+    Caption = 'DX Motor'
+    ClientHeight = 99
+    ClientWidth = 221
+    TabOrder = 2
+    object dxupbtn: TBitBtn
+      AnchorSideLeft.Control = m1gb
+      AnchorSideTop.Control = dxupspinedit
+      AnchorSideRight.Side = asrCenter
+      AnchorSideBottom.Control = dxupspinedit
+      AnchorSideBottom.Side = asrBottom
+      Left = 10
+      Height = 23
+      Top = 10
+      Width = 110
+      Anchors = [akTop, akLeft, akBottom]
+      BorderSpacing.Left = 10
+      BorderSpacing.Right = 10
+      Caption = 'Up'
+      Constraints.MaxWidth = 110
+      Constraints.MinWidth = 110
+      OnClick = btnclick
+      TabOrder = 0
+    end
+    object dxdownbtn: TBitBtn
+      AnchorSideLeft.Control = m1gb
+      AnchorSideTop.Control = dxdownspinedit
+      AnchorSideBottom.Control = dxdownspinedit
+      AnchorSideBottom.Side = asrBottom
+      Left = 10
+      Height = 23
+      Top = 53
+      Width = 110
+      Anchors = [akTop, akLeft, akBottom]
+      BorderSpacing.Left = 10
+      BorderSpacing.Right = 10
+      Caption = 'Down'
+      OnClick = btnclick
+      TabOrder = 1
+    end
+    object dxupspinedit: TSpinEdit
+      AnchorSideTop.Control = m1gb
+      AnchorSideRight.Control = m1gb
+      AnchorSideRight.Side = asrBottom
+      Left = 131
+      Height = 23
+      Top = 10
+      Width = 80
+      Anchors = [akTop, akRight]
+      BorderSpacing.Top = 10
+      BorderSpacing.Right = 10
+      Constraints.MaxWidth = 80
+      Constraints.MinWidth = 80
+      MaxValue = 0
+      TabOrder = 2
+      Value = 100
+    end
+    object dxdownspinedit: TSpinEdit
+      AnchorSideTop.Control = dxupspinedit
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = m1gb
+      AnchorSideRight.Side = asrBottom
+      Left = 131
+      Height = 23
+      Top = 53
+      Width = 80
+      Anchors = [akTop, akRight]
+      BorderSpacing.Top = 20
+      BorderSpacing.Right = 10
+      BorderSpacing.Bottom = 10
+      Constraints.MaxWidth = 80
+      Constraints.MinWidth = 80
+      MaxValue = 0
+      TabOrder = 3
+      Value = 100
+    end
+  end
+end
