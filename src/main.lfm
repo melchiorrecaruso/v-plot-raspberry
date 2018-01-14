@@ -1,7 +1,7 @@
 object mainform: Tmainform
-  Left = 379
+  Left = 328
   Height = 452
-  Top = 146
+  Top = 122
   Width = 778
   Caption = 'VPlot Driver'
   ClientHeight = 452
@@ -1284,8 +1284,8 @@ object mainform: Tmainform
       AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Control = morebtn
       Left = 5
-      Height = 23
-      Top = 359
+      Height = 19
+      Top = 363
       Width = 140
       Anchors = [akLeft, akRight, akBottom]
       BorderSpacing.Left = 5

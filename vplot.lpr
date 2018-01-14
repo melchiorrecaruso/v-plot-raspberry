@@ -20,7 +20,7 @@
 
 program vplot;
 
-{$mode objfpc}{$h+}
+{$mode objfpc}{$H+}
 
 uses
   {$ifdef unix} cthreads, {$endif} interfaces, forms, lazcontrols, main, initform;
@@ -32,7 +32,7 @@ begin
   requirederivedformresource := true;
   application.initialize;
   application.createform(tmainform, mainform);
-  Application.createForm(TForm1, Form1);
+  application.createform(tform1, form1);
   application.run;
 end.
 

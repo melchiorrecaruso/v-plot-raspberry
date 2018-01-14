@@ -21,13 +21,13 @@
 
 unit main;
 
-{$mode objfpc}{$h+}
+{$mode objfpc}{$H+}
 
 interface
 
 uses
   classes, sysutils, forms, controls, graphics, dialogs, extctrls, stdctrls,
-  comctrls, buttons, menus;
+  comctrls, buttons, menus, inifiles, libvplot;
 
 type
 
@@ -63,8 +63,10 @@ type
     procedure morebtnclick(sender: tobject);
     procedure timertimer(sender: tobject);
   private
-    procedure ondraw;
-    procedure ondrawn;
+    point:   tvplotpoint;
+    inlist:  tstringlist;
+    inifile: tinifile;
+    procedure ontick;
   end;
 
 
@@ -74,25 +76,34 @@ var
 
 implementation
 
-{$R main.lfm}
+{$R *.lfm}
 
 uses
-  initform, libvplot, math;
+  initform, math;
 
 { tmainform }
 
 procedure tmainform.formcreate(sender: tobject);
 begin
+  showmessage('OK');
+
   loadbtn.enabled := true;
   playbtn.enabled := false;
   stopbtn.enabled := false;
   morebtn.enabled := true;
   // ---
-  vplotdriver     := tvplotdriver.create;
+  inlist      := tstringlist.create;
+  inifile     := tinifile.create(changefileext(paramstr(0), '.ini'));
+  vplotdriver := tvplotdriver.create;
+
+
+
 end;
 
 procedure tmainform.formdestroy(sender: tobject);
 begin
+  inlist.destroy;
+  inifile.destroy;
   vplotdriver.destroy;
 end;
 
@@ -149,20 +160,23 @@ begin
     previewimage.stretchinenabled  := false;
     previewimage.stretchoutenabled := false;
     previewimage.stretch           := false;
-
-    // progressbar.min      := 0;
-    // progressbar.max      := vplotlist.count;
-    // progressbar.position := 0;
-    // progressbar.smooth   := true;
     // ---
     playbtn.enabled := true;
     stopbtn.enabled := false;
     // ---
-    vplotcoder          := tvplotcoder.create;
-    vplotcoder.ondraw   := @ondraw;
-    vplotcoder.ondrawn  := @ondrawn;
-    vplotcoder.filename := opendialog.filename;
-    vplotcoder.enabled  := false;
+    inlist.clear;
+    inlist.loadfromfile(opendialog.filename);
+    // ---
+    // progressbar.min      := 0;
+    // progressbar.max      := inlist.count;
+    // progressbar.position := 0;
+    // progressbar.smooth   := true;
+    // ---
+    point.x := 0;
+    point.y := 0;
+    // ---
+    vplotcoder        := tvplotcoder.create(inlist, inifile);
+    vplotcoder.ontick := @ontick;
     vplotcoder.start;
     // ---
     x := 0;
@@ -174,15 +188,15 @@ begin
   if assigned(vplotcoder) then
   begin
     if sender = playbtn then
-      vplotcoder.enabled := true
+      vplotdriver.enabled := true
     else
     if sender = stopbtn then
-      vplotcoder.enabled := false;
+      vplotdriver.enabled := false;
     // ---
-    timer  .enabled :=     vplotcoder.enabled;
-    playbtn.enabled := not vplotcoder.enabled;
-    stopbtn.enabled :=     vplotcoder.enabled;
-    prvwbtn.enabled := not vplotcoder.enabled;
+    timer  .enabled :=     vplotdriver.enabled;
+    playbtn.enabled := not vplotdriver.enabled;
+    stopbtn.enabled :=     vplotdriver.enabled;
+    prvwbtn.enabled := not vplotdriver.enabled;
   end;
 end;
 
@@ -196,38 +210,28 @@ begin
   form1.showmodal;
 end;
 
-procedure Tmainform.ondraw;
-var
-  p0, p1: tvplotpoint;
+procedure Tmainform.ontick;
 begin
-  if assigned(vplotcoder) then
-  begin
-    previewimage.canvas.pen.color   := clred;
-    previewimage.canvas.brush.color := clred;
-    previewimage.canvas.brush.style := bssolid;
-
-    vplotcoder.drawn(p0, p1);
-    previewimage.canvas.line(
-      round(p1.x), round(p1.y),
-      round(p0.x), round(p0.y));
-  end;
-end;
-
-procedure Tmainform.ondrawn;
-var
-  p0, p1: tvplotpoint;
-begin
-  if assigned(vplotcoder) then
+  if vplotcoder.pz < 0 then
   begin
     previewimage.canvas.pen.color   := clblack;
     previewimage.canvas.brush.color := clblack;
     previewimage.canvas.brush.style := bssolid;
-
-    vplotcoder.drawn(p0, p1);
-    previewimage.canvas.line(
-      round(p1.x), round(p1.y),
-      round(p0.x), round(p0.y));
+  end else
+  begin
+    previewimage.canvas.pen.color   := clred;
+    previewimage.canvas.brush.color := clred;
+    previewimage.canvas.brush.style := bssolid;
   end;
+
+  previewimage.canvas.line(
+    round(vplotcoder.px), round(vplotcoder.py),
+    round(point.x),       round(point.y));
+
+  point.x := vplotcoder.px;
+  point.y := vplotcoder.py;
+
+  while not vplotdriver.enabled do sleep(100);
 end;
 
 procedure tmainform.timertimer(Sender: TObject);
@@ -239,10 +243,6 @@ begin
   end else
     playorstopbtnclick(stopbtn);
 end;
-
-
-
-
 
 end.
 

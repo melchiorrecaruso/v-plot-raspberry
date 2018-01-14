@@ -41,8 +41,8 @@ object Form1: TForm1
     BorderSpacing.Left = 5
     BorderSpacing.Top = 5
     Caption = 'SX Motor'
-    ClientHeight = 100
-    ClientWidth = 223
+    ClientHeight = 99
+    ClientWidth = 221
     TabOrder = 1
     object sxupbtn: TBitBtn
       AnchorSideLeft.Control = m0gb
@@ -50,7 +50,7 @@ object Form1: TForm1
       AnchorSideBottom.Control = sxupspinedit
       AnchorSideBottom.Side = asrBottom
       Left = 10
-      Height = 30
+      Height = 23
       Top = 10
       Width = 110
       Anchors = [akTop, akLeft, akBottom]
@@ -69,8 +69,8 @@ object Form1: TForm1
       AnchorSideBottom.Control = sxdownspinedit
       AnchorSideBottom.Side = asrBottom
       Left = 10
-      Height = 30
-      Top = 60
+      Height = 23
+      Top = 53
       Width = 110
       Anchors = [akTop, akLeft, akRight, akBottom]
       BorderSpacing.Left = 10
@@ -85,8 +85,8 @@ object Form1: TForm1
       AnchorSideTop.Control = m0gb
       AnchorSideRight.Control = m0gb
       AnchorSideRight.Side = asrBottom
-      Left = 133
-      Height = 30
+      Left = 131
+      Height = 23
       Top = 10
       Width = 80
       Anchors = [akTop, akRight]
@@ -103,9 +103,9 @@ object Form1: TForm1
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = m0gb
       AnchorSideRight.Side = asrBottom
-      Left = 133
-      Height = 30
-      Top = 60
+      Left = 131
+      Height = 23
+      Top = 53
       Width = 80
       Anchors = [akTop, akRight]
       BorderSpacing.Top = 20
@@ -131,8 +131,8 @@ object Form1: TForm1
     BorderSpacing.Top = 5
     BorderSpacing.Right = 5
     Caption = 'DX Motor'
-    ClientHeight = 100
-    ClientWidth = 223
+    ClientHeight = 99
+    ClientWidth = 221
     TabOrder = 2
     object dxupbtn: TBitBtn
       AnchorSideLeft.Control = m1gb
@@ -141,7 +141,7 @@ object Form1: TForm1
       AnchorSideBottom.Control = dxupspinedit
       AnchorSideBottom.Side = asrBottom
       Left = 10
-      Height = 30
+      Height = 23
       Top = 10
       Width = 110
       Anchors = [akTop, akLeft, akBottom]
@@ -159,8 +159,8 @@ object Form1: TForm1
       AnchorSideBottom.Control = dxdownspinedit
       AnchorSideBottom.Side = asrBottom
       Left = 10
-      Height = 30
-      Top = 60
+      Height = 23
+      Top = 53
       Width = 110
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 10
@@ -173,8 +173,8 @@ object Form1: TForm1
       AnchorSideTop.Control = m1gb
       AnchorSideRight.Control = m1gb
       AnchorSideRight.Side = asrBottom
-      Left = 133
-      Height = 30
+      Left = 131
+      Height = 23
       Top = 10
       Width = 80
       Anchors = [akTop, akRight]
@@ -191,9 +191,9 @@ object Form1: TForm1
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = m1gb
       AnchorSideRight.Side = asrBottom
-      Left = 133
-      Height = 30
-      Top = 60
+      Left = 131
+      Height = 23
+      Top = 53
       Width = 80
       Anchors = [akTop, akRight]
       BorderSpacing.Top = 20

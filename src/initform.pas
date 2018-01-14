@@ -1,6 +1,6 @@
 unit initform;
 
-{$mode objfpc}
+{$mode objfpc}{$H+}
 
 interface
 
@@ -35,6 +35,8 @@ var
 
 implementation
 
+{$R *.lfm}
+
 uses
   libvplot;
 
@@ -57,10 +59,6 @@ begin
   if sender = dxdownbtn then vplotdriver.move4(0, +dxdownspinedit.value, 0);
   updatebtn(true);
 end;
-
-initialization
-
-  {$I initform.lrs}
 
 end.
 
