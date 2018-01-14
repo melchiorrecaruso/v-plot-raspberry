@@ -28,9 +28,9 @@ uses
 {$R *.res}
 
 begin
-  Application.Scaled:=True;
   requirederivedformresource := true;
   application.title := 'VPlot Driver';
+  application.scaled:=true;
   application.initialize;
   application.createform(tmainform, mainform);
   application.createform(tinitform, initform);

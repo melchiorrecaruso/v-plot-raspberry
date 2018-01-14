@@ -21,7 +21,7 @@
 unit libvplot;
 
 {$mode objfpc}{$H+}
-{$define debug}
+{*$define debug}
 
 interface
 
@@ -62,49 +62,60 @@ type
 type
   tvplotcoder = class(tthread)
   private
-
-    fpx:     double;
-    fpy:     double;
-    fpz:     double;
-    fmot0:   longint;
-    fmot1:   longint;
-    fmotz:   longint;
+    fpx:      double;
+    fpy:      double;
+    fpz:      double;
+    foffsetx: double;
+    foffsety: double;
+    fmot0:    longint;
+    fmot1:    longint;
+    fmotz:    longint;
+    ffault:   longint;
 
     finlist:  tstringlist;
     finifile: tinifile;
     findex:   longint;
+    fenabled: boolean;
 
     fontick: tthreadmethod;
 
+    fratio:     double;
     fpoint0:    tvplotpoint;
     fpoint1:    tvplotpoint;
     fpoint2:    tvplotpoint;
     fpoint3:    tvplotpoint;
     fpoint4:    tvplotpoint;
     fpoint5:    tvplotpoint;
+    fpoint9:    tvplotposition;
 
-    fpoint9:    tvplotpoint;
-    fratio:     double;
 
     fcurrpath:  array of tvplotposition;
+
     procedure interpolateline(const p0, p1: tvplotpoint);
     procedure interpolatearc (const p0, p1, cc: tvplotpoint; clockwise: boolean);
     procedure optimizexy(var position: tvplotposition);
     procedure encode(const code: tvplotcode);
     procedure dotick(const position: tvplotposition; const z: double);
+
   protected
     procedure execute; override;
   public
     constructor create(inlist: tstringlist; inifile: tinifile);
     destructor destroy; override;
   published
+    property enabled: boolean       read fenabled write fenabled;
+    property index:   longint       read findex;
+
     property px:      double        read fpx;
     property py:      double        read fpy;
     property pz:      double        read fpz;
     property mot0:    longint       read fmot0;
     property mot1:    longint       read fmot1;
     property motz:    longint       read fmotz;
-    property index:   longint       read findex;
+    property offsetx: double        read foffsetx;
+    property offsety: double        read foffsety;
+    property height:  double        read fpoint1.y;
+    property width:   double        read fpoint1.x;
   published
     property ontick:  tthreadmethod read fontick write fontick;
   end;
@@ -131,6 +142,13 @@ type
     property delayms: longword read fdelayms write fdelayms;
     property enabled: boolean  read fenabled write fenabled;
   end;
+
+function translatepoint(const cc, p: tvplotpoint): tvplotpoint; inline;
+function rotatepoint(const p: tvplotpoint; const alpha: double): tvplotpoint; inline;
+function distancebetween(const p0, p1: tvplotpoint): double; inline;
+function linebetween(const p0, p1: tvplotpoint): tvplotline; inline;
+function lineangle(var line: tvplotline): double; inline;
+function intersectlines(const l0, l1: tvplotline): tvplotpoint; inline;
 
 var
   vplotcoder:  tvplotcoder  = nil;
@@ -244,31 +262,31 @@ end;
 
 // routines //
 
-function translatepoint(const cc, p: tvplotpoint): tvplotpoint; inline;
+function translatepoint(const cc, p: tvplotpoint): tvplotpoint;
 begin
   result.x := cc.x + p.x;
   result.y := cc.y + p.y;
 end;
 
-function rotatepoint(const p: tvplotpoint; const alpha: double): tvplotpoint; inline;
+function rotatepoint(const p: tvplotpoint; const alpha: double): tvplotpoint;
 begin
   result.x := p.x * cos(alpha) - p.y * sin(alpha);
   result.y := p.x * sin(alpha) + p.y * cos(alpha);
 end;
 
-function distancebetween(const p0, p1: tvplotpoint): double; inline;
+function distancebetween(const p0, p1: tvplotpoint): double;
 begin
   result := sqrt(sqr(p1.x - p0.x) + sqr(p1.y - p0.y));
 end;
 
-function linebetween(const p0, p1: tvplotpoint): tvplotline; inline;
+function linebetween(const p0, p1: tvplotpoint): tvplotline;
 begin
   result.a :=  p1.y - p0.y;
   result.b :=  p0.x - p1.x;
   result.c := (p1.x - p0.x) * p0.y - (p1.y - p0.y) * p0.x;
 end;
 
-function lineangle(var line: tvplotline): double; inline;
+function lineangle(var line: tvplotline): double;
 begin
   if line.b = 0 then
   begin
@@ -280,7 +298,7 @@ begin
     result := arctan2(line.a, -line.b);
 end;
 
-function intersectlines(const l0, l1: tvplotline): tvplotpoint; inline;
+function intersectlines(const l0, l1: tvplotline): tvplotpoint;
 begin
   if (l0.a * l1.b) <> (l0.b * l1.a) then
   begin
@@ -294,8 +312,51 @@ end;
 
 constructor tvplotcoder.create(inlist: tstringlist; inifile: tinifile);
 begin
-  finlist         := inlist;
-  finifile        := inifile;
+  fenabled    := false;
+  ffault      := 0;
+  finlist     := inlist;
+  finifile    := inifile;
+  // ---
+  fratio      := finifile.readfloat('VPLOT v1.0', 'R'   ,  -1); if fratio    = -1 then ffault := -1;
+  fpoint0.x   := finifile.readfloat('VPLOT v1.0', 'P00.X', -1); if fpoint0.x = -1 then ffault := -1;
+  fpoint0.y   := finifile.readfloat('VPLOT v1.0', 'P00.Y', -1); if fpoint0.y = -1 then ffault := -1;
+  fpoint1.x   := finifile.readfloat('VPLOT v1.0', 'P01.X', -1); if fpoint1.x = -1 then ffault := -1;
+  fpoint1.y   := finifile.readfloat('VPLOT v1.0', 'P01.Y', -1); if fpoint1.y = -1 then ffault := -1;
+  fpoint2.x   := finifile.readfloat('VPLOT v1.0', 'P02.X', -1); if fpoint2.x = -1 then ffault := -1;
+  fpoint2.y   := finifile.readfloat('VPLOT v1.0', 'P02.Y', -1); if fpoint2.y = -1 then ffault := -1;
+  foffsetx    := finifile.readfloat('VPLOT v1.0', 'D23.X', -1); if foffsetx  = -1 then ffault := -1;
+  foffsety    := finifile.readfloat('VPLOT v1.0', 'D23.Y', -1); if foffsety  = -1 then ffault := -1;
+  fpoint3.x   := fpoint2.x + foffsetx;
+  fpoint3.y   := fpoint2.y + foffsety;
+  foffsetx    := finifile.readfloat('VPLOT v1.0', 'D24.X', -1); if foffsetx  = -1 then ffault := -1;
+  foffsety    := finifile.readfloat('VPLOT v1.0', 'D24.Y', -1); if foffsety  = -1 then ffault := -1;
+  fpoint4.x   := fpoint2.x + foffsetx;
+  fpoint4.y   := fpoint2.y + foffsety;
+  foffsetx    := finifile.readfloat('VPLOT v1.0', 'D25.X', -1); if foffsetx  = -1 then ffault := -1;
+  foffsety    := finifile.readfloat('VPLOT v1.0', 'D25.Y', -1); if foffsety  = -1 then ffault := -1;
+  fpoint5.x   := fpoint2.x + foffsetx;
+  fpoint5.y   := fpoint2.y + foffsety;
+  fpoint9.p.x := -fpoint2.x;
+  fpoint9.p.y := -fpoint2.y;
+  fpoint2     := translatepoint(fpoint9.p, fpoint2);
+  fpoint3     := translatepoint(fpoint9.p, fpoint3);
+  fpoint4     := translatepoint(fpoint9.p, fpoint4);
+  fpoint5     := translatepoint(fpoint9.p, fpoint5);
+  fpoint9.p.x := -fpoint9.p.x;
+  fpoint9.p.y := -fpoint9.p.y;
+  {$ifdef debug}
+  writeln('--- VPLOT v1.0 ---');
+  writeln(format('P00.X = %-5.3f  P00.Y = %-5.3f', [fpoint0.x,   fpoint0.y]));
+  writeln(format('P01.X = %-5.3f  P01.Y = %-5.3f', [fpoint1.x,   fpoint1.y]));
+  writeln(format('P02.X = %-5.3f  P02.Y = %-5.3f', [fpoint2.x,   fpoint2.y]));
+  writeln(format('P03.X = %-5.3f  P03.Y = %-5.3f', [fpoint3.x,   fpoint3.y]));
+  writeln(format('P04.X = %-5.3f  P04.Y = %-5.3f', [fpoint4.x,   fpoint4.y]));
+  writeln(format('P05.X = %-5.3f  P05.Y = %-5.3f', [fpoint5.x,   fpoint5.y]));
+  writeln(format('P09.X = %-5.3f  P09.Y = %-5.3f', [fpoint9.p.x, fpoint9.p.y]));
+  writeln(format('R     = %-5.3f', [fratio]));
+  {$endif}
+  optimizexy  (fpoint9);
+  // ---
   freeonterminate := true;
   inherited create(true);
 end;
@@ -317,7 +378,9 @@ begin
   fmot1 := position.m1;
   fmotz := round(z);
   if assigned(fontick) then
+  begin
     synchronize(fontick);
+  end;
 end;
 
 procedure tvplotcoder.interpolateline(const p0, p1: tvplotpoint);
@@ -412,22 +475,16 @@ begin
 
   position.m0 := round(distancebetween(fpoint0, tmp3) / fratio);
   position.m1 := round(distancebetween(fpoint1, tmp4) / fratio);
-
   {$ifdef debug}
   writeln('--- OPTIMIZE ---');
-  writeln('alpha ', radtodeg(ang):2:2);
-  writeln('P2.x  ', tmp2.x:2:2);
-  writeln('P2.y  ', tmp2.y:2:2);
-  writeln('P3.x  ', tmp3.x:2:2);
-  writeln('P3.y  ', tmp3.y:2:2);
-  writeln('P4.x  ', tmp4.x:2:2);
-  writeln('P4.y  ', tmp4.y:2:2);
-  writeln('P5.x  ', tmp5.x:2:2);
-  writeln('P5.y  ', tmp5.y:2:2);
-  writeln('P6.x  ', tmp6.x:2:2);
-  writeln('P6.y  ', tmp6.y:2:2);
-  writeln('D03   ', distancebetween(fpoint0, tmp3):2:2);
-  writeln('D14   ', distancebetween(fpoint1, tmp4):2:2);
+  writeln(format('alpha = %-5.3f', [radtodeg(ang)]));
+  writeln(format('P02.X = %-5.3f  P02.Y = %-5.3f', [tmp2.x, tmp2.y]));
+  writeln(format('P03.X = %-5.3f  P03.Y = %-5.3f', [tmp3.x, tmp3.y]));
+  writeln(format('P04.X = %-5.3f  P04.Y = %-5.3f', [tmp4.x, tmp4.y]));
+  writeln(format('P05.X = %-5.3f  P05.Y = %-5.3f', [tmp5.x, tmp5.y]));
+  writeln(format('P06.X = %-5.3f  P06.Y = %-5.3f', [tmp6.x, tmp6.y]));
+  writeln(format('D03   = %-5.3f', [distancebetween(fpoint0, tmp3)]));
+  writeln(format('D14   = %-5.3f', [distancebetween(fpoint1, tmp4)]));
   {$endif}
 end;
 
@@ -441,18 +498,18 @@ begin
   begin
     p0.x := fpx;
     p0.y := fpy;
-    p1.x := code.x;
-    p1.y := code.y;
+    p1.x := code.x + foffsetx;
+    p1.y := code.y + foffsety;
     interpolateline(p0, p1);
   end else
   if (code.c ='G02 ') or (code.c = 'G03 ') then
   begin
     p0.x := fpx;
     p0.y := fpy;
-    p1.x := code.x;
-    p1.y := code.y;
-    cc.x := p0.x + code.i;
-    cc.y := p0.y + code.j;
+    p1.x := code.x + foffsetx;
+    p1.y := code.y + foffsety;
+    cc.x := p0.x + code.i + foffsetx;
+    cc.y := p0.y + code.j + foffsety;
     interpolatearc(p0, p1, cc, code.c = 'G02 ');
   end;
 
@@ -468,64 +525,27 @@ end;
 procedure tvplotcoder.execute;
 var
   code: tvplotcode;
-  home: tvplotposition;
   xmin, xmax: double;
   ymin, ymax: double;
-  offsetx: double;
-  offsety: double;
 begin
-  fpoint0.x := finifile.readfloat('VPLOT v1.0', 'P00.X', -1); if fpoint0.x = -1 then terminate;
-  fpoint0.y := finifile.readfloat('VPLOT v1.0', 'P00.Y', -1); if fpoint0.y = -1 then terminate;
-  fpoint1.x := finifile.readfloat('VPLOT v1.0', 'P01.X', -1); if fpoint1.x = -1 then terminate;
-  fpoint1.y := finifile.readfloat('VPLOT v1.0', 'P01.Y', -1); if fpoint1.y = -1 then terminate;
-  fpoint2.x := finifile.readfloat('VPLOT v1.0', 'P02.X', -1); if fpoint2.x = -1 then terminate;
-  fpoint2.y := finifile.readfloat('VPLOT v1.0', 'P02.Y', -1); if fpoint2.y = -1 then terminate;
-  offsetx   := finifile.readfloat('VPLOT v1.0', 'D23.X', -1); if offsetx   = -1 then terminate;
-  offsety   := finifile.readfloat('VPLOT v1.0', 'D23.Y', -1); if offsety   = -1 then terminate;
-  fpoint3.x := fpoint2.x + offsetx;
-  fpoint3.y := fpoint2.y + offsety;
-  offsetx   := finifile.readfloat('VPLOT v1.0', 'D24.X', -1); if offsetx   = -1 then terminate;
-  offsety   := finifile.readfloat('VPLOT v1.0', 'D24.Y', -1); if offsety   = -1 then terminate;
-  fpoint4.x := fpoint2.x + offsetx;
-  fpoint4.y := fpoint2.y + offsety;
-  offsetx   := finifile.readfloat('VPLOT v1.0', 'D25.X', -1); if offsetx   = -1 then terminate;
-  offsety   := finifile.readfloat('VPLOT v1.0', 'D25.Y', -1); if offsety   = -1 then terminate;
-  fpoint5.x := fpoint2.x + offsetx;
-  fpoint5.y := fpoint2.y + offsety;
-  fratio    := finifile.readfloat('VPLOT v1.0', 'R'   ,  -1);
+  code.c := '';
+  code.x := 0;
+  code.y := 0;
+  code.z := 0;
+  code.f := 0;
+  code.e := 0;
+  code.i := 0;
+  code.j := 0;
+  code.k := 0;
+  code.r := 0;
   // ---
-  fpoint9.x := -fpoint2.x;
-  fpoint9.y := -fpoint2.y;
-  fpoint2   := translatepoint(fpoint9, fpoint2);
-  fpoint3   := translatepoint(fpoint9, fpoint3);
-  fpoint4   := translatepoint(fpoint9, fpoint4);
-  fpoint5   := translatepoint(fpoint9, fpoint5);
-  fpoint9.x := -fpoint9.x;
-  fpoint9.y := -fpoint9.y;
-  // ---
-  writeln('--- VPLOT v1.0 ---');
-  writeln(format(' P00.X = %-5.3f  P00.Y = %-5.3f', [fpoint0.x, fpoint0.y]));
-  writeln(format(' P01.X = %-5.3f  P01.Y = %-5.3f', [fpoint1.x, fpoint1.y]));
-  writeln(format(' P02.X = %-5.3f  P02.Y = %-5.3f', [fpoint2.x, fpoint2.y]));
-  writeln(format(' P03.X = %-5.3f  P03.Y = %-5.3f', [fpoint3.x, fpoint3.y]));
-  writeln(format(' P04.X = %-5.3f  P04.Y = %-5.3f', [fpoint4.x, fpoint4.y]));
-  writeln(format(' P05.X = %-5.3f  P05.Y = %-5.3f', [fpoint5.x, fpoint5.y]));
-  writeln(format(' P09.X = %-5.3f  P09.Y = %-5.3f', [fpoint9.x, fpoint9.y]));
-  writeln(format(' R     = %-5.3f', [fratio]));
-  // ---
-  home.p.x := fpoint9.x;
-  home.p.y := fpoint9.y;
-  optimizexy(home);
-
-  if not terminated then
+  if (ffault <> -1) then
   begin
-    writeln('--- CENTRE DRAWING ---');
-
     xmin   := fpoint1.x;
     xmax   := 0;
     ymin   := fpoint1.y;
     ymax   := 0;
-
+    // ---
     findex := 0;
     while (findex < finlist.count) do
     begin
@@ -540,33 +560,30 @@ begin
       end;
       inc(findex);
     end;
-
-    writeln('xmin = ', xmin:2:2);
-    writeln('xmax = ', xmax:2:2);
-    writeln('ymin = ', ymin:2:2);
-    writeln('ymax = ', ymax:2:2);
-
-    offsetx := (fpoint1.x / 2) - ((xmax + xmin) / 2);
-    offsety := (fpoint1.y / 2) - ((ymax + ymin) / 2);
-
-    writeln('offset x = ', offsetx:2:2);
-    writeln('offset y = ', offsety:2:2);
+    foffsetx := (fpoint1.x / 2) - ((xmax + xmin) / 2);
+    foffsety := (fpoint1.y / 2) - ((ymax + ymin) / 2);
+    {$ifdef debug}
+    writeln('--- CENTRE DRAWING ---');
+    writeln('offset x = ', foffsetx:2:2);
+    writeln('offset y = ', foffsety:2:2);
+    {$endif}
     // ---
     findex := 0;
-    dotick(home, 1);
+    dotick(fpoint9, 1);
     while (findex < finlist.count) and (not terminated) do
     begin
-      parse_line(finlist[findex], code);
-      if (code.c ='G00 ') or (code.c ='G01 ') or
-         (code.c ='G02 ') or (code.c ='G03 ') then
+      if enabled then
       begin
-        code.x := code.x + offsetx;
-        code.y := code.y + offsetx;
-        encode(code);
-      end;
-      inc(findex);
+        parse_line(finlist[findex], code);
+        if (code.c ='G00 ') or (code.c ='G01 ') or
+           (code.c ='G02 ') or (code.c ='G03 ') then encode(code);
+
+        sleep(2);
+        inc(findex);
+      end else
+        sleep(250);
     end;
-    dotick(home, 1);
+    dotick(fpoint9, 1);
   end;
 end;
 
