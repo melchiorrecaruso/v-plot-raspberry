@@ -204,7 +204,12 @@ begin
   end;
 
   if length(s) > 0 then
+  begin
+    for i := 1 to length(s) do
+      if s[i] in ['.', ','] then
+        s[i] := decimalseparator;
     value := strtofloat(s);
+  end;
 end;
 
 procedure parse_line(gcode: rawbytestring; var vcode: tvplotcode);
@@ -312,9 +317,7 @@ begin
   fmot1 := position.m1;
   fmotz := round(z);
   if assigned(fontick) then
-  begin
     synchronize(fontick);
-  end;
 end;
 
 procedure tvplotcoder.interpolateline(const p0, p1: tvplotpoint);
@@ -395,13 +398,13 @@ begin
     tmp6  := intersectlines(linebetween(fpoint0, tmp3),
                             linebetween(fpoint1, tmp4));
 
-    err := abs(tmp6.y - tmp5.y);
+    err := abs(tmp6.x - tmp5.x);
     if  err > 0.001 then
     begin
-      if tmp6.y < tmp5.y then
+      if tmp6.x < tmp5.x then
         ang := ang - (err / 100)
       else
-      if tmp6.y > tmp5.y then
+      if tmp6.x > tmp5.x then
         ang := ang + (err / 100);
     end else
       break;
@@ -411,7 +414,7 @@ begin
   position.m1 := round(distancebetween(fpoint1, tmp4) / fratio);
 
   {$ifdef debug}
-  writeln('--- OPTIMIZED ---');
+  writeln('--- OPTIMIZE ---');
   writeln('alpha ', radtodeg(ang):2:2);
   writeln('P2.x  ', tmp2.x:2:2);
   writeln('P2.y  ', tmp2.y:2:2);
@@ -471,77 +474,60 @@ var
   offsetx: double;
   offsety: double;
 begin
-  fpoint0.x := -1;  fpoint0.y := -1;
-  fpoint1.x := -1;  fpoint1.y := -1;
-  fpoint2.x := -1;  fpoint2.y := -1;
-  fpoint3.x := -1;  fpoint3.y := -1;
-  fpoint4.x := -1;  fpoint4.y := -1;
-  fpoint5.x := -1;  fpoint5.y := -1;
-  fpoint9.x := -1;  fpoint9.y := -1;
-  fratio    := -1;
-
-  if assigned(finifile) then
-  begin
-    fpoint0.x := finifile.readfloat('VPLOT v1.0', 'P0.X', -1);
-    fpoint0.y := finifile.readfloat('VPLOT v1.0', 'P0.Y', -1);
-    fpoint1.x := finifile.readfloat('VPLOT v1.0', 'P1.X', -1);
-    fpoint1.y := finifile.readfloat('VPLOT v1.0', 'P1.Y', -1);
-    fpoint2.x := finifile.readfloat('VPLOT v1.0', 'P2.X', -1);
-    fpoint2.y := finifile.readfloat('VPLOT v1.0', 'P2.Y', -1);
-    fpoint3.x := finifile.readfloat('VPLOT v1.0', 'P3.X', -1);
-    fpoint3.y := finifile.readfloat('VPLOT v1.0', 'P3.Y', -1);
-    fpoint4.x := finifile.readfloat('VPLOT v1.0', 'P4.X', -1);
-    fpoint4.y := finifile.readfloat('VPLOT v1.0', 'P4.Y', -1);
-    fpoint5.x := finifile.readfloat('VPLOT v1.0', 'P5.X', -1);
-    fpoint5.y := finifile.readfloat('VPLOT v1.0', 'P5.Y', -1);
-    fpoint9.x := finifile.readfloat('VPLOT v1.0', 'P9.X', -1);
-    fpoint9.y := finifile.readfloat('VPLOT v1.0', 'P9.Y', -1);
-    fratio    := finifile.readfloat('VPLOT v1.0', 'R'   , -1);
-  end;
-
-  writeln('VPLOT v1.0');
-  writeln(format(' P0.X = %-5.3f  P1.X = %-5.3f', [fpoint0.x, fpoint1.x]));
-  writeln(format(' P0.Y = %-5.3f  P1.Y = %-5.3f', [fpoint0.y, fpoint1.y]));
-  writeln(format(' P2.X = %-5.3f  P3.X = %-5.3f  P4.X = %-5.3f  P5.X = %-5.3f', [fpoint2.x, fpoint3.x, fpoint4.x, fpoint5.x]));
-  writeln(format(' P2.Y = %-5.3f  P3.Y = %-5.3f  P4.Y = %-5.3f  P5.Y = %-5.3f', [fpoint2.y, fpoint3.y, fpoint4.y, fpoint5.y]));
-  writeln(format(' P9.X = %-5.3f', [fpoint9.x]));
-  writeln(format(' P9.Y = %-5.3f', [fpoint9.y]));
-  writeln(format('RATIO = %-5.3f', [fratio]));
-  readln;
-
-  if fpoint0.x = -1 then terminate;  if fpoint0.y = -1 then terminate;
-  if fpoint1.x = -1 then terminate;  if fpoint1.y = -1 then terminate;
-  if fpoint2.x = -1 then terminate;  if fpoint2.y = -1 then terminate;
-  if fpoint3.x = -1 then terminate;  if fpoint3.y = -1 then terminate;
-  if fpoint4.x = -1 then terminate;  if fpoint4.y = -1 then terminate;
-  if fpoint5.x = -1 then terminate;  if fpoint5.y = -1 then terminate;
-  if fpoint9.x = -1 then terminate;  if fpoint9.y = -1 then terminate;
-  if fratio    = -1 then terminate;
-
+  fpoint0.x := finifile.readfloat('VPLOT v1.0', 'P00.X', -1); if fpoint0.x = -1 then terminate;
+  fpoint0.y := finifile.readfloat('VPLOT v1.0', 'P00.Y', -1); if fpoint0.y = -1 then terminate;
+  fpoint1.x := finifile.readfloat('VPLOT v1.0', 'P01.X', -1); if fpoint1.x = -1 then terminate;
+  fpoint1.y := finifile.readfloat('VPLOT v1.0', 'P01.Y', -1); if fpoint1.y = -1 then terminate;
+  fpoint2.x := finifile.readfloat('VPLOT v1.0', 'P02.X', -1); if fpoint2.x = -1 then terminate;
+  fpoint2.y := finifile.readfloat('VPLOT v1.0', 'P02.Y', -1); if fpoint2.y = -1 then terminate;
+  offsetx   := finifile.readfloat('VPLOT v1.0', 'D23.X', -1); if offsetx   = -1 then terminate;
+  offsety   := finifile.readfloat('VPLOT v1.0', 'D23.Y', -1); if offsety   = -1 then terminate;
+  fpoint3.x := fpoint2.x + offsetx;
+  fpoint3.y := fpoint2.y + offsety;
+  offsetx   := finifile.readfloat('VPLOT v1.0', 'D24.X', -1); if offsetx   = -1 then terminate;
+  offsety   := finifile.readfloat('VPLOT v1.0', 'D24.Y', -1); if offsety   = -1 then terminate;
+  fpoint4.x := fpoint2.x + offsetx;
+  fpoint4.y := fpoint2.y + offsety;
+  offsetx   := finifile.readfloat('VPLOT v1.0', 'D25.X', -1); if offsetx   = -1 then terminate;
+  offsety   := finifile.readfloat('VPLOT v1.0', 'D25.Y', -1); if offsety   = -1 then terminate;
+  fpoint5.x := fpoint2.x + offsetx;
+  fpoint5.y := fpoint2.y + offsety;
+  fratio    := finifile.readfloat('VPLOT v1.0', 'R'   ,  -1);
+  // ---
+  fpoint9.x := -fpoint2.x;
+  fpoint9.y := -fpoint2.y;
+  fpoint2   := translatepoint(fpoint9, fpoint2);
+  fpoint3   := translatepoint(fpoint9, fpoint3);
+  fpoint4   := translatepoint(fpoint9, fpoint4);
+  fpoint5   := translatepoint(fpoint9, fpoint5);
+  fpoint9.x := -fpoint9.x;
+  fpoint9.y := -fpoint9.y;
+  // ---
+  writeln('--- VPLOT v1.0 ---');
+  writeln(format(' P00.X = %-5.3f  P00.Y = %-5.3f', [fpoint0.x, fpoint0.y]));
+  writeln(format(' P01.X = %-5.3f  P01.Y = %-5.3f', [fpoint1.x, fpoint1.y]));
+  writeln(format(' P02.X = %-5.3f  P02.Y = %-5.3f', [fpoint2.x, fpoint2.y]));
+  writeln(format(' P03.X = %-5.3f  P03.Y = %-5.3f', [fpoint3.x, fpoint3.y]));
+  writeln(format(' P04.X = %-5.3f  P04.Y = %-5.3f', [fpoint4.x, fpoint4.y]));
+  writeln(format(' P05.X = %-5.3f  P05.Y = %-5.3f', [fpoint5.x, fpoint5.y]));
+  writeln(format(' P09.X = %-5.3f  P09.Y = %-5.3f', [fpoint9.x, fpoint9.y]));
+  writeln(format(' R     = %-5.3f', [fratio]));
+  // ---
   home.p.x := fpoint9.x;
   home.p.y := fpoint9.y;
   optimizexy(home);
 
   if not terminated then
   begin
-    dotick(home, 1);
+    writeln('--- CENTRE DRAWING ---');
+
+    xmin   := fpoint1.x;
+    xmax   := 0;
+    ymin   := fpoint1.y;
+    ymax   := 0;
 
     findex := 0;
-    if finlist.count > 0 then
-    begin
-      parse_line(finlist[findex], code);
-      if (code.c ='G00 ') or (code.c ='G01 ') or
-         (code.c ='G02 ') or (code.c ='G03 ') then
-      begin
-        xmin := code.x;
-        xmax := code.x;
-        ymin := code.y;
-        ymax := code.y;
-      end;
-      inc(findex);
-    end;
-
-    while (findex < finlist.count) and (not terminated) do
+    while (findex < finlist.count) do
     begin
       parse_line(finlist[findex], code);
       if (code.c ='G00 ') or (code.c ='G01 ') or
@@ -554,13 +540,23 @@ begin
       end;
       inc(findex);
     end;
+
+    writeln('xmin = ', xmin:2:2);
+    writeln('xmax = ', xmax:2:2);
+    writeln('ymin = ', ymin:2:2);
+    writeln('ymax = ', ymax:2:2);
+
     offsetx := (fpoint1.x / 2) - ((xmax + xmin) / 2);
     offsety := (fpoint1.y / 2) - ((ymax + ymin) / 2);
 
+    writeln('offset x = ', offsetx:2:2);
+    writeln('offset y = ', offsety:2:2);
+    // ---
     findex := 0;
-    while (finlist.count > 0) and (not terminated) do
+    dotick(home, 1);
+    while (findex < finlist.count) and (not terminated) do
     begin
-      parse_line(finlist[0], code);
+      parse_line(finlist[findex], code);
       if (code.c ='G00 ') or (code.c ='G01 ') or
          (code.c ='G02 ') or (code.c ='G03 ') then
       begin

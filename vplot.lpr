@@ -23,16 +23,17 @@ program vplot;
 {$mode objfpc}{$H+}
 
 uses
-  {$ifdef unix} cthreads, {$endif} interfaces, forms, lazcontrols, main, initform;
+  {$ifdef unix} cthreads, {$endif} interfaces, forms, lazcontrols, mainfrm, initfrm;
 
 {$R *.res}
 
 begin
-  application.title := 'VPlot Driver';
+  Application.Scaled:=True;
   requirederivedformresource := true;
+  application.title := 'VPlot Driver';
   application.initialize;
   application.createform(tmainform, mainform);
-  application.createform(tform1, form1);
+  application.createform(tinitform, initform);
   application.run;
 end.
 
