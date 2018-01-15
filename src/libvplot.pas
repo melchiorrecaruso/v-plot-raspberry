@@ -21,12 +21,12 @@
 unit libvplot;
 
 {$mode objfpc}{$H+}
-{*$define debug}
+{$define debug}
 
 interface
 
 uses
-  classes, inifiles, {$ifdef raspberrypi} pca9685, wiringpi, {$endif} sysutils;
+  classes, inifiles;
 
 type
   tvplotpoint = packed record
@@ -157,9 +157,9 @@ var
 implementation
 
 uses
-  math;
+  math, {$ifdef cpuarm} pca9685, wiringpi, {$endif} sysutils;
 
-{$ifdef raspberrypi}
+{$ifdef cpuarm}
 const
   mot0_step     = P38;
   mot0_dir      = P40;
@@ -316,6 +316,7 @@ begin
   ffault      := 0;
   finlist     := inlist;
   finifile    := inifile;
+  finifile.formatsettings.dateseparator := '.';
   // ---
   fratio      := finifile.readfloat('VPLOT v1.0', 'R'   ,  -1); if fratio    = -1 then ffault := -1;
   fpoint0.x   := finifile.readfloat('VPLOT v1.0', 'P00.X', -1); if fpoint0.x = -1 then ffault := -1;
@@ -508,8 +509,8 @@ begin
     p0.y := fpy;
     p1.x := code.x + foffsetx;
     p1.y := code.y + foffsety;
-    cc.x := p0.x + code.i + foffsetx;
-    cc.y := p0.y + code.j + foffsety;
+    cc.x := p0.x + code.i;
+    cc.y := p0.y + code.j;
     interpolatearc(p0, p1, cc, code.c = 'G02 ');
   end;
 
@@ -579,6 +580,8 @@ begin
            (code.c ='G02 ') or (code.c ='G03 ') then encode(code);
 
         inc(findex);
+
+        sleep(5);
       end else
         sleep(250);
     end;

@@ -162,8 +162,9 @@ begin
     p0.x := -1;
     p0.y := -1;
     // ---
-    vplotcoder        := tvplotcoder.create(inlist, inifile);
-    vplotcoder.ontick := @ontick;
+    vplotcoder         := tvplotcoder.create(inlist, inifile);
+    vplotcoder.ontick  := @ontick;
+    vplotcoder.enabled := false;
     // ---
 
     bmp.setsize(
