@@ -1,7 +1,7 @@
 object mainform: Tmainform
-  Left = 418
+  Left = 362
   Height = 452
-  Top = 116
+  Top = 124
   Width = 778
   Caption = 'VPlot Driver'
   ClientHeight = 452
@@ -1314,22 +1314,6 @@ object mainform: Tmainform
     ClientHeight = 452
     ClientWidth = 623
     TabOrder = 1
-    object previewimage: TImage
-      AnchorSideLeft.Control = previewpanel
-      AnchorSideTop.Control = previewpanel
-      AnchorSideRight.Control = previewpanel
-      AnchorSideRight.Side = asrBottom
-      AnchorSideBottom.Control = previewpanel
-      AnchorSideBottom.Side = asrBottom
-      Left = 0
-      Height = 452
-      Top = 0
-      Width = 623
-      Anchors = [akTop, akLeft, akRight, akBottom]
-      AutoSize = True
-      StretchOutEnabled = False
-      StretchInEnabled = False
-    end
     object updownbtn: TUpDown
       AnchorSideLeft.Control = panbtn
       AnchorSideRight.Control = panbtn
@@ -1402,6 +1386,22 @@ object mainform: Tmainform
       Step = 1
       TabOrder = 3
       BarShowText = True
+    end
+    object previewimage: TImage
+      AnchorSideLeft.Control = previewpanel
+      AnchorSideTop.Control = previewpanel
+      AnchorSideRight.Control = previewpanel
+      AnchorSideRight.Side = asrBottom
+      AnchorSideBottom.Control = previewpanel
+      AnchorSideBottom.Side = asrBottom
+      Left = 0
+      Height = 452
+      Top = 0
+      Width = 623
+      Anchors = [akTop, akLeft, akRight, akBottom]
+      AutoSize = True
+      StretchOutEnabled = False
+      StretchInEnabled = False
     end
   end
   object opendialog: TOpenDialog

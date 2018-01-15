@@ -34,9 +34,9 @@ type
 
   tmainform = class(tform)
     bevel2: tbevel;
+    previewimage: TImage;
     prvwbtn: TCheckBox;
     panbtn: tbitbtn;
-    previewimage: timage;
     loadbtn: tbitbtn;
     morebtn: tbitbtn;
     btnpanel: tpanel;
@@ -62,6 +62,7 @@ type
     procedure morebtnclick(sender: tobject);
     procedure timertimer(sender: tobject);
   private
+    bmp:     tbitmap;
     p0:      tvplotpoint;
     inlist:  tstringlist;
     inifile: tinifile;
@@ -89,6 +90,7 @@ begin
   stopbtn.enabled := false;
   morebtn.enabled := true;
   // ---
+  bmp         := tbitmap.create;
   inlist      := tstringlist.create;
   inifile     := tinifile.create(changefileext(paramstr(0), '.ini'));
   vplotdriver := tvplotdriver.create;
@@ -96,6 +98,7 @@ end;
 
 procedure tmainform.formdestroy(sender: tobject);
 begin
+  bmp.destroy;
   inlist.destroy;
   inifile.destroy;
   vplotdriver.destroy;
@@ -144,6 +147,7 @@ var
 begin
   if opendialog.execute then
   begin
+    loadbtn.enabled := false;
     playbtn.enabled := true;
     stopbtn.enabled := false;
     // ---
@@ -161,6 +165,17 @@ begin
     vplotcoder        := tvplotcoder.create(inlist, inifile);
     vplotcoder.ontick := @ontick;
     // ---
+
+    bmp.setsize(
+      round(vplotcoder.width),
+      round(vplotcoder.height));
+    bmp.canvas.pen.color   := clwhite;
+    bmp.canvas.brush.color := clwhite;
+    bmp.canvas.brush.style := bssolid;
+    bmp.canvas.fillrect(0,0,
+      round(vplotcoder.width),
+      round(vplotcoder.height));
+
     previewimage.picture.bitmap.setsize(
       round(vplotcoder.width),
       round(vplotcoder.height));
@@ -218,25 +233,31 @@ var
 begin
   if vplotcoder.pz < 0 then
   begin
-    previewimage.canvas.pen.color   := clblack;
-    previewimage.canvas.brush.color := clblack;
-    previewimage.canvas.brush.style := bssolid;
+    bmp.canvas.pen.color   := clblack;
+    bmp.canvas.brush.color := clblack;
+    bmp.canvas.brush.style := bssolid;
   end else
   begin
-    previewimage.canvas.pen.color   := clred;
-    previewimage.canvas.brush.color := clred;
-    previewimage.canvas.brush.style := bssolid;
+    bmp.canvas.pen.color   := clred;
+    bmp.canvas.brush.color := clred;
+    bmp.canvas.brush.style := bssolid;
   end;
 
   p1.x :=                     vplotcoder.px;
   p1.y := vplotcoder.height - vplotcoder.py;
-  if (p0.x <> -1) and (p0.y <> -1) then
-    previewimage.canvas.line(
-      round(p0.x),
-      round(p0.y),
+  if (p0.x <> -1) and
+     (p0.y <> -1) then
+    bmp.canvas.line(
       round(p1.x),
-      round(p1.y));
+      round(p1.y),
+      round(p0.x),
+      round(p0.y));
   p0 := p1;
+
+  vplotdriver.enabled := not prvwbtn.checked;
+  with vplotcoder do
+    vplotdriver.move2(mot0, mot1, motz);
+  application.processmessages;
 end;
 
 procedure tmainform.timertimer(Sender: TObject);
@@ -248,9 +269,16 @@ begin
   end else
   begin
     playorstopbtnclick(stopbtn);
+    loadbtn.enabled := true;
     playbtn.enabled := false;
     stopbtn.enabled := false;
   end;
+
+  previewimage.canvas.copyrect(
+    previewimage.canvas.cliprect,
+    bmp.canvas,
+    bmp.canvas.cliprect);
+  previewimage.invalidate;
 end;
 
 end.

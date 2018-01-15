@@ -578,7 +578,6 @@ begin
         if (code.c ='G00 ') or (code.c ='G01 ') or
            (code.c ='G02 ') or (code.c ='G03 ') then encode(code);
 
-        sleep(2);
         inc(findex);
       end else
         sleep(250);
@@ -587,13 +586,12 @@ begin
   end;
 end;
 
-
 // tvplotdriver //
 
 constructor tvplotdriver.create;
 begin
   inherited create;
-  {$ifdef raspberrypi}
+  {$ifdef cpuarm}
   // setup wiringpi library
   ffault := wiringpisetup;
   // setup pca9685 library
@@ -632,7 +630,7 @@ end;
 
 procedure  tvplotdriver.init(cnt0, cnt1, cntz: longint);
 begin
-  {$ifdef raspberrypi}
+  {$ifdef cpuarm}
   fcount0  := cnt0;
   fcount1  := cnt1;
   fcountz  := cntz;
@@ -641,14 +639,14 @@ end;
 
 procedure tvplotdriver.move2(cnt0, cnt1, cntz: longint);
 begin
-  {$ifdef raspberrypi}
+  {$ifdef cpuarm}
   move4(cnt0 - fcount0, cnt1 - fcount1, cntz - fcountz);
   {$endif}
 end;
 
 procedure tvplotdriver.largedisplacements(cnt0, cnt1: longint);
 begin
-  {$ifdef raspberrypi}
+  {$ifdef cpuarm}
   inc(fcount0, cnt0);
   inc(fcount1, cnt1);
 
@@ -682,12 +680,12 @@ begin
 end;
 
 procedure tvplotdriver.smalldisplacements(cnt0, cnt1: longint);
-{$ifdef raspberrypi}
+{$ifdef cpuarm}
 var
   i: longint;
 {$endif}
 begin
-  {$ifdef raspberrypi}
+  {$ifdef cpuarm}
   inc(fcount0, cnt0);
   inc(fcount1, cnt1);
 
@@ -723,7 +721,7 @@ end;
 
 procedure tvplotdriver.move4(cnt0, cnt1, cntz: longint);
 begin
-  {$ifdef raspberrypi}
+  {$ifdef cpuarm}
   if not enabled  then exit;
   if ffault  = -1 then exit;
   // move pwm motz
