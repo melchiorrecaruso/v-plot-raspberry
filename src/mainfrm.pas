@@ -33,18 +33,16 @@ type
   { tmainform }
 
   tmainform = class(tform)
-    bevel2: tbevel;
+    loadbtn: TBitBtn;
+    morebtn: TBitBtn;
+    pausebtn: TBitBtn;
+    playbtn: TBitBtn;
     previewimage: TImage;
-    prvwbtn: TCheckBox;
     panbtn: tbitbtn;
-    loadbtn: tbitbtn;
-    morebtn: tbitbtn;
-    btnpanel: tpanel;
     previewpanel: tpanel;
-    playbtn: tbitbtn;
-    progressbar: tprogressbar;
     opendialog: topendialog;
-    stopbtn: tbitbtn;
+    prvwbtn: TCheckBox;
+    stopbtn: TBitBtn;
     timer: ttimer;
     updownbtn: tupdown;
     leftrightbtn: tupdown;
@@ -63,7 +61,6 @@ type
     procedure timertimer(sender: tobject);
   private
     bmp:     tbitmap;
-    p0:      tvplotpoint;
     inlist:  tstringlist;
     inifile: tinifile;
     procedure ontick;
@@ -85,10 +82,11 @@ uses
 
 procedure tmainform.formcreate(sender: tobject);
 begin
-  loadbtn.enabled := true;
-  playbtn.enabled := false;
-  stopbtn.enabled := false;
-  morebtn.enabled := true;
+  loadbtn .enabled := true;
+  playbtn .enabled := false;
+  pausebtn.enabled := false;
+  stopbtn .enabled := false;
+  morebtn .enabled := true;
   // ---
   bmp         := tbitmap.create;
   inlist      := tstringlist.create;
@@ -107,7 +105,7 @@ end;
 procedure tmainform.formclose(sender: tobject; var closeaction: tcloseaction);
 begin
   if assigned(vplotcoder) then
-    vplotcoder.terminate;
+    playorstopbtnclick(stopbtn);
 
   if assigned(vplotcoder) then
     closeaction := canone
@@ -147,26 +145,19 @@ var
 begin
   if opendialog.execute then
   begin
-    loadbtn.enabled := false;
-    playbtn.enabled := true;
-    stopbtn.enabled := false;
+    loadbtn .enabled := false;
+    playbtn .enabled := true;
+    pausebtn.enabled := false;
+    stopbtn .enabled := false;
+    morebtn .enabled := true;
     // ---
     inlist.clear;
     inlist.loadfromfile(opendialog.filename);
-    // ---
-    // progressbar.min      := 0;
-    // progressbar.max      := inlist.count;
-    // progressbar.position := 0;
-    // progressbar.smooth   := true;
-    // ---
-    p0.x := -1;
-    p0.y := -1;
     // ---
     vplotcoder         := tvplotcoder.create(inlist, inifile);
     vplotcoder.ontick  := @ontick;
     vplotcoder.enabled := false;
     // ---
-
     bmp.setsize(
       round(vplotcoder.width),
       round(vplotcoder.height));
@@ -180,7 +171,6 @@ begin
     previewimage.picture.bitmap.setsize(
       round(vplotcoder.width),
       round(vplotcoder.height));
-
     previewimage.canvas.pen.color   := clwhite;
     previewimage.canvas.brush.color := clwhite;
     previewimage.canvas.brush.style := bssolid;
@@ -208,13 +198,21 @@ begin
     if sender = playbtn then
       vplotcoder.enabled := true
     else
+    if sender = pausebtn then
+      vplotcoder.enabled := false
+    else
     if sender = stopbtn then
-      vplotcoder.enabled := false;
-    // ---
-    timer  .enabled :=     vplotcoder.enabled;
-    playbtn.enabled := not vplotcoder.enabled;
-    stopbtn.enabled :=     vplotcoder.enabled;
-    prvwbtn.enabled := not vplotcoder.enabled;
+    begin
+      vplotcoder.terminate;
+      vplotcoder.enabled := true;
+    end;
+
+    timer   .enabled :=     vplotcoder.enabled;
+    playbtn .enabled := not vplotcoder.enabled;
+    pausebtn.enabled :=     vplotcoder.enabled;
+    stopbtn .enabled :=     vplotcoder.enabled;
+    prvwbtn .enabled := not vplotcoder.enabled;
+    morebtn .enabled := false;
   end;
 end;
 
@@ -229,31 +227,15 @@ begin
 end;
 
 procedure Tmainform.ontick;
-var
-  p1: tvplotpoint;
 begin
   if vplotcoder.pz < 0 then
-  begin
-    bmp.canvas.pen.color   := clblack;
-    bmp.canvas.brush.color := clblack;
-    bmp.canvas.brush.style := bssolid;
-  end else
-  begin
-    bmp.canvas.pen.color   := clred;
-    bmp.canvas.brush.color := clred;
-    bmp.canvas.brush.style := bssolid;
-  end;
-
-  p1.x :=                     vplotcoder.px;
-  p1.y := vplotcoder.height - vplotcoder.py;
-  if (p0.x <> -1) and
-     (p0.y <> -1) then
-    bmp.canvas.line(
-      round(p1.x),
-      round(p1.y),
-      round(p0.x),
-      round(p0.y));
-  p0 := p1;
+    bmp.canvas.pixels[
+      round(vplotcoder.px),
+      round(vplotcoder.height - vplotcoder.py)] := clblack
+  else
+    bmp.canvas.pixels[
+      round(vplotcoder.px),
+      round(vplotcoder.height - vplotcoder.py)] := clred;
 
   vplotdriver.enabled := not prvwbtn.checked;
   with vplotcoder do
@@ -263,23 +245,27 @@ end;
 
 procedure tmainform.timertimer(Sender: TObject);
 begin
-  if assigned(vplotcoder) then
-  begin
-    inc(x);
-    caption := 'VPlot - Time elapsed ' + inttostr(x) + ' secs';
-  end else
-  begin
-    playorstopbtnclick(stopbtn);
-    loadbtn.enabled := true;
-    playbtn.enabled := false;
-    stopbtn.enabled := false;
-  end;
-
+  inc(x);
   previewimage.canvas.copyrect(
     previewimage.canvas.cliprect,
     bmp.canvas,
     bmp.canvas.cliprect);
   previewimage.invalidate;
+  if assigned(vplotcoder) then
+  begin
+    caption := format('VPlot Driver - Drawing %u%% - Time elapsed %u secs',
+      [(100 * vplotcoder.index) div vplotcoder.count, x]);
+  end else
+  begin
+    playorstopbtnclick(stopbtn);
+    timer   .enabled := false;
+    loadbtn .enabled := true;
+    playbtn .enabled := false;
+    pausebtn.enabled := false;
+    stopbtn .enabled := false;
+    morebtn .enabled := true;
+    caption := format('VPlot Driver - Time elapsed %u secs', [x]);
+  end;
 end;
 
 end.

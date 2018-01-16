@@ -1,7 +1,7 @@
 object initform: Tinitform
-  Left = 549
+  Left = 609
   Height = 172
-  Top = 209
+  Top = 228
   Width = 480
   Align = alRight
   BorderIcons = [biSystemMenu]

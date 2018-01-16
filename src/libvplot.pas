@@ -90,7 +90,7 @@ type
 
 
     fcurrpath:  array of tvplotposition;
-
+    function  getcount: longint;
     procedure interpolateline(const p0, p1: tvplotpoint);
     procedure interpolatearc (const p0, p1, cc: tvplotpoint; clockwise: boolean);
     procedure optimizexy(var position: tvplotposition);
@@ -105,6 +105,7 @@ type
   published
     property enabled: boolean       read fenabled write fenabled;
     property index:   longint       read findex;
+    property count:   longint       read getcount;
 
     property px:      double        read fpx;
     property py:      double        read fpy;
@@ -580,13 +581,16 @@ begin
            (code.c ='G02 ') or (code.c ='G03 ') then encode(code);
 
         inc(findex);
-
-        sleep(5);
       end else
         sleep(250);
     end;
     dotick(fpoint9, 1);
   end;
+end;
+
+function tvplotcoder.getcount: longint;
+begin
+  result := finlist.count;
 end;
 
 // tvplotdriver //
@@ -724,6 +728,8 @@ end;
 
 procedure tvplotdriver.move4(cnt0, cnt1, cntz: longint);
 begin
+  sleep(10);
+
   {$ifdef cpuarm}
   if not enabled  then exit;
   if ffault  = -1 then exit;
