@@ -184,6 +184,8 @@ begin
     previewimage.stretchinenabled  := false;
     previewimage.stretchoutenabled := false;
     previewimage.stretch           := false;
+    panbtnclick(panbtn);
+
     // ---
     vplotcoder.start;
     // ---

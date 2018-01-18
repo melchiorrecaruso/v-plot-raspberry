@@ -1,7 +1,7 @@
 object mainform: Tmainform
-  Left = 388
+  Left = 383
   Height = 558
-  Top = 72
+  Top = 122
   Width = 867
   Caption = 'VPlot Driver'
   ClientHeight = 558
@@ -14,11 +14,17 @@ object mainform: Tmainform
   OnDestroy = FormDestroy
   LCLVersion = '1.9.0.0'
   object previewpanel: TPanel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 558
     Top = 0
     Width = 867
-    Align = alClient
+    Anchors = [akTop, akLeft, akRight, akBottom]
     BevelOuter = bvNone
     ClientHeight = 558
     ClientWidth = 867
@@ -78,9 +84,9 @@ object mainform: Tmainform
       TabOrder = 2
     end
     object previewimage: TImage
-      Left = 140
+      Left = 243
       Height = 482
-      Top = 39
+      Top = 104
       Width = 619
       Anchors = []
       AutoSize = True
@@ -89,19 +95,18 @@ object mainform: Tmainform
     end
   end
   object pausebtn: TBitBtn
-    AnchorSideLeft.Control = playbtn
-    AnchorSideLeft.Side = asrBottom
-    AnchorSideTop.Control = loadbtn
+    AnchorSideLeft.Control = loadbtn
+    AnchorSideTop.Control = playbtn
+    AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = loadbtn
     AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = loadbtn
     AnchorSideBottom.Side = asrBottom
-    Left = 265
-    Height = 56
-    Top = 5
+    Left = 5
+    Height = 60
+    Top = 135
     Width = 125
-    Anchors = [akTop, akLeft, akBottom]
-    BorderSpacing.Left = 5
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 5
     Caption = 'Pause'
     Glyph.Data = {
       36240000424D3624000000000000360000002800000030000000300000000100
@@ -399,19 +404,18 @@ object mainform: Tmainform
     TabOrder = 3
   end
   object stopbtn: TBitBtn
-    AnchorSideLeft.Control = pausebtn
-    AnchorSideLeft.Side = asrBottom
-    AnchorSideTop.Control = loadbtn
+    AnchorSideLeft.Control = loadbtn
+    AnchorSideTop.Control = pausebtn
+    AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = loadbtn
     AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = loadbtn
     AnchorSideBottom.Side = asrBottom
-    Left = 395
-    Height = 56
-    Top = 5
+    Left = 5
+    Height = 60
+    Top = 200
     Width = 125
-    Anchors = [akTop, akLeft, akBottom]
-    BorderSpacing.Left = 5
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 5
     Caption = 'Stop'
     Glyph.Data = {
       36240000424D3624000000000000360000002800000030000000300000000100
@@ -709,12 +713,17 @@ object mainform: Tmainform
     TabOrder = 4
   end
   object morebtn: TBitBtn
-    Left = 737
-    Height = 159
-    Top = 5
+    AnchorSideLeft.Control = loadbtn
+    AnchorSideRight.Control = loadbtn
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 5
+    Height = 60
+    Top = 493
     Width = 125
-    Anchors = [akTop, akRight, akBottom]
-    BorderSpacing.Right = 5
+    Anchors = [akLeft, akRight, akBottom]
+    BorderSpacing.Bottom = 5
     Glyph.Data = {
       36240000424D3624000000000000360000002800000030000000300000000100
       2000000000000024000064000000640000000000000000000000000000000000
@@ -1011,12 +1020,13 @@ object mainform: Tmainform
     TabOrder = 5
   end
   object prvwbtn: TCheckBox
+    AnchorSideLeft.Control = Owner
     AnchorSideRight.Control = loadbtn
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = morebtn
     Left = 5
-    Height = 23
-    Top = -23
+    Height = 19
+    Top = 469
     Width = 125
     Anchors = [akLeft, akRight, akBottom]
     BorderSpacing.Left = 5
@@ -1028,12 +1038,16 @@ object mainform: Tmainform
     TabOrder = 6
   end
   object playbtn: TBitBtn
-    Left = 135
-    Height = 159
-    Top = 5
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = loadbtn
+    AnchorSideTop.Side = asrBottom
+    AnchorSideBottom.Side = asrBottom
+    Left = 5
+    Height = 60
+    Top = 70
     Width = 125
-    Anchors = [akTop, akLeft, akBottom]
     BorderSpacing.Left = 5
+    BorderSpacing.Top = 5
     Caption = 'Play'
     Glyph.Data = {
       36240000424D3624000000000000360000002800000030000000300000000100
@@ -1331,8 +1345,10 @@ object mainform: Tmainform
     TabOrder = 2
   end
   object loadbtn: TBitBtn
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Owner
     Left = 5
-    Height = 56
+    Height = 60
     Top = 5
     Width = 125
     BorderSpacing.Left = 5
@@ -1635,13 +1651,13 @@ object mainform: Tmainform
     TabOrder = 1
   end
   object opendialog: TOpenDialog
-    left = 32
-    top = 80
+    left = 152
+    top = 72
   end
   object timer: TTimer
     Enabled = False
     OnTimer = timerTimer
-    left = 96
-    top = 80
+    left = 152
+    top = 128
   end
 end

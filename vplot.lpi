@@ -380,10 +380,10 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="191"/>
-        <CursorPos X="16" Y="198"/>
-        <FoldState Value=" T3jT082a"/>
-        <UsageCount Value="42"/>
+        <TopLine Value="167"/>
+        <CursorPos X="24" Y="190"/>
+        <FoldState Value=" T3jT081y"/>
+        <UsageCount Value="43"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit47>
@@ -395,7 +395,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="3"/>
         <CursorPos X="9" Y="4"/>
-        <UsageCount Value="42"/>
+        <UsageCount Value="43"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit48>
@@ -494,7 +494,7 @@
         <UsageCount Value="9"/>
       </Unit61>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="src/mainfrm.pas"/>
         <Caret Line="216" TopLine="192"/>
@@ -611,6 +611,10 @@
         <Filename Value="src/mainfrm.pas"/>
         <Caret Line="58" Column="33" TopLine="39"/>
       </Position29>
+      <Position30>
+        <Filename Value="src/mainfrm.pas"/>
+        <Caret Line="205" Column="80" TopLine="74"/>
+      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
