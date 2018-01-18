@@ -104,10 +104,9 @@ object mainform: Tmainform
     Left = 5
     Height = 60
     Top = 135
-    Width = 125
+    Width = 120
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 5
-    Caption = 'Pause'
     Glyph.Data = {
       36240000424D3624000000000000360000002800000030000000300000000100
       2000000000000024000064000000640000000000000000000000000000000000
@@ -413,10 +412,9 @@ object mainform: Tmainform
     Left = 5
     Height = 60
     Top = 200
-    Width = 125
+    Width = 120
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 5
-    Caption = 'Stop'
     Glyph.Data = {
       36240000424D3624000000000000360000002800000030000000300000000100
       2000000000000024000064000000640000000000000000000000000000000000
@@ -721,7 +719,7 @@ object mainform: Tmainform
     Left = 5
     Height = 60
     Top = 493
-    Width = 125
+    Width = 120
     Anchors = [akLeft, akRight, akBottom]
     BorderSpacing.Bottom = 5
     Glyph.Data = {
@@ -1027,7 +1025,7 @@ object mainform: Tmainform
     Left = 5
     Height = 19
     Top = 469
-    Width = 125
+    Width = 120
     Anchors = [akLeft, akRight, akBottom]
     BorderSpacing.Left = 5
     BorderSpacing.Bottom = 5
@@ -1041,14 +1039,16 @@ object mainform: Tmainform
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = loadbtn
     AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = loadbtn
+    AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Side = asrBottom
     Left = 5
     Height = 60
     Top = 70
-    Width = 125
+    Width = 120
+    Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Left = 5
     BorderSpacing.Top = 5
-    Caption = 'Play'
     Glyph.Data = {
       36240000424D3624000000000000360000002800000030000000300000000100
       2000000000000024000064000000640000000000000000000000000000000000
@@ -1350,10 +1350,9 @@ object mainform: Tmainform
     Left = 5
     Height = 60
     Top = 5
-    Width = 125
+    Width = 120
     BorderSpacing.Left = 5
     BorderSpacing.Top = 5
-    Caption = 'Load'
     Default = True
     Glyph.Data = {
       36240000424D3624000000000000360000002800000030000000300000000100
@@ -1651,13 +1650,13 @@ object mainform: Tmainform
     TabOrder = 1
   end
   object opendialog: TOpenDialog
-    left = 152
-    top = 72
+    left = 32
+    top = 280
   end
   object timer: TTimer
     Enabled = False
     OnTimer = timerTimer
-    left = 152
-    top = 128
+    left = 32
+    top = 336
   end
 end
