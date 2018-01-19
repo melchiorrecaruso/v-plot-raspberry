@@ -21,7 +21,7 @@
 unit libvplot;
 
 {$mode objfpc}{$H+}
-{$define debug}
+{*$define debug}
 
 interface
 
@@ -728,8 +728,6 @@ end;
 
 procedure tvplotdriver.move4(cnt0, cnt1, cntz: longint);
 begin
-  sleep(10);
-
   {$ifdef cpuarm}
   if not enabled  then exit;
   if ffault  = -1 then exit;

@@ -33,20 +33,18 @@ type
   { tmainform }
 
   tmainform = class(tform)
+    leftrightbtn: TUpDown;
     loadbtn: TBitBtn;
     morebtn: TBitBtn;
+    panbtn: TBitBtn;
     pausebtn: TBitBtn;
     playbtn: TBitBtn;
     previewimage: TImage;
-    panbtn: tbitbtn;
-    previewpanel: tpanel;
     opendialog: topendialog;
     prvwbtn: TCheckBox;
     stopbtn: TBitBtn;
-    stopbtn1: TBitBtn;
     timer: ttimer;
-    updownbtn: tupdown;
-    leftrightbtn: tupdown;
+    updownbtn: TUpDown;
 
     procedure formcreate(sender: tobject);
     procedure formdestroy(sender: tobject);
@@ -119,7 +117,7 @@ begin
   if button = btprev then
     previewimage.left := min(2, previewimage.left + 100)
   else
-    previewimage.left := max(previewpanel.width -
+    previewimage.left := max(mainform.width -
                              previewimage.width - 2,
                              previewimage.left  - 100);
 end;
@@ -129,15 +127,15 @@ begin
   if button = btnext then
     previewimage.top := min(2, previewimage.top + 100)
   else
-    previewimage.top := max(previewpanel.height -
+    previewimage.top := max(mainform.height -
                             previewimage.height - 2,
                             previewimage.top    - 100);
 end;
 
 procedure tmainform.panbtnclick(sender: tobject);
 begin
-  previewimage.top  := (previewpanel.height - previewimage.height) div 2;
-  previewimage.left := (previewpanel.width  - previewimage.width)  div 2;
+  previewimage.top  := (mainform.height - previewimage.height) div 2;
+  previewimage.left := (mainform.width  - previewimage.width)  div 2;
 end;
 
 procedure tmainform.loadbtnclick(sender: tobject);
@@ -248,7 +246,7 @@ end;
 
 procedure tmainform.timertimer(Sender: TObject);
 begin
-  inc(x);
+  inc(x, timer.interval);
   previewimage.canvas.copyrect(
     previewimage.canvas.cliprect,
     bmp.canvas,
@@ -257,7 +255,7 @@ begin
   if assigned(vplotcoder) then
   begin
     caption := format('VPlot Driver - Drawing %u%% - Time elapsed %u secs',
-      [(100 * vplotcoder.index) div vplotcoder.count, x]);
+      [(100 * vplotcoder.index) div vplotcoder.count, x div 1000]);
   end else
   begin
     playorstopbtnclick(stopbtn);
@@ -267,7 +265,7 @@ begin
     pausebtn.enabled := false;
     stopbtn .enabled := false;
     morebtn .enabled := true;
-    caption := format('VPlot Driver - Time elapsed %u secs', [x]);
+    caption := format('VPlot Driver - Time elapsed %u secs', [x div 1000]);
   end;
 end;
 
