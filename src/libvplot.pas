@@ -130,10 +130,11 @@ type
     fdelayms: longword;
     fenabled: boolean;
     ffault:   longint;
+    fmode:    longint;
     procedure largedisplacements(cnt0, cnt1: longint);
     procedure smalldisplacements(cnt0, cnt1: longint);
   public
-    constructor create;
+    constructor create(mode: longint);
     destructor destroy; override;
     procedure  init (cnt0, cnt1, cntz: longint);
     procedure  move2(cnt0, cnt1, cntz: longint);
@@ -164,8 +165,12 @@ uses
 const
   mot0_step     = P38;
   mot0_dir      = P40;
-  mot1_step     = P16;
-  mot1_dir      = P18;
+  mot1_step     = P29;
+  mot1_dir      = P31;
+
+  motx_mod0     = P15;
+  motx_mod1     = P13;
+  motx_mod2     = P11;
 
   motz_maxvalue = 2.50;
   motz_minvalue = 0.50;
@@ -595,7 +600,7 @@ end;
 
 // tvplotdriver //
 
-constructor tvplotdriver.create;
+constructor tvplotdriver.create(mode: longint);
 begin
   inherited create;
   {$ifdef cpuarm}
@@ -611,6 +616,61 @@ begin
     pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_minvalue, motz_freq)); delay(2000);
     pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq)); delay(2000);
     pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq)); delay(2000);
+    // init mode
+    pinmode(motx_mod0,    OUTPUT);
+    pinmode(motx_mod1,    OUTPUT);
+    pinmode(motx_mod2,    OUTPUT);
+
+    fmode := mode;
+    if fmode = 1 then
+    begin
+      digitalwrite(motx_mod0,  LOW);
+      digitalwrite(motx_mod1,  LOW);
+      digitalwrite(motx_mod2,  LOW);
+    end else
+    if fmode = 2 then
+    begin
+      digitalwrite(motx_mod0, HIGH);
+      digitalwrite(motx_mod1,  LOW);
+      digitalwrite(motx_mod2,  LOW);
+    end else
+    if fmode = 4 then
+    begin
+      digitalwrite(motx_mod0,  LOW);
+      digitalwrite(motx_mod1, HIGH);
+      digitalwrite(motx_mod2,  LOW);
+    end else
+    if fmode = 8 then
+    begin
+      digitalwrite(motx_mod0,  LOW);
+      digitalwrite(motx_mod1, HIGH);
+      digitalwrite(motx_mod2, HIGH);
+    end else
+    if fmode = 16 then
+    begin
+      digitalwrite(motx_mod0, HIGH);
+      digitalwrite(motx_mod1,  LOW);
+      digitalwrite(motx_mod2,  LOW);
+    end else
+    if fmode = 32 then
+    begin
+      digitalwrite(motx_mod0, HIGH);
+      digitalwrite(motx_mod1,  LOW);
+      digitalwrite(motx_mod2, HIGH);
+    end else
+    if fmode = 64 then
+      begin
+      digitalwrite(motx_mod0, HIGH);
+      digitalwrite(motx_mod1, HIGH);
+      digitalwrite(motx_mod2,  LOW);
+    end else
+    if fmode = 128 then
+      begin
+      digitalwrite(motx_mod0, HIGH);
+      digitalwrite(motx_mod1, HIGH);
+      digitalwrite(motx_mod2, HIGH);
+    end else
+      ffault := -1;
     // init step motor0
     pinmode(mot0_dir,    OUTPUT);
     pinmode(mot0_step,   OUTPUT);

@@ -90,7 +90,7 @@ begin
   bmp         := tbitmap.create;
   inlist      := tstringlist.create;
   inifile     := tinifile.create(changefileext(paramstr(0), '.ini'));
-  vplotdriver := tvplotdriver.create;
+  vplotdriver := tvplotdriver.create(4);
 end;
 
 procedure tmainform.formdestroy(sender: tobject);
