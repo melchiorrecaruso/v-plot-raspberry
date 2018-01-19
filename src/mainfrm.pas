@@ -43,6 +43,7 @@ type
     opendialog: topendialog;
     prvwbtn: TCheckBox;
     stopbtn: TBitBtn;
+    stopbtn1: TBitBtn;
     timer: ttimer;
     updownbtn: tupdown;
     leftrightbtn: tupdown;
