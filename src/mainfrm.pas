@@ -55,7 +55,6 @@ type
     procedure panbtnclick(sender: tobject);
     procedure loadbtnclick(sender: tobject);
     procedure playorstopbtnclick(sender: tobject);
-    procedure prvwbtnchange(sender: tobject);
     procedure morebtnclick(sender: tobject);
     procedure timertimer(sender: tobject);
   private
@@ -90,7 +89,7 @@ begin
   bmp         := tbitmap.create;
   inlist      := tstringlist.create;
   inifile     := tinifile.create(changefileext(paramstr(0), '.ini'));
-  vplotdriver := tvplotdriver.create(4);
+  vplotdriver := tvplotdriver.create(2);
 end;
 
 procedure tmainform.formdestroy(sender: tobject);
@@ -139,8 +138,6 @@ begin
 end;
 
 procedure tmainform.loadbtnclick(sender: tobject);
-var
-  p1: tvplotpoint;
 begin
   if opendialog.execute then
   begin
@@ -184,7 +181,6 @@ begin
     previewimage.stretchoutenabled := false;
     previewimage.stretch           := false;
     panbtnclick(panbtn);
-
     // ---
     vplotcoder.start;
     // ---
@@ -217,14 +213,13 @@ begin
   end;
 end;
 
-procedure tmainform.prvwbtnchange(sender: tobject);
-begin
-  vplotdriver.enabled := not prvwbtn.checked;
-end;
-
 procedure tmainform.morebtnclick(sender: tobject);
+var
+  c0, c1: longint;
 begin
   initform.showmodal;
+  vplotcoder.gethome(c0, c1);
+  vplotdriver.init  (c0, c1, 1);
 end;
 
 procedure Tmainform.ontick;

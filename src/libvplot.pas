@@ -60,68 +60,6 @@ type
   end;
 
 type
-  tvplotcoder = class(tthread)
-  private
-    fpx:      double;
-    fpy:      double;
-    fpz:      double;
-    foffsetx: double;
-    foffsety: double;
-    fmot0:    longint;
-    fmot1:    longint;
-    fmotz:    longint;
-    ffault:   longint;
-
-    finlist:  tstringlist;
-    finifile: tinifile;
-    findex:   longint;
-    fenabled: boolean;
-
-    fontick: tthreadmethod;
-
-    fratio:     double;
-    fpoint0:    tvplotpoint;
-    fpoint1:    tvplotpoint;
-    fpoint2:    tvplotpoint;
-    fpoint3:    tvplotpoint;
-    fpoint4:    tvplotpoint;
-    fpoint5:    tvplotpoint;
-    fpoint9:    tvplotposition;
-
-
-    fcurrpath:  array of tvplotposition;
-    function  getcount: longint;
-    procedure interpolateline(const p0, p1: tvplotpoint);
-    procedure interpolatearc (const p0, p1, cc: tvplotpoint; clockwise: boolean);
-    procedure optimizexy(var position: tvplotposition);
-    procedure encode(const code: tvplotcode);
-    procedure dotick(const position: tvplotposition; const z: double);
-
-  protected
-    procedure execute; override;
-  public
-    constructor create(inlist: tstringlist; inifile: tinifile);
-    destructor destroy; override;
-  published
-    property enabled: boolean       read fenabled write fenabled;
-    property index:   longint       read findex;
-    property count:   longint       read getcount;
-
-    property px:      double        read fpx;
-    property py:      double        read fpy;
-    property pz:      double        read fpz;
-    property mot0:    longint       read fmot0;
-    property mot1:    longint       read fmot1;
-    property motz:    longint       read fmotz;
-    property offsetx: double        read foffsetx;
-    property offsety: double        read foffsety;
-    property height:  double        read fpoint1.y;
-    property width:   double        read fpoint1.x;
-  published
-    property ontick:  tthreadmethod read fontick write fontick;
-  end;
-
-type
   tvplotdriver = class
   private
     fcount0:  longint;
@@ -143,6 +81,69 @@ type
     property fault:   longint  read ffault;
     property delayms: longword read fdelayms write fdelayms;
     property enabled: boolean  read fenabled write fenabled;
+  end;
+
+type
+  tvplotcoder = class(tthread)
+  private
+    fpx:      double;
+    fpy:      double;
+    fpz:      double;
+    foffsetx: double;
+    foffsety: double;
+    fmot0:    longint;
+    fmot1:    longint;
+    fmotz:    longint;
+    ffault:   longint;
+
+    finlist:  tstringlist;
+    finifile: tinifile;
+    findex:   longint;
+    fenabled: boolean;
+
+    fontick:  tthreadmethod;
+
+    fratio:   double;
+    fpoint0:  tvplotpoint;
+    fpoint1:  tvplotpoint;
+    fpoint2:  tvplotpoint;
+    fpoint3:  tvplotpoint;
+    fpoint4:  tvplotpoint;
+    fpoint5:  tvplotpoint;
+    fpoint9:  tvplotposition;
+
+
+    fcurrpath:  array of tvplotposition;
+    function  getcount: longint;
+    procedure interpolateline(const p0, p1: tvplotpoint);
+    procedure interpolatearc (const p0, p1, cc: tvplotpoint; clockwise: boolean);
+    procedure optimizexy(var position: tvplotposition);
+    procedure encode(const code: tvplotcode);
+    procedure dotick(const position: tvplotposition; const z: double);
+
+  protected
+    procedure execute; override;
+  public
+    constructor create(inlist: tstringlist; inifile: tinifile);
+    destructor destroy; override;
+    procedure gethome(var count0, count1: longint);
+  published
+    property index:   longint       read findex;
+    property count:   longint       read getcount;
+    property enabled: boolean       read fenabled write fenabled;
+
+    property px:      double        read fpx;
+    property py:      double        read fpy;
+    property pz:      double        read fpz;
+    property mot0:    longint       read fmot0;
+    property mot1:    longint       read fmot1;
+    property motz:    longint       read fmotz;
+    property offsetx: double        read foffsetx;
+    property offsety: double        read foffsety;
+    property height:  double        read fpoint1.y;
+    property width:   double        read fpoint1.x;
+  published
+    property ontick:  tthreadmethod read fontick write fontick;
   end;
 
 function translatepoint(const cc, p: tvplotpoint): tvplotpoint; inline;
@@ -362,7 +363,7 @@ begin
   writeln(format('P09.X = %-5.3f  P09.Y = %-5.3f', [fpoint9.p.x, fpoint9.p.y]));
   writeln(format('R     = %-5.3f', [fratio]));
   {$endif}
-  optimizexy  (fpoint9);
+  optimizexy(fpoint9);
   // ---
   freeonterminate := true;
   inherited create(true);
@@ -374,6 +375,12 @@ begin
   finifile   := nil;
   vplotcoder := nil;
   inherited destroy;
+end;
+
+procedure tvplotcoder.gethome(var count0, count1: longint);
+begin
+  count0 := fpoint9.m0;
+  count1 := fpoint9.m1;
 end;
 
 procedure tvplotcoder.dotick(const position: tvplotposition; const z: double);
