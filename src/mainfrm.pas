@@ -217,7 +217,9 @@ procedure tmainform.morebtnclick(sender: tobject);
 var
   c0, c1: longint;
 begin
+  vplotdriver.enabled := not prvwbtn.checked;
   initform.showmodal;
+
   vplotcoder.gethome(c0, c1);
   vplotdriver.init  (c0, c1, 1);
 end;
@@ -236,17 +238,18 @@ begin
   vplotdriver.enabled := not prvwbtn.checked;
   with vplotcoder do
     vplotdriver.move2(mot0, mot1, motz);
+  sleep(5);
   application.processmessages;
 end;
 
 procedure tmainform.timertimer(Sender: TObject);
 begin
   inc(x, timer.interval);
-  previewimage.canvas.copyrect(
-    previewimage.canvas.cliprect,
-    bmp.canvas,
-    bmp.canvas.cliprect);
-  previewimage.invalidate;
+  //previewimage.canvas.copyrect(
+  //  previewimage.canvas.cliprect,
+  //  bmp.canvas,
+  //  bmp.canvas.cliprect);
+  //previewimage.invalidate;
   if assigned(vplotcoder) then
   begin
     caption := format('VPlot Driver - Drawing %u%% - Time elapsed %u secs',

@@ -692,7 +692,7 @@ begin
   {$else}
   ffault   := -1;
   {$endif}
-  fdelayms := 10;
+  fdelayms := 1000;
   fenabled := false;
 end;
 
@@ -738,16 +738,16 @@ begin
   cnt0 := abs(cnt0);
   while cnt0 > 0 do
   begin
-    digitalwrite(mot0_step, HIGH);  delay(fdelayms);
-    digitalwrite(mot0_step,  LOW);  delay(fdelayms);
+    digitalwrite(mot0_step, HIGH);  delaymicroseconds(fdelayms);
+    digitalwrite(mot0_step,  LOW);  delaymicroseconds(fdelayms);
     dec(cnt0);
   end;
   // move step motor1
   cnt1 := abs(cnt1);
   while cnt1 > 0 do
   begin
-    digitalwrite(mot1_step, HIGH);  delay(fdelayms);
-    digitalwrite(mot1_step,  LOW);  delay(fdelayms);
+    digitalwrite(mot1_step, HIGH);  delaymicroseconds(fdelayms);
+    digitalwrite(mot1_step,  LOW);  delaymicroseconds(fdelayms);
     dec(cnt1);
   end;
   {$endif}
@@ -780,14 +780,14 @@ begin
     // move step motor0
     if vplotmatrix[cnt0, i] = 1 then
     begin
-      digitalwrite(mot0_step, HIGH);  delay(fdelayms);
-      digitalwrite(mot0_step,  LOW);  delay(fdelayms);
+      digitalwrite(mot0_step, HIGH);  delaymicroseconds(fdelayms);
+      digitalwrite(mot0_step,  LOW);  delaymicroseconds(fdelayms);
     end;
     // move step motor1
     if vplotmatrix[cnt1, i] = 1 then
     begin
-      digitalwrite(mot1_step, HIGH);  delay(fdelayms);
-      digitalwrite(mot1_step,  LOW);  delay(fdelayms);
+      digitalwrite(mot1_step, HIGH);  delaymicroseconds(fdelayms);
+      digitalwrite(mot1_step,  LOW);  delaymicroseconds(fdelayms);
     end;
   end;
   {$endif}
