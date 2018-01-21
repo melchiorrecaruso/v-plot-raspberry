@@ -58,9 +58,9 @@ type
     procedure morebtnclick(sender: tobject);
     procedure timertimer(sender: tobject);
   private
-    bmp:     tbitmap;
-    inlist:  tstringlist;
-    inifile: tinifile;
+    bmp:      tbitmap;
+    inlist:   tstringlist;
+    inifile:  tinifile;
     procedure ontick;
   end;
 
@@ -86,10 +86,15 @@ begin
   stopbtn .enabled := false;
   morebtn .enabled := true;
   // ---
-  bmp         := tbitmap.create;
-  inlist      := tstringlist.create;
-  inifile     := tinifile.create(changefileext(paramstr(0), '.ini'));
-  vplotdriver := tvplotdriver.create(2);
+  bmp     := tbitmap.create;
+  inlist  := tstringlist.create;
+  inifile := tinifile.create(changefileext(paramstr(0), '.ini'));
+
+  loadsetup(inifile, vplotsetup);
+  vplotdriver   := tvplotdriver.create(vplotsetup.mode);
+  vplothome.p.x := vplotsetup.point9.x;
+  vplothome.p.y := vplotsetup.point9.y;
+  optimize(vplothome, vplotsetup);
 end;
 
 procedure tmainform.formdestroy(sender: tobject);
@@ -150,29 +155,29 @@ begin
     inlist.clear;
     inlist.loadfromfile(opendialog.filename);
     // ---
-    vplotcoder         := tvplotcoder.create(inlist, inifile);
+    vplotcoder         := tvplotcoder.create(inlist);
     vplotcoder.ontick  := @ontick;
     vplotcoder.enabled := false;
     // ---
     bmp.setsize(
-      round(vplotcoder.width),
-      round(vplotcoder.height));
+      round(vplotsetup.point1.x),
+      round(vplotsetup.point1.y));
     bmp.canvas.pen.color   := clwhite;
     bmp.canvas.brush.color := clwhite;
     bmp.canvas.brush.style := bssolid;
     bmp.canvas.fillrect(0,0,
-      round(vplotcoder.width),
-      round(vplotcoder.height));
+      round(vplotsetup.point1.x),
+      round(vplotsetup.point1.y));
 
     previewimage.picture.bitmap.setsize(
-      round(vplotcoder.width),
-      round(vplotcoder.height));
+      round(vplotsetup.point1.x),
+      round(vplotsetup.point1.y));
     previewimage.canvas.pen.color   := clwhite;
     previewimage.canvas.brush.color := clwhite;
     previewimage.canvas.brush.style := bssolid;
     previewimage.canvas.rectangle(0, 0,
-      round(vplotcoder.width),
-      round(vplotcoder.height));
+      round(vplotsetup.point1.x),
+      round(vplotsetup.point1.y));
 
     previewimage.anchors := [aktop, akleft, akright, akbottom];
     previewimage.anchors := [];
@@ -214,26 +219,24 @@ begin
 end;
 
 procedure tmainform.morebtnclick(sender: tobject);
-var
-  c0, c1: longint;
 begin
   vplotdriver.enabled := not prvwbtn.checked;
   initform.showmodal;
 
-  vplotcoder.gethome(c0, c1);
-  vplotdriver.init  (c0, c1, 1);
+  with vplotcoder do
+    vplotdriver.init(vplothome.m0, vplothome.m1, 1);
 end;
 
 procedure Tmainform.ontick;
 begin
   if vplotcoder.pz < 0 then
     bmp.canvas.pixels[
-      round(vplotcoder.px),
-      round(vplotcoder.height - vplotcoder.py)] := clblack
+      round(                      vplotcoder.px),
+      round(vplotsetup.point1.y - vplotcoder.py)] := clblack
   else
     bmp.canvas.pixels[
-      round(vplotcoder.px),
-      round(vplotcoder.height - vplotcoder.py)] := clred;
+      round(                      vplotcoder.px),
+      round(vplotsetup.point1.y - vplotcoder.py)] := clred;
 
   vplotdriver.enabled := not prvwbtn.checked;
   with vplotcoder do
@@ -245,15 +248,15 @@ end;
 procedure tmainform.timertimer(Sender: TObject);
 begin
   inc(x, timer.interval);
-  //previewimage.canvas.copyrect(
-  //  previewimage.canvas.cliprect,
-  //  bmp.canvas,
-  //  bmp.canvas.cliprect);
-  //previewimage.invalidate;
+  previewimage.canvas.copyrect(
+    previewimage.canvas.cliprect,
+    bmp.canvas,
+    bmp.canvas.cliprect);
+  previewimage.invalidate;
   if assigned(vplotcoder) then
   begin
     caption := format('VPlot Driver - Drawing %u%% - Time elapsed %u secs',
-      [(100 * vplotcoder.index) div vplotcoder.count, x div 1000]);
+      [(100 * vplotcoder.listindex) div vplotcoder.listcount, x div 1000]);
   end else
   begin
     playorstopbtnclick(stopbtn);
