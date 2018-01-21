@@ -91,10 +91,12 @@ begin
   inifile := tinifile.create(changefileext(paramstr(0), '.ini'));
 
   loadsetup(inifile, vplotsetup);
-  vplotdriver   := tvplotdriver.create(vplotsetup.mode);
   vplothome.p.x := vplotsetup.point9.x;
   vplothome.p.y := vplotsetup.point9.y;
   optimize(vplothome, vplotsetup);
+
+  vplotdriver   := tvplotdriver.create(vplotsetup.mode);
+  vplotdriver.init(vplothome.m0, vplothome.m1, 1);
 end;
 
 procedure tmainform.formdestroy(sender: tobject);

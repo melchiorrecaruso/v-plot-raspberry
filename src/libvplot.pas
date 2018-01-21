@@ -21,7 +21,7 @@
 unit libvplot;
 
 {$mode objfpc}{$H+}
-{*$define debug}
+{$define debug}
 
 interface
 
@@ -311,7 +311,7 @@ var
   offsetx: double;
   offsety: double;
 begin
-  inifile.formatsettings.dateseparator := '.';
+  inifile.formatsettings.decimalseparator := '.';
   setup.ratio    := inifile.readfloat  ('VPLOT v1.0', 'R'   ,  -1);
   setup.mode     := inifile.readinteger('VPLOT v1.0', 'MODE',  -1);
   setup.point0.x := inifile.readfloat  ('VPLOT v1.0', 'P00.X', -1);
@@ -350,7 +350,7 @@ begin
   writeln(format('P05.X = %-5.3f  P05.Y = %-5.3f', [setup.point5.x, setup.point5.y]));
   writeln(format('P09.X = %-5.3f  P09.Y = %-5.3f', [setup.point9.x, setup.point9.y]));
 
-  writeln(format('MODE  = %-5.3f', [setup.mode]));
+  writeln(format('MODE  = %-5.3u', [setup.mode]));
   writeln(format('R     = %-5.3f', [setup.ratio]));
   {$endif}
 end;
@@ -360,7 +360,7 @@ var
   err:  double;
   tmp0: tvplotpoint;
   tmp1: tvplotpoint;
-//tmp2: tvplotpoint;
+  tmp2: tvplotpoint;
   tmp3: tvplotpoint;
   tmp4: tvplotpoint;
   tmp5: tvplotpoint;
@@ -370,7 +370,7 @@ begin
   repeat
     tmp0  := l.point0;
     tmp1  := l.point1;
-  //tmp2  := translatepoint(position.p, rotatepoint(l.point2, result));
+    tmp2  := translatepoint(position.p, rotatepoint(l.point2, result));
     tmp3  := translatepoint(position.p, rotatepoint(l.point3, result));
     tmp4  := translatepoint(position.p, rotatepoint(l.point4, result));
     tmp5  := translatepoint(position.p, rotatepoint(l.point5, result));
@@ -389,8 +389,8 @@ begin
       break;
   until false;
 
-  position.m0 := round((l.mode * distancebetween(tmp0, tmp3)) / l.ratio);
-  position.m1 := round((l.mode * distancebetween(tmp1, tmp4)) / l.ratio);
+  position.m0 := round(l.mode * (distancebetween(tmp0, tmp3) / l.ratio));
+  position.m1 := round(l.mode * (distancebetween(tmp1, tmp4) / l.ratio));
   {$ifdef debug}
   writeln('--- OPTIMIZE ---');
   writeln(format('alpha = %-5.3f', [radtodeg(result)]));
@@ -399,8 +399,10 @@ begin
   writeln(format('P04.X = %-5.3f  P04.Y = %-5.3f', [tmp4.x, tmp4.y]));
   writeln(format('P05.X = %-5.3f  P05.Y = %-5.3f', [tmp5.x, tmp5.y]));
   writeln(format('P06.X = %-5.3f  P06.Y = %-5.3f', [tmp6.x, tmp6.y]));
-  writeln(format('D03   = %-5.3f', [distancebetween(fpoint0, tmp3)]));
-  writeln(format('D14   = %-5.3f', [distancebetween(fpoint1, tmp4)]));
+  writeln(format('D03   = %-5.3f', [distancebetween(tmp0, tmp3)]));
+  writeln(format('D14   = %-5.3f', [distancebetween(tmp1, tmp4)]));
+  writeln(format('CNT0  = %-5.3u', [position.m0]));
+  writeln(format('CNT1  = %-5.3u', [position.m1]));
   {$endif}
 end;
 
@@ -523,10 +525,11 @@ begin
   j := length(fpath);
   if j > 0 then
     for i := 0 to j - 1 do
-    begin
-      optimize(fpath[i], vplotsetup);
-      dotick(fpath[i], code.z);
-    end;
+      if not terminated then
+      begin
+        optimize(fpath[i], vplotsetup);
+        dotick(fpath[i], code.z);
+      end;
 end;
 
 procedure tvplotcoder.execute;
@@ -614,56 +617,56 @@ begin
     pinmode(motx_mod1,    OUTPUT);
     pinmode(motx_mod2,    OUTPUT);
 
-    fmode := mode;
-    if fmode = 1 then
+    if mode = 1 then
     begin
       digitalwrite(motx_mod0,  LOW);
       digitalwrite(motx_mod1,  LOW);
       digitalwrite(motx_mod2,  LOW);
     end else
-    if fmode = 2 then
+    if mode = 2 then
     begin
       digitalwrite(motx_mod0, HIGH);
       digitalwrite(motx_mod1,  LOW);
       digitalwrite(motx_mod2,  LOW);
     end else
-    if fmode = 4 then
+    if mode = 4 then
     begin
       digitalwrite(motx_mod0,  LOW);
       digitalwrite(motx_mod1, HIGH);
       digitalwrite(motx_mod2,  LOW);
     end else
-    if fmode = 8 then
+    if mode = 8 then
     begin
       digitalwrite(motx_mod0,  LOW);
       digitalwrite(motx_mod1, HIGH);
       digitalwrite(motx_mod2, HIGH);
     end else
-    if fmode = 16 then
+    if mode = 16 then
     begin
       digitalwrite(motx_mod0, HIGH);
       digitalwrite(motx_mod1,  LOW);
       digitalwrite(motx_mod2,  LOW);
     end else
-    if fmode = 32 then
+    if mode = 32 then
     begin
       digitalwrite(motx_mod0, HIGH);
       digitalwrite(motx_mod1,  LOW);
       digitalwrite(motx_mod2, HIGH);
     end else
-    if fmode = 64 then
+    if mode = 64 then
       begin
       digitalwrite(motx_mod0, HIGH);
       digitalwrite(motx_mod1, HIGH);
       digitalwrite(motx_mod2,  LOW);
     end else
-    if fmode = 128 then
+    if mode = 128 then
       begin
       digitalwrite(motx_mod0, HIGH);
       digitalwrite(motx_mod1, HIGH);
       digitalwrite(motx_mod2, HIGH);
     end else
       ffault := -1;
+
     // init step motor0
     pinmode(mot0_dir,    OUTPUT);
     pinmode(mot0_step,   OUTPUT);
