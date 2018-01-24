@@ -21,7 +21,7 @@
 unit libvplot;
 
 {$mode objfpc}{$H+}
-{$define debug}
+{*$define debug}
 
 interface
 
@@ -119,7 +119,6 @@ type
     constructor create(inlist: tstringlist);
     destructor destroy; override;
   published
-    property enabled:   boolean       read fenabled write fenabled;
     property listindex: longint       read flistindex;
     property listcount: longint       read flistcount;
     property px:        double        read fpx;
@@ -145,10 +144,9 @@ function  optimize(var position: tvplotposition; const l: tvplotsetup): double; 
 procedure loadsetup(inifile: tinifile; var setup: tvplotsetup);
 
 var
-  vplotcoder:  tvplotcoder  = nil;
-  vplotdriver: tvplotdriver = nil;
-  vplotsetup:  tvplotsetup;
+  vplotcoder:  tvplotcoder = nil;
   vplothome:   tvplotposition;
+  vplotsetup:  tvplotsetup;
 
 implementation
 
@@ -584,14 +582,10 @@ begin
   dotick(vplothome, 1);
   while (flistindex < flistcount) and (not terminated) do
   begin
-    if enabled then
-    begin
-      parse_line(flist[flistindex], code);
-      if (code.c ='G00 ') or (code.c ='G01 ') or
-         (code.c ='G02 ') or (code.c ='G03 ') then encode(code);
-         inc(flistindex);
-    end else
-      sleep(250);
+    parse_line(flist[flistindex], code);
+    if (code.c ='G00 ') or (code.c ='G01 ') or
+       (code.c ='G02 ') or (code.c ='G03 ') then encode(code);
+    inc(flistindex);
   end;
   dotick(vplothome, 1);
 end;
@@ -689,7 +683,6 @@ end;
 
 destructor tvplotdriver.destroy;
 begin
-  vplotdriver := nil;
   inherited destroy;
 end;
 

@@ -59,7 +59,6 @@ var
   a: longint;
   b: longint;
   c: longint;
-  d: longint;
   s: string;
 begin
   if asocket.getmessage(s) > 0 then
@@ -77,12 +76,10 @@ begin
       parser('A', s, a);
       parser('B', s, b);
       parser('C', s, c);
-      parser('D', s, d);
 
       if (a = -1) or
          (b = -1) or
          (c = -1) or
-         (d = -1) then
         ffault := -1;
 
       if ffault = 0 then
