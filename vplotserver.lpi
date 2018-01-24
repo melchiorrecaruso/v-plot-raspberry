@@ -41,12 +41,12 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="vplotserver"/>
+      <Filename Value="build\$(TargetCPU)-$(TargetOS)\bin\vplotserver"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
       <OtherUnitFiles Value="src"/>
-      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+      <UnitOutputDirectory Value="build\$(TargetCPU)-$(TargetOS)\lib"/>
     </SearchPaths>
   </CompilerOptions>
   <Debugging>
