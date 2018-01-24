@@ -27,29 +27,48 @@ interface
 
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls,
-  comctrls, buttons, menus, inifiles, libvplot;
+  comctrls, buttons, menus, inifiles, libvplot, lnet, lNetComponents;
 
 type
   { tmainform }
 
   tmainform = class(tform)
-    leftrightbtn: TUpDown;
+    aboutbtn: TBitBtn;
     loadbtn: TBitBtn;
-    morebtn: TBitBtn;
-    panbtn: TBitBtn;
+    startbtn: TBitBtn;
     pausebtn: TBitBtn;
-    playbtn: TBitBtn;
+    stopbtn: TBitBtn;
+    reloadbtn: TBitBtn;
+    creativecontrolgb: TGroupBox;
+    sethomebtn: TBitBtn;
+    bordersbtn: TBitBtn;
+    leftdownbtn: TBitBtn;
+    rightdownbtn: TBitBtn;
+    penupbtn: TBitBtn;
+    pendownbtn: TBitBtn;
+    leftupbtn: TBitBtn;
+    rightupbtn: TBitBtn;
+    gohomebtn: TBitBtn;
+    leftedit: TEdit;
+    rightedit: TEdit;
+    connectgb: TGroupBox;
+    manualdrivinggb: TGroupBox;
+    drawingcontrolgb: TGroupBox;
+    leftrightbtn: TUpDown;
+    tpc: TLTCPComponent;
+    panbtn: TBitBtn;
     previewimage: TImage;
     opendialog: topendialog;
-    prvwbtn: TCheckBox;
-    stopbtn: TBitBtn;
+    conbtn: TSpeedButton;
     timer: ttimer;
     updownbtn: TUpDown;
 
+    procedure conbtnClick(Sender: TObject);
     procedure formcreate(sender: tobject);
     procedure formdestroy(sender: tobject);
     procedure formclose(sender: tobject; var closeaction: tcloseaction);
     procedure leftrightbtnclick(sender: tobject; button: tudbtntype);
+    procedure sethomebtnClick(Sender: TObject);
 
     procedure updownbtnclick(sender: tobject; button: tudbtntype);
     procedure panbtnclick(sender: tobject);
@@ -80,23 +99,62 @@ uses
 
 procedure tmainform.formcreate(sender: tobject);
 begin
-  loadbtn .enabled := true;
-  playbtn .enabled := false;
-  pausebtn.enabled := false;
-  stopbtn .enabled := false;
-  morebtn .enabled := true;
+  conbtn      .enabled := true;
+  leftupbtn   .enabled := false;
+  penupbtn    .enabled := false;
+  rightupbtn  .enabled := false;
+  leftedit    .enabled := false;
+  sethomebtn  .enabled := false;
+  rightedit   .enabled := false;
+  leftdownbtn .enabled := false;
+  pendownbtn  .enabled := false;
+  rightdownbtn.enabled := false;
+  bordersbtn  .enabled := false;
+  gohomebtn   .enabled := false;
+  loadbtn     .enabled := false;
+  reloadbtn   .enabled := false;
+  startbtn    .enabled := false;
+  pausebtn    .enabled := false;
+  stopbtn     .enabled := false;
+  aboutbtn    .enabled := true;
+  leftrightbtn.enabled := false;
+  updownbtn   .enabled := false;
+  panbtn      .enabled := false;
   // ---
   bmp     := tbitmap.create;
   inlist  := tstringlist.create;
   inifile := tinifile.create(changefileext(paramstr(0), '.ini'));
+  // ---
+  conbtnclick(conbtn);
+
+
+
 
   loadsetup(inifile, vplotsetup);
   vplothome.p.x := vplotsetup.point9.x;
   vplothome.p.y := vplotsetup.point9.y;
   optimize(vplothome, vplotsetup);
 
-  vplotdriver   := tvplotdriver.create(vplotsetup.mode);
+  vplotdriver := tvplotdriver.create(vplotsetup.mode);
+
+
+
   vplotdriver.init(vplothome.m0, vplothome.m1, 1);
+end;
+
+procedure tmainform.conbtnclick(sender: tobject);
+begin
+  if conbtn.caption = 'Connect' then
+  begin
+    tpc.connect('192.168.1.87', 4500);
+    if tpc.connected then
+      conbtn.caption := 'Disconnect'
+  end else
+  begin
+    if tpc.connected then;
+      tpc.disconnect;
+    conbtn.caption := 'Connect';
+  end;
 end;
 
 procedure tmainform.formdestroy(sender: tobject);
@@ -128,6 +186,11 @@ begin
                              previewimage.left  - 100);
 end;
 
+procedure tmainform.sethomebtnClick(Sender: TObject);
+begin
+
+end;
+
 procedure tmainform.updownbtnclick(sender: tobject; button: tudbtntype);
 begin
   if button = btnext then
@@ -149,10 +212,10 @@ begin
   if opendialog.execute then
   begin
     loadbtn .enabled := false;
-    playbtn .enabled := true;
+    startbtn .enabled := true;
     pausebtn.enabled := false;
     stopbtn .enabled := false;
-    morebtn .enabled := true;
+    aboutbtn .enabled := true;
     // ---
     inlist.clear;
     inlist.loadfromfile(opendialog.filename);
@@ -199,7 +262,7 @@ procedure tmainform.playorstopbtnclick(sender: tobject);
 begin
   if assigned(vplotcoder) then
   begin
-    if sender = playbtn then
+    if sender = startbtn then
       vplotcoder.enabled := true
     else
     if sender = pausebtn then
@@ -212,17 +275,16 @@ begin
     end;
 
     timer   .enabled :=     vplotcoder.enabled;
-    playbtn .enabled := not vplotcoder.enabled;
+    startbtn .enabled := not vplotcoder.enabled;
     pausebtn.enabled :=     vplotcoder.enabled;
     stopbtn .enabled :=     vplotcoder.enabled;
-    prvwbtn .enabled := not vplotcoder.enabled;
-    morebtn .enabled := false;
+    aboutbtn .enabled := false;
   end;
 end;
 
 procedure tmainform.morebtnclick(sender: tobject);
 begin
-  vplotdriver.enabled := not prvwbtn.checked;
+
   initform.showmodal;
 
   with vplotcoder do
@@ -240,7 +302,8 @@ begin
       round(                      vplotcoder.px),
       round(vplotsetup.point1.y - vplotcoder.py)] := clred;
 
-  vplotdriver.enabled := not prvwbtn.checked;
+
+
   with vplotcoder do
     vplotdriver.move2(mot0, mot1, motz);
   sleep(5);
@@ -264,10 +327,10 @@ begin
     playorstopbtnclick(stopbtn);
     timer   .enabled := false;
     loadbtn .enabled := true;
-    playbtn .enabled := false;
+    startbtn .enabled := false;
     pausebtn.enabled := false;
     stopbtn .enabled := false;
-    morebtn .enabled := true;
+    aboutbtn .enabled := true;
     caption := format('VPlot Driver - Time elapsed %u secs', [x div 1000]);
   end;
 end;

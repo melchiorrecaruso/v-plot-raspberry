@@ -133,6 +133,8 @@ type
     property ontick:    tthreadmethod read fontick write fontick;
   end;
 
+
+
 function  translatepoint(const cc, p: tvplotpoint): tvplotpoint; inline;
 function  rotatepoint(const p: tvplotpoint; const alpha: double): tvplotpoint; inline;
 function  distancebetween(const p0, p1: tvplotpoint): double; inline;
@@ -203,17 +205,17 @@ begin
     setlength(result, i - 1);
 end;
 
-procedure parse_prefix(const prefix, gcode: rawbytestring; var value: double);
+procedure parse_prefix(const prefix, code: rawbytestring; var value: double);
 var
   i: longint;
   s: rawbytestring = '';
 begin
-  i := pos(prefix, gcode);
+  i := pos(prefix, code);
   if i > 0 then
   begin
-    while (i < length(gcode)) and (gcode[i] <> ' ') do
+    while (i < length(code)) and (code[i] <> ' ') do
     begin
-      s := s + gcode[i];
+      s := s + code[i];
       inc(i);
     end;
     delete(s, 1, 1);
