@@ -1,7 +1,7 @@
 
 { Description: vPlot Main Form.
 
-  Copyright (C) 2014-2017 Melchiorre Caruso <melchiorrecaruso@gmail.com>
+  Copyright (C) 2014-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
   This source is free software; you can redistribute it and/or modify it under
   the terms of the GNU General Public License as published by the Free
@@ -27,13 +27,14 @@ interface
 
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls,
-  comctrls, buttons, menus, Spin, inifiles, libvplot, lnet, lNetComponents;
+  comctrls, buttons, menus, spin, inifiles, libvplot, lnet, lnetcomponents;
 
 type
   { tmainform }
 
   tmainform = class(tform)
     aboutbtn: TBitBtn;
+    verticalcb: TCheckBox;
     redrawbtn: TBitBtn;
     formatcb: TComboBox;
     papersizegb: TGroupBox;
@@ -50,7 +51,6 @@ type
     startbtn: TBitBtn;
     pausebtn: TBitBtn;
     stopbtn: TBitBtn;
-    reloadbtn: TBitBtn;
     creativecontrolgb: TGroupBox;
     sethomebtn: TBitBtn;
     bordersbtn: TBitBtn;
@@ -66,48 +66,44 @@ type
     connectgb: TGroupBox;
     manualdrivinggb: TGroupBox;
     drawingcontrolgb: TGroupBox;
-    leftrightbtn: TUpDown;
     tpc: TLTCPComponent;
-    panbtn: TBitBtn;
     previewimage: TImage;
     opendialog: topendialog;
     conbtn: TSpeedButton;
-    timer: ttimer;
-    updownbtn: TUpDown;
 
-    procedure bordersbtnClick(Sender: TObject);
-    procedure conbtnClick(Sender: TObject);
+    procedure bordersbtnclick(sender: tobject);
+    procedure conbtnclick(sender: tobject);
+    procedure formatcbchange(sender: tobject);
     procedure formcreate(sender: tobject);
     procedure formdestroy(sender: tobject);
     procedure formclose(sender: tobject; var closeaction: tcloseaction);
-    procedure gohomebtnClick(Sender: TObject);
-    procedure leftdownbtnClick(Sender: TObject);
-    procedure leftrightbtnclick(sender: tobject; button: tudbtntype);
-    procedure leftupbtnClick(Sender: TObject);
-    procedure pendownbtnClick(Sender: TObject);
-    procedure penupbtnClick(Sender: TObject);
-    procedure reloadbtnClick(Sender: TObject);
-    procedure rightdownbtnClick(Sender: TObject);
-    procedure rightupbtnClick(Sender: TObject);
-    procedure sethomebtnClick(Sender: TObject);
-    procedure tpcConnect(aSocket: TLSocket);
-    procedure tpcDisconnect(aSocket: TLSocket);
-    procedure tpcError(const msg: string; aSocket: TLSocket);
+    procedure gohomebtnclick(sender: tobject);
+    procedure leftdownbtnclick(sender: tobject);
 
-    procedure updownbtnclick(sender: tobject; button: tudbtntype);
-    procedure panbtnclick(sender: tobject);
+    procedure leftupbtnclick(sender: tobject);
+    procedure pendownbtnclick(sender: tobject);
+    procedure penupbtnclick(sender: tobject);
+    procedure reloadbtnclick(sender: tobject);
+    procedure rightdownbtnclick(sender: tobject);
+    procedure rightupbtnclick(sender: tobject);
+    procedure sethomebtnclick(sender: tobject);
+    procedure tpcconnect(asocket: tlsocket);
+    procedure tpcdisconnect(asocket: tlsocket);
+    procedure tpcerror(const msg: string; asocket: tlsocket);
+
+
+
     procedure loadbtnclick(sender: tobject);
     procedure playorstopbtnclick(sender: tobject);
-    procedure morebtnclick(sender: tobject);
-    procedure timertimer(sender: tobject);
+    procedure verticalcbeditingdone(sender: tobject);
   private
-    filename: rawbytestring;
-    bmp:  tbitmap;
-    ini:  tinifile;
+    ini:   tinifile;
+    image: tbitmap;
     list1: tstringlist;
     list2: tstringlist;
+    procedure onstart;
+    procedure onstop;
     procedure ontick;
-    procedure onterminate(sender: tobject);
   end;
 
 
@@ -120,49 +116,26 @@ implementation
 {$R *.lfm}
 
 uses
-  initfrm, math, sysutils;
+  math, sysutils;
 
 { tmainform }
 
 procedure tmainform.formcreate(sender: tobject);
 begin
-  conbtn      .enabled := true;
-  leftupbtn   .enabled := false;
-  penupbtn    .enabled := false;
-  rightupbtn  .enabled := false;
-  leftedit    .enabled := false;
-  sethomebtn  .enabled := false;
-  rightedit   .enabled := false;
-  leftdownbtn .enabled := false;
-  pendownbtn  .enabled := false;
-  rightdownbtn.enabled := false;
-  bordersbtn  .enabled := false;
-  gohomebtn   .enabled := false;
-  loadbtn     .enabled := true;
-  reloadbtn   .enabled := false;
-  redrawbtn   .enabled := false;
-  startbtn    .enabled := false;
-  pausebtn    .enabled := false;
-  stopbtn     .enabled := false;
-  aboutbtn    .enabled := true;
-  leftrightbtn.enabled := false;
-  updownbtn   .enabled := false;
-  panbtn      .enabled := false;
+  conbtn           .caption := 'Connect';
+  connectgb        .enabled := true;
+  manualdrivinggb  .enabled := false;
+  creativecontrolgb.enabled := true;
+  papersizegb      .enabled := false;
+  drawingcontrolgb .enabled := false;
   // ---
-  bmp   := tbitmap.create;
-  ini   := tinifile.create(changefileext(paramstr(0), '.ini'));
+  image := tbitmap.create;
   list1 := tstringlist.create;
   list2 := tstringlist.create;
-  // ---
-  conbtnclick(conbtn);
+  ini := tinifile.create(changefileext(paramstr(0), '.ini'));
+  loadlayout(ini, vplayout);
 
-  loadsetup(ini, vplotsetup);
-  vplothome.p.x := vplotsetup.point9.x;
-  vplothome.p.y := vplotsetup.point9.y;
-  optimize(vplothome, vplotsetup);
-
-
-   filename := '';    ;
+  reloadbtnclick(nil);
 end;
 
 procedure tmainform.conbtnclick(sender: tobject);
@@ -174,6 +147,29 @@ begin
                 ini.readinteger('Server', 'Port'   , 4500));
 end;
 
+procedure tmainform.formatcbchange(sender: tobject);
+begin
+  verticalcb.enabled := true;
+  heightse  .enabled := false;
+  widthse   .enabled := false;
+  case formatcb.itemindex of
+    0: begin heightse.value := 841; widthse .value := 1189; end;
+    1: begin heightse.value := 594; widthse .value :=  841; end;
+    2: begin heightse.value := 420; widthse .value :=  594; end;
+    3: begin heightse.value := 297; widthse .value :=  420; end;
+    4: begin heightse.value := 210; widthse .value :=  297; end;
+    5: begin heightse.value := 148; widthse .value :=  210; end;
+  else begin
+         verticalcb.enabled := false;
+         heightse  .enabled := true;
+         widthse   .enabled := true;
+       end;
+  end;
+  verticalcbeditingdone(formatcb);
+end;
+
+
+
 procedure tmainform.bordersbtnclick(sender: tobject);
 begin
    tpc.sendmessage('bordersbtnclick');
@@ -181,18 +177,18 @@ end;
 
 procedure tmainform.formdestroy(sender: tobject);
 begin
-  bmp.destroy;
   ini.destroy;
+  image.destroy;
   list1.destroy;
   list2.destroy;
 end;
 
 procedure tmainform.formclose(sender: tobject; var closeaction: tcloseaction);
 begin
-  if assigned(vplotcoder) then
+  if assigned(vpcoder) then
     playorstopbtnclick(stopbtn);
 
-  if assigned(vplotcoder) then
+  if assigned(vpcoder) then
     closeaction := canone
   else
     closeaction := cafree;
@@ -206,16 +202,6 @@ end;
 procedure tmainform.leftdownbtnclick(sender: tobject);
 begin
   tpc.sendmessage('leftdownbtnclick');
-end;
-
-procedure tmainform.leftrightbtnclick(sender: tobject; button: tudbtntype);
-begin
-  if button = btprev then
-    previewimage.left := min(2, previewimage.left + 100)
-  else
-    previewimage.left := max(mainform.width -
-                             previewimage.width - 2,
-                             previewimage.left  - 100);
 end;
 
 procedure tmainform.leftupbtnclick(Sender: TObject);
@@ -235,52 +221,43 @@ end;
 
 procedure tmainform.reloadbtnclick(sender: tobject);
 begin
-  reloadbtn   .enabled := false;
-  redrawbtn   .enabled := false;
-  startbtn    .enabled := false;
-  pausebtn    .enabled := false;
-  stopbtn     .enabled := false;
-  leftrightbtn.enabled := false;
-  updownbtn   .enabled := false;
-  panbtn      .enabled := false;
+  verticalcbeditingdone(sender);
   // ---
-  list2.clear;
-  list1.clear;
-  list1.loadfromfile(filename);
+  image.canvas.pen.color   := clltgray;
+  image.canvas.brush.color := clltgray;
+  image.canvas.brush.style := bssolid;
+  image.setsize(
+     widthse.value,
+    heightse.value);
+  image.canvas.fillrect(0,0,
+     widthse.value,
+    heightse.value);
   // ---
-  vplotcoder             := tvplotcoder.create(list1);
-  vplotcoder.ontick      := @ontick;
-  vplotcoder.onterminate := @onterminate;
-  // ---
-  bmp.setsize(
-    round(vplotsetup.point1.x),
-    round(vplotsetup.point1.y));
-  bmp.canvas.pen.color   := clwhite;
-  bmp.canvas.brush.color := clwhite;
-  bmp.canvas.brush.style := bssolid;
-  bmp.canvas.fillrect(0,0,
-    round(vplotsetup.point1.x),
-    round(vplotsetup.point1.y));
-  // ---
-  previewimage.picture.bitmap.setsize(
-    round(vplotsetup.point1.x),
-    round(vplotsetup.point1.y));
-  previewimage.canvas.pen.color   := clwhite;
-  previewimage.canvas.brush.color := clwhite;
+  previewimage.canvas.pen.color   := clltgray;
+  previewimage.canvas.brush.color := clltgray;
   previewimage.canvas.brush.style := bssolid;
-  previewimage.canvas.rectangle(0, 0,
-    round(vplotsetup.point1.x),
-    round(vplotsetup.point1.y));
+  previewimage.picture.bitmap.setsize(
+     widthse.value,
+    heightse.value);
+  previewimage.canvas.fillrect(0, 0,
+     widthse.value,
+    heightse.value);
 
-  previewimage.anchors := [aktop, akleft, akright, akbottom];
-  previewimage.anchors := [];
-
-  previewimage.stretchinenabled  := false;
+  previewimage.center            := true;
+  previewimage.proportional      := true;
+  previewimage.stretchinenabled  := true;
   previewimage.stretchoutenabled := false;
-  previewimage.stretch           := false;
-  panbtnclick(panbtn);
-  // ---
-  vplotcoder.start;
+  previewimage.stretch           := true;
+
+
+  if sender <> nil then
+  begin
+    vpcoder         := tvpcoder.create(list1);
+    vpcoder.onstart := @onstart;
+    vpcoder.onstop  := @onstop;
+    vpcoder.ontick  := @ontick;
+    vpcoder.start;
+  end;
 end;
 
 procedure tmainform.rightdownbtnclick(sender: tobject);
@@ -301,7 +278,7 @@ end;
 procedure tmainform.tpcconnect(asocket: tlsocket);
 begin
   conbtn      .caption := 'Disconnect';
-//conbtn      .enabled := true;
+  conbtn      .enabled := true;
   leftupbtn   .enabled := true;
   penupbtn    .enabled := true;
   rightupbtn  .enabled := true;
@@ -313,22 +290,12 @@ begin
   rightdownbtn.enabled := true;
   bordersbtn  .enabled := true;
   gohomebtn   .enabled := true;
-//loadbtn     .enabled := true;
-  reloadbtn   .enabled := false;
-  redrawbtn   .enabled := false;
-  startbtn    .enabled := false;
-  pausebtn    .enabled := false;
-  stopbtn     .enabled := false;
-  aboutbtn    .enabled := true;
-  leftrightbtn.enabled := false;
-  updownbtn   .enabled := false;
-  panbtn      .enabled := false;
 end;
 
 procedure tmainform.tpcdisconnect(asocket: tlsocket);
 begin
   conbtn      .caption := 'Connect';
-//conbtn      .enabled := true;
+  conbtn      .enabled := true;
   leftupbtn   .enabled := false;
   penupbtn    .enabled := false;
   rightupbtn  .enabled := false;
@@ -340,141 +307,105 @@ begin
   rightdownbtn.enabled := false;
   bordersbtn  .enabled := false;
   gohomebtn   .enabled := false;
-//loadbtn     .enabled := true;
-  reloadbtn   .enabled := false;
-  redrawbtn   .enabled := false;
-  startbtn    .enabled := false;
-  pausebtn    .enabled := false;
-  stopbtn     .enabled := false;
-  aboutbtn    .enabled := true;
-  leftrightbtn.enabled := false;
-  updownbtn   .enabled := false;
-  panbtn      .enabled := false;
 end;
 
 procedure tmainform.tpcerror(const msg: string; asocket: tlsocket);
 begin
-  showmessage('Error');
-end;
 
-procedure tmainform.updownbtnclick(sender: tobject; button: tudbtntype);
-begin
-  if button = btnext then
-    previewimage.top := min(2, previewimage.top + 100)
-  else
-    previewimage.top := max(mainform.height -
-                            previewimage.height - 2,
-                            previewimage.top    - 100);
-end;
 
-procedure tmainform.panbtnclick(sender: tobject);
-begin
-  previewimage.top  := (mainform.height - previewimage.height) div 2;
-  previewimage.left := (mainform.width  - previewimage.width)  div 2;
+
 end;
 
 procedure tmainform.loadbtnclick(sender: tobject);
 begin
   if opendialog.execute then
   begin
-    filename := opendialog.filename;
+    list2.clear;
+    list1.clear;
+    list1.loadfromfile(opendialog.filename);
     reloadbtnclick(loadbtn)
   end;
 end;
 
 procedure tmainform.playorstopbtnclick(sender: tobject);
 begin
-  if assigned(vplotcoder) then
+  if assigned(vpcoder) then
   begin
-    (*
-    if sender = startbtn then
-      vplotcoder.enabled := true
-    else
-    if sender = pausebtn then
-      vplotcoder.enabled := false
-    else
     if sender = stopbtn then
     begin
-      vplotcoder.terminate;
-      vplotcoder.enabled := true;
+      vpcoder.terminate;
     end;
 
-    timer   .enabled :=     vplotcoder.enabled;
-    startbtn .enabled := not vplotcoder.enabled;
-    pausebtn.enabled :=     vplotcoder.enabled;
-    stopbtn .enabled :=     vplotcoder.enabled;
-    aboutbtn .enabled := false;
-    *)
+
+    //startbtn .enabled := not vplotcoder.enabled;
+    //pausebtn.enabled :=     vplotcoder.enabled;
+    //stopbtn .enabled :=     vplotcoder.enabled;
+    //aboutbtn .enabled := false;
+
   end;
 end;
 
-procedure tmainform.morebtnclick(sender: tobject);
+procedure tmainform.onstart;
 begin
+  list2.clear;
 
+  creativecontrolgb.enabled := false;
+  papersizegb      .enabled := false;
+  drawingcontrolgb .enabled := false;
+end;
 
+procedure tmainform.onstop;
+begin
+  caption := 'VPlot Driver';
+  previewimage.canvas.copyrect(
+    previewimage.canvas.cliprect,
+    image.canvas,
+    image.canvas.cliprect);
+  previewimage.invalidate;
+
+  creativecontrolgb.enabled := true;
+  papersizegb      .enabled := true;
+  drawingcontrolgb .enabled := true;
 end;
 
 procedure tmainform.ontick;
+var
+   p: tvppoint;
+  m0: longint;
+  m1: longint;
 begin
-  if vplotcoder.pz < 0 then
-    bmp.canvas.pixels[
-      round(                      vplotcoder.px),
-      round(vplotsetup.point1.y - vplotcoder.py)] := clblack
+  p.x :=                   ( widthse.value div 2) + offsetxse.value + vpcoder.px;
+  p.y := heightse.value - ((heightse.value div 2) + offsetyse.value + vpcoder.py);
+  if vpcoder.pz < 0 then
+    image.canvas.pixels[round(p.x), round(p.y)] := clblack
   else
-    bmp.canvas.pixels[
-      round(                      vplotcoder.px),
-      round(vplotsetup.point1.y - vplotcoder.py)] := clred;
+    image.canvas.pixels[round(p.x), round(p.y)] := clred;
 
+  p.x := vpcoder.px + vplayout.point8.x;
+  p.y := vpcoder.py + vplayout.point8.y;
+  optimize(p, vplayout, m0, m1);
+  list2.append(format('MOVE2 A%u B%u C%u', [m0, m1, round(vpcoder.pz)]));
 
-
-  with vplotcoder do
-    list2.append(format('MOVE2 A%u B%u C%u', [mot0, mot1, motz]));
-
-  tpc.sendmessage(list2[list2.count - 1]);
+  if vpcoder.index mod 10 = 0 then
+    caption := format('VPlot Driver - Drawing [%u / %u]',
+      [vpcoder.index, vpcoder.count]);
   application.processmessages;
 end;
 
-procedure tmainform.onterminate(sender: tobject);
+procedure tmainform.verticalcbeditingdone(sender: tobject);
+var
+  amin, amax: longint;
 begin
-  previewimage.canvas.copyrect(
-    previewimage.canvas.cliprect,
-    bmp.canvas,
-    bmp.canvas.cliprect);
-  previewimage.invalidate;
-
-  loadbtn     .enabled := true;
-  reloadbtn   .enabled := true;
-  redrawbtn   .enabled := true;
-  startbtn    .enabled := true;
-  pausebtn    .enabled := true;
-  stopbtn     .enabled := true;
-  leftrightbtn.enabled := true;
-  updownbtn   .enabled := true;
-  panbtn      .enabled := true;
-end;
-
-procedure tmainform.timertimer(Sender: TObject);
-begin
-  inc(x, timer.interval);
-  previewimage.canvas.copyrect(
-    previewimage.canvas.cliprect,
-    bmp.canvas,
-    bmp.canvas.cliprect);
-  previewimage.invalidate;
-  if assigned(vplotcoder) then
+  amin := min(heightse.value, widthse.value);
+  amax := max(heightse.value, widthse.value);
+  if verticalcb.checked then
   begin
-    caption := format('VPlot Driver - Drawing %u%% - Time elapsed %u secs',
-      [(100 * vplotcoder.listindex) div vplotcoder.listcount, x div 1000]);
+    heightse.value := amax;
+    widthse .value := amin;
   end else
   begin
-    playorstopbtnclick(stopbtn);
-    timer   .enabled := false;
-    loadbtn .enabled := true;
-    startbtn .enabled := false;
-    pausebtn.enabled := false;
-    stopbtn .enabled := false;
-    aboutbtn .enabled := true;
-    caption := format('VPlot Driver - Time elapsed %u secs', [x div 1000]);
+    heightse.value := amin;
+    widthse .value := amax;
   end;
 end;
 

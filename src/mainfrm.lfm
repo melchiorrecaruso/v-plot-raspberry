@@ -1,12 +1,12 @@
 object mainform: Tmainform
-  Left = 440
-  Height = 649
-  Top = 19
-  Width = 867
+  Left = 380
+  Height = 681
+  Top = 7
+  Width = 885
   Caption = 'VPlot Driver'
-  ClientHeight = 649
-  ClientWidth = 867
-  Color = clWhite
+  ClientHeight = 681
+  ClientWidth = 885
+  Color = clWindow
   Constraints.MinHeight = 450
   Constraints.MinWidth = 450
   OnClose = FormClose
@@ -14,68 +14,25 @@ object mainform: Tmainform
   OnDestroy = FormDestroy
   LCLVersion = '1.9.0.0'
   object previewimage: TImage
-    Left = 528
-    Height = 482
-    Top = 90
-    Width = 299
-    Anchors = []
-    AutoSize = True
-    StretchOutEnabled = False
-    StretchInEnabled = False
-  end
-  object updownbtn: TUpDown
-    AnchorSideLeft.Control = panbtn
-    AnchorSideRight.Control = panbtn
-    AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = panbtn
-    Left = 836
-    Height = 68
-    Top = 545
-    Width = 26
-    Anchors = [akLeft, akRight, akBottom]
-    BorderSpacing.Bottom = 5
-    Min = 0
-    OnClick = updownbtnClick
-    Position = 0
-    TabOrder = 0
-    Wrap = False
-  end
-  object leftrightbtn: TUpDown
-    AnchorSideTop.Control = panbtn
-    AnchorSideRight.Control = panbtn
-    AnchorSideBottom.Control = panbtn
-    AnchorSideBottom.Side = asrBottom
-    Left = 763
-    Height = 26
-    Top = 618
-    Width = 68
-    Anchors = [akTop, akRight, akBottom]
-    BorderSpacing.Right = 5
-    Min = 0
-    OnClick = leftrightbtnClick
-    Orientation = udHorizontal
-    Position = 0
-    TabOrder = 1
-    Wrap = False
-  end
-  object panbtn: TBitBtn
+    AnchorSideLeft.Control = manualdrivinggb
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = Owner
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
-    Left = 836
-    Height = 26
-    Top = 618
-    Width = 26
-    Anchors = [akRight, akBottom]
+    Left = 309
+    Height = 671
+    Top = 5
+    Width = 571
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    AutoSize = True
+    BorderSpacing.Left = 5
+    BorderSpacing.Top = 5
     BorderSpacing.Right = 5
     BorderSpacing.Bottom = 5
-    Constraints.MaxHeight = 26
-    Constraints.MaxWidth = 26
-    Constraints.MinHeight = 26
-    Constraints.MinWidth = 26
-    OnClick = panbtnClick
-    TabOrder = 2
+    StretchOutEnabled = False
+    StretchInEnabled = False
   end
   object connectgb: TGroupBox
     AnchorSideLeft.Control = manualdrivinggb
@@ -92,7 +49,7 @@ object mainform: Tmainform
     Caption = 'Connect'
     ClientHeight = 39
     ClientWidth = 290
-    TabOrder = 3
+    TabOrder = 0
     object conbtn: TSpeedButton
       AnchorSideLeft.Control = connectgb
       AnchorSideTop.Control = connectgb
@@ -127,7 +84,7 @@ object mainform: Tmainform
     Caption = 'Manual Driving'
     ClientHeight = 143
     ClientWidth = 290
-    TabOrder = 4
+    TabOrder = 1
     object sethomebtn: TBitBtn
       AnchorSideLeft.Control = penupbtn
       AnchorSideTop.Control = leftedit
@@ -314,7 +271,7 @@ object mainform: Tmainform
     AnchorSideRight.Side = asrBottom
     Left = 10
     Height = 115
-    Top = 477
+    Top = 454
     Width = 294
     Anchors = [akTop, akLeft, akRight]
     AutoSize = True
@@ -322,7 +279,7 @@ object mainform: Tmainform
     Caption = 'Drawing Control'
     ClientHeight = 95
     ClientWidth = 290
-    TabOrder = 5
+    TabOrder = 2
     object startbtn: TBitBtn
       AnchorSideLeft.Control = drawingcontrolgb
       AnchorSideTop.Control = drawingcontrolgb
@@ -378,16 +335,16 @@ object mainform: Tmainform
     AnchorSideRight.Control = manualdrivinggb
     AnchorSideRight.Side = asrBottom
     Left = 10
-    Height = 87
+    Height = 59
     Top = 237
     Width = 294
     Anchors = [akTop, akLeft, akRight]
     AutoSize = True
     BorderSpacing.Top = 5
     Caption = 'Creative control'
-    ClientHeight = 67
+    ClientHeight = 39
     ClientWidth = 290
-    TabOrder = 6
+    TabOrder = 3
     object loadbtn: TBitBtn
       AnchorSideLeft.Control = creativecontrolgb
       AnchorSideTop.Control = creativecontrolgb
@@ -401,26 +358,10 @@ object mainform: Tmainform
       BorderSpacing.Left = 5
       BorderSpacing.Top = 6
       BorderSpacing.Right = 5
+      BorderSpacing.Bottom = 10
       Caption = 'Load'
       OnClick = loadbtnclick
       TabOrder = 0
-    end
-    object reloadbtn: TBitBtn
-      AnchorSideLeft.Control = loadbtn
-      AnchorSideTop.Control = loadbtn
-      AnchorSideTop.Side = asrBottom
-      AnchorSideRight.Control = loadbtn
-      AnchorSideRight.Side = asrBottom
-      Left = 5
-      Height = 23
-      Top = 34
-      Width = 280
-      Anchors = [akTop, akLeft, akRight]
-      BorderSpacing.Top = 5
-      BorderSpacing.Bottom = 10
-      Caption = 'Reload'
-      OnClick = reloadbtnClick
-      TabOrder = 1
     end
   end
   object aboutbtn: TBitBtn
@@ -433,7 +374,7 @@ object mainform: Tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 17
     Height = 23
-    Top = 597
+    Top = 574
     Width = 280
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Left = 7
@@ -441,7 +382,7 @@ object mainform: Tmainform
     BorderSpacing.Right = 7
     BorderSpacing.Bottom = 5
     Caption = 'About ...'
-    TabOrder = 7
+    TabOrder = 4
   end
   object papersizegb: TGroupBox
     AnchorSideLeft.Control = creativecontrolgb
@@ -450,16 +391,16 @@ object mainform: Tmainform
     AnchorSideRight.Control = creativecontrolgb
     AnchorSideRight.Side = asrBottom
     Left = 10
-    Height = 143
-    Top = 329
+    Height = 148
+    Top = 301
     Width = 294
     Anchors = [akTop, akLeft, akRight]
     AutoSize = True
     BorderSpacing.Top = 5
     Caption = 'Paper size'
-    ClientHeight = 123
+    ClientHeight = 128
     ClientWidth = 290
-    TabOrder = 8
+    TabOrder = 5
     object offsetxse: TSpinEdit
       AnchorSideLeft.Control = widthse
       AnchorSideTop.Control = heightse
@@ -591,6 +532,8 @@ object mainform: Tmainform
         'A5'
         'CUSTOM'
       )
+      OnChange = formatcbChange
+      Style = csDropDownList
       TabOrder = 2
       Text = 'A4'
     end
@@ -602,11 +545,11 @@ object mainform: Tmainform
       AnchorSideRight.Side = asrBottom
       Left = 5
       Height = 23
-      Top = 90
+      Top = 95
       Width = 280
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 5
-      BorderSpacing.Top = 5
+      BorderSpacing.Top = 10
       BorderSpacing.Right = 5
       BorderSpacing.Bottom = 10
       Caption = 'Redraw'
@@ -647,16 +590,26 @@ object mainform: Tmainform
       TabOrder = 5
       Value = 210
     end
+    object verticalcb: TCheckBox
+      AnchorSideLeft.Control = offsetxse
+      AnchorSideTop.Control = formatcb
+      AnchorSideRight.Control = papersizegb
+      AnchorSideRight.Side = asrBottom
+      AnchorSideBottom.Control = formatcb
+      AnchorSideBottom.Side = asrBottom
+      Left = 205
+      Height = 23
+      Top = 6
+      Width = 80
+      Anchors = [akTop, akLeft, akRight, akBottom]
+      BorderSpacing.Right = 5
+      Caption = 'Vertical'
+      OnEditingDone = verticalcbEditingDone
+      TabOrder = 6
+    end
   end
   object opendialog: TOpenDialog
     left = 336
-    top = 16
-  end
-  object timer: TTimer
-    Enabled = False
-    Interval = 2000
-    OnTimer = timerTimer
-    left = 400
     top = 16
   end
   object tpc: TLTCPComponent
