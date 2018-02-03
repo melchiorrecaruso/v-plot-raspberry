@@ -343,13 +343,6 @@ var
   i: longint;
 begin
 
-  if tpc.get(i, sizeof(longint)) = sizeof(longint) then
-  begin
-    if i = 4 * sizeof(longint) then serverisbusy := false;
-
-    showmessage(inttostr(i));
-  end;
-
 end;
 
 procedure tmainform.onstart;
@@ -393,16 +386,18 @@ begin
   optimize(p, vplayout, m0, m1);
   mz := round(vpcoder.pz);
 
-  serverisbusy := true;
-  if tpc.connected then
+
+
+  // if tpc.connected then
   begin
+    serverisbusy := true;
     tpc.send(id, sizeof(longint));
     tpc.send(m0, sizeof(longint));
     tpc.send(m1, sizeof(longint));
     tpc.send(mz, sizeof(longint));
   end;
 
-  while serverisbusy do sleep(5);
+  sleep(250);
 
 
   if vpcoder.index mod 10 = 0 then

@@ -35,39 +35,33 @@ end;
 
 procedure tvplotserver.onre(asocket: tlsocket);
 var
-  id: longint;
-  m0: longint;
-  m1: longint;
-  mz: longint;
-  er: longint;
+  buf: array[0..3] of longint;
+  err: longint;
 begin
-  er := fcon.get(id, sizeof(longint), asocket) +
-        fcon.get(m0, sizeof(longint), asocket) +
-        fcon.get(m1, sizeof(longint), asocket) +
-        fcon.get(mz, sizeof(longint), asocket);
+  err := fcon.get(buf, sizeof(buf), asocket);
 
-  if er = (4 * sizeof(longint)) then
+  if err = sizeof(buf) then
   begin
-    if id = 0 then
+    if buf[0] = 0 then
     begin
       writeln('INIT');
-      fdrv.init (m0, m1, mz);
+      fdrv.init (buf[1] , buf[2] , buf[3]);
     end else
-    if id = 2 then
+    if buf[0] = 2 then
     begin
       writeln('MOVE2');
-      fdrv.move2(m0, m1, mz);
+      fdrv.move2(buf[1] , buf[2] , buf[3]);
     end else
-    if id = 4 then
+    if buf[0] = 4 then
     begin
       writeln('MOVE4');
-      fdrv.move4(m0, m1, mz);
+      fdrv.move4(buf[1] , buf[2] , buf[3]);
     end;
   end;
 
   fcon.iterreset;
   while fcon.iternext do
-    fcon.send(er, sizeof(longint), fcon.iterator);
+    fcon.send(err, sizeof(longint), fcon.iterator);
 end;
 
 procedure tvplotserver.onds(asocket: tlsocket);

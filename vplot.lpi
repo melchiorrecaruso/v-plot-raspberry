@@ -386,8 +386,8 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="374"/>
-        <CursorPos X="6" Y="383"/>
+        <TopLine Value="332"/>
+        <CursorPos Y="345"/>
         <FoldState Value=" T3n7031W"/>
         <UsageCount Value="92"/>
         <Loaded Value="True"/>
@@ -662,7 +662,7 @@
       </Position29>
       <Position30>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="347" Column="29" TopLine="323"/>
+        <Caret Line="347" Column="21" TopLine="326"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>
