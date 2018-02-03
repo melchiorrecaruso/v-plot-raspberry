@@ -100,6 +100,7 @@ type
     procedure tpcReceive(aSocket: TLSocket);
     procedure verticalcbeditingdone(sender: tobject);
   private
+    strm: tmemorystream;
     ini:   tinifile;
     image: tbitmap;
     list: tstringlist;
@@ -137,6 +138,8 @@ begin
   list  := tstringlist.create;
   ini := tinifile.create(changefileext(paramstr(0), '.ini'));
   loadlayout(ini, vplayout);
+  strm := tmemorystream.create;
+
 
   reloadbtnclick(nil);
   conbtnclick(nil);
@@ -184,6 +187,7 @@ begin
   ini.destroy;
   image.destroy;
   list.destroy;
+  strm.destroy;
 end;
 
 procedure tmainform.formclose(sender: tobject; var closeaction: tcloseaction);
@@ -252,7 +256,6 @@ begin
   previewimage.stretchoutenabled := false;
   previewimage.stretch           := true;
 
-
   if sender <> nil then
   begin
     vpcoder         := tvpcoder.create(list);
@@ -283,7 +286,10 @@ begin
   if sender = startbtn then
   begin
     startbtn.enabled := false;
+    pausebtn.enabled := true;
+    stopbtn .enabled := true;
 
+    tpc.send(strm.size, sizeof(int64));
   end;
 
 end;
@@ -343,10 +349,16 @@ var
   i: longint;
 begin
 
+  tpc.get(i, sizeof(i), asocket);
+
+  showmessage(inttostr(i));
+  serverisbusy := false;
 end;
 
 procedure tmainform.onstart;
 begin
+  strm.clear;
+
   creativecontrolgb.enabled := false;
   papersizegb      .enabled := false;
   drawingcontrolgb .enabled := false;
@@ -368,11 +380,10 @@ end;
 
 procedure tmainform.ontick;
 var
-  id: longint = 2;
+   p: tvppoint;
+   x: longint;
   m0: longint;
   m1: longint;
-  mz: longint;
-   p: tvppoint;
 begin
   p.x := ( widthse.value div 2) + offsetxse.value + vpcoder.px;
   p.y := (heightse.value div 2) - offsetyse.value - vpcoder.py;
@@ -384,21 +395,14 @@ begin
   p.x := vpcoder.px + vplayout.point8.x;
   p.y := vpcoder.py + vplayout.point8.y;
   optimize(p, vplayout, m0, m1);
-  mz := round(vpcoder.pz);
 
+  x := 2;
+  strm.write(x,  sizeof(longint));
+  strm.write(m0, sizeof(longint));
+  strm.write(m1, sizeof(longint));
 
-
-  // if tpc.connected then
-  begin
-    serverisbusy := true;
-    tpc.send(id, sizeof(longint));
-    tpc.send(m0, sizeof(longint));
-    tpc.send(m1, sizeof(longint));
-    tpc.send(mz, sizeof(longint));
-  end;
-
-  sleep(250);
-
+  x := round(vpcoder.pz);
+  strm.write(x,  sizeof(longint));
 
   if vpcoder.index mod 10 = 0 then
     caption := format('VPlot Driver - Drawing [%u / %u]',
