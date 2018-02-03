@@ -294,6 +294,7 @@ object mainform: Tmainform
       BorderSpacing.Top = 6
       BorderSpacing.Right = 5
       Caption = 'Start'
+      OnClick = startbtnClick
       TabOrder = 0
     end
     object pausebtn: TBitBtn
@@ -309,6 +310,7 @@ object mainform: Tmainform
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Top = 5
       Caption = 'Pause'
+      OnClick = startbtnClick
       TabOrder = 1
     end
     object stopbtn: TBitBtn
@@ -325,6 +327,7 @@ object mainform: Tmainform
       BorderSpacing.Top = 5
       BorderSpacing.Bottom = 10
       Caption = 'Stop'
+      OnClick = startbtnClick
       TabOrder = 2
     end
   end
@@ -614,12 +617,14 @@ object mainform: Tmainform
   end
   object tpc: TLTCPComponent
     Port = 0
+    OnReceive = tpcReceive
     OnError = tpcError
     OnDisconnect = tpcDisconnect
     OnConnect = tpcConnect
+    OnCanSend = tpcCanSend
     Timeout = 0
     ReuseAddress = False
-    left = 448
+    left = 400
     top = 16
   end
 end

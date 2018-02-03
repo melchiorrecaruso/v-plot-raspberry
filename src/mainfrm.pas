@@ -87,6 +87,8 @@ type
     procedure rightdownbtnclick(sender: tobject);
     procedure rightupbtnclick(sender: tobject);
     procedure sethomebtnclick(sender: tobject);
+    procedure startbtnclick(sender: tobject);
+    procedure tpcCanSend(aSocket: TLSocket);
     procedure tpcconnect(asocket: tlsocket);
     procedure tpcdisconnect(asocket: tlsocket);
     procedure tpcerror(const msg: string; asocket: tlsocket);
@@ -95,6 +97,7 @@ type
 
     procedure loadbtnclick(sender: tobject);
     procedure playorstopbtnclick(sender: tobject);
+    procedure tpcReceive(aSocket: TLSocket);
     procedure verticalcbeditingdone(sender: tobject);
   private
     ini:   tinifile;
@@ -275,6 +278,30 @@ begin
   tpc.sendmessage('sethomebtnclick');
 end;
 
+procedure tmainform.startbtnclick(sender: tobject);
+begin
+  if sender = startbtn then
+  begin
+    startbtn.enabled := false;
+    pausebtn.enabled := list2.count > 0;
+    stopbtn .enabled := list2.count > 0;
+  end;
+
+end;
+
+procedure tmainform.tpccansend(asocket: tlsocket);
+begin
+  if stopbtn.enabled then
+    if list2.count > 0 then
+      if tpc.sendmessage(list2[0]) = length(list2[0]) then
+      begin
+        list2.delete(0);
+      end;
+
+  pausebtn.enabled := list2.count > 0;
+  stopbtn .enabled := list2.count > 0;
+end;
+
 procedure tmainform.tpcconnect(asocket: tlsocket);
 begin
   conbtn      .caption := 'Disconnect';
@@ -345,6 +372,11 @@ begin
   end;
 end;
 
+procedure tmainform.tpcReceive(aSocket: TLSocket);
+begin
+
+end;
+
 procedure tmainform.onstart;
 begin
   list2.clear;
@@ -370,12 +402,12 @@ end;
 
 procedure tmainform.ontick;
 var
-   p: tvppoint;
   m0: longint;
   m1: longint;
+   p: tvppoint;
 begin
-  p.x :=                   ( widthse.value div 2) + offsetxse.value + vpcoder.px;
-  p.y := heightse.value - ((heightse.value div 2) + offsetyse.value + vpcoder.py);
+  p.x := ( widthse.value div 2) + offsetxse.value + vpcoder.px;
+  p.y := (heightse.value div 2) - offsetyse.value - vpcoder.py;
   if vpcoder.pz < 0 then
     image.canvas.pixels[round(p.x), round(p.y)] := clblack
   else

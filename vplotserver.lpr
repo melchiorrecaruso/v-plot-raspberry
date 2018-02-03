@@ -109,9 +109,9 @@ begin
     end else
       ffault := -1;
 
-    fcon.iterreset;
-    while fcon.iternext do
-      a := fcon.sendmessage(inttostr(ffault), fcon.iterator);
+    //fcon.iterreset;
+    //while fcon.iternext do
+    //  a := fcon.sendmessage(inttostr(ffault), fcon.iterator);
   end;
 end;
 
