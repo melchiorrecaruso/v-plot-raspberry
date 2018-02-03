@@ -27,7 +27,7 @@ interface
 
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls,
-  comctrls, buttons, menus, spin, inifiles, libvplot, lnet, lnetcomponents;
+  comctrls, buttons, menus, spin, inifiles, libvplot;
 
 type
   { tmainform }
@@ -63,16 +63,13 @@ type
     gohomebtn: TBitBtn;
     leftedit: TEdit;
     rightedit: TEdit;
-    connectgb: TGroupBox;
     manualdrivinggb: TGroupBox;
     drawingcontrolgb: TGroupBox;
-    tpc: TLTCPComponent;
     previewimage: TImage;
     opendialog: topendialog;
-    conbtn: TSpeedButton;
 
     procedure bordersbtnclick(sender: tobject);
-    procedure conbtnclick(sender: tobject);
+
     procedure formatcbchange(sender: tobject);
     procedure formcreate(sender: tobject);
     procedure formdestroy(sender: tobject);
@@ -89,18 +86,13 @@ type
     procedure sethomebtnclick(sender: tobject);
     procedure startbtnclick(sender: tobject);
 
-    procedure tpcconnect(asocket: tlsocket);
-    procedure tpcdisconnect(asocket: tlsocket);
-    procedure tpcerror(const msg: string; asocket: tlsocket);
-
 
 
     procedure loadbtnclick(sender: tobject);
     procedure playorstopbtnclick(sender: tobject);
-    procedure tpcReceive(aSocket: TLSocket);
+
     procedure verticalcbeditingdone(sender: tobject);
   private
-    strm: tmemorystream;
     ini:   tinifile;
     image: tbitmap;
     list: tstringlist;
@@ -114,7 +106,7 @@ var
   mainform: Tmainform;
   x:        longword;
 
-  serverisbusy: boolean;
+
 
 implementation
 
@@ -127,9 +119,7 @@ uses
 
 procedure tmainform.formcreate(sender: tobject);
 begin
-  conbtn           .caption := 'Connect';
-  connectgb        .enabled := true;
-  manualdrivinggb  .enabled := false;
+  manualdrivinggb  .enabled := true;
   creativecontrolgb.enabled := true;
   papersizegb      .enabled := false;
   drawingcontrolgb .enabled := false;
@@ -138,20 +128,11 @@ begin
   list  := tstringlist.create;
   ini := tinifile.create(changefileext(paramstr(0), '.ini'));
   loadlayout(ini, vplayout);
-  strm := tmemorystream.create;
+
 
 
   reloadbtnclick(nil);
-  conbtnclick(nil);
-end;
 
-procedure tmainform.conbtnclick(sender: tobject);
-begin
-  if tpc.connected then
-    tpc.disconnect
-  else
-    tpc.connect(ini.readstring ('Server', 'Address', '192.168.1.10'),
-                ini.readinteger('Server', 'Port'   , 4500));
 end;
 
 procedure tmainform.formatcbchange(sender: tobject);
@@ -179,7 +160,7 @@ end;
 
 procedure tmainform.bordersbtnclick(sender: tobject);
 begin
-   tpc.sendmessage('bordersbtnclick');
+   // tpc.sendmessage('bordersbtnclick');
 end;
 
 procedure tmainform.formdestroy(sender: tobject);
@@ -187,7 +168,7 @@ begin
   ini.destroy;
   image.destroy;
   list.destroy;
-  strm.destroy;
+
 end;
 
 procedure tmainform.formclose(sender: tobject; var closeaction: tcloseaction);
@@ -203,27 +184,27 @@ end;
 
 procedure tmainform.gohomebtnclick(sender: tobject);
 begin
-   tpc.sendmessage('gohomebtnclick');
+
 end;
 
 procedure tmainform.leftdownbtnclick(sender: tobject);
 begin
-  tpc.sendmessage('leftdownbtnclick');
+
 end;
 
 procedure tmainform.leftupbtnclick(Sender: TObject);
 begin
-  tpc.sendmessage('leftupbtnclick');
+
 end;
 
 procedure tmainform.pendownbtnclick(Sender: TObject);
 begin
-  tpc.sendmessage('pendownbtnclick');
+
 end;
 
 procedure tmainform.penupbtnclick(sender: tobject);
 begin
-  tpc.sendmessage('penupbtnclick');
+
 end;
 
 procedure tmainform.reloadbtnclick(sender: tobject);
@@ -268,53 +249,24 @@ end;
 
 procedure tmainform.rightdownbtnclick(sender: tobject);
 begin
-   tpc.sendmessage('rightdownbtnclick');
+
 end;
 
 procedure tmainform.rightupbtnclick(sender: tobject);
 begin
-  tpc.sendmessage('rightupbtnclick');
+
 end;
 
 procedure tmainform.sethomebtnclick(sender: tobject);
 begin
-  tpc.sendmessage('sethomebtnclick');
+
 end;
 
 procedure tmainform.startbtnclick(sender: tobject);
 begin
-  if sender = startbtn then
-  begin
-    startbtn.enabled := false;
-    pausebtn.enabled := true;
-    stopbtn .enabled := true;
-
-    tpc.send(strm.size, sizeof(int64));
-  end;
 
 end;
 
-procedure tmainform.tpcconnect(asocket: tlsocket);
-begin
-  serverisbusy   := false;
-  conbtn.caption := 'Disconnect';
-  manualdrivinggb.enabled := true;
-
-end;
-
-procedure tmainform.tpcdisconnect(asocket: tlsocket);
-begin
-  serverisbusy   := false;
-  conbtn.caption := 'Connect';
-  manualdrivinggb.enabled := false;
-end;
-
-procedure tmainform.tpcerror(const msg: string; asocket: tlsocket);
-begin
-
-
-
-end;
 
 procedure tmainform.loadbtnclick(sender: tobject);
 begin
@@ -344,21 +296,10 @@ begin
   end;
 end;
 
-procedure tmainform.tpcreceive(asocket: tlsocket);
-var
-  i: longint;
-begin
-
-  tpc.get(i, sizeof(i), asocket);
-
-  showmessage(inttostr(i));
-  serverisbusy := false;
-end;
 
 procedure tmainform.onstart;
 begin
-  strm.clear;
-
+  manualdrivinggb  .enabled := false;
   creativecontrolgb.enabled := false;
   papersizegb      .enabled := false;
   drawingcontrolgb .enabled := false;
@@ -373,6 +314,7 @@ begin
     image.canvas.cliprect);
   previewimage.invalidate;
 
+  manualdrivinggb  .enabled := true;
   creativecontrolgb.enabled := true;
   papersizegb      .enabled := true;
   drawingcontrolgb .enabled := true;
@@ -396,13 +338,7 @@ begin
   p.y := vpcoder.py + vplayout.point8.y;
   optimize(p, vplayout, m0, m1);
 
-  x := 2;
-  strm.write(x,  sizeof(longint));
-  strm.write(m0, sizeof(longint));
-  strm.write(m1, sizeof(longint));
-
-  x := round(vpcoder.pz);
-  strm.write(x,  sizeof(longint));
+  // poltdriver
 
   if vpcoder.index mod 10 = 0 then
     caption := format('VPlot Driver - Drawing [%u / %u]',

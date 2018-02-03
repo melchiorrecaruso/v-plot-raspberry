@@ -24,7 +24,7 @@ program vplot;
 
 uses
   {$ifdef unix} cthreads, {$endif} interfaces, forms, mainfrm,
-  initfrm, lnetbase, lnetvisual;
+  initfrm;
 
 {$R *.res}
 

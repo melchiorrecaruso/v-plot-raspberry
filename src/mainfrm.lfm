@@ -34,49 +34,12 @@ object mainform: Tmainform
     StretchOutEnabled = False
     StretchInEnabled = False
   end
-  object connectgb: TGroupBox
-    AnchorSideLeft.Control = manualdrivinggb
-    AnchorSideTop.Control = Owner
-    AnchorSideRight.Control = manualdrivinggb
-    AnchorSideRight.Side = asrBottom
-    Left = 10
-    Height = 59
-    Top = 5
-    Width = 294
-    Anchors = [akTop, akLeft, akRight]
-    AutoSize = True
-    BorderSpacing.Top = 5
-    Caption = 'Connect'
-    ClientHeight = 39
-    ClientWidth = 290
-    TabOrder = 0
-    object conbtn: TSpeedButton
-      AnchorSideLeft.Control = connectgb
-      AnchorSideTop.Control = connectgb
-      AnchorSideRight.Control = connectgb
-      AnchorSideRight.Side = asrBottom
-      AnchorSideBottom.Control = connectgb
-      AnchorSideBottom.Side = asrBottom
-      Left = 5
-      Height = 23
-      Top = 6
-      Width = 280
-      Anchors = [akTop, akLeft, akRight]
-      BorderSpacing.Left = 5
-      BorderSpacing.Top = 6
-      BorderSpacing.Right = 5
-      BorderSpacing.Bottom = 10
-      Caption = 'Connect'
-      OnClick = conbtnClick
-    end
-  end
   object manualdrivinggb: TGroupBox
     AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = connectgb
-    AnchorSideTop.Side = asrBottom
+    AnchorSideTop.Control = Owner
     Left = 10
     Height = 163
-    Top = 69
+    Top = 5
     Width = 294
     AutoSize = True
     BorderSpacing.Left = 10
@@ -84,7 +47,7 @@ object mainform: Tmainform
     Caption = 'Manual Driving'
     ClientHeight = 143
     ClientWidth = 290
-    TabOrder = 1
+    TabOrder = 0
     object sethomebtn: TBitBtn
       AnchorSideLeft.Control = penupbtn
       AnchorSideTop.Control = leftedit
@@ -271,7 +234,7 @@ object mainform: Tmainform
     AnchorSideRight.Side = asrBottom
     Left = 10
     Height = 115
-    Top = 454
+    Top = 390
     Width = 294
     Anchors = [akTop, akLeft, akRight]
     AutoSize = True
@@ -279,7 +242,7 @@ object mainform: Tmainform
     Caption = 'Drawing Control'
     ClientHeight = 95
     ClientWidth = 290
-    TabOrder = 2
+    TabOrder = 1
     object startbtn: TBitBtn
       AnchorSideLeft.Control = drawingcontrolgb
       AnchorSideTop.Control = drawingcontrolgb
@@ -339,7 +302,7 @@ object mainform: Tmainform
     AnchorSideRight.Side = asrBottom
     Left = 10
     Height = 59
-    Top = 237
+    Top = 173
     Width = 294
     Anchors = [akTop, akLeft, akRight]
     AutoSize = True
@@ -347,7 +310,7 @@ object mainform: Tmainform
     Caption = 'Creative control'
     ClientHeight = 39
     ClientWidth = 290
-    TabOrder = 3
+    TabOrder = 2
     object loadbtn: TBitBtn
       AnchorSideLeft.Control = creativecontrolgb
       AnchorSideTop.Control = creativecontrolgb
@@ -377,7 +340,7 @@ object mainform: Tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 17
     Height = 23
-    Top = 574
+    Top = 510
     Width = 280
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Left = 7
@@ -385,7 +348,7 @@ object mainform: Tmainform
     BorderSpacing.Right = 7
     BorderSpacing.Bottom = 5
     Caption = 'About ...'
-    TabOrder = 4
+    TabOrder = 3
   end
   object papersizegb: TGroupBox
     AnchorSideLeft.Control = creativecontrolgb
@@ -395,7 +358,7 @@ object mainform: Tmainform
     AnchorSideRight.Side = asrBottom
     Left = 10
     Height = 148
-    Top = 301
+    Top = 237
     Width = 294
     Anchors = [akTop, akLeft, akRight]
     AutoSize = True
@@ -403,7 +366,7 @@ object mainform: Tmainform
     Caption = 'Paper size'
     ClientHeight = 128
     ClientWidth = 290
-    TabOrder = 5
+    TabOrder = 4
     object offsetxse: TSpinEdit
       AnchorSideLeft.Control = widthse
       AnchorSideTop.Control = heightse
@@ -613,17 +576,6 @@ object mainform: Tmainform
   end
   object opendialog: TOpenDialog
     left = 336
-    top = 16
-  end
-  object tpc: TLTCPComponent
-    Port = 0
-    OnReceive = tpcReceive
-    OnError = tpcError
-    OnDisconnect = tpcDisconnect
-    OnConnect = tpcConnect
-    Timeout = 0
-    ReuseAddress = False
-    left = 400
     top = 16
   end
 end
