@@ -102,8 +102,7 @@ type
   private
     ini:   tinifile;
     image: tbitmap;
-    list1: tstringlist;
-    list2: tstringlist;
+    list: tstringlist;
     procedure onstart;
     procedure onstop;
     procedure ontick;
@@ -113,6 +112,8 @@ type
 var
   mainform: Tmainform;
   x:        longword;
+
+  serverisbusy: boolean;
 
 implementation
 
@@ -133,8 +134,7 @@ begin
   drawingcontrolgb .enabled := false;
   // ---
   image := tbitmap.create;
-  list1 := tstringlist.create;
-  list2 := tstringlist.create;
+  list  := tstringlist.create;
   ini := tinifile.create(changefileext(paramstr(0), '.ini'));
   loadlayout(ini, vplayout);
 
@@ -183,8 +183,7 @@ procedure tmainform.formdestroy(sender: tobject);
 begin
   ini.destroy;
   image.destroy;
-  list1.destroy;
-  list2.destroy;
+  list.destroy;
 end;
 
 procedure tmainform.formclose(sender: tobject; var closeaction: tcloseaction);
@@ -256,7 +255,7 @@ begin
 
   if sender <> nil then
   begin
-    vpcoder         := tvpcoder.create(list1);
+    vpcoder         := tvpcoder.create(list);
     vpcoder.onstart := @onstart;
     vpcoder.onstop  := @onstop;
     vpcoder.ontick  := @ontick;
@@ -284,20 +283,22 @@ begin
   if sender = startbtn then
   begin
     startbtn.enabled := false;
-    pausebtn.enabled := list2.count > 0;
-    stopbtn .enabled := list2.count > 0;
+
   end;
 
 end;
 
 procedure tmainform.tpcconnect(asocket: tlsocket);
 begin
+  serverisbusy   := false;
   conbtn.caption := 'Disconnect';
   manualdrivinggb.enabled := true;
+
 end;
 
 procedure tmainform.tpcdisconnect(asocket: tlsocket);
 begin
+  serverisbusy   := false;
   conbtn.caption := 'Connect';
   manualdrivinggb.enabled := false;
 end;
@@ -313,9 +314,8 @@ procedure tmainform.loadbtnclick(sender: tobject);
 begin
   if opendialog.execute then
   begin
-    list2.clear;
-    list1.clear;
-    list1.loadfromfile(opendialog.filename);
+    list.clear;
+    list.loadfromfile(opendialog.filename);
     reloadbtnclick(loadbtn)
   end;
 end;
@@ -340,35 +340,20 @@ end;
 
 procedure tmainform.tpcreceive(asocket: tlsocket);
 var
-  s: string;
+  i: longint;
 begin
 
-
-  if tpc.getmessage(s) > 0 then
+  if tpc.get(i, sizeof(longint)) = sizeof(longint) then
   begin
-    showmessage(s);
+    if i = 4 * sizeof(longint) then serverisbusy := false;
 
-
-
-
+    showmessage(inttostr(i));
   end;
 
-
-
-  //  if list2.count > 0 then
-  //     if tpc.sendmessage(list2[0]) = length(list2[0]) then
-  //    begin
-  //      list2.delete(0);
-  //    end;
-
-  pausebtn.enabled := list2.count > 0;
-  stopbtn .enabled := list2.count > 0;
 end;
 
 procedure tmainform.onstart;
 begin
-  list2.clear;
-
   creativecontrolgb.enabled := false;
   papersizegb      .enabled := false;
   drawingcontrolgb .enabled := false;
@@ -390,8 +375,10 @@ end;
 
 procedure tmainform.ontick;
 var
+  id: longint = 2;
   m0: longint;
   m1: longint;
+  mz: longint;
    p: tvppoint;
 begin
   p.x := ( widthse.value div 2) + offsetxse.value + vpcoder.px;
@@ -404,7 +391,19 @@ begin
   p.x := vpcoder.px + vplayout.point8.x;
   p.y := vpcoder.py + vplayout.point8.y;
   optimize(p, vplayout, m0, m1);
-  list2.append(format('MOVE2 A%u B%u C%u', [m0, m1, round(vpcoder.pz)]));
+  mz := round(vpcoder.pz);
+
+  serverisbusy := true;
+  if tpc.connected then
+  begin
+    tpc.send(id, sizeof(longint));
+    tpc.send(m0, sizeof(longint));
+    tpc.send(m1, sizeof(longint));
+    tpc.send(mz, sizeof(longint));
+  end;
+
+  while serverisbusy do sleep(5);
+
 
   if vpcoder.index mod 10 = 0 then
     caption := format('VPlot Driver - Drawing [%u / %u]',

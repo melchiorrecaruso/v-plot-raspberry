@@ -33,55 +33,41 @@ begin
   writeln('connection accepted from ', asocket.peeraddress);
 end;
 
-procedure parser(const prefix, code: rawbytestring; var value: longint);
-var
-  i: longint;
-  s: rawbytestring = '';
-begin
-  i := pos(prefix, code);
-  if i > 0 then
-  begin
-    while (i < length(code)) and (code[i] <> ' ') do
-    begin
-      s := s + code[i];
-      inc(i);
-    end;
-    for i := 0 to length(prefix) -1 do
-      delete(s, 1, 1);
-  end;
-
-  if length(s) > 0 then
-    value := strtoint(s);
-end;
-
 procedure tvplotserver.onre(asocket: tlsocket);
 var
-  a: longint = 0;
-  b: longint = 0;
-  c: longint = 0;
-  s: string  = '';
+  id: longint;
+  m0: longint;
+  m1: longint;
+  mz: longint;
+  er: longint;
 begin
-  if fcon.getmessage(s, asocket) > 0 then
+  er := fcon.get(id, sizeof(longint), asocket) +
+        fcon.get(m0, sizeof(longint), asocket) +
+        fcon.get(m1, sizeof(longint), asocket) +
+        fcon.get(mz, sizeof(longint), asocket);
+
+  if er = (4 * sizeof(longint)) then
   begin
-    writeln(s);
-
-    if (pos('MOVE4 ', s) = 1) or
-       (pos('MOVE2 ', s) = 1) or
-       (pos('INIT ' , s) = 1) then
+    if id = 0 then
     begin
-      parser('A', s, a);
-      parser('B', s, b);
-      parser('C', s, c);
-
-      if (pos('MOVE4 ', s) = 1) then fdrv.move4(a, b, c) else
-      if (pos('MOVE2 ', s) = 1) then fdrv.move2(a, b, c) else
-      if (pos('INIT ' , s) = 1) then fdrv.init (a, b, c);
+      writeln('INIT');
+      fdrv.init (m0, m1, mz);
+    end else
+    if id = 2 then
+    begin
+      writeln('MOVE2');
+      fdrv.move2(m0, m1, mz);
+    end else
+    if id = 4 then
+    begin
+      writeln('MOVE4');
+      fdrv.move4(m0, m1, mz);
     end;
-
-    fcon.iterreset;
-    while fcon.iternext do
-      a := fcon.sendmessage(inttostr(ffault), fcon.iterator);
   end;
+
+  fcon.iterreset;
+  while fcon.iternext do
+    fcon.send(er, sizeof(longint), fcon.iterator);
 end;
 
 procedure tvplotserver.onds(asocket: tlsocket);
