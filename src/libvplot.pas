@@ -41,16 +41,20 @@ type
   end;
 
   tvplayout = packed record
-    point0:  tvppoint;
-    point1:  tvppoint;
-    point2:  tvppoint;
-    point3:  tvppoint;
-    point4:  tvppoint;
-    point5:  tvppoint;
-    point8:  tvppoint;
-    point9:  tvppoint;
-    ratio:   double;
-    mode:    byte;
+    p00: tvppoint;
+    p01: tvppoint;
+    p02: tvppoint;
+    p03: tvppoint;
+    p04: tvppoint;
+    p05: tvppoint;
+    p08: tvppoint;
+    p09: tvppoint;
+    p10: tvppoint;
+    p11: tvppoint;
+    p12: tvppoint;
+    p13: tvppoint;
+      r: double;
+      m: byte;
   end;
 
   tvpcode = packed record
@@ -134,7 +138,8 @@ procedure loadlayout(ini: tinifile; var layout: tvplayout);
 procedure optimize(const p: tvppoint; const l: tvplayout; var m0, m1: longint); inline;
 
 var
-  vpcoder:  tvpcoder = nil;
+  vpcoder:  tvpcoder  = nil;
+  vpdriver: tvpdriver = nil;
   vplayout: tvplayout;
 
 implementation
@@ -302,37 +307,53 @@ end;
 procedure loadlayout(ini: tinifile; var layout: tvplayout);
 begin
   ini.formatsettings.decimalseparator := '.';
-  layout.ratio    := ini.readfloat  ('VPLOT v1.0', 'R'   ,  -1);
-  layout.mode     := ini.readinteger('VPLOT v1.0', 'MODE',  -1);
-  layout.point0.x := ini.readfloat  ('VPLOT v1.0', 'P00.X', -1);
-  layout.point0.y := ini.readfloat  ('VPLOT v1.0', 'P00.Y', -1);
-  layout.point1.x := ini.readfloat  ('VPLOT v1.0', 'P01.X', -1);
-  layout.point1.y := ini.readfloat  ('VPLOT v1.0', 'P01.Y', -1);
-  layout.point2.x := ini.readfloat  ('VPLOT v1.0', 'P02.X', -1);
-  layout.point2.y := ini.readfloat  ('VPLOT v1.0', 'P02.Y', -1);
-  layout.point3.x := ini.readfloat  ('VPLOT v1.0', 'P03.X', -1);
-  layout.point3.y := ini.readfloat  ('VPLOT v1.0', 'P03.Y', -1);
-  layout.point4.x := ini.readfloat  ('VPLOT v1.0', 'P04.X', -1);
-  layout.point4.y := ini.readfloat  ('VPLOT v1.0', 'P04.Y', -1);
-  layout.point5.x := ini.readfloat  ('VPLOT v1.0', 'P05.X', -1);
-  layout.point5.y := ini.readfloat  ('VPLOT v1.0', 'P05.Y', -1);
-  layout.point8.x := ini.readfloat  ('VPLOT v1.0', 'P08.X', -1);
-  layout.point8.y := ini.readfloat  ('VPLOT v1.0', 'P08.Y', -1);
-  layout.point9.x := ini.readfloat  ('VPLOT v1.0', 'P09.X', -1);
-  layout.point9.y := ini.readfloat  ('VPLOT v1.0', 'P09.Y', -1);
+  layout.r     := ini.readfloat  ('VPLOT v1.0', 'R'   ,  -1);
+  layout.m     := ini.readinteger('VPLOT v1.0', 'MODE',  -1);
+  layout.p00.x := ini.readfloat  ('VPLOT v1.0', 'P00.X', -1);
+  layout.p00.y := ini.readfloat  ('VPLOT v1.0', 'P00.Y', -1);
+  layout.p01.x := ini.readfloat  ('VPLOT v1.0', 'P01.X', -1);
+  layout.p01.y := ini.readfloat  ('VPLOT v1.0', 'P01.Y', -1);
+  layout.p02.x := ini.readfloat  ('VPLOT v1.0', 'P02.X', -1);
+  layout.p02.y := ini.readfloat  ('VPLOT v1.0', 'P02.Y', -1);
+  layout.p03.x := ini.readfloat  ('VPLOT v1.0', 'P03.X', -1);
+  layout.p03.y := ini.readfloat  ('VPLOT v1.0', 'P03.Y', -1);
+  layout.p04.x := ini.readfloat  ('VPLOT v1.0', 'P04.X', -1);
+  layout.p04.y := ini.readfloat  ('VPLOT v1.0', 'P04.Y', -1);
+  layout.p05.x := ini.readfloat  ('VPLOT v1.0', 'P05.X', -1);
+  layout.p05.y := ini.readfloat  ('VPLOT v1.0', 'P05.Y', -1);
+
+  layout.p08.x := ini.readfloat  ('VPLOT v1.0', 'P08.X', -1);
+  layout.p08.y := ini.readfloat  ('VPLOT v1.0', 'P08.Y', -1);
+  layout.p09.x := ini.readfloat  ('VPLOT v1.0', 'P09.X', -1);
+  layout.p09.y := ini.readfloat  ('VPLOT v1.0', 'P09.Y', -1);
+
+  layout.p10.x := ini.readfloat  ('VPLOT v1.0', 'P10.X', -1);
+  layout.p10.y := ini.readfloat  ('VPLOT v1.0', 'P10.Y', -1);
+  layout.p11.x := ini.readfloat  ('VPLOT v1.0', 'P11.X', -1);
+  layout.p11.y := ini.readfloat  ('VPLOT v1.0', 'P11.Y', -1);
+  layout.p12.x := ini.readfloat  ('VPLOT v1.0', 'P12.X', -1);
+  layout.p12.y := ini.readfloat  ('VPLOT v1.0', 'P12.Y', -1);
+  layout.p13.x := ini.readfloat  ('VPLOT v1.0', 'P13.X', -1);
+  layout.p13.y := ini.readfloat  ('VPLOT v1.0', 'P13.Y', -1);
+
   {$ifdef debug}
   writeln('--- VPLOT v1.0 ---');
-  writeln(format('P00.X = %-5.3f  P00.Y = %-5.3f', [layout.point0.x, layout.point0.y]));
-  writeln(format('P01.X = %-5.3f  P01.Y = %-5.3f', [layout.point1.x, layout.point1.y]));
-  writeln(format('P02.X = %-5.3f  P02.Y = %-5.3f', [layout.point2.x, layout.point2.y]));
-  writeln(format('P03.X = %-5.3f  P03.Y = %-5.3f', [layout.point3.x, layout.point3.y]));
-  writeln(format('P04.X = %-5.3f  P04.Y = %-5.3f', [layout.point4.x, layout.point4.y]));
-  writeln(format('P05.X = %-5.3f  P05.Y = %-5.3f', [layout.point5.x, layout.point5.y]));
-  writeln(format('P08.X = %-5.3f  P08.Y = %-5.3f', [layout.point8.x, layout.point8.y]));
-  writeln(format('P09.X = %-5.3f  P09.Y = %-5.3f', [layout.point9.x, layout.point9.y]));
+  writeln(format('P00.X = %-5.3f  P00.Y = %-5.3f', [layout.p00.x, layout.p00.y]));
+  writeln(format('P01.X = %-5.3f  P01.Y = %-5.3f', [layout.p01.x, layout.p01.y]));
+  writeln(format('P02.X = %-5.3f  P02.Y = %-5.3f', [layout.p02.x, layout.p02.y]));
+  writeln(format('P03.X = %-5.3f  P03.Y = %-5.3f', [layout.p03.x, layout.p03.y]));
+  writeln(format('P04.X = %-5.3f  P04.Y = %-5.3f', [layout.p04.x, layout.p04.y]));
+  writeln(format('P05.X = %-5.3f  P05.Y = %-5.3f', [layout.p05.x, layout.p05.y]));
+  writeln(format('P08.X = %-5.3f  P08.Y = %-5.3f', [layout.p08.x, layout.p08.y]));
+  writeln(format('P09.X = %-5.3f  P09.Y = %-5.3f', [layout.p09.x, layout.p09.y]));
 
-  writeln(format('MODE  = %-5.3u', [layout.mode]));
-  writeln(format('R     = %-5.3f', [layout.ratio]));
+  writeln(format('P10.X = %-5.3f  P10.Y = %-5.3f', [layout.p10.x, layout.p10.y]));
+  writeln(format('P11.X = %-5.3f  P11.Y = %-5.3f', [layout.p11.x, layout.p11.y]));
+  writeln(format('P12.X = %-5.3f  P12.Y = %-5.3f', [layout.p12.x, layout.p12.y]));
+  writeln(format('P13.X = %-5.3f  P13.Y = %-5.3f', [layout.p13.x, layout.p13.y]));
+
+  writeln(format('MODE  = %-5.3u', [layout.m]));
+  writeln(format('R     = %-5.3f', [layout.r]));
   {$endif}
 end;
 
@@ -340,49 +361,49 @@ procedure optimize(const p: tvppoint; const l: tvplayout; var m0, m1: longint);
 var
   alpha: double;
   err:   double;
-  tmp0:  tvppoint;
-  tmp1:  tvppoint;
-  tmp2:  tvppoint;
-  tmp3:  tvppoint;
-  tmp4:  tvppoint;
-  tmp5:  tvppoint;
-  tmp6:  tvppoint;
+  tmp00: tvppoint;
+  tmp01: tvppoint;
+  tmp02: tvppoint;
+  tmp03: tvppoint;
+  tmp04: tvppoint;
+  tmp05: tvppoint;
+  tmp06: tvppoint;
 begin
   alpha   := 0;
   repeat
-    tmp0  := l.point0;
-    tmp1  := l.point1;
-    tmp2  := translatepoint(p, rotatepoint(l.point2, alpha));
-    tmp3  := translatepoint(p, rotatepoint(l.point3, alpha));
-    tmp4  := translatepoint(p, rotatepoint(l.point4, alpha));
-    tmp5  := translatepoint(p, rotatepoint(l.point5, alpha));
-    tmp6  := intersectlines(linebetween(tmp0, tmp3),
-                            linebetween(tmp1, tmp4));
+    tmp00  := l.p00;
+    tmp01  := l.p01;
+    tmp02  := translatepoint(p, rotatepoint(l.p02, alpha));
+    tmp03  := translatepoint(p, rotatepoint(l.p03, alpha));
+    tmp04  := translatepoint(p, rotatepoint(l.p04, alpha));
+    tmp05  := translatepoint(p, rotatepoint(l.p05, alpha));
+    tmp06  := intersectlines(linebetween(tmp00, tmp03),
+                             linebetween(tmp01, tmp04));
 
-    err := abs(tmp6.x - tmp5.x);
+    err := abs(tmp06.x - tmp05.x);
     if  err > 0.001 then
     begin
-      if tmp6.x < tmp5.x then
+      if tmp06.x < tmp05.x then
         alpha := alpha - (err / 100)
       else
-      if tmp6.x > tmp5.x then
+      if tmp06.x > tmp05.x then
         alpha := alpha + (err / 100);
     end else
       break;
   until false;
 
-  m0 := round(l.mode * (distancebetween(tmp0, tmp3) / l.ratio));
-  m1 := round(l.mode * (distancebetween(tmp1, tmp4) / l.ratio));
+  m0 := round(l.m * (distancebetween(tmp00, tmp03) / l.r));
+  m1 := round(l.m * (distancebetween(tmp01, tmp04) / l.r));
   {$ifdef debug}
   writeln('--- OPTIMIZE ---');
   writeln(format('alpha = %-5.3f', [radtodeg(alpha)]));
-  writeln(format('P02.X = %-5.3f  P02.Y = %-5.3f', [tmp2.x, tmp2.y]));
-  writeln(format('P03.X = %-5.3f  P03.Y = %-5.3f', [tmp3.x, tmp3.y]));
-  writeln(format('P04.X = %-5.3f  P04.Y = %-5.3f', [tmp4.x, tmp4.y]));
-  writeln(format('P05.X = %-5.3f  P05.Y = %-5.3f', [tmp5.x, tmp5.y]));
-  writeln(format('P06.X = %-5.3f  P06.Y = %-5.3f', [tmp6.x, tmp6.y]));
-  writeln(format('D03   = %-5.3f', [distancebetween(tmp0, tmp3)]));
-  writeln(format('D14   = %-5.3f', [distancebetween(tmp1, tmp4)]));
+  writeln(format('P02.X = %-5.3f  P02.Y = %-5.3f', [tmp02.x, tmp02.y]));
+  writeln(format('P03.X = %-5.3f  P03.Y = %-5.3f', [tmp03.x, tmp03.y]));
+  writeln(format('P04.X = %-5.3f  P04.Y = %-5.3f', [tmp04.x, tmp04.y]));
+  writeln(format('P05.X = %-5.3f  P05.Y = %-5.3f', [tmp05.x, tmp05.y]));
+  writeln(format('P06.X = %-5.3f  P06.Y = %-5.3f', [tmp06.x, tmp06.y]));
+  writeln(format('D03   = %-5.3f', [distancebetween(tmp00, tmp03)]));
+  writeln(format('D14   = %-5.3f', [distancebetween(tmp01, tmp04)]));
   writeln(format('CNT0  = %-5.3u', [m0]));
   writeln(format('CNT1  = %-5.3u', [m1]));
   {$endif}

@@ -34,6 +34,8 @@ type
 
   tmainform = class(tform)
     aboutbtn: TBitBtn;
+    leftedit: TSpinEdit;
+    rightedit: TSpinEdit;
     verticalcb: TCheckBox;
     redrawbtn: TBitBtn;
     formatcb: TComboBox;
@@ -61,8 +63,6 @@ type
     leftupbtn: TBitBtn;
     rightupbtn: TBitBtn;
     gohomebtn: TBitBtn;
-    leftedit: TEdit;
-    rightedit: TEdit;
     manualdrivinggb: TGroupBox;
     drawingcontrolgb: TGroupBox;
     previewimage: TImage;
@@ -95,7 +95,7 @@ type
   private
     ini:   tinifile;
     image: tbitmap;
-    list: tstringlist;
+    list:  tstringlist;
     procedure onstart;
     procedure onstop;
     procedure ontick;
@@ -104,8 +104,6 @@ type
 
 var
   mainform: Tmainform;
-  x:        longword;
-
 
 
 implementation
@@ -115,7 +113,7 @@ implementation
 uses
   math, sysutils;
 
-{ tmainform }
+// form events //
 
 procedure tmainform.formcreate(sender: tobject);
 begin
@@ -126,14 +124,39 @@ begin
   // ---
   image := tbitmap.create;
   list  := tstringlist.create;
-  ini := tinifile.create(changefileext(paramstr(0), '.ini'));
+  ini   := tinifile.create(changefileext(paramstr(0), '.ini'));
   loadlayout(ini, vplayout);
-
-
-
   reloadbtnclick(nil);
 
+  vpdriver := tvpdriver.create(vplayout.m);
 end;
+
+procedure tmainform.formdestroy(sender: tobject);
+var
+  m0: longint;
+  m1: longint;
+begin
+  optimize(vplayout.p09, vplayout, m0, m1);
+  vpdriver.move2(m0, m1, 1);
+  vpdriver.destroy;
+
+  image.destroy;
+  list.destroy;
+  ini.destroy;
+end;
+
+procedure tmainform.formclose(sender: tobject; var closeaction: tcloseaction);
+begin
+  if assigned(vpcoder) then
+    playorstopbtnclick(stopbtn);
+
+  if assigned(vpcoder) then
+    closeaction := canone
+  else
+    closeaction := cafree;
+end;
+
+//
 
 procedure tmainform.formatcbchange(sender: tobject);
 begin
@@ -157,55 +180,86 @@ begin
 end;
 
 
+// manual driving //
 
-procedure tmainform.bordersbtnclick(sender: tobject);
+procedure tmainform.leftupbtnclick(Sender: TObject);
 begin
-   // tpc.sendmessage('bordersbtnclick');
-end;
-
-procedure tmainform.formdestroy(sender: tobject);
-begin
-  ini.destroy;
-  image.destroy;
-  list.destroy;
-
-end;
-
-procedure tmainform.formclose(sender: tobject; var closeaction: tcloseaction);
-begin
-  if assigned(vpcoder) then
-    playorstopbtnclick(stopbtn);
-
-  if assigned(vpcoder) then
-    closeaction := canone
-  else
-    closeaction := cafree;
-end;
-
-procedure tmainform.gohomebtnclick(sender: tobject);
-begin
-
+  vpdriver.move4(+leftedit.value, 0, 0);
 end;
 
 procedure tmainform.leftdownbtnclick(sender: tobject);
 begin
-
-end;
-
-procedure tmainform.leftupbtnclick(Sender: TObject);
-begin
-
+  vpdriver.move4(-leftedit.value, 0, 0);
 end;
 
 procedure tmainform.pendownbtnclick(Sender: TObject);
 begin
-
+  vpdriver.move4(0, 0, -1);
 end;
 
 procedure tmainform.penupbtnclick(sender: tobject);
 begin
-
+  vpdriver.move4(0, 0, +1);
 end;
+
+procedure tmainform.rightupbtnclick(sender: tobject);
+begin
+  vpdriver.move4(+rightedit.value, 0, 0);
+end;
+
+procedure tmainform.rightdownbtnclick(sender: tobject);
+begin
+  vpdriver.move4(-rightedit.value, 0, 0);
+end;
+
+procedure tmainform.sethomebtnclick(sender: tobject);
+var
+  m0: longint;
+  m1: longint;
+begin
+  optimize(vplayout.p09, vplayout, m0, m1);
+  vpdriver.init(m0, m1, 1);
+end;
+
+procedure tmainform.bordersbtnclick(sender: tobject);
+var
+  m0: longint;
+  m1: longint;
+begin
+  optimize(vplayout.p10, vplayout, m0, m1);
+  vpdriver.move2(m0, m1, 1);
+  optimize(vplayout.p11, vplayout, m0, m1);
+  vpdriver.move2(m0, m1, 1);
+  optimize(vplayout.p12, vplayout, m0, m1);
+  vpdriver.move2(m0, m1, 1);
+  optimize(vplayout.p13, vplayout, m0, m1);
+  vpdriver.move2(m0, m1, 1);
+  optimize(vplayout.p10, vplayout, m0, m1);
+  vpdriver.move2(m0, m1, 1);
+  optimize(vplayout.p09, vplayout, m0, m1);
+  vpdriver.move2(m0, m1, 1);
+end;
+
+procedure tmainform.gohomebtnclick(sender: tobject);
+var
+  m0: longint;
+  m1: longint;
+begin
+  optimize(vplayout.p09, vplayout, m0, m1);
+  vpdriver.move2(m0, m1, 1);
+end;
+
+//
+
+
+
+
+
+
+
+
+
+
 
 procedure tmainform.reloadbtnclick(sender: tobject);
 begin
@@ -245,22 +299,20 @@ begin
     vpcoder.ontick  := @ontick;
     vpcoder.start;
   end;
-end;
 
-procedure tmainform.rightdownbtnclick(sender: tobject);
-begin
 
-end;
+  // drawingcontrolgb.enabled := sender = startbtn;
 
-procedure tmainform.rightupbtnclick(sender: tobject);
-begin
 
-end;
 
-procedure tmainform.sethomebtnclick(sender: tobject);
-begin
+
+
 
 end;
+
+
+
+
 
 procedure tmainform.startbtnclick(sender: tobject);
 begin
@@ -323,7 +375,6 @@ end;
 procedure tmainform.ontick;
 var
    p: tvppoint;
-   x: longint;
   m0: longint;
   m1: longint;
 begin
@@ -334,11 +385,14 @@ begin
   else
     image.canvas.pixels[round(p.x), round(p.y)] := clred;
 
-  p.x := vpcoder.px + vplayout.point8.x;
-  p.y := vpcoder.py + vplayout.point8.y;
-  optimize(p, vplayout, m0, m1);
 
-  // poltdriver
+  if drawingcontrolgb.enabled then
+  begin
+    p.x := vpcoder.px + vplayout.p08.x;
+    p.y := vpcoder.py + vplayout.p08.y;
+    optimize(p, vplayout, m0, m1);
+    vpdriver.move2(m0, m1, round(vpcoder.pz));
+  end;
 
   if vpcoder.index mod 10 = 0 then
     caption := format('VPlot Driver - Drawing [%u / %u]',

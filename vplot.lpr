@@ -23,8 +23,7 @@ program vplot;
 {$mode objfpc}{$H+}
 
 uses
-  {$ifdef unix} cthreads, {$endif} interfaces, forms, mainfrm,
-  initfrm;
+  {$ifdef unix} cthreads, {$endif} interfaces, forms, mainfrm;
 
 {$R *.res}
 
@@ -34,7 +33,6 @@ begin
   application.scaled:=true;
   application.initialize;
   application.createform(tmainform, mainform);
-  application.createform(tinitform, initform);
   application.run;
 end.
 
