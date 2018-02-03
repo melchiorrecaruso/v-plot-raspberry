@@ -11,7 +11,7 @@ type
   tvplotserver = class
   private
     fcon:   tltcp;
-    fdrv:   tvplotdriver;
+    fdrv:   tvpdriver;
     ffault: longint;
     procedure oner(const msg: string; asocket: tlsocket);
     procedure onac(asocket: tlsocket);
@@ -63,12 +63,11 @@ var
 begin
   if asocket.getmessage(s) > 0 then
   begin
-    writeln(s);
+    // writeln(s);
 
     a := -1;
     b := -1;
     c := -1;
-    d := -1;
     if (pos('MOVE4 ', s) = 1) or
        (pos('MOVE2 ', s) = 1) or
        (pos('INIT ' , s) = 1) then
@@ -79,8 +78,7 @@ begin
 
       if (a = -1) or
          (b = -1) or
-         (c = -1) or
-        ffault := -1;
+         (c = -1) then ffault := -1;
 
       if ffault = 0 then
       begin
@@ -99,14 +97,6 @@ begin
       else
         fdrv.delayms := a;
     end else
-    if pos('ENABLED ',  s) = 1 then
-    begin
-      parser('A', s, a);
-      if (a = -1) then
-        ffault := -1
-      else
-        fdrv.enabled := boolean(a);
-    end else
       ffault := -1;
 
     //fcon.iterreset;
@@ -122,7 +112,7 @@ end;
 
 constructor tvplotserver.create;
 begin
-  fdrv := tvplotdriver.create(2);
+  fdrv := tvpdriver.create(2);
   fcon := tltcp.create(nil);
   fcon.onerror      := @oner;
   fcon.onreceive    := @onre;

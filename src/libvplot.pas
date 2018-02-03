@@ -684,24 +684,24 @@ end;
 procedure  tvpdriver.init(cnt0, cnt1, cntz: longint);
 begin
   {$ifdef cpuarm}
-  fcount0  := cnt0;
-  fcount1  := cnt1;
-  fcountz  := cntz;
+  fcnt0  := cnt0;
+  fcnt1  := cnt1;
+  fcntz  := cntz;
   {$endif}
 end;
 
 procedure tvpdriver.move2(cnt0, cnt1, cntz: longint);
 begin
   {$ifdef cpuarm}
-  move4(cnt0 - fcount0, cnt1 - fcount1, cntz - fcountz);
+  move4(cnt0 - fcnt0, cnt1 - fcnt1, cntz - fcntz);
   {$endif}
 end;
 
 procedure tvpdriver.largedisplacements(cnt0, cnt1: longint);
 begin
   {$ifdef cpuarm}
-  inc(fcount0, cnt0);
-  inc(fcount1, cnt1);
+  inc(fcnt0, cnt0);
+  inc(fcnt1, cnt1);
 
   if cnt0 > 0 then
     digitalwrite(mot0_dir, HIGH)
@@ -739,8 +739,8 @@ var
 {$endif}
 begin
   {$ifdef cpuarm}
-  inc(fcount0, cnt0);
-  inc(fcount1, cnt1);
+  inc(fcnt0, cnt0);
+  inc(fcnt1, cnt1);
 
   if cnt0 > 0 then
     digitalwrite(mot0_dir, HIGH)
@@ -775,16 +775,15 @@ end;
 procedure tvpdriver.move4(cnt0, cnt1, cntz: longint);
 begin
   {$ifdef cpuarm}
-  if not enabled  then exit;
   if ffault  = -1 then exit;
   // move pwm motz
   if cntz <> 0 then
   begin
-    fcountz := min(1, max(-1, fcountz + cntz));
-    if fcountz < 0 then
+    fcntz := min(1, max(-1, fcntz + cntz));
+    if fcntz < 0 then
       pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq))
     else
-    if fcountz > 0 then
+    if fcntz > 0 then
       pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_minvalue, motz_freq))
     else
       pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
