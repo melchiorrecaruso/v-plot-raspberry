@@ -136,9 +136,9 @@ var
   m0: longint;
   m1: longint;
 begin
-  optimize(vplayout.p09, vplayout, m0, m1);
-  vpdriver.move2(m0, m1, 1);
-  vpdriver.destroy;
+  //optimize(vplayout.p09, vplayout, m0, m1);
+  //vpdriver.move2(m0, m1, 1);
+  //vpdriver.destroy;
 
   image.destroy;
   list.destroy;

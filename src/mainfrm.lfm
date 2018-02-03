@@ -6,7 +6,6 @@ object mainform: Tmainform
   Caption = 'VPlot Driver'
   ClientHeight = 681
   ClientWidth = 885
-  Color = clWindow
   Constraints.MinHeight = 450
   Constraints.MinWidth = 450
   OnClose = FormClose
