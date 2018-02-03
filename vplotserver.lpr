@@ -56,18 +56,15 @@ end;
 
 procedure tvplotserver.onre(asocket: tlsocket);
 var
-  a: longint;
-  b: longint;
-  c: longint;
-  s: string;
+  a: longint = 0;
+  b: longint = 0;
+  c: longint = 0;
+  s: string  = '';
 begin
-  if asocket.getmessage(s) > 0 then
+  if fcon.getmessage(s, asocket) > 0 then
   begin
     writeln(s);
 
-    a := -1;
-    b := -1;
-    c := -1;
     if (pos('MOVE4 ', s) = 1) or
        (pos('MOVE2 ', s) = 1) or
        (pos('INIT ' , s) = 1) then
@@ -76,20 +73,10 @@ begin
       parser('B', s, b);
       parser('C', s, c);
 
-      if (a = -1) or
-         (b = -1) or
-         (c = -1) then ffault := -1;
-
-      if ffault = 0 then
-      begin
-        if (pos('MOVE4 ', s) = 1) then fdrv.move4(a, b, c) else
-        if (pos('MOVE2 ', s) = 1) then fdrv.move2(a, b, c) else
-        if (pos('INIT ' , s) = 1) then fdrv.init (a, b, c);
-        ffault := fdrv.fault;
-      end
-
-    end else
-      ffault := -1;
+      if (pos('MOVE4 ', s) = 1) then fdrv.move4(a, b, c) else
+      if (pos('MOVE2 ', s) = 1) then fdrv.move2(a, b, c) else
+      if (pos('INIT ' , s) = 1) then fdrv.init (a, b, c);
+    end;
 
     fcon.iterreset;
     while fcon.iternext do
