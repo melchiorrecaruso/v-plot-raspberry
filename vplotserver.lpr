@@ -63,7 +63,7 @@ var
 begin
   if asocket.getmessage(s) > 0 then
   begin
-    // writeln(s);
+    writeln(s);
 
     a := -1;
     b := -1;
@@ -89,19 +89,11 @@ begin
       end
 
     end else
-    if pos('DELAY ',  s) = 1 then
-    begin
-      parser('A', s, a);
-      if (a = -1) then
-        ffault := -1
-      else
-        fdrv.delayms := a;
-    end else
       ffault := -1;
 
-    //fcon.iterreset;
-    //while fcon.iternext do
-    //  a := fcon.sendmessage(inttostr(ffault), fcon.iterator);
+    fcon.iterreset;
+    while fcon.iternext do
+      a := fcon.sendmessage(inttostr(ffault), fcon.iterator);
   end;
 end;
 

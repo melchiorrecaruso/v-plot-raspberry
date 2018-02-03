@@ -621,7 +621,6 @@ object mainform: Tmainform
     OnError = tpcError
     OnDisconnect = tpcDisconnect
     OnConnect = tpcConnect
-    OnCanSend = tpcCanSend
     Timeout = 0
     ReuseAddress = False
     left = 400

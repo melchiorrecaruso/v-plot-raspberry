@@ -88,7 +88,7 @@ type
     procedure rightupbtnclick(sender: tobject);
     procedure sethomebtnclick(sender: tobject);
     procedure startbtnclick(sender: tobject);
-    procedure tpcCanSend(aSocket: TLSocket);
+
     procedure tpcconnect(asocket: tlsocket);
     procedure tpcdisconnect(asocket: tlsocket);
     procedure tpcerror(const msg: string; asocket: tlsocket);
@@ -139,6 +139,7 @@ begin
   loadlayout(ini, vplayout);
 
   reloadbtnclick(nil);
+  conbtnclick(nil);
 end;
 
 procedure tmainform.conbtnclick(sender: tobject);
@@ -289,51 +290,16 @@ begin
 
 end;
 
-procedure tmainform.tpccansend(asocket: tlsocket);
-begin
-  if stopbtn.enabled then
-    if list2.count > 0 then
-      if tpc.sendmessage(list2[0]) = length(list2[0]) then
-      begin
-        list2.delete(0);
-      end;
-
-  pausebtn.enabled := list2.count > 0;
-  stopbtn .enabled := list2.count > 0;
-end;
-
 procedure tmainform.tpcconnect(asocket: tlsocket);
 begin
-  conbtn      .caption := 'Disconnect';
-  conbtn      .enabled := true;
-  leftupbtn   .enabled := true;
-  penupbtn    .enabled := true;
-  rightupbtn  .enabled := true;
-  leftedit    .enabled := true;
-  sethomebtn  .enabled := true;
-  rightedit   .enabled := true;
-  leftdownbtn .enabled := true;
-  pendownbtn  .enabled := true;
-  rightdownbtn.enabled := true;
-  bordersbtn  .enabled := true;
-  gohomebtn   .enabled := true;
+  conbtn.caption := 'Disconnect';
+  manualdrivinggb.enabled := true;
 end;
 
 procedure tmainform.tpcdisconnect(asocket: tlsocket);
 begin
-  conbtn      .caption := 'Connect';
-  conbtn      .enabled := true;
-  leftupbtn   .enabled := false;
-  penupbtn    .enabled := false;
-  rightupbtn  .enabled := false;
-  leftedit    .enabled := false;
-  sethomebtn  .enabled := false;
-  rightedit   .enabled := false;
-  leftdownbtn .enabled := false;
-  pendownbtn  .enabled := false;
-  rightdownbtn.enabled := false;
-  bordersbtn  .enabled := false;
-  gohomebtn   .enabled := false;
+  conbtn.caption := 'Connect';
+  manualdrivinggb.enabled := false;
 end;
 
 procedure tmainform.tpcerror(const msg: string; asocket: tlsocket);
@@ -372,9 +338,31 @@ begin
   end;
 end;
 
-procedure tmainform.tpcReceive(aSocket: TLSocket);
+procedure tmainform.tpcreceive(asocket: tlsocket);
+var
+  s: string;
 begin
 
+
+  if tpc.getmessage(s) > 0 then
+  begin
+    showmessage(s);
+
+
+
+
+  end;
+
+
+
+  //  if list2.count > 0 then
+  //     if tpc.sendmessage(list2[0]) = length(list2[0]) then
+  //    begin
+  //      list2.delete(0);
+  //    end;
+
+  pausebtn.enabled := list2.count > 0;
+  stopbtn .enabled := list2.count > 0;
 end;
 
 procedure tmainform.onstart;
