@@ -50,9 +50,9 @@
       </Unit1>
       <Unit2>
         <Filename Value="src/libvplot.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="260"/>
-        <CursorPos X="38" Y="813"/>
+        <CursorPos X="3" Y="24"/>
         <FoldState Value=" TCVK33 T7j8DY T3lD0F7 piYjO080261251x"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -378,9 +378,8 @@
         <ComponentName Value="mainform"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="301"/>
+        <TopLine Value="260"/>
         <CursorPos X="37" Y="331"/>
         <FoldState Value=" T3lA038A"/>
         <UsageCount Value="103"/>
