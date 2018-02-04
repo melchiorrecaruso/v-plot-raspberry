@@ -30,7 +30,6 @@ uses
 begin
   requirederivedformresource := true;
   application.title := 'VPlot Driver';
-  application.scaled:=true;
   application.initialize;
   application.createform(tmainform, mainform);
   application.run;

@@ -34,6 +34,7 @@ type
 
   tmainform = class(tform)
     aboutbtn: TBitBtn;
+    aboutgb: TGroupBox;
     leftedit: TSpinEdit;
     rightedit: TSpinEdit;
     verticalcb: TCheckBox;
@@ -51,7 +52,6 @@ type
     heightse: TSpinEdit;
     widthse: TSpinEdit;
     startbtn: TBitBtn;
-    pausebtn: TBitBtn;
     stopbtn: TBitBtn;
     creativecontrolgb: TGroupBox;
     sethomebtn: TBitBtn;
@@ -84,7 +84,7 @@ type
     procedure rightdownbtnclick(sender: tobject);
     procedure rightupbtnclick(sender: tobject);
     procedure sethomebtnclick(sender: tobject);
-    procedure startbtnclick(sender: tobject);
+
 
 
 
@@ -122,27 +122,25 @@ begin
   papersizegb      .enabled := false;
   drawingcontrolgb .enabled := false;
   // ---
+
   image := tbitmap.create;
   list  := tstringlist.create;
   ini   := tinifile.create(changefileext(paramstr(0), '.ini'));
-  loadlayout(ini, vplayout);
-  reloadbtnclick(nil);
 
+  loadlayout(ini, vplayout);
   vpdriver := tvpdriver.create(vplayout.m);
+
+  sethomebtnclick(nil);
+  reloadbtnclick (nil);
 end;
 
 procedure tmainform.formdestroy(sender: tobject);
-var
-  m0: longint;
-  m1: longint;
 begin
-  //optimize(vplayout.p09, vplayout, m0, m1);
-  //vpdriver.move2(m0, m1, 1);
-  //vpdriver.destroy;
+  vpdriver.destroy;
 
-  image.destroy;
-  list.destroy;
   ini.destroy;
+  list.destroy;
+  image.destroy;
 end;
 
 procedure tmainform.formclose(sender: tobject; var closeaction: tcloseaction);
@@ -249,17 +247,17 @@ begin
   vpdriver.move2(m0, m1, 1);
 end;
 
-//
+// ---
 
-
-
-
-
-
-
-
-
-
+procedure tmainform.loadbtnclick(sender: tobject);
+begin
+  if opendialog.execute then
+  begin
+    list.clear;
+    list.loadfromfile(opendialog.filename);
+    reloadbtnclick(sender);
+  end;
+end;
 
 procedure tmainform.reloadbtnclick(sender: tobject);
 begin
@@ -290,43 +288,16 @@ begin
   previewimage.stretchinenabled  := true;
   previewimage.stretchoutenabled := false;
   previewimage.stretch           := true;
-
+  // ---
+  vpdriver.enabled := sender = startbtn;
   if sender <> nil then
   begin
     vpcoder         := tvpcoder.create(list);
     vpcoder.onstart := @onstart;
     vpcoder.onstop  := @onstop;
     vpcoder.ontick  := @ontick;
+    vpcoder.enabled := true;
     vpcoder.start;
-  end;
-
-
-  // drawingcontrolgb.enabled := sender = startbtn;
-
-
-
-
-
-
-end;
-
-
-
-
-
-procedure tmainform.startbtnclick(sender: tobject);
-begin
-
-end;
-
-
-procedure tmainform.loadbtnclick(sender: tobject);
-begin
-  if opendialog.execute then
-  begin
-    list.clear;
-    list.loadfromfile(opendialog.filename);
-    reloadbtnclick(loadbtn)
   end;
 end;
 
@@ -334,16 +305,29 @@ procedure tmainform.playorstopbtnclick(sender: tobject);
 begin
   if assigned(vpcoder) then
   begin
+
     if sender = stopbtn then
     begin
       vpcoder.terminate;
+      vpcoder.enabled := true;
+    end else
+    if sender = startbtn then
+    begin
+      vpcoder.enabled := not vpcoder.enabled;
+      if vpcoder.enabled then
+        startbtn.caption := 'Pause'
+      else
+        startbtn.caption := 'Play';
     end;
 
+  end else
+  begin
 
-    //startbtn .enabled := not vplotcoder.enabled;
-    //pausebtn.enabled :=     vplotcoder.enabled;
-    //stopbtn .enabled :=     vplotcoder.enabled;
-    //aboutbtn .enabled := false;
+    if sender = startbtn then
+    begin
+      reloadbtnclick(startbtn);
+
+    end;
 
   end;
 end;
@@ -351,25 +335,26 @@ end;
 
 procedure tmainform.onstart;
 begin
+  startbtn.caption          := 'Pause';
   manualdrivinggb  .enabled := false;
   creativecontrolgb.enabled := false;
   papersizegb      .enabled := false;
-  drawingcontrolgb .enabled := false;
+  drawingcontrolgb .enabled := true;
+  application.processmessages;
 end;
 
 procedure tmainform.onstop;
 begin
   caption := 'VPlot Driver';
-  previewimage.canvas.copyrect(
-    previewimage.canvas.cliprect,
-    image.canvas,
-    image.canvas.cliprect);
-  previewimage.invalidate;
+  previewimage.canvas.draw(0,0, image);
 
+
+  startbtn.caption          := 'Play';
   manualdrivinggb  .enabled := true;
   creativecontrolgb.enabled := true;
   papersizegb      .enabled := true;
   drawingcontrolgb .enabled := true;
+  application.processmessages;
 end;
 
 procedure tmainform.ontick;
@@ -385,16 +370,12 @@ begin
   else
     image.canvas.pixels[round(p.x), round(p.y)] := clred;
 
+  p.x := vpcoder.px + vplayout.p08.x;
+  p.y := vpcoder.py + vplayout.p08.y;
+  optimize(p, vplayout, m0, m1);
+  vpdriver.move2(m0, m1, round(vpcoder.pz));
 
-  if drawingcontrolgb.enabled then
-  begin
-    p.x := vpcoder.px + vplayout.p08.x;
-    p.y := vpcoder.py + vplayout.p08.y;
-    optimize(p, vplayout, m0, m1);
-    vpdriver.move2(m0, m1, round(vpcoder.pz));
-  end;
-
-  if vpcoder.index mod 10 = 0 then
+  if vpcoder.index mod 20 = 0 then
     caption := format('VPlot Driver - Drawing [%u / %u]',
       [vpcoder.index, vpcoder.count]);
   application.processmessages;

@@ -231,14 +231,14 @@ object mainform: Tmainform
     AnchorSideRight.Control = manualdrivinggb
     AnchorSideRight.Side = asrBottom
     Left = 10
-    Height = 135
+    Height = 100
     Top = 449
     Width = 292
     Anchors = [akTop, akLeft, akRight]
     AutoSize = True
     BorderSpacing.Top = 5
     Caption = 'Drawing Control'
-    ClientHeight = 116
+    ClientHeight = 81
     ClientWidth = 290
     TabOrder = 1
     object startbtn: TBitBtn
@@ -254,11 +254,11 @@ object mainform: Tmainform
       BorderSpacing.Left = 5
       BorderSpacing.Top = 6
       BorderSpacing.Right = 5
-      Caption = 'Start'
-      OnClick = startbtnClick
+      Caption = 'Play'
+      OnClick = playorstopbtnclick
       TabOrder = 0
     end
-    object pausebtn: TBitBtn
+    object stopbtn: TBitBtn
       AnchorSideLeft.Control = startbtn
       AnchorSideTop.Control = startbtn
       AnchorSideTop.Side = asrBottom
@@ -270,26 +270,10 @@ object mainform: Tmainform
       Width = 280
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Top = 5
-      Caption = 'Pause'
-      OnClick = startbtnClick
-      TabOrder = 1
-    end
-    object stopbtn: TBitBtn
-      AnchorSideLeft.Control = startbtn
-      AnchorSideTop.Control = pausebtn
-      AnchorSideTop.Side = asrBottom
-      AnchorSideRight.Control = startbtn
-      AnchorSideRight.Side = asrBottom
-      Left = 5
-      Height = 30
-      Top = 76
-      Width = 280
-      Anchors = [akTop, akLeft, akRight]
-      BorderSpacing.Top = 5
       BorderSpacing.Bottom = 10
       Caption = 'Stop'
-      OnClick = startbtnClick
-      TabOrder = 2
+      OnClick = playorstopbtnclick
+      TabOrder = 1
     end
   end
   object creativecontrolgb: TGroupBox
@@ -328,26 +312,6 @@ object mainform: Tmainform
       TabOrder = 0
     end
   end
-  object aboutbtn: TBitBtn
-    AnchorSideLeft.Control = drawingcontrolgb
-    AnchorSideTop.Control = drawingcontrolgb
-    AnchorSideTop.Side = asrBottom
-    AnchorSideRight.Control = drawingcontrolgb
-    AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = Owner
-    AnchorSideBottom.Side = asrBottom
-    Left = 17
-    Height = 30
-    Top = 589
-    Width = 278
-    Anchors = [akTop, akLeft, akRight]
-    BorderSpacing.Left = 7
-    BorderSpacing.Top = 5
-    BorderSpacing.Right = 7
-    BorderSpacing.Bottom = 5
-    Caption = 'About ...'
-    TabOrder = 3
-  end
   object papersizegb: TGroupBox
     AnchorSideLeft.Control = creativecontrolgb
     AnchorSideTop.Control = creativecontrolgb
@@ -364,7 +328,7 @@ object mainform: Tmainform
     Caption = 'Paper size'
     ClientHeight = 150
     ClientWidth = 290
-    TabOrder = 4
+    TabOrder = 3
     object offsetxse: TSpinEdit
       AnchorSideLeft.Control = widthse
       AnchorSideTop.Control = heightse
@@ -570,6 +534,42 @@ object mainform: Tmainform
       Caption = 'Vertical'
       OnEditingDone = verticalcbEditingDone
       TabOrder = 6
+    end
+  end
+  object aboutgb: TGroupBox
+    AnchorSideLeft.Control = drawingcontrolgb
+    AnchorSideTop.Control = drawingcontrolgb
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = drawingcontrolgb
+    AnchorSideRight.Side = asrBottom
+    Left = 10
+    Height = 65
+    Top = 554
+    Width = 292
+    Anchors = [akTop, akLeft, akRight]
+    AutoSize = True
+    BorderSpacing.Top = 5
+    Caption = 'About'
+    ClientHeight = 46
+    ClientWidth = 290
+    TabOrder = 4
+    object aboutbtn: TBitBtn
+      AnchorSideLeft.Control = aboutgb
+      AnchorSideTop.Control = aboutgb
+      AnchorSideRight.Control = aboutgb
+      AnchorSideRight.Side = asrBottom
+      AnchorSideBottom.Side = asrBottom
+      Left = 5
+      Height = 30
+      Top = 6
+      Width = 280
+      Anchors = [akTop, akLeft, akRight]
+      BorderSpacing.Left = 5
+      BorderSpacing.Top = 6
+      BorderSpacing.Right = 5
+      BorderSpacing.Bottom = 10
+      Caption = 'About ...'
+      TabOrder = 0
     end
   end
   object opendialog: TOpenDialog

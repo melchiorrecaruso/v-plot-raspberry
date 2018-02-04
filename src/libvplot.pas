@@ -1,6 +1,6 @@
 { Description: vPlot library.
 
-  Copyright (C) 2014-2017 Melchiorre Caruso <melchiorrecaruso@gmail.com>
+  Copyright (C) 2014-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
   This source is free software; you can redistribute it and/or modify it under
   the terms of the GNU General Public License as published by the Free
@@ -21,7 +21,7 @@
 unit libvplot;
 
 {$mode objfpc}{$H+}
-{*$define debug}
+{$define debug}
 
 interface
 
@@ -76,6 +76,7 @@ type
     fcnt1:  longint;
     fcntz:  longint;
     fdelayms: longword;
+    fenabled: boolean;
     ffault:   longint;
     procedure largedisplacements(cnt0, cnt1: longint);
     procedure smalldisplacements(cnt0, cnt1: longint);
@@ -87,6 +88,7 @@ type
     procedure   move4(cnt0, cnt1, cntz: longint);
   published
     property delayms: longword read fdelayms write fdelayms;
+    property enabled: boolean  read fenabled write fenabled;
     property fault:   longint  read ffault;
   end;
 
@@ -101,6 +103,7 @@ type
     fonstart: tthreadmethod;
     fonstop:  tthreadmethod;
     fontick:  tthreadmethod;
+    fenabled: boolean;
     function getcount: longint;
     function getitem(index: longint): rawbytestring;
     procedure interpolateline(const p0, p1: tvppoint);
@@ -122,6 +125,7 @@ type
     property onstart: tthreadmethod read fonstart write fonstart;
     property onstop:  tthreadmethod read fonstop  write fonstop;
     property ontick:  tthreadmethod read fontick  write fontick;
+    property enabled: boolean       read fenabled write fenabled;
   end;
 
 
@@ -132,9 +136,8 @@ function  linebetween(const p0, p1: tvppoint): tvpline; inline;
 function  lineangle(var line: tvpline): double; inline;
 function  intersectlines(const l0, l1: tvpline): tvppoint; inline;
 
-
-
 procedure loadlayout(ini: tinifile; var layout: tvplayout);
+
 procedure optimize(const p: tvppoint; const l: tvplayout; var m0, m1: longint); inline;
 
 var
@@ -177,8 +180,6 @@ const
     (0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0),  //  9
     (1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1)); // 10
 {$endif}
-
-
 
 //  gcode parser //
 
@@ -357,6 +358,8 @@ begin
   {$endif}
 end;
 
+// ---
+
 procedure optimize(const p: tvppoint; const l: tvplayout; var m0, m1: longint);
 var
   alpha: double;
@@ -413,8 +416,8 @@ end;
 
 constructor tvpcoder.create(list: tstringlist);
 begin
-  findex := 0;
-  fitems := list;
+  fenabled := false;
+  fitems   := list;
   freeonterminate := true;
   inherited create(true);
 end;
@@ -580,21 +583,27 @@ begin
   {$endif}
   // ---
   findex := 0;
-  if assigned(fonstart) then fonstart;
+  if assigned(fonstart) then
+    synchronize(fonstart);
+
   while (findex < fitems.count) and (not terminated) do
-  begin
-    parse_line(fitems[findex], code);
-    if (code.c ='G00 ') or (code.c ='G01 ') or
-       (code.c ='G02 ') or (code.c ='G03 ') then
+    if fenabled then
     begin
-      codeoff   := code;
-      codeoff.x := codeoff.x + offsetx;
-      codeoff.y := codeoff.y + offsety;
-      encode(codeoff);
-    end;
-    inc(findex);
-  end;
-  if assigned(fonstop) then fonstop;
+      parse_line(fitems[findex], code);
+      if (code.c ='G00 ') or (code.c ='G01 ') or
+         (code.c ='G02 ') or (code.c ='G03 ') then
+      begin
+        codeoff   := code;
+        codeoff.x := codeoff.x + offsetx;
+        codeoff.y := codeoff.y + offsety;
+        encode(codeoff);
+      end;
+      inc(findex);
+    end else
+      sleep(250);
+
+  if assigned(fonstop) then
+    synchronize(fonstop);
 end;
 
 function tvpcoder.getitem(index: longint): rawbytestring;
@@ -695,10 +704,12 @@ begin
   ffault   := -1;
   {$endif}
   fdelayms := 1000;
+  fenabled := false;
 end;
 
 destructor tvpdriver.destroy;
 begin
+  vpdriver := nil;
   inherited destroy;
 end;
 
@@ -796,6 +807,7 @@ end;
 procedure tvpdriver.move4(cnt0, cnt1, cntz: longint);
 begin
   {$ifdef cpuarm}
+  if not fenabled then exit;
   if ffault  = -1 then exit;
   // move pwm motz
   if cntz <> 0 then
@@ -821,9 +833,9 @@ begin
       largedisplacements(cnt0, cnt1);
   end;
   {$ifdef debug}
-  writeln('fcountz = ', fcountz);
-  writeln('fcount1 = ', fcount0);
-  writeln('fcount1 = ', fcount1);
+  writeln('fcount0 = ', fcnt0);
+  writeln('fcount1 = ', fcnt1);
+  writeln('fcountz = ', fcntz);
   {$endif}
   {$endif}
 end;
