@@ -146,12 +146,14 @@ end;
 procedure tmainform.formclose(sender: tobject; var closeaction: tcloseaction);
 begin
   if assigned(vpcoder) then
+  begin
     playorstopbtnclick(stopbtn);
-
-  if assigned(vpcoder) then
-    closeaction := canone
-  else
+    closeaction := canone;
+  end else
+  begin
+    gohomebtnclick(sender);
     closeaction := cafree;
+  end;
 end;
 
 //
@@ -184,42 +186,36 @@ procedure tmainform.leftupbtnclick(Sender: TObject);
 begin
   vpdriver.enabled := true;
   vpdriver.move4(-leftedit.value, 0, 0);
-  vpdriver.enabled := false;
 end;
 
 procedure tmainform.leftdownbtnclick(sender: tobject);
 begin
   vpdriver.enabled := true;
   vpdriver.move4(+leftedit.value, 0, 0);
-  vpdriver.enabled := false;
 end;
 
 procedure tmainform.pendownbtnclick(Sender: TObject);
 begin
   vpdriver.enabled := true;
   vpdriver.move4(0, 0, -1);
-  vpdriver.enabled := false;
 end;
 
 procedure tmainform.penupbtnclick(sender: tobject);
 begin
   vpdriver.enabled := true;
   vpdriver.move4(0, 0, +1);
-  vpdriver.enabled := false;
 end;
 
 procedure tmainform.rightupbtnclick(sender: tobject);
 begin
   vpdriver.enabled := true;
   vpdriver.move4(0, -rightedit.value, 0);
-  vpdriver.enabled := false;
 end;
 
 procedure tmainform.rightdownbtnclick(sender: tobject);
 begin
   vpdriver.enabled := true;
   vpdriver.move4(0, +rightedit.value, 0);
-  vpdriver.enabled := false;
 end;
 
 procedure tmainform.sethomebtnclick(sender: tobject);
@@ -228,9 +224,7 @@ var
   m1: longint;
 begin
   optimize(vplayout.p09, vplayout, m0, m1);
-  vpdriver.enabled := true;
   vpdriver.init(m0, m1, 1);
-  vpdriver.enabled := false;
 end;
 
 procedure tmainform.bordersbtnclick(sender: tobject);
@@ -251,7 +245,6 @@ begin
   vpdriver.move2(m0, m1, 1);
   optimize(vplayout.p09, vplayout, m0, m1);
   vpdriver.move2(m0, m1, 1);
-  vpdriver.enabled := false;
 end;
 
 procedure tmainform.gohomebtnclick(sender: tobject);
@@ -259,10 +252,9 @@ var
   m0: longint;
   m1: longint;
 begin
-  optimize(vplayout.p09, vplayout, m0, m1);
   vpdriver.enabled := true;
+  optimize(vplayout.p09, vplayout, m0, m1);
   vpdriver.move2(m0, m1, 1);
-  vpdriver.enabled := false;
 end;
 
 // ---
@@ -308,6 +300,9 @@ begin
   previewimage.stretch           := true;
   // ---
   vpdriver.enabled := sender = startbtn;
+  if vpdriver.enabled then
+    gohomebtnclick(sender);
+
   if sender <> nil then
   begin
     vpcoder         := tvpcoder.create(list);
