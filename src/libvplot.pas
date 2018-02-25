@@ -831,7 +831,7 @@ begin
   begin
     if (abs(cnt0) < 11) and
        (abs(cnt1) < 11) then
-      smalldisplacements(cnt0, cnt1)
+      largedisplacements(cnt0, cnt1)
     else
       largedisplacements(cnt0, cnt1);
   end;

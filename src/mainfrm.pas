@@ -384,8 +384,8 @@ begin
 
   if vpdriver.enabled then
   begin
-    p.x := vpcoder.px + vplayout.p08.x;
-    p.y := vpcoder.py + vplayout.p08.y;
+    p.x := vplayout.p08.x + offsetxse.value + vpcoder.px;
+    p.y := vplayout.p08.y + offsetyse.value + vpcoder.py;
 
     optimize(p, vplayout, m0, m1);
     vpdriver.move2(m0, m1, round(vpcoder.pz));
