@@ -354,7 +354,7 @@ begin
   writeln(format('P13.X = %-5.3f  P13.Y = %-5.3f', [layout.p13.x, layout.p13.y]));
 
   writeln(format('MODE  = %-5.3u', [layout.m]));
-  writeln(format('R     = %-5.3f', [layout.r]));
+  writeln(format('R     = %-5.8f', [layout.r]));
   {$endif}
 end;
 
@@ -409,6 +409,9 @@ begin
   writeln(format('D14   = %-5.3f', [distancebetween(tmp01, tmp04)]));
   writeln(format('CNT0  = %-5.3u', [m0]));
   writeln(format('CNT1  = %-5.3u', [m1]));
+
+  writeln(format('MODE  = %-5.3u', [l.m]));
+  writeln(format('R     = %-5.8f', [l.r]));
   {$endif}
 end;
 
@@ -703,7 +706,7 @@ begin
   {$else}
   ffault   := -1;
   {$endif}
-  fdelayms := 1000;
+  fdelayms := 500;
   fenabled := false;
 end;
 
