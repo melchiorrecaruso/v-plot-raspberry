@@ -21,7 +21,7 @@
 unit libvplot;
 
 {$mode objfpc}{$H+}
-{$define debug}
+{*$define debug}
 
 interface
 
@@ -706,7 +706,7 @@ begin
   {$else}
   ffault   := -1;
   {$endif}
-  fdelayms := 500;
+  fdelayms := 1000;
   fenabled := false;
 end;
 

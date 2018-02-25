@@ -96,10 +96,21 @@ type
     ini:   tinifile;
     image: tbitmap;
     list:  tstringlist;
+    list2: tlist;
     procedure onstart;
     procedure onstop;
     procedure ontick;
   end;
+
+
+type
+  rec = packed record
+    c0: longint;
+    c1: longint;
+    cz: longint;
+  end;
+
+  prec = ^rec;
 
 
 var
@@ -124,6 +135,7 @@ begin
   // ---
 
   image := tbitmap.create;
+  list2 := tlist.create;
   list  := tstringlist.create;
   ini   := tinifile.create(changefileext(paramstr(0), '.ini'));
 
@@ -140,6 +152,15 @@ begin
 
   ini.destroy;
   list.destroy;
+
+
+
+  while list2.count > 0 do
+  begin
+    dispose(prec(list2[0]));
+    list2.delete(0);
+  end;
+
   image.destroy;
 end;
 
@@ -348,6 +369,12 @@ end;
 
 procedure tmainform.onstart;
 begin
+  while list2.count > 0 do
+  begin
+    dispose(prec(list2[0]));
+    list2.delete(0);
+  end;
+
   startbtn.caption          := 'Pause';
   manualdrivinggb  .enabled := false;
   creativecontrolgb.enabled := false;
@@ -357,7 +384,24 @@ begin
 end;
 
 procedure tmainform.onstop;
+var
+  pr: prec;
 begin
+
+  caption := 'VPlot Plotting...' + inttostr(list2.count);
+  while list2.count > 0 do
+  begin
+    pr := prec(list2[0]);
+    vpdriver.move2(pr^.c0, pr^.c1, pr^.cz);
+
+    dispose(pr);
+    list2.delete(0);
+
+    application.processmessages;
+  end;
+
+
+
   caption := 'VPlot Driver';
   previewimage.canvas.draw(0,0, image);
 
@@ -374,6 +418,7 @@ var
    p: tvppoint;
   m0: longint;
   m1: longint;
+  pr: prec;
 begin
   p.x := ( widthse.value div 2) + offsetxse.value + vpcoder.px;
   p.y := (heightse.value div 2) - offsetyse.value - vpcoder.py;
@@ -382,14 +427,18 @@ begin
   else
     image.canvas.pixels[round(p.x), round(p.y)] := clred;
 
-  if vpdriver.enabled then
-  begin
-    p.x := vplayout.p08.x + offsetxse.value + vpcoder.px;
-    p.y := vplayout.p08.y + offsetyse.value + vpcoder.py;
 
-    optimize(p, vplayout, m0, m1);
-    vpdriver.move2(m0, m1, round(vpcoder.pz));
-  end;
+
+  p.x := vplayout.p08.x + offsetxse.value + vpcoder.px;
+  p.y := vplayout.p08.y + offsetyse.value + vpcoder.py;
+  optimize(p, vplayout, m0, m1);
+
+  new(pr);
+  pr^.c0 := m0;
+  pr^.c1 := m1;
+  pr^.cz := round(vpcoder.pz);
+  list2.add(pr);
+
 
   if vpcoder.index mod 20 = 0 then
     caption := format('VPlot Driver - Drawing [%u / %u]',
