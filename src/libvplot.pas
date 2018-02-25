@@ -75,7 +75,7 @@ type
     fcnt0:  longint;
     fcnt1:  longint;
     fcntz:  longint;
-    fdelayms: longword;
+    fdelayms: longint;
     fenabled: boolean;
     ffault:   longint;
     procedure largedisplacements(cnt0, cnt1: longint);
@@ -87,9 +87,9 @@ type
     procedure   move2(cnt0, cnt1, cntz: longint);
     procedure   move4(cnt0, cnt1, cntz: longint);
   published
-    property delayms: longword read fdelayms write fdelayms;
-    property enabled: boolean  read fenabled write fenabled;
-    property fault:   longint  read ffault;
+    property delayms: longint read fdelayms write fdelayms;
+    property enabled: boolean read fenabled write fenabled;
+    property fault:   longint read ffault;
   end;
 
   tvpcoder = class(tthread)
@@ -706,7 +706,7 @@ begin
   {$else}
   ffault   := -1;
   {$endif}
-  fdelayms := 1000;
+  fdelayms := 2000;
   fenabled := false;
 end;
 
@@ -719,9 +719,18 @@ end;
 procedure  tvpdriver.init(cnt0, cnt1, cntz: longint);
 begin
   {$ifdef cpuarm}
-  fcnt0  := cnt0;
-  fcnt1  := cnt1;
-  fcntz  := cntz;
+  fcnt0 := cnt0;
+  fcnt1 := cnt1;
+  fcntz := cntz;
+
+  if fcntz < 0 then
+    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq))
+  else
+  if fcntz > 0 then
+    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_minvalue, motz_freq))
+  else
+    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
+  delay(1000);
   {$endif}
 end;
 
@@ -813,7 +822,7 @@ begin
   if not fenabled then exit;
   if ffault  = -1 then exit;
   // move pwm motz
-  if cntz <> 0 then
+  if fcntz <> min(1, max(-1, fcntz + cntz)) then
   begin
     fcntz := min(1, max(-1, fcntz + cntz));
     if fcntz < 0 then
@@ -831,7 +840,7 @@ begin
   begin
     if (abs(cnt0) < 11) and
        (abs(cnt1) < 11) then
-      largedisplacements(cnt0, cnt1)
+      smalldisplacements(cnt0, cnt1)
     else
       largedisplacements(cnt0, cnt1);
   end;
