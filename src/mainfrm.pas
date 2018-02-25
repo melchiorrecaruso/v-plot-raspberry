@@ -373,8 +373,8 @@ var
   m0: longint;
   m1: longint;
 begin
-  p.x := ( widthse.value div 2) + offsetxse.value + vpcoder.px;
-  p.y := (heightse.value div 2) - offsetyse.value - vpcoder.py;
+  p.x := ( widthse.value div 2) + offsetxse.value + (vpcoder.px);
+  p.y := (heightse.value div 2) - offsetyse.value - (vpcoder.py);
   if vpcoder.pz < 0 then
     image.canvas.pixels[round(p.x), round(p.y)] := clblack
   else
@@ -382,8 +382,8 @@ begin
 
   if vpdriver.enabled then
   begin
-    p.x := vplayout.p08.x + offsetxse.value + vpcoder.px;
-    p.y := vplayout.p08.y + offsetyse.value + vpcoder.py;
+    p.x := vplayout.p08.x + offsetxse.value + (vpcoder.px);
+    p.y := vplayout.p08.y + offsetyse.value + (vpcoder.py);
     optimize(p, vplayout, m0, m1);
 
     vpdriver.move2(m0, m1, round(vpcoder.pz));
