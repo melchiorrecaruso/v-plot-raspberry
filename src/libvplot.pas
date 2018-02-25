@@ -21,12 +21,12 @@
 unit libvplot;
 
 {$mode objfpc}{$H+}
-{*$define debug}
+{$define debug}
 
 interface
 
 uses
-  classes, inifiles;
+  {$ifdef cpuarm} pca9685, wiringpi, {$endif} classes, inifiles;
 
 type
   tvppoint = packed record
@@ -148,7 +148,7 @@ var
 implementation
 
 uses
-  math, {$ifdef cpuarm} pca9685, wiringpi, {$endif} sysutils;
+  math, sysutils;
 
 {$ifdef cpuarm}
 const

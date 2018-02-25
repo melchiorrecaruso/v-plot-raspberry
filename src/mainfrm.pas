@@ -182,32 +182,44 @@ end;
 
 procedure tmainform.leftupbtnclick(Sender: TObject);
 begin
-  vpdriver.move4(+leftedit.value, 0, 0);
+  vpdriver.enabled := true;
+  vpdriver.move4(-leftedit.value, 0, 0);
+  vpdriver.enabled := false;
 end;
 
 procedure tmainform.leftdownbtnclick(sender: tobject);
 begin
-  vpdriver.move4(-leftedit.value, 0, 0);
+  vpdriver.enabled := true;
+  vpdriver.move4(+leftedit.value, 0, 0);
+  vpdriver.enabled := false;
 end;
 
 procedure tmainform.pendownbtnclick(Sender: TObject);
 begin
+  vpdriver.enabled := true;
   vpdriver.move4(0, 0, -1);
+  vpdriver.enabled := false;
 end;
 
 procedure tmainform.penupbtnclick(sender: tobject);
 begin
+  vpdriver.enabled := true;
   vpdriver.move4(0, 0, +1);
+  vpdriver.enabled := false;
 end;
 
 procedure tmainform.rightupbtnclick(sender: tobject);
 begin
-  vpdriver.move4(+rightedit.value, 0, 0);
+  vpdriver.enabled := true;
+  vpdriver.move4(0, -rightedit.value, 0);
+  vpdriver.enabled := false;
 end;
 
 procedure tmainform.rightdownbtnclick(sender: tobject);
 begin
-  vpdriver.move4(-rightedit.value, 0, 0);
+  vpdriver.enabled := true;
+  vpdriver.move4(0, +rightedit.value, 0);
+  vpdriver.enabled := false;
 end;
 
 procedure tmainform.sethomebtnclick(sender: tobject);
@@ -216,7 +228,9 @@ var
   m1: longint;
 begin
   optimize(vplayout.p09, vplayout, m0, m1);
+  vpdriver.enabled := true;
   vpdriver.init(m0, m1, 1);
+  vpdriver.enabled := false;
 end;
 
 procedure tmainform.bordersbtnclick(sender: tobject);
@@ -224,6 +238,7 @@ var
   m0: longint;
   m1: longint;
 begin
+  vpdriver.enabled := true;
   optimize(vplayout.p10, vplayout, m0, m1);
   vpdriver.move2(m0, m1, 1);
   optimize(vplayout.p11, vplayout, m0, m1);
@@ -236,6 +251,7 @@ begin
   vpdriver.move2(m0, m1, 1);
   optimize(vplayout.p09, vplayout, m0, m1);
   vpdriver.move2(m0, m1, 1);
+  vpdriver.enabled := false;
 end;
 
 procedure tmainform.gohomebtnclick(sender: tobject);
@@ -244,7 +260,9 @@ var
   m1: longint;
 begin
   optimize(vplayout.p09, vplayout, m0, m1);
+  vpdriver.enabled := true;
   vpdriver.move2(m0, m1, 1);
+  vpdriver.enabled := false;
 end;
 
 // ---
@@ -348,7 +366,6 @@ begin
   caption := 'VPlot Driver';
   previewimage.canvas.draw(0,0, image);
 
-
   startbtn.caption          := 'Play';
   manualdrivinggb  .enabled := true;
   creativecontrolgb.enabled := true;
@@ -370,10 +387,14 @@ begin
   else
     image.canvas.pixels[round(p.x), round(p.y)] := clred;
 
-  p.x := vpcoder.px + vplayout.p08.x;
-  p.y := vpcoder.py + vplayout.p08.y;
-  optimize(p, vplayout, m0, m1);
-  vpdriver.move2(m0, m1, round(vpcoder.pz));
+  if vpdriver.enabled then
+  begin
+    p.x := vpcoder.px + vplayout.p08.x;
+    p.y := vpcoder.py + vplayout.p08.y;
+
+    optimize(p, vplayout, m0, m1);
+    vpdriver.move2(m0, m1, round(vpcoder.pz));
+  end;
 
   if vpcoder.index mod 20 = 0 then
     caption := format('VPlot Driver - Drawing [%u / %u]',

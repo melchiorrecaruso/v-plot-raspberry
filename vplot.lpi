@@ -33,7 +33,7 @@
       <Unit0>
         <Filename Value="vplot.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="18" Y="8"/>
+        <CursorPos X="31" Y="8"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -50,10 +50,10 @@
       </Unit1>
       <Unit2>
         <Filename Value="src/libvplot.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="3" Y="24"/>
-        <FoldState Value=" TCVK33 T7j8DY T3lD0F7 piYjO080261251x"/>
+        <TopLine Value="731"/>
+        <CursorPos X="42" Y="731"/>
+        <FoldState Value=" TCVK33 T7j8DY T3lD0F7 piYjO080261242;"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -378,11 +378,12 @@
         <ComponentName Value="mainform"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="260"/>
-        <CursorPos X="37" Y="331"/>
-        <FoldState Value=" T3lA038A"/>
-        <UsageCount Value="103"/>
+        <TopLine Value="371"/>
+        <CursorPos Y="390"/>
+        <FoldState Value=" T3lA058W"/>
+        <UsageCount Value="106"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit47>
@@ -542,124 +543,124 @@
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="381" Column="53" TopLine="373"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="602" Column="5" TopLine="577"/>
       </Position1>
       <Position2>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="150" Column="9" TopLine="134"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="604" TopLine="586"/>
       </Position2>
       <Position3>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="108" Column="10" TopLine="88"/>
+        <Caret Line="346" Column="31" TopLine="318"/>
       </Position3>
       <Position4>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="314" TopLine="298"/>
+        <Caret Line="336" Column="51" TopLine="318"/>
       </Position4>
       <Position5>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="87" Column="5" TopLine="67"/>
+        <Caret Line="395" Column="37" TopLine="383"/>
       </Position5>
       <Position6>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="109" Column="12" TopLine="94"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="87" Column="22" TopLine="65"/>
       </Position6>
       <Position7>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="338" Column="49" TopLine="316"/>
+        <Caret Line="315" Column="53" TopLine="290"/>
       </Position7>
       <Position8>
-        <Filename Value="src/libvplot.pas"/>
-        <Caret Line="700" Column="21" TopLine="668"/>
+        <Filename Value="src/mainfrm.pas"/>
+        <Caret Line="314" Column="53" TopLine="289"/>
       </Position8>
       <Position9>
-        <Filename Value="src/libvplot.pas"/>
-        <Caret Line="602" Column="5" TopLine="577"/>
+        <Filename Value="src/mainfrm.pas"/>
+        <Caret Line="135" Column="3" TopLine="111"/>
       </Position9>
       <Position10>
-        <Filename Value="src/libvplot.pas"/>
-        <Caret Line="604" TopLine="586"/>
+        <Filename Value="src/mainfrm.pas"/>
+        <Caret Line="268" Column="13" TopLine="248"/>
       </Position10>
       <Position11>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="346" Column="31" TopLine="318"/>
+        <Caret Line="268" Column="21" TopLine="248"/>
       </Position11>
       <Position12>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="336" Column="51" TopLine="318"/>
+        <Caret Line="270" Column="47" TopLine="248"/>
       </Position12>
       <Position13>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="395" Column="37" TopLine="383"/>
+        <Caret Line="346" Column="33" TopLine="332"/>
       </Position13>
       <Position14>
-        <Filename Value="src/libvplot.pas"/>
-        <Caret Line="87" Column="22" TopLine="65"/>
+        <Filename Value="src/mainfrm.pas"/>
+        <Caret Line="347" Column="5" TopLine="332"/>
       </Position14>
       <Position15>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="315" Column="53" TopLine="290"/>
+        <Caret Line="330" Column="73" TopLine="321"/>
       </Position15>
       <Position16>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="314" Column="53" TopLine="289"/>
+        <Caret Line="371" Column="3" TopLine="355"/>
       </Position16>
       <Position17>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="135" Column="3" TopLine="111"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="87" Column="22" TopLine="59"/>
       </Position17>
       <Position18>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="268" Column="13" TopLine="248"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="24" Column="2"/>
       </Position18>
       <Position19>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="268" Column="21" TopLine="248"/>
+        <Caret Line="360" Column="39" TopLine="353"/>
       </Position19>
       <Position20>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="270" Column="47" TopLine="248"/>
+        <Caret Line="361" Column="39" TopLine="354"/>
       </Position20>
       <Position21>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="346" Column="33" TopLine="332"/>
+        <Caret Line="360" Column="39" TopLine="353"/>
       </Position21>
       <Position22>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="347" Column="5" TopLine="332"/>
+        <Caret Line="361" Column="39" TopLine="354"/>
       </Position22>
       <Position23>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="330" Column="73" TopLine="321"/>
+        <Caret Line="331" Column="37" TopLine="289"/>
       </Position23>
       <Position24>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="371" Column="3" TopLine="355"/>
+        <Caret Line="185" Column="3" TopLine="183"/>
       </Position24>
       <Position25>
-        <Filename Value="src/libvplot.pas"/>
-        <Caret Line="87" Column="22" TopLine="59"/>
+        <Filename Value="src/mainfrm.pas"/>
+        <Caret Line="125" Column="30" TopLine="118"/>
       </Position25>
       <Position26>
-        <Filename Value="src/libvplot.pas"/>
-        <Caret Line="24" Column="2"/>
+        <Filename Value="src/mainfrm.pas"/>
+        <Caret Line="199" Column="29" TopLine="118"/>
       </Position26>
       <Position27>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="360" Column="39" TopLine="353"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="84" Column="23" TopLine="60"/>
       </Position27>
       <Position28>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="361" Column="39" TopLine="354"/>
+        <Filename Value="src/libvplot.pas"/>
+        <Caret Line="630" Column="34" TopLine="600"/>
       </Position28>
       <Position29>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="360" Column="39" TopLine="353"/>
+        <Caret Line="199" Column="29" TopLine="118"/>
       </Position29>
       <Position30>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="361" Column="39" TopLine="354"/>
+        <Caret Line="194" Column="75" TopLine="183"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>
