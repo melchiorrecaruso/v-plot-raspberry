@@ -226,26 +226,21 @@ begin
 end;
 
 procedure tmainform.bordersbtnclick(sender: tobject);
-var
-  m0: longint;
-  m1: longint;
 begin
-  vpdriver.enabled := true;
-  vpdriver.delayms := 2000;
-
-
-  optimize(vplayout.p10, vplayout, m0, m1);
-  vpdriver.move2(m0, m1, 1);
-  optimize(vplayout.p11, vplayout, m0, m1);
-  vpdriver.move2(m0, m1, 1);
-  optimize(vplayout.p12, vplayout, m0, m1);
-  vpdriver.move2(m0, m1, 1);
-  optimize(vplayout.p13, vplayout, m0, m1);
-  vpdriver.move2(m0, m1, 1);
-  optimize(vplayout.p10, vplayout, m0, m1);
-  vpdriver.move2(m0, m1, 1);
-  optimize(vplayout.p09, vplayout, m0, m1);
-  vpdriver.move2(m0, m1, 1);
+  list.clear;
+  with vplayout do
+  begin
+    list.add('begin');
+    list.add(format('G00 X%5.4f Y%5.4f Z%5.4f ', [p09.x, p09.y, 0.0]));
+    list.add(format('G00 X%5.4f Y%5.4f Z%5.4f ', [p10.x, p10.y, 0.0]));
+    list.add(format('G01 X%5.4f Y%5.4f Z%5.4f ', [p11.x, p11.y,-1.0]));
+    list.add(format('G01 X%5.4f Y%5.4f Z%5.4f ', [p12.x, p12.y,-1.0]));
+    list.add(format('G01 X%5.4f Y%5.4f Z%5.4f ', [p13.x, p13.y,-1.0]));
+    list.add(format('G01 X%5.4f Y%5.4f Z%5.4f ', [p10.x, p10.y,-1.0]));
+    list.add(format('G00 X%5.4f Y%5.4f Z%5.4f ', [p09.x, p09.y, 0.0]));
+    list.add('end');
+  end;
+  reloadbtnclick(loadbtn);
 end;
 
 procedure tmainform.gohomebtnclick(sender: tobject);
