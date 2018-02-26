@@ -231,6 +231,9 @@ var
   m1: longint;
 begin
   vpdriver.enabled := true;
+  vpdriver.delayms := 2000;
+
+
   optimize(vplayout.p10, vplayout, m0, m1);
   vpdriver.move2(m0, m1, 1);
   optimize(vplayout.p11, vplayout, m0, m1);
