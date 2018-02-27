@@ -50,9 +50,10 @@
       </Unit1>
       <Unit2>
         <Filename Value="src/libvplot.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="221"/>
-        <CursorPos X="22" Y="230"/>
+        <TopLine Value="812"/>
+        <CursorPos X="14" Y="835"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -377,10 +378,9 @@
         <ComponentName Value="mainform"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="228"/>
-        <CursorPos X="7" Y="242"/>
+        <TopLine Value="171"/>
+        <CursorPos X="107" Y="182"/>
         <FoldState Value=" T3lA046P"/>
         <UsageCount Value="114"/>
         <Loaded Value="True"/>
@@ -540,7 +540,7 @@
         <UsageCount Value="10"/>
       </Unit68>
       <Unit69>
-        <Filename Value="../../../../../FPC/3.0.4/source/rtl/objpas/sysutils/sysinth.inc"/>
+        <Filename Value="/FPC/3.0.4/source/rtl/objpas/sysutils/sysinth.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="116"/>
         <CursorPos X="3" Y="134"/>

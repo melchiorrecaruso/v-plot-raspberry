@@ -730,7 +730,7 @@ begin
     pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_minvalue, motz_freq))
   else
     pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
-  delay(1000);
+  delay(500);
   {$endif}
 end;
 
@@ -832,7 +832,7 @@ begin
       pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_minvalue, motz_freq))
     else
       pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
-    delay(1000);
+    delay(500);
   end;
   // mode step motors
   if (cnt0 <> 0) or
