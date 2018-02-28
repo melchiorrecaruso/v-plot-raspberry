@@ -23,7 +23,8 @@ program vplot;
 {$mode objfpc}{$H+}
 
 uses
-  {$ifdef unix} cthreads, {$endif} interfaces, forms, mainfrm;
+  {$ifdef unix} cthreads, {$endif} interfaces, forms, fpvectorialpkg,
+  mainfrm, vplayout;
 
 {$R *.res}
 

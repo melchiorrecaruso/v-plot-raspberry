@@ -27,7 +27,7 @@ interface
 
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls,
-  comctrls, buttons, menus, spin, inifiles, libvplot;
+  comctrls, buttons, menus, spin, vpcoder, vplayout, vpdriver;
 
 type
   { tmainform }
@@ -37,6 +37,14 @@ type
     aboutgb: TGroupBox;
     leftedit: TSpinEdit;
     rightedit: TSpinEdit;
+    StaticText1: TStaticText;
+    StaticText2: TStaticText;
+    StaticText3: TStaticText;
+    StaticText4: TStaticText;
+    StaticText5: TStaticText;
+    StaticText6: TStaticText;
+    StaticText7: TStaticText;
+    StaticText8: TStaticText;
     verticalcb: TCheckBox;
     redrawbtn: TBitBtn;
     formatcb: TComboBox;
@@ -90,7 +98,6 @@ type
 
     procedure verticalcbeditingdone(sender: tobject);
   private
-    ini:   tinifile;
     image: tbitmap;
     list:  tstringlist;
     procedure onstart;
@@ -108,7 +115,13 @@ implementation
 {$R *.lfm}
 
 uses
-  math, sysutils;
+  math, sysutils, fpvectorial, avisocncgcodewriter, dxfvectorialreader;
+
+var
+  coder:  tvpcoder;
+  driver: tvpdriver;
+  layout: tvplayout;
+
 
 // form events //
 
@@ -122,10 +135,11 @@ begin
 
   image := tbitmap.create;
   list  := tstringlist.create;
-  ini   := tinifile.create(changefileext(paramstr(0), '.ini'));
 
-  loadlayout(ini, vplayout);
-  vpdriver := tvpdriver.create(vplayout.m);
+
+
+  loadlayout(layout, changefileext(paramstr(0), '.ini'));
+  driver := tvpdriver.create(layout.mode);
 
   sethomebtnclick(nil);
   reloadbtnclick (nil);
@@ -133,9 +147,7 @@ end;
 
 procedure tmainform.formdestroy(sender: tobject);
 begin
-  vpdriver.destroy;
-
-  ini.destroy;
+  driver.destroy;
   list.destroy;
 
   image.destroy;
@@ -143,7 +155,7 @@ end;
 
 procedure tmainform.formclose(sender: tobject; var closeaction: tcloseaction);
 begin
-  if assigned(vpcoder) then
+  if assigned(coder) then
   begin
     playorstopbtnclick(stopbtn);
     closeaction := canone;
@@ -182,38 +194,38 @@ end;
 
 procedure tmainform.leftupbtnclick(Sender: TObject);
 begin
-  vpdriver.enabled := true;
-  vpdriver.move4(-leftedit.value, 0, 0);
+  driver.enabled := true;
+  driver.move4(-leftedit.value, 0, 0);
 end;
 
 procedure tmainform.leftdownbtnclick(sender: tobject);
 begin
-  vpdriver.enabled := true;
-  vpdriver.move4(+leftedit.value, 0, 0);
+  driver.enabled := true;
+  driver.move4(+leftedit.value, 0, 0);
 end;
 
 procedure tmainform.pendownbtnclick(Sender: TObject);
 begin
-  vpdriver.enabled := true;
-  vpdriver.move4(0, 0, -1);
+  driver.enabled := true;
+  driver.move4(0, 0, -1);
 end;
 
 procedure tmainform.penupbtnclick(sender: tobject);
 begin
-  vpdriver.enabled := true;
-  vpdriver.move4(0, 0, +1);
+  driver.enabled := true;
+  driver.move4(0, 0, +1);
 end;
 
 procedure tmainform.rightupbtnclick(sender: tobject);
 begin
-  vpdriver.enabled := true;
-  vpdriver.move4(0, -rightedit.value, 0);
+  driver.enabled := true;
+  driver.move4(0, -rightedit.value, 0);
 end;
 
 procedure tmainform.rightdownbtnclick(sender: tobject);
 begin
-  vpdriver.enabled := true;
-  vpdriver.move4(0, +rightedit.value, 0);
+  driver.enabled := true;
+  driver.move4(0, +rightedit.value, 0);
 end;
 
 procedure tmainform.sethomebtnclick(sender: tobject);
@@ -221,8 +233,8 @@ var
   m0: longint;
   m1: longint;
 begin
-  optimize(vplayout.p09, vplayout, m0, m1);
-  vpdriver.init(m0, m1, 1);
+  optimize(layout.p09, layout, m0, m1);
+  driver.init(m0, m1, 1);
 end;
 
 procedure tmainform.bordersbtnclick(sender: tobject);
@@ -238,19 +250,37 @@ var
   m0: longint;
   m1: longint;
 begin
-  vpdriver.enabled := true;
-  optimize(vplayout.p09, vplayout, m0, m1);
-  vpdriver.move2(m0, m1, 1);
+  driver.enabled := true;
+  optimize(layout.p09, layout, m0, m1);
+  driver.move2(m0, m1, 1);
 end;
 
 // ---
 
 procedure tmainform.loadbtnclick(sender: tobject);
+var
+  vec:     tvvectorialdocument;
+  lformat: tvvectorialformat;
 begin
   if opendialog.execute then
   begin
     list.clear;
+
+    (*
+    vec := tvvectorialdocument.create;
+    try
+      lformat := tvvectorialdocument.getformatfromextension(opendialog.filename);
+      vec.readfromfile(opendialog.filename, lformat);
+      vec.writetostrings(list, vfgcodeavisocncprototipov5);
+
+      list.savetofile('pippo.txt');
+    finally
+      vec.free;
+    end;
+    *)
+
     list.loadfromfile(opendialog.filename);
+
     reloadbtnclick(sender);
   end;
 end;
@@ -285,35 +315,35 @@ begin
   previewimage.stretchoutenabled := false;
   previewimage.stretch           := true;
   // ---
-  vpdriver.enabled := sender = startbtn;
-  if vpdriver.enabled then
+  driver.enabled := sender = startbtn;
+  if driver.enabled then
     gohomebtnclick(sender);
 
   if sender <> nil then
   begin
-    vpcoder         := tvpcoder.create(list);
-    vpcoder.onstart := @onstart;
-    vpcoder.onstop  := @onstop;
-    vpcoder.ontick  := @ontick;
-    vpcoder.enabled := true;
-    vpcoder.start;
+    coder         := tvpcoder.create(list);
+    coder.onstart := @onstart;
+    coder.onstop  := @onstop;
+    coder.ontick  := @ontick;
+    coder.enabled := true;
+    coder.start;
   end;
 end;
 
 procedure tmainform.playorstopbtnclick(sender: tobject);
 begin
-  if assigned(vpcoder) then
+  if assigned(coder) then
   begin
 
     if sender = stopbtn then
     begin
-      vpcoder.terminate;
-      vpcoder.enabled := true;
+      coder.terminate;
+      coder.enabled := true;
     end else
     if sender = startbtn then
     begin
-      vpcoder.enabled := not vpcoder.enabled;
-      if vpcoder.enabled then
+      coder.enabled := not coder.enabled;
+      if coder.enabled then
         startbtn.caption := 'Pause'
       else
         startbtn.caption := 'Play';
@@ -344,6 +374,20 @@ end;
 
 procedure tmainform.onstop;
 begin
+
+
+  statictext1.caption := 'xmin = ' + floattostr(coder.xmin);
+  statictext2.caption := 'xmax = ' + floattostr(coder.xmax);
+  statictext3.caption := 'ymin = ' + floattostr(coder.ymin);
+  statictext4.caption := 'ymax = ' + floattostr(coder.ymax);
+
+  statictext5.caption := 'width  = ' + floattostr(coder.xmax - coder.xmin);
+  statictext6.caption := 'height = ' + floattostr(coder.ymax - coder.ymin);
+
+  statictext7.caption := 'offsetx  = ' + floattostr(coder.offsetx);
+  statictext8.caption := 'offsety  = ' + floattostr(coder.offsety);
+
+
   caption := 'VPlot Driver';
   previewimage.canvas.draw(0,0, image);
 
@@ -353,6 +397,8 @@ begin
   papersizegb      .enabled := true;
   drawingcontrolgb .enabled := true;
   application.processmessages;
+
+  coder := nil;
 end;
 
 procedure tmainform.ontick;
@@ -361,25 +407,25 @@ var
   m0: longint;
   m1: longint;
 begin
-  p.x := ( widthse.value div 2) + offsetxse.value + (vpcoder.px);
-  p.y := (heightse.value div 2) - offsetyse.value - (vpcoder.py);
-  if vpcoder.pz < 0 then
+  p.x := (widthse .value div 2) + offsetxse.value + (coder.px);
+  p.y := (heightse.value div 2) - offsetyse.value - (coder.py);
+  if coder.pz < 0 then
     image.canvas.pixels[round(p.x), round(p.y)] := clblack
   else
     image.canvas.pixels[round(p.x), round(p.y)] := clred;
 
-  if vpdriver.enabled then
+  if driver.enabled then
   begin
-    p.x := vplayout.p08.x + offsetxse.value + (vpcoder.px);
-    p.y := vplayout.p08.y + offsetyse.value + (vpcoder.py);
-    optimize(p, vplayout, m0, m1);
+    p.x := layout.p08.x + offsetxse.value + (coder.px);
+    p.y := layout.p08.y + offsetyse.value + (coder.py);
+    optimize(p, layout, m0, m1);
 
-    vpdriver.move2(m0, m1, round(vpcoder.pz));
+    driver.move2(m0, m1, round(coder.pz));
   end;
 
-  if vpcoder.index mod 20 = 0 then
+  if coder.index mod 20 = 0 then
     caption := format('VPlot Driver - Drawing [%u / %u]',
-      [vpcoder.index, vpcoder.count]);
+      [coder.index, list.count]);
   application.processmessages;
 end;
 
