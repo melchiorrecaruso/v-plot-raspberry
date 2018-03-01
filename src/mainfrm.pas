@@ -295,7 +295,7 @@ begin
   image.setsize(
      widthse.value,
     heightse.value);
-  image.canvas.fillrect(0,0,
+  image.canvas.fillrect(0, 0,
      widthse.value,
     heightse.value);
   // ---
@@ -317,7 +317,7 @@ begin
   // ---
   driver.enabled := sender = startbtn;
   if driver.enabled then
-    gohomebtnclick(sender);
+    driver.move4(0, 0, -driver.cntz);
 
   if sender <> nil then
   begin
@@ -409,6 +409,7 @@ var
 begin
   p.x := (widthse .value div 2) + offsetxse.value + (coder.px);
   p.y := (heightse.value div 2) - offsetyse.value - (coder.py);
+
   if coder.pz < 0 then
     image.canvas.pixels[round(p.x), round(p.y)] := clblack
   else

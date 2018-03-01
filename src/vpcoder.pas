@@ -46,7 +46,6 @@ type
     fonstart: tthreadmethod;
     fonstop:  tthreadmethod;
     fontick:  tthreadmethod;
-    fscale:   double;
     fenabled: boolean;
   protected
     procedure execute; override;
@@ -68,7 +67,6 @@ type
     property onstart: tthreadmethod read fonstart write fonstart;
     property onstop:  tthreadmethod read fonstop  write fonstop;
     property ontick:  tthreadmethod read fontick  write fontick;
-    property scale:   double        read fscale   write fscale;
     property enabled: boolean       read fenabled write fenabled;
   end;
 
@@ -87,38 +85,7 @@ implementation
 uses
   math, sysutils;
 
-{$ifdef cpuarm}
-const
-  mot0_step     = P38;
-  mot0_dir      = P40;
-  mot1_step     = P29;
-  mot1_dir      = P31;
-
-  motx_mod0     = P15;
-  motx_mod1     = P13;
-  motx_mod2     = P11;
-
-  motz_maxvalue = 2.50;
-  motz_minvalue = 0.50;
-  motz_rstvalue = 1.50;
-  motz_incvalue = 0.10;
-  motz_freq     = 50;
-
-  vplotmatrix : array [0..10, 0..18] of longint = (
-    (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),  //  0
-    (0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),  //  1
-    (0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0),  //  2
-    (0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0),  //  3
-    (1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1),  //  4
-    (1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1),  //  5
-    (0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0),  //  6
-    (1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1),  //  7
-    (1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1),  //  8
-    (0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0),  //  9
-    (1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1)); // 10
-{$endif}
-
-//  parser //
+//  parser routines //
 
 function  parse_comment(const gcode: rawbytestring): rawbytestring;
 var
@@ -298,7 +265,7 @@ begin
   end;
 end;
 
-// ---
+//
 
 procedure optimize(const p: tvppoint; const l: tvplayout; var m0, m1: longint);
 var
@@ -312,7 +279,7 @@ var
   tmp05: tvppoint;
   tmp06: tvppoint;
 begin
-  alpha   := 0;
+  alpha    := 0;
   repeat
     tmp00  := l.p00;
     tmp01  := l.p01;
@@ -355,17 +322,22 @@ begin
   {$endif}
 end;
 
-// tvplotcoder //
+// tvpcoder //
 
 constructor tvpcoder.create(list: tstringlist);
 begin
+  fpx      := 0;
+  fpy      := 0;
+  fpz      := 0;
+  fxmin    := + maxint;
+  fxmax    := - maxint;
+  fymin    := + maxint;
+  fymax    := - maxint;
+  foffsetx := 0;
+  foffsety := 0;
+
   flist    := list;
   fenabled := false;
-
-  fscale   := 1.0;
-
-
-
   freeonterminate := true;
   inherited create(true);
 end;
@@ -376,20 +348,14 @@ begin
   inherited destroy;
 end;
 
-
-
-
-
 procedure tvpcoder.execute;
 var
-  code:    tvpcode;
-
-  i:    longint;
-  j:    longint;
-
-  p0:   tvppoint;
-  p1:   tvppoint;
-  cc:   tvppoint;
+  code: tvpcode;
+     i: longint;
+     j: longint;
+    p0: tvppoint;
+    p1: tvppoint;
+    cc: tvppoint;
   path: tvppath;
 begin
   code.c := '';
@@ -397,14 +363,11 @@ begin
   code.f := 0; code.e := 0; code.i := 0;
   code.j := 0; code.k := 0; code.r := 0;
   // ---
-  fxmin  := +maxint;  fxmax  := -maxint;
-  fymin  := +maxint;  fymax  := -maxint;
-  // ---
   findex := 0;
   while (findex < flist.count) do
   begin
     parse_line(flist[findex], code);
-    if (code.c ='G00 ') or (code.c ='G01 ') or
+    if (code.c ='G01 ') or (code.c ='G01 ') or
        (code.c ='G02 ') or (code.c ='G03 ') then
       if code.z < 0 then;
       begin
@@ -415,13 +378,15 @@ begin
       end;
     inc(findex);
   end;
-  foffsetx := -(fxmax + fxmin) / 2;
-  foffsety := -(fymax + fymin) / 2;
+  foffsetx := - (fxmin + fxmax) / 2;
+  foffsety := - (fymin + fymax) / 2;
   // ---
   findex := 0;
   if assigned(fonstart) then
     synchronize(fonstart);
+
   while (findex < flist.count) and (not terminated) do
+  begin
     if fenabled then
     begin
       parse_line(flist[findex], code);
@@ -459,10 +424,10 @@ begin
             if assigned(fontick) then
               synchronize(fontick);
           end;
-      setlength(path, 0);
       inc(findex);
     end else
       sleep(250);
+  end;
 
   if assigned(fonstop) then
     synchronize(fonstop);

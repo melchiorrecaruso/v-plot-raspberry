@@ -47,6 +47,9 @@ type
     procedure   move2(cnt0, cnt1, cntz: longint);
     procedure   move4(cnt0, cnt1, cntz: longint);
   published
+    property cnt0:    longint read fcnt0;
+    property cnt1:    longint read fcnt1;
+    property cntz:    longint read fcntz;
     property delayms: longint read fdelayms write fdelayms;
     property enabled: boolean read fenabled write fenabled;
     property fault:   longint read ffault;
@@ -54,6 +57,37 @@ type
 
 
 implementation
+
+{$ifdef cpuarm}
+const
+  mot0_step     = P38;
+  mot0_dir      = P40;
+  mot1_step     = P29;
+  mot1_dir      = P31;
+
+  motx_mod0     = P15;
+  motx_mod1     = P13;
+  motx_mod2     = P11;
+
+  motz_maxvalue = 2.50;
+  motz_minvalue = 0.50;
+  motz_rstvalue = 1.50;
+  motz_incvalue = 0.10;
+  motz_freq     = 50;
+
+  vplotmatrix : array [0..10, 0..18] of longint = (
+    (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),  //  0
+    (0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),  //  1
+    (0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0),  //  2
+    (0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0),  //  3
+    (1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1),  //  4
+    (1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1),  //  5
+    (0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0),  //  6
+    (1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1),  //  7
+    (1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1),  //  8
+    (0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0),  //  9
+    (1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1)); // 10
+{$endif}
 
 constructor tvpdriver.create(mode: longint);
 begin

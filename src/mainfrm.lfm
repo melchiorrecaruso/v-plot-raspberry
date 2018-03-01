@@ -586,11 +586,16 @@ object mainform: Tmainform
     TabOrder = 5
   end
   object StaticText2: TStaticText
-    Left = 320
+    AnchorSideLeft.Control = StaticText1
+    AnchorSideTop.Control = StaticText1
+    AnchorSideTop.Side = asrBottom
+    AnchorSideBottom.Side = asrBottom
+    Left = 319
     Height = 16
-    Top = 56
+    Top = 41
     Width = 57
     AutoSize = True
+    BorderSpacing.Top = 10
     Caption = 'StaticText2'
     TabOrder = 6
   end
