@@ -27,137 +27,54 @@ unit vpcoder;
 interface
 
 uses
-  classes, vplayout;
+  classes, vpcommon, vplayout, fpvectorial;
 
 type
-  tvpcoder = class(tthread)
+  tvplotter = class(tthread)
   private
-    fpx:      double;
-    fpy:      double;
-    fpz:      double;
-    fxmin:    double;
-    fxmax:    double;
-    fymin:    double;
-    fymax:    double;
-    foffsetx: double;
-    foffsety: double;
-    findex:   longint;
-    flist:    tstringlist;
-    fonstart: tthreadmethod;
-    fonstop:  tthreadmethod;
-    fontick:  tthreadmethod;
-    fenabled: boolean;
+    fpx:       double;
+    fpy:       double;
+    fpz:       double;
+    flist:     tvppointlist;
+    fplot:     boolean;
+    fprogress: longint;
+    fonstart:  tthreadmethod;
+    fonstop:   tthreadmethod;
+    fontick:   tthreadmethod;
   protected
     procedure execute; override;
   public
-    constructor create(list: tstringlist);
-    destructor destroy; override;
+    constructor create(list: tvppointlist);
+    destructor  destroy; override;
   public
-    property px:      double        read fpx;
-    property py:      double        read fpy;
-    property pz:      double        read fpz;
-    property xmin:    double        read fxmin;
-    property xmax:    double        read fxmax;
-    property ymin:    double        read fymin;
-    property ymax:    double        read fymax;
-    property offsetx: double        read foffsetx;
-    property offsety: double        read foffsety;
-
-    property index:   longint       read findex;
-    property onstart: tthreadmethod read fonstart write fonstart;
-    property onstop:  tthreadmethod read fonstop  write fonstop;
-    property ontick:  tthreadmethod read fontick  write fontick;
-    property enabled: boolean       read fenabled write fenabled;
+    property px:       double        read fpx;
+    property py:       double        read fpy;
+    property pz:       double        read fpz;
+    property plot:     boolean       read fplot      write fplot;
+    property progress: longint       read fprogress;
+    property onstart:  tthreadmethod read fonstart   write fonstart;
+    property onstop:   tthreadmethod read fonstop    write fonstop;
+    property ontick:   tthreadmethod read fontick    write fontick;
   end;
 
-function  translatepoint(const cc, p: tvppoint): tvppoint; inline;
-function  rotatepoint(const p: tvppoint; const alpha: double): tvppoint; inline;
-function  distancebetween(const p0, p1: tvppoint): double; inline;
-function  linebetween(const p0, p1: tvppoint): tvpline; inline;
-function  lineangle(var line: tvpline): double; inline;
-function  intersectlines(const l0, l1: tvpline): tvppoint; inline;
 
-procedure optimize(const p: tvppoint; const l: tvplayout; var m0, m1: longint); inline;
+function  translatepoint(const cc, p: tvppoint): tvppoint;
+function  rotatepoint(const p: tvppoint; const alpha: double): tvppoint;
+function  distancebetween(const p0, p1: tvppoint): double;
+function  linebetween(const p0, p1: tvppoint): tvpline;
+function  lineangle(var line: tvpline): double;
+function  intersectlines(const l0, l1: tvpline): tvppoint;
+
+function createvppointlist(vec: tvvectorialdocument): tvppointlist;
+
+procedure optimize(const p: tvppoint; const l: tvplayout; var m0, m1: longint);
 
 
 implementation
 
+
 uses
   math, sysutils;
-
-//  parser routines //
-
-function  parse_comment(const gcode: rawbytestring): rawbytestring;
-var
-  i, j: longint;
-begin
-  result := gcode;
-  i := pos('(', result);
-  if i > 0 then
-  begin
-    j := pos(')', result);
-    delete(result, i, j - 1);
-  end;
-
-  i := pos(';', result);
-  if i > 0 then
-    setlength(result, i - 1);
-end;
-
-procedure parse_prefix(const prefix, code: rawbytestring; var value: double);
-var
-  i: longint;
-  s: rawbytestring = '';
-begin
-  i := pos(prefix, code);
-  if i > 0 then
-  begin
-    while (i < length(code)) and (code[i] <> ' ') do
-    begin
-      s := s + code[i];
-      inc(i);
-    end;
-    delete(s, 1, 1);
-  end;
-
-  if length(s) > 0 then
-  begin
-    for i := 1 to length(s) do
-      if s[i] in ['.', ','] then
-        s[i] := decimalseparator;
-    value := strtofloat(s);
-  end;
-end;
-
-procedure parse_line(gcode: rawbytestring; var vcode: tvpcode);
-begin
-  vcode.c := '';
-  gcode   := parse_comment(gcode);
-  if length(gcode) > 0 then
-  begin
-    if pos('G0 ' , gcode) = 1 then vcode.c := 'G00 ' else
-    if pos('G00 ', gcode) = 1 then vcode.c := 'G00 ' else
-    if pos('G1 ' , gcode) = 1 then vcode.c := 'G01 ' else
-    if pos('G01 ', gcode) = 1 then vcode.c := 'G01 ' else
-    if pos('G2 ' , gcode) = 1 then vcode.c := 'G02 ' else
-    if pos('G02 ', gcode) = 1 then vcode.c := 'G02 ' else
-    if pos('G3 ' , gcode) = 1 then vcode.c := 'G03 ' else
-    if pos('G03 ', gcode) = 1 then vcode.c := 'G03 ';
-
-    if vcode.c <> '' then
-    begin
-      parse_prefix('X', gcode, vcode.x);
-      parse_prefix('Y', gcode, vcode.y);
-      parse_prefix('Z', gcode, vcode.z);
-      parse_prefix('F', gcode, vcode.f);
-      parse_prefix('E', gcode, vcode.e);
-      parse_prefix('I', gcode, vcode.i);
-      parse_prefix('J', gcode, vcode.j);
-      parse_prefix('K', gcode, vcode.k);
-      parse_prefix('R', gcode, vcode.r);
-    end;
-  end;
-end;
 
 // geometry routines //
 
@@ -165,12 +82,17 @@ function translatepoint(const cc, p: tvppoint): tvppoint;
 begin
   result.x := cc.x + p.x;
   result.y := cc.y + p.y;
+  result.z :=        p.z;
 end;
 
 function rotatepoint(const p: tvppoint; const alpha: double): tvppoint;
+var
+  sinus, cosinus : double;
 begin
-  result.x := p.x * cos(alpha) - p.y * sin(alpha);
-  result.y := p.x * sin(alpha) + p.y * cos(alpha);
+  sincos(alpha, sinus, cosinus);
+  result.x := p.x * cosinus - p.y *   sinus;
+  result.y := p.x *   sinus + p.y * cosinus;
+  result.z := p.z;
 end;
 
 function distancebetween(const p0, p1: tvppoint): double;
@@ -203,66 +125,133 @@ begin
   begin
     result.x := (-l0.c * l1.b + l0.b * l1.c) / (l0.a * l1.b - l0.b * l1.a);
     result.y := (-l0.c - l0.a * result.x) / (l0.b);
+    result.z := 0;
   end else
     raise exception.create('Intersectlines routine exception');
 end;
 
-procedure interpolateline(const p0, p1: tvppoint; var path: tvppath);
+procedure interpolate_line(const p0, p1: tvppoint; points: tvppointlist);
 var
   dx, dy: double;
-  i, j: longint;
+  i, len: longint;
+       p: tvppoint;
 begin
-  i := max(1, round(distancebetween(p0, p1) / 0.15));
-  dx := (p1.x - p0.x) / i;
-  dy := (p1.y - p0.y) / i;
+  len := max(1, round(distancebetween(p0, p1) / 0.15));
+   dx := (p1.x - p0.x) / len;
+   dy := (p1.y - p0.y) / len;
 
-  setlength(path, i + 1);
-  for j := 0 to i do
+  for i := 0 to len do
   begin
-    path[j].x := j * dx;
-    path[j].y := j * dy;
-    path[j]   := translatepoint(p0, path[j]);
+    p.x := i * dx;
+    p.y := i * dy;
+    p.z := p1.z;
+    p   := translatepoint(p0, p);
+    points.add(p);
   end;
 end;
 
-procedure interpolatearc(const p0, p1, cc: tvppoint; clockwise: boolean; var path: tvppath);
+procedure interpolate_circle(const entity: tvcircle; points: tvppointlist);
 var
-  i, j: longint;
-  angle0: double;
-  angle1: double;
-  line0: tvpline;
-  line1: tvpline;
+      i: longint;
+    len: longint;
+     cc: tvppoint;
+      p: tvppoint;
+  start: tvppoint;
   sweep: double;
-  tmp0: tvppoint;
-  tmp1: tvppoint;
-  tmp2: tvppoint;
 begin
-  tmp0.x := p0.x - cc.x;
-  tmp0.y := p0.y - cc.y;
-  tmp1.x := p1.x - cc.x;
-  tmp1.y := p1.y - cc.y;
-  tmp2.x := 0;
-  tmp2.y := 0;
+  cc.x    := entity.x;
+  cc.y    := entity.y;
+  cc.z    := 0;
+  start.x := entity.radius;
+  start.y := +0.0;
+  start.z := -1.0;
+  sweep   := 2 * pi;
 
-  line0  := linebetween(tmp2, tmp0);
-  line1  := linebetween(tmp2, tmp1);
-  angle0 := lineangle(line0);
-  angle1 := lineangle(line1);
-  sweep  := angle1 - angle0;
+  len := max(1, round(abs(sweep) * entity.radius / 0.15));
 
-  if (clockwise) and (sweep >= 0) then
-    sweep := sweep - (2 * pi)
-  else
-    if (not clockwise) and (sweep <= 0) then
-      sweep := sweep + (2 * pi);
-
-  i := max(1, round(abs(sweep) * distancebetween(tmp2, tmp0) / 0.15));
-  setlength(path, i + 1);
-  for j := 0 to i do
+  for i := 0 to len do
   begin
-    path[j] := rotatepoint(tmp0, (j * (sweep / i)));
-    path[j] := translatepoint(cc, path[j]);
+    p := rotatepoint(start, (i * (sweep / len)));
+    p := translatepoint(cc, p);
+    points.add(p);
   end;
+end;
+
+procedure interpolate_circlearc(const entity: tvcirculararc; points: tvppointlist);
+var
+      i: longint;
+    len: longint;
+     cc: tvppoint;
+      p: tvppoint;
+  start: tvppoint;
+  sweep: double;
+begin
+  cc.x    := entity.x;
+  cc.y    := entity.y;
+  cc.z    := 0;
+  start.x := entity.radius;
+  start.y := +0.0;
+  start.z := -1.0;
+  start   := rotatepoint(start, degtorad(entity.startangle));
+  sweep   := degtorad(entity.endangle - entity.startangle);
+
+  len := max(1, round(abs(sweep) * entity.radius / 0.15));
+
+  for i := 0 to len do
+  begin
+    p := rotatepoint(start, (i * (sweep / len)));
+    p := translatepoint(cc, p);
+    points.add(p);
+  end;
+end;
+
+procedure interpolate_path(const entity: tpath; points: tvppointlist);
+var
+   dx, dy: double;
+     i, j: longint;
+      len: longint;
+        p: tvppoint;
+   p0, p1: tvppoint;
+  segment: tpathsegment;
+begin
+  entity.prepareforsequentialreading;
+
+  for i := 0 to entity.len - 1 do
+  begin
+    segment := tpathsegment(entity.next());
+    case segment.segmenttype of
+      stmoveto:
+      begin
+        p0.x := t2dsegment(segment).x;
+        p0.y := t2dsegment(segment).y;
+        p0.z := 0.0;
+        points.add(p0);
+      end;
+      st2dlinewithpen, st2dline, st3dline:
+      begin
+        p1.x := t2dsegment(segment).x;
+        p1.y := t2dsegment(segment).y;
+        p1.z := -1.0;
+
+        len := max(1, round(distancebetween(p0, p1) / 0.15));
+        dx := (p1.x - p0.x) / len;
+        dy := (p1.y - p0.y) / len;
+
+        for j := 0 to len do
+        begin
+          p.x := j * dx;
+          p.y := j * dy;
+          p.z := -1.0;
+          p   := translatepoint(p0, p);
+          points.add(p);
+        end;
+        p0 := p1;
+      end;
+      else
+        writeln(segment.segmenttype);
+    end;
+  end;
+
 end;
 
 //
@@ -322,115 +311,88 @@ begin
   {$endif}
 end;
 
-// tvpcoder //
 
-constructor tvpcoder.create(list: tstringlist);
+
+
+// tvplotter
+
+constructor tvplotter.create(list: tvppointlist);
 begin
-  fpx      := 0;
-  fpy      := 0;
-  fpz      := 0;
-  fxmin    := + maxint;
-  fxmax    := - maxint;
-  fymin    := + maxint;
-  fymax    := - maxint;
-  foffsetx := 0;
-  foffsety := 0;
-
   flist    := list;
-  fenabled := false;
+  fplot    := true;
+  fonstart := nil;
+  fonstop  := nil;
+  fontick  := nil;
   freeonterminate := true;
   inherited create(true);
 end;
 
-destructor tvpcoder.destroy;
+destructor tvplotter.destroy;
 begin
-  flist  := nil;
+  flist := nil;
   inherited destroy;
 end;
 
-procedure tvpcoder.execute;
+procedure tvplotter.execute;
 var
-  code: tvpcode;
-     i: longint;
-     j: longint;
-    p0: tvppoint;
-    p1: tvppoint;
-    cc: tvppoint;
-  path: tvppath;
+   i: longint = 0;
+  p0, p1: tvppoint;
 begin
-  code.c := '';
-  code.x := 0; code.y := 0; code.z := 0;
-  code.f := 0; code.e := 0; code.i := 0;
-  code.j := 0; code.k := 0; code.r := 0;
-  // ---
-  findex := 0;
-  while (findex < flist.count) do
-  begin
-    parse_line(flist[findex], code);
-    if (code.c ='G01 ') or (code.c ='G01 ') or
-       (code.c ='G02 ') or (code.c ='G03 ') then
-      if code.z < 0 then;
-      begin
-        fxmin := min(fxmin, code.x);
-        fxmax := max(fxmax, code.x);
-        fymin := min(fymin, code.y);
-        fymax := max(fymax, code.y);
-      end;
-    inc(findex);
-  end;
-  foffsetx := - (fxmin + fxmax) / 2;
-  foffsety := - (fymin + fymax) / 2;
-  // ---
-  findex := 0;
+  p0.x := 0;
+  p0.y := 0;
+  p0.z := 0;
+
   if assigned(fonstart) then
     synchronize(fonstart);
 
-  while (findex < flist.count) and (not terminated) do
-  begin
-    if fenabled then
+  if assigned(fontick) then
+    while (i < flist.count) and (not terminated) do
     begin
-      parse_line(flist[findex], code);
+      p1  := flist.items[i]^;
+      fpx := p1.x;
+      fpy := p1.y;
+      fpz := p1.z;
+      //if distancebetween(p0, p1) > 0.5 then
+      // p0 := p1;
 
-      setlength(path, 0);
-      if (code.c = 'G00 ') or
-         (code.c = 'G01 ') then
-      begin
-        p0.x := fpx;
-        p0.y := fpy;
-        p1.x := code.x + foffsetx;
-        p1.y := code.y + foffsety;
-        interpolateline(p0, p1, path);
-      end else
-      if (code.c = 'G02 ') or
-         (code.c = 'G03 ') then
-      begin
-        p0.x := fpx;
-        p0.y := fpy;
-        p1.x := code.x + foffsetx;
-        p1.y := code.y + foffsety;
-        cc.x := p0.x + code.i;
-        cc.y := p0.y + code.j;
-        interpolatearc(p0, p1, cc, code.c = 'G02 ', path);
-      end;
-
-      j := length(path);
-      if j > 0 then
-        for i := 0 to j - 1 do
-          if not terminated then
-          begin
-            fpx := path[i].x;
-            fpy := path[i].y;
-            fpz :=    code.z;
-            if assigned(fontick) then
-              synchronize(fontick);
-          end;
-      inc(findex);
-    end else
-      sleep(250);
-  end;
+      fprogress := trunc(100 * i / flist.count);
+      synchronize(fontick);
+      inc(i);
+    end;
 
   if assigned(fonstop) then
     synchronize(fonstop);
+end;
+
+// ---
+
+function createvppointlist(vec: tvvectorialdocument): tvppointlist;
+var
+    i, j: longint;
+       p: pvppoint;
+  entity: tventity;
+    page: tvpage;
+begin
+  result := tvppointlist.create;
+  for i := 0 to vec.getpagecount - 1 do
+  begin
+    page := vec.getpage(0);
+    for j := 0 to page.getentitiescount - 1 do
+    begin
+      entity := page.getentity(j);
+      if entity is tvcircle then
+        interpolate_circle(tvcircle(entity), result)
+      else
+      if entity is tvcirculararc then
+        interpolate_circlearc(tvcirculararc(entity), result)
+      else
+      if entity is tpath then
+        interpolate_path(tpath(entity), result)
+      else
+        writeln(entity.classname);
+    end;
+  end;
+  result.update;
 end;
 
 end.

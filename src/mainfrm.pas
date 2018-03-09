@@ -1,5 +1,5 @@
-
-{ Description: vPlot Main Form.
+{
+  Description: vPlot Main Form.
 
   Copyright (C) 2014-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
@@ -27,62 +27,62 @@ interface
 
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls,
-  comctrls, buttons, menus, spin, vpcoder, vplayout, vpdriver;
+  comctrls, buttons, menus, spin, vpcommon, vpcoder, vplayout, vpdriver,
+  fpvectorial;
 
 type
   { tmainform }
 
   tmainform = class(tform)
-    aboutbtn: TBitBtn;
-    aboutgb: TGroupBox;
-    leftedit: TSpinEdit;
-    rightedit: TSpinEdit;
-    StaticText1: TStaticText;
-    StaticText2: TStaticText;
-    StaticText3: TStaticText;
-    StaticText4: TStaticText;
-    StaticText5: TStaticText;
-    StaticText6: TStaticText;
-    StaticText7: TStaticText;
-    StaticText8: TStaticText;
-    verticalcb: TCheckBox;
-    redrawbtn: TBitBtn;
-    formatcb: TComboBox;
-    papersizegb: TGroupBox;
-    Label1: TLabel;
-    Label2: TLabel;
-    heightl: TLabel;
-    widthl: TLabel;
-    formatl: TLabel;
-    loadbtn: TBitBtn;
-    offsetyse: TSpinEdit;
-    offsetxse: TSpinEdit;
-    heightse: TSpinEdit;
-    widthse: TSpinEdit;
-    startbtn: TBitBtn;
-    stopbtn: TBitBtn;
-    creativecontrolgb: TGroupBox;
-    sethomebtn: TBitBtn;
-    bordersbtn: TBitBtn;
-    leftdownbtn: TBitBtn;
-    rightdownbtn: TBitBtn;
-    penupbtn: TBitBtn;
-    pendownbtn: TBitBtn;
-    leftupbtn: TBitBtn;
-    rightupbtn: TBitBtn;
-    gohomebtn: TBitBtn;
-    manualdrivinggb: TGroupBox;
-    drawingcontrolgb: TGroupBox;
-    previewimage: TImage;
+    aboutbtn: tbitbtn;
+    aboutgb: tgroupbox;
+    image: TImage;
+    leftedit: tspinedit;
+    rightedit: tspinedit;
+    verticalcb: tcheckbox;
+    redrawbtn: tbitbtn;
+    formatcb: tcombobox;
+    papersizegb: tgroupbox;
+    label1: tlabel;
+    label2: tlabel;
+    heightl: tlabel;
+    widthl: tlabel;
+    formatl: tlabel;
+    loadbtn: tbitbtn;
+    offsetyse: tspinedit;
+    offsetxse: tspinedit;
+    heightse: tspinedit;
+    widthse: tspinedit;
+    startbtn: tbitbtn;
+    stopbtn: tbitbtn;
+    creativecontrolgb: tgroupbox;
+    sethomebtn: tbitbtn;
+    bordersbtn: tbitbtn;
+    leftdownbtn: tbitbtn;
+    rightdownbtn: tbitbtn;
+    penupbtn: tbitbtn;
+    pendownbtn: tbitbtn;
+    leftupbtn: tbitbtn;
+    rightupbtn: tbitbtn;
+    gohomebtn: tbitbtn;
+    manualdrivinggb: tgroupbox;
+    drawingcontrolgb: tgroupbox;
     opendialog: topendialog;
 
     procedure bordersbtnclick(sender: tobject);
+    procedure creativecontrolgbclick(sender: tobject);
 
     procedure formatcbchange(sender: tobject);
     procedure formcreate(sender: tobject);
     procedure formdestroy(sender: tobject);
     procedure formclose(sender: tobject; var closeaction: tcloseaction);
     procedure gohomebtnclick(sender: tobject);
+    procedure imagemousedown(sender: tobject; button: tmousebutton;
+      shift: tshiftstate; x, y: integer);
+    procedure imagemousemove(sender: tobject; shift: tshiftstate; x, y: integer
+      );
+    procedure imagemouseup(sender: tobject; button: tmousebutton;
+      shift: tshiftstate; x, y: integer);
     procedure leftdownbtnclick(sender: tobject);
 
     procedure leftupbtnclick(sender: tobject);
@@ -98,11 +98,16 @@ type
 
     procedure verticalcbeditingdone(sender: tobject);
   private
-    image: tbitmap;
-    list:  tstringlist;
-    procedure onstart;
-    procedure onstop;
-    procedure ontick;
+   bitmap:    tbitmap;
+     list:    tvppointlist;
+      vec:    tvvectorialdocument;
+
+ mouseisdown: boolean;
+   px: longint;
+   py: longint;
+    procedure onplotterstart;
+    procedure onplotterstop;
+    procedure onplottertick;
   end;
 
 
@@ -115,13 +120,12 @@ implementation
 {$R *.lfm}
 
 uses
-  math, sysutils, fpvectorial, avisocncgcodewriter, dxfvectorialreader;
+  math, sysutils, dxfvectorialreader;
 
 var
-  coder:  tvpcoder;
-  driver: tvpdriver;
-  layout: tvplayout;
-
+  layout:  tvplayout;
+  plotter: tvplotter = nil;
+  driver:  tvpdriver = nil;
 
 // form events //
 
@@ -132,63 +136,37 @@ begin
   papersizegb      .enabled := false;
   drawingcontrolgb .enabled := false;
   // ---
-
-  image := tbitmap.create;
-  list  := tstringlist.create;
-
-
-
   loadlayout(layout, changefileext(paramstr(0), '.ini'));
-  driver := tvpdriver.create(layout.mode);
-
+  driver    := tvpdriver.create(layout.mode);
+  vec       := tvvectorialdocument.create;
+  list      := createvppointlist(vec);
+  bitmap    := tbitmap.create;
+  // ---
+  formatcbchange (nil);
   sethomebtnclick(nil);
   reloadbtnclick (nil);
 end;
 
 procedure tmainform.formdestroy(sender: tobject);
 begin
-  driver.destroy;
+  gohomebtnclick(nil);
+  // ---
+  vec.destroy;
   list.destroy;
-
-  image.destroy;
+  driver.destroy;
+  bitmap.destroy;
 end;
 
 procedure tmainform.formclose(sender: tobject; var closeaction: tcloseaction);
 begin
-  if assigned(coder) then
+  if assigned(plotter) then
   begin
-    playorstopbtnclick(stopbtn);
     closeaction := canone;
+    plotter.plot := true;
+    plotter.terminate;
   end else
-  begin
-    gohomebtnclick(sender);
     closeaction := cafree;
-  end;
 end;
-
-//
-
-procedure tmainform.formatcbchange(sender: tobject);
-begin
-  verticalcb.enabled := true;
-  heightse  .enabled := false;
-  widthse   .enabled := false;
-  case formatcb.itemindex of
-    0: begin heightse.value := 841; widthse .value := 1189; end;
-    1: begin heightse.value := 594; widthse .value :=  841; end;
-    2: begin heightse.value := 420; widthse .value :=  594; end;
-    3: begin heightse.value := 297; widthse .value :=  420; end;
-    4: begin heightse.value := 210; widthse .value :=  297; end;
-    5: begin heightse.value := 148; widthse .value :=  210; end;
-  else begin
-         verticalcb.enabled := false;
-         heightse  .enabled := true;
-         widthse   .enabled := true;
-       end;
-  end;
-  verticalcbeditingdone(formatcb);
-end;
-
 
 // manual driving //
 
@@ -245,6 +223,11 @@ begin
 
 end;
 
+procedure tmainform.creativecontrolgbclick(sender: TObject);
+begin
+
+end;
+
 procedure tmainform.gohomebtnclick(sender: tobject);
 var
   m0: longint;
@@ -255,33 +238,67 @@ begin
   driver.move2(m0, m1, 1);
 end;
 
-// ---
+procedure tmainform.imagemousedown(sender: tobject; button: tmousebutton;
+  shift: tshiftstate; x, y: integer);
+begin
+  if button = mbleft then
+  begin
+    mouseisdown := true;
+    px := x;
+    py := y;
+  end;
+end;
+
+procedure tmainform.imagemousemove(sender: tobject;
+  shift: tshiftstate; x, y: integer);
+var
+  nleft: longint;
+   ntop: longint;
+begin
+  if mouseisdown then
+  begin
+    nleft := image.left + (x - px);
+    ntop  := image.top  + (y - py);
+
+    image.left := nleft;
+    image.top  := ntop;
+  end;
+end;
+
+procedure tmainform.imagemouseup(sender: tobject; button: tmousebutton;
+  shift: tshiftstate; x, y: integer);
+begin
+  mouseisdown := false;
+end;
+
+// creativecontrol groupbox
 
 procedure tmainform.loadbtnclick(sender: tobject);
-var
-  vec:     tvvectorialdocument;
-  lformat: tvvectorialformat;
 begin
+  opendialog.filter := 'DXF Files (*.dxf)|*.dxf';
   if opendialog.execute then
   begin
-    list.clear;
+    manualdrivinggb  .enabled := false;
+    creativecontrolgb.enabled := false;
+    papersizegb      .enabled := false;
+    drawingcontrolgb .enabled := false;
 
-    (*
+    freeandnil(list);
+    freeandnil(vec);
     vec := tvvectorialdocument.create;
     try
-      lformat := tvvectorialdocument.getformatfromextension(opendialog.filename);
-      vec.readfromfile(opendialog.filename, lformat);
-      vec.writetostrings(list, vfgcodeavisocncprototipov5);
-
-      list.savetofile('pippo.txt');
+      vec.readfromfile(opendialog.filename,
+        vec.getformatfromextension(opendialog.filename));
     finally
-      vec.free;
     end;
-    *)
+    list := createvppointlist(vec);
 
-    list.loadfromfile(opendialog.filename);
+    manualdrivinggb  .enabled := true;
+    creativecontrolgb.enabled := true;
+    papersizegb      .enabled := true;
+    drawingcontrolgb .enabled := true;
 
-    reloadbtnclick(sender);
+    formatcbchange(nil);
   end;
 end;
 
@@ -289,145 +306,41 @@ procedure tmainform.reloadbtnclick(sender: tobject);
 begin
   verticalcbeditingdone(sender);
   // ---
-  image.canvas.pen.color   := clltgray;
-  image.canvas.brush.color := clltgray;
-  image.canvas.brush.style := bssolid;
-  image.setsize(
-     widthse.value,
-    heightse.value);
-  image.canvas.fillrect(0, 0,
-     widthse.value,
-    heightse.value);
-  // ---
-  previewimage.canvas.pen.color   := clltgray;
-  previewimage.canvas.brush.color := clltgray;
-  previewimage.canvas.brush.style := bssolid;
-  previewimage.picture.bitmap.setsize(
-     widthse.value,
-    heightse.value);
-  previewimage.canvas.fillrect(0, 0,
-     widthse.value,
-    heightse.value);
-
-  previewimage.center            := true;
-  previewimage.proportional      := true;
-  previewimage.stretchinenabled  := true;
-  previewimage.stretchoutenabled := false;
-  previewimage.stretch           := true;
-  // ---
   driver.enabled := sender = startbtn;
   if driver.enabled then
     driver.move4(0, 0, -driver.cntz);
 
   if sender <> nil then
   begin
-    coder         := tvpcoder.create(list);
-    coder.onstart := @onstart;
-    coder.onstop  := @onstop;
-    coder.ontick  := @ontick;
-    coder.enabled := true;
-    coder.start;
+    plotter         := tvplotter.create(list);
+    plotter.onstart := @onplotterstart;
+    plotter.onstop  := @onplotterstop;
+    plotter.ontick  := @onplottertick;
+    plotter.start;
   end;
 end;
 
-procedure tmainform.playorstopbtnclick(sender: tobject);
+procedure tmainform.formatcbchange(sender: tobject);
 begin
-  if assigned(coder) then
-  begin
-
-    if sender = stopbtn then
-    begin
-      coder.terminate;
-      coder.enabled := true;
-    end else
-    if sender = startbtn then
-    begin
-      coder.enabled := not coder.enabled;
-      if coder.enabled then
-        startbtn.caption := 'Pause'
-      else
-        startbtn.caption := 'Play';
-    end;
-
-  end else
-  begin
-
-    if sender = startbtn then
-    begin
-      reloadbtnclick(startbtn);
-
-    end;
-
-  end;
-end;
-
-
-procedure tmainform.onstart;
-begin
-  startbtn.caption          := 'Pause';
-  manualdrivinggb  .enabled := false;
-  creativecontrolgb.enabled := false;
-  papersizegb      .enabled := false;
-  drawingcontrolgb .enabled := true;
-  application.processmessages;
-end;
-
-procedure tmainform.onstop;
-begin
-
-
-  statictext1.caption := 'xmin = ' + floattostr(coder.xmin);
-  statictext2.caption := 'xmax = ' + floattostr(coder.xmax);
-  statictext3.caption := 'ymin = ' + floattostr(coder.ymin);
-  statictext4.caption := 'ymax = ' + floattostr(coder.ymax);
-
-  statictext5.caption := 'width  = ' + floattostr(coder.xmax - coder.xmin);
-  statictext6.caption := 'height = ' + floattostr(coder.ymax - coder.ymin);
-
-  statictext7.caption := 'offsetx  = ' + floattostr(coder.offsetx);
-  statictext8.caption := 'offsety  = ' + floattostr(coder.offsety);
-
-
-  caption := 'VPlot Driver';
-  previewimage.canvas.draw(0,0, image);
-
-  startbtn.caption          := 'Play';
-  manualdrivinggb  .enabled := true;
-  creativecontrolgb.enabled := true;
-  papersizegb      .enabled := true;
-  drawingcontrolgb .enabled := true;
-  application.processmessages;
-
-  coder := nil;
-end;
-
-procedure tmainform.ontick;
-var
-   p: tvppoint;
-  m0: longint;
-  m1: longint;
-begin
-  p.x := (widthse .value div 2) + offsetxse.value + (coder.px);
-  p.y := (heightse.value div 2) - offsetyse.value - (coder.py);
-
-  if coder.pz < 0 then
-    image.canvas.pixels[round(p.x), round(p.y)] := clblack
-  else
-    image.canvas.pixels[round(p.x), round(p.y)] := clred;
-
-  if driver.enabled then
-  begin
-    p.x := layout.p08.x + offsetxse.value + (coder.px);
-    p.y := layout.p08.y + offsetyse.value + (coder.py);
-    optimize(p, layout, m0, m1);
-
-    driver.move2(m0, m1, round(coder.pz));
+  verticalcb.enabled := true;
+  heightse  .enabled := false;
+  widthse   .enabled := false;
+  case formatcb.itemindex of
+    0: begin heightse.value := 841; widthse .value := 1189; end;
+    1: begin heightse.value := 594; widthse .value :=  841; end;
+    2: begin heightse.value := 420; widthse .value :=  594; end;
+    3: begin heightse.value := 297; widthse .value :=  420; end;
+    4: begin heightse.value := 210; widthse .value :=  297; end;
+    5: begin heightse.value := 148; widthse .value :=  210; end;
+  else begin
+         verticalcb.enabled := false;
+         heightse  .enabled := true;
+         widthse   .enabled := true;
+       end;
   end;
 
-  if coder.index mod 20 = 0 then
-    caption := format('VPlot Driver - Drawing [%u / %u]',
-      [coder.index, list.count]);
-  application.processmessages;
+  if verticalcb.enabled then
+    verticalcbeditingdone(formatcb);
 end;
 
 procedure tmainform.verticalcbeditingdone(sender: tobject);
@@ -445,7 +358,114 @@ begin
     heightse.value := amin;
     widthse .value := amax;
   end;
+  // ---
+  bitmap.canvas.pen.color   := clltgray;
+  bitmap.canvas.brush.color := clltgray;
+  bitmap.canvas.brush.style := bssolid;
+  bitmap.setsize(
+     widthse.value,
+    heightse.value);
+  bitmap.canvas.fillrect(0, 0,
+     widthse.value,
+    heightse.value);
+  // ---
+  image.canvas.pen.color   := clltgray;
+  image.canvas.brush.color := clltgray;
+  image.canvas.brush.style := bssolid;
+  image.picture.bitmap.setsize(
+     widthse.value,
+    heightse.value);
+  image.canvas.fillrect(0, 0,
+     widthse.value,
+    heightse.value);
+
+  image.center            := true;
+  image.proportional      := true;
+  image.stretchinenabled  := false;
+  image.stretchoutenabled := false;
+  image.stretch           := false;
 end;
+
+procedure tmainform.playorstopbtnclick(sender: tobject);
+begin
+  if assigned(plotter) then
+  begin
+    if sender = stopbtn then
+    begin
+      plotter.plot := true;
+      plotter.terminate;
+    end else
+    if sender = startbtn then
+    begin
+      plotter.plot := not plotter.plot;
+      if plotter.plot then
+        startbtn.caption := 'Pause'
+      else
+        startbtn.caption := 'Play';
+    end;
+
+  end else
+  begin
+    if sender = startbtn then
+    begin
+      reloadbtnclick(startbtn);
+    end;
+  end;
+end;
+
+procedure tmainform.onplotterstart;
+begin
+  startbtn.caption          := 'Pause';
+  manualdrivinggb  .enabled := false;
+  creativecontrolgb.enabled := false;
+  papersizegb      .enabled := false;
+  drawingcontrolgb .enabled := true;
+  application.processmessages;
+end;
+
+procedure tmainform.onplotterstop;
+begin
+  caption                   := 'VPlot Driver';
+  startbtn.caption          := 'Play';
+  manualdrivinggb  .enabled := true;
+  creativecontrolgb.enabled := true;
+  papersizegb      .enabled := true;
+  drawingcontrolgb .enabled := true;
+  image.canvas.draw(0,0, bitmap);
+  application.processmessages;
+
+  plotter := nil;
+end;
+
+procedure tmainform.onplottertick;
+var
+   p: tvppoint;
+  m0: longint;
+  m1: longint;
+begin
+  p.x := (widthse .value div 2) + offsetxse.value + (plotter.px);
+  p.y := (heightse.value div 2) - offsetyse.value - (plotter.py);
+
+  if plotter.pz < 0 then
+    bitmap.canvas.pixels[trunc(p.x), trunc(p.y)] := clblack
+  else
+    bitmap.canvas.pixels[trunc(p.x), trunc(p.y)] := clred;
+
+  if driver.enabled then
+  begin
+    p.x := layout.p08.x + offsetxse.value + (plotter.px);
+    p.y := layout.p08.y + offsetyse.value + (plotter.py);
+    optimize(p, layout, m0, m1);
+
+    driver.move2(m0, m1, round(plotter.pz));
+  end;
+
+  caption := inttostr(plotter.progress);
+
+  application.processmessages;
+end;
+
+
 
 end.
 

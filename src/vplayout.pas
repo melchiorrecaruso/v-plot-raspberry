@@ -26,33 +26,10 @@ unit vplayout;
 
 interface
 
+uses
+  vpcommon;
+
 type
-  tvppoint = packed record
-    x: double;
-    y: double;
-  end;
-
-  tvppath = array of tvppoint;
-
-  tvpline = packed record
-    a: double;
-    b: double;
-    c: double;
-  end;
-
-  tvpcode = packed record
-    c: rawbytestring;
-    x: double;
-    y: double;
-    z: double;
-    f: double;
-    e: double;
-    i: double;
-    j: double;
-    k: double;
-    r: double;
-  end;
-
   tvplayout = packed record
     p00:   tvppoint;
     p01:   tvppoint;
