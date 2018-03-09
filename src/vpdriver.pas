@@ -27,7 +27,7 @@ unit vpdriver;
 interface
 
 uses
-  classes, {$ifdef cpuarm} pca9685, wiringpi, {$endif} sysutils;
+  classes, {$ifdef cpuarm} pca9685, wiringpi, math, {$endif} sysutils;
 
 type
   tvpdriver = class
