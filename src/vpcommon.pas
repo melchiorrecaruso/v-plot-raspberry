@@ -71,9 +71,9 @@ uses
 
 { tvppointlist }
 
-function compare(item1, item2: pvppoint): longint;
+function compare(item1, item2: pvppoint): boolean;
 begin
-  result := 1;
+  result := (item1^.x = item2^.x) and (item1^.y = item2^.y);
 end;
 
 constructor tvppointlist.create;

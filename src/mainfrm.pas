@@ -459,9 +459,9 @@ begin
 
     driver.move2(m0, m1, round(plotter.pz));
   end;
+  image.canvas.draw(0,0, bitmap);
 
   caption := inttostr(plotter.progress);
-
   application.processmessages;
 end;
 

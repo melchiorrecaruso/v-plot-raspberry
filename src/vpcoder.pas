@@ -148,6 +148,7 @@ begin
     p   := translatepoint(p0, p);
     points.add(p);
   end;
+  writeln('interpolate_line');
 end;
 
 procedure interpolate_circle(const entity: tvcircle; points: tvppointlist);
@@ -175,6 +176,7 @@ begin
     p := translatepoint(cc, p);
     points.add(p);
   end;
+  writeln('interpolate_circle');
 end;
 
 procedure interpolate_circlearc(const entity: tvcirculararc; points: tvppointlist);
@@ -203,6 +205,7 @@ begin
     p := translatepoint(cc, p);
     points.add(p);
   end;
+  writeln('interpolate_circlearc');
 end;
 
 procedure interpolate_path(const entity: tpath; points: tvppointlist);
@@ -215,7 +218,6 @@ var
   segment: tpathsegment;
 begin
   entity.prepareforsequentialreading;
-
   for i := 0 to entity.len - 1 do
   begin
     segment := tpathsegment(entity.next());
@@ -252,6 +254,7 @@ begin
     end;
   end;
 
+  writeln('interpolate_path');
 end;
 
 //
@@ -346,19 +349,26 @@ begin
     synchronize(fonstart);
 
   if assigned(fontick) then
-    while (i < flist.count) and (not terminated) do
+  begin
+    if plot then
     begin
-      p1  := flist.items[i]^;
-      fpx := p1.x;
-      fpy := p1.y;
-      fpz := p1.z;
-      //if distancebetween(p0, p1) > 0.5 then
-      // p0 := p1;
+      while (i < flist.count) and (not terminated) do
+      begin
+        p1  := flist.items[i]^;
+        fpx := p1.x;
+        fpy := p1.y;
+        fpz := p1.z;
+        //if distancebetween(p0, p1) > 0.5 then
+        // p0 := p1;
 
-      fprogress := trunc(100 * i / flist.count);
-      synchronize(fontick);
-      inc(i);
-    end;
+        fprogress := trunc(100 * i / flist.count);
+        synchronize(fontick);
+        inc(i);
+      end;
+
+    end else
+      sleep(250);
+  end;
 
   if assigned(fonstop) then
     synchronize(fonstop);
@@ -390,6 +400,7 @@ begin
         interpolate_path(tpath(entity), result)
       else
         writeln(entity.classname);
+
     end;
   end;
   result.update;
