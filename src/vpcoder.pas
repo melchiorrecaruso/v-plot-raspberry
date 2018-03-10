@@ -35,7 +35,7 @@ type
     fpx:       double;
     fpy:       double;
     fpz:       double;
-    flist:     tvppointlist;
+    fpaths:    tvppaths;
     fplot:     boolean;
     fprogress: longint;
     fonstart:  tthreadmethod;
@@ -44,7 +44,7 @@ type
   protected
     procedure execute; override;
   public
-    constructor create(list: tvppointlist);
+    constructor create(paths: tvppaths);
     destructor  destroy; override;
   public
     property px:       double        read fpx;
@@ -65,7 +65,7 @@ function  linebetween(const p0, p1: tvppoint): tvpline;
 function  lineangle(var line: tvpline): double;
 function  intersectlines(const l0, l1: tvpline): tvppoint;
 
-function createvppointlist(vec: tvvectorialdocument): tvppointlist;
+function createvppaths(vec: tvvectorialdocument): tvppaths;
 
 procedure optimize(const p: tvppoint; const l: tvplayout; var m0, m1: longint);
 
@@ -130,7 +130,9 @@ begin
     raise exception.create('Intersectlines routine exception');
 end;
 
-procedure interpolate_line(const p0, p1: tvppoint; points: tvppointlist);
+// toolpath routines //
+
+function interpolate_line(const p0, p1: tvppoint): tvppath;
 var
   dx, dy: double;
   i, len: longint;
@@ -140,18 +142,19 @@ begin
    dx := (p1.x - p0.x) / len;
    dy := (p1.y - p0.y) / len;
 
+  result := tvppath.create;
   for i := 0 to len do
   begin
     p.x := i * dx;
     p.y := i * dy;
     p.z := p1.z;
     p   := translatepoint(p0, p);
-    points.add(p);
+    result.add(p);
   end;
   writeln('interpolate_line');
 end;
 
-procedure interpolate_circle(const entity: tvcircle; points: tvppointlist);
+function interpolate_circle(const entity: tvcircle ): tvppath;
 var
       i: longint;
     len: longint;
@@ -170,16 +173,17 @@ begin
 
   len := max(1, round(abs(sweep) * entity.radius / 0.15));
 
+  result := tvppath.create;
   for i := 0 to len do
   begin
     p := rotatepoint(start, (i * (sweep / len)));
     p := translatepoint(cc, p);
-    points.add(p);
+    result.add(p);
   end;
   writeln('interpolate_circle');
 end;
 
-procedure interpolate_circlearc(const entity: tvcirculararc; points: tvppointlist);
+function interpolate_circlearc(const entity: tvcirculararc): tvppath;
 var
       i: longint;
     len: longint;
@@ -199,16 +203,17 @@ begin
 
   len := max(1, round(abs(sweep) * entity.radius / 0.15));
 
+  result := tvppath.create;
   for i := 0 to len do
   begin
     p := rotatepoint(start, (i * (sweep / len)));
     p := translatepoint(cc, p);
-    points.add(p);
+    result.add(p);
   end;
   writeln('interpolate_circlearc');
 end;
 
-procedure interpolate_path(const entity: tpath; points: tvppointlist);
+function interpolate_path(const entity: tpath): tvppath;
 var
    dx, dy: double;
      i, j: longint;
@@ -217,6 +222,8 @@ var
    p0, p1: tvppoint;
   segment: tpathsegment;
 begin
+  result := tvppath.create;
+
   entity.prepareforsequentialreading;
   for i := 0 to entity.len - 1 do
   begin
@@ -227,7 +234,7 @@ begin
         p0.x := t2dsegment(segment).x;
         p0.y := t2dsegment(segment).y;
         p0.z := 0.0;
-        points.add(p0);
+        result.add(p0);
       end;
       st2dlinewithpen, st2dline, st3dline:
       begin
@@ -245,7 +252,7 @@ begin
           p.y := j * dy;
           p.z := -1.0;
           p   := translatepoint(p0, p);
-          points.add(p);
+          result.add(p);
         end;
         p0 := p1;
       end;
@@ -314,14 +321,11 @@ begin
   {$endif}
 end;
 
-
-
-
 // tvplotter
 
-constructor tvplotter.create(list: tvppointlist);
+constructor tvplotter.create(paths: tvppaths);
 begin
-  flist    := list;
+  fpaths   := paths;
   fplot    := true;
   fonstart := nil;
   fonstop  := nil;
@@ -332,43 +336,40 @@ end;
 
 destructor tvplotter.destroy;
 begin
-  flist := nil;
+  fpaths := nil;
   inherited destroy;
 end;
 
 procedure tvplotter.execute;
 var
-   i: longint = 0;
-  p0, p1: tvppoint;
+       i: longint;
+       j: longint;
+    page: tvppath;
+   point: pvppoint;
 begin
-  p0.x := 0;
-  p0.y := 0;
-  p0.z := 0;
-
   if assigned(fonstart) then
     synchronize(fonstart);
 
   if assigned(fontick) then
-  begin
-    if plot then
+    for i := 0 to fpaths.count - 1 do
     begin
-      while (i < flist.count) and (not terminated) do
+      page := fpaths.item[i];
+
+      for j := 0 to page.count - 1 do
       begin
-        p1  := flist.items[i]^;
-        fpx := p1.x;
-        fpy := p1.y;
-        fpz := p1.z;
-        //if distancebetween(p0, p1) > 0.5 then
-        // p0 := p1;
+        point := page.item[j];
 
-        fprogress := trunc(100 * i / flist.count);
-        synchronize(fontick);
-        inc(i);
+        if not terminated then
+        begin
+          fpx := point^.x;
+          fpy := point^.y;
+          fpz := point^.z;
+          synchronize(fontick);
+          while not fplot do sleep(250);
+        end;
+
       end;
-
-    end else
-      sleep(250);
-  end;
+    end;
 
   if assigned(fonstop) then
     synchronize(fonstop);
@@ -376,28 +377,28 @@ end;
 
 // ---
 
-function createvppointlist(vec: tvvectorialdocument): tvppointlist;
+function createvppaths(vec: tvvectorialdocument): tvppaths;
 var
     i, j: longint;
        p: pvppoint;
   entity: tventity;
     page: tvpage;
 begin
-  result := tvppointlist.create;
+  result := tvppaths.create;
   for i := 0 to vec.getpagecount - 1 do
   begin
-    page := vec.getpage(0);
+    page := vec.getpageasvectorial(i);
     for j := 0 to page.getentitiescount - 1 do
     begin
       entity := page.getentity(j);
       if entity is tvcircle then
-        interpolate_circle(tvcircle(entity), result)
+        result.add(interpolate_circle(tvcircle(entity)))
       else
       if entity is tvcirculararc then
-        interpolate_circlearc(tvcirculararc(entity), result)
+        result.add(interpolate_circlearc(tvcirculararc(entity)))
       else
       if entity is tpath then
-        interpolate_path(tpath(entity), result)
+        result.add(interpolate_path(tpath(entity)))
       else
         writeln(entity.classname);
 

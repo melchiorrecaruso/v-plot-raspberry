@@ -99,7 +99,7 @@ type
     procedure verticalcbeditingdone(sender: tobject);
   private
    bitmap:    tbitmap;
-     list:    tvppointlist;
+    paths:    tvppaths;
       vec:    tvvectorialdocument;
 
  mouseisdown: boolean;
@@ -139,7 +139,7 @@ begin
   loadlayout(layout, changefileext(paramstr(0), '.ini'));
   driver    := tvpdriver.create(layout.mode);
   vec       := tvvectorialdocument.create;
-  list      := createvppointlist(vec);
+  paths     := createvppaths(vec);
   bitmap    := tbitmap.create;
   // ---
   formatcbchange (nil);
@@ -152,7 +152,7 @@ begin
   gohomebtnclick(nil);
   // ---
   vec.destroy;
-  list.destroy;
+  paths.destroy;
   driver.destroy;
   bitmap.destroy;
 end;
@@ -283,7 +283,7 @@ begin
     papersizegb      .enabled := false;
     drawingcontrolgb .enabled := false;
 
-    freeandnil(list);
+    freeandnil(paths);
     freeandnil(vec);
     vec := tvvectorialdocument.create;
     try
@@ -291,7 +291,7 @@ begin
         vec.getformatfromextension(opendialog.filename));
     finally
     end;
-    list := createvppointlist(vec);
+    paths := createvppaths(vec);
 
     manualdrivinggb  .enabled := true;
     creativecontrolgb.enabled := true;
@@ -312,7 +312,7 @@ begin
 
   if sender <> nil then
   begin
-    plotter         := tvplotter.create(list);
+    plotter         := tvplotter.create(paths);
     plotter.onstart := @onplotterstart;
     plotter.onstop  := @onplotterstop;
     plotter.ontick  := @onplottertick;
@@ -460,6 +460,7 @@ begin
     driver.move2(m0, m1, round(plotter.pz));
   end;
   image.canvas.draw(0,0, bitmap);
+  sleep(5);
 
   caption := inttostr(plotter.progress);
   application.processmessages;
