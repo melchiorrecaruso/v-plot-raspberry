@@ -312,7 +312,6 @@ begin
   {$ifdef debug}
   writeln('fcount0 = ', fcnt0);
   writeln('fcount1 = ', fcnt1);
-  writeln('fcountz = ', fcntz);
   {$endif}
   {$endif}
 end;

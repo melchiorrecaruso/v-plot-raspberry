@@ -445,11 +445,7 @@ var
 begin
   p.x := (widthse .value div 2) + offsetxse.value + (plotter.px);
   p.y := (heightse.value div 2) - offsetyse.value - (plotter.py);
-
-  if plotter.pz < 0 then
-    bitmap.canvas.pixels[trunc(p.x), trunc(p.y)] := clblack
-  else
-    bitmap.canvas.pixels[trunc(p.x), trunc(p.y)] := clred;
+  bitmap.canvas.pixels[trunc(p.x), trunc(p.y)] := clblack;
 
   if driver.enabled then
   begin
@@ -466,7 +462,6 @@ begin
     image.canvas.draw(0,0, bitmap);
     progress := 0;
   end;
-  sleep(2);
 
   caption := inttostr(plotter.progress);
   application.processmessages;

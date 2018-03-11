@@ -34,7 +34,6 @@ type
   private
     fpx:       double;
     fpy:       double;
-    fpz:       double;
     fpaths:    tvppaths;
     fplot:     boolean;
     fprogress: longint;
@@ -49,7 +48,6 @@ type
   public
     property px:       double        read fpx;
     property py:       double        read fpy;
-    property pz:       double        read fpz;
     property plot:     boolean       read fplot      write fplot;
     property progress: longint       read fprogress;
     property onstart:  tthreadmethod read fonstart   write fonstart;
@@ -58,12 +56,7 @@ type
   end;
 
 
-function  translatepoint(const cc, p: tvppoint): tvppoint;
-function  rotatepoint(const p: tvppoint; const alpha: double): tvppoint;
-function  distancebetween(const p0, p1: tvppoint): double;
-function  linebetween(const p0, p1: tvppoint): tvpline;
-function  lineangle(var line: tvpline): double;
-function  intersectlines(const l0, l1: tvpline): tvppoint;
+
 
 function createvppaths(vec: tvvectorialdocument): tvppaths;
 
@@ -76,59 +69,10 @@ implementation
 uses
   math, sysutils;
 
-// geometry routines
 
-function translatepoint(const cc, p: tvppoint): tvppoint;
-begin
-  result.x := cc.x + p.x;
-  result.y := cc.y + p.y;
-  result.z :=        p.z;
-end;
 
-function rotatepoint(const p: tvppoint; const alpha: double): tvppoint;
-var
-  sinus, cosinus : double;
-begin
-  sincos(alpha, sinus, cosinus);
-  result.x := p.x * cosinus - p.y *   sinus;
-  result.y := p.x *   sinus + p.y * cosinus;
-  result.z := p.z;
-end;
 
-function distancebetween(const p0, p1: tvppoint): double;
-begin
-  result := sqrt(sqr(p1.x - p0.x) + sqr(p1.y - p0.y));
-end;
 
-function linebetween(const p0, p1: tvppoint): tvpline;
-begin
-  result.a :=  p1.y - p0.y;
-  result.b :=  p0.x - p1.x;
-  result.c := (p1.x - p0.x) * p0.y - (p1.y - p0.y) * p0.x;
-end;
-
-function lineangle(var line: tvpline): double;
-begin
-  if line.b = 0 then
-  begin
-    if line.a > 0 then
-      result := +pi / 2
-    else
-      result := -pi / 2;
-  end else
-    result := arctan2(line.a, -line.b);
-end;
-
-function intersectlines(const l0, l1: tvpline): tvppoint;
-begin
-  if (l0.a * l1.b) <> (l0.b * l1.a) then
-  begin
-    result.x := (-l0.c * l1.b + l0.b * l1.c) / (l0.a * l1.b - l0.b * l1.a);
-    result.y := (-l0.c - l0.a * result.x) / (l0.b);
-    result.z := 0;
-  end else
-    raise exception.create('Intersectlines routine exception');
-end;
 
 // toolpath routines
 
@@ -147,7 +91,6 @@ begin
   begin
     p.x := i * dx;
     p.y := i * dy;
-    p.z := p1.z;
     p   := translatepoint(p0, p);
     result.add(p);
   end;
@@ -164,10 +107,8 @@ var
 begin
   cc.x    := entity.x;
   cc.y    := entity.y;
-  cc.z    := 0;
   start.x := entity.radius;
   start.y := +0.0;
-  start.z := -1.0;
   sweep   := 2 * pi;
 
   len := max(1, round(abs(sweep) * entity.radius / 0.15));
@@ -192,10 +133,8 @@ var
 begin
   cc.x    := entity.x;
   cc.y    := entity.y;
-  cc.z    := 0;
   start.x := entity.radius;
   start.y := +0.0;
-  start.z := -1.0;
   start   := rotatepoint(start, degtorad(entity.startangle));
   sweep   := degtorad(entity.endangle - entity.startangle);
 
@@ -229,14 +168,11 @@ begin
       begin
         p0.x := t2dsegment(segment).x;
         p0.y := t2dsegment(segment).y;
-        p0.z := 0.0;
-        result.add(p0);
       end;
       st2dlinewithpen, st2dline, st3dline:
       begin
         p1.x := t2dsegment(segment).x;
         p1.y := t2dsegment(segment).y;
-        p1.z := -1.0;
 
         len := max(1, round(distancebetween(p0, p1) / 0.15));
         dx := (p1.x - p0.x) / len;
@@ -246,7 +182,6 @@ begin
         begin
           p.x := j * dx;
           p.y := j * dy;
-          p.z := -1.0;
           p   := translatepoint(p0, p);
           result.add(p);
         end;
@@ -354,7 +289,6 @@ begin
         begin
           fpx := point^.x;
           fpy := point^.y;
-          fpz := point^.z;
           synchronize(fontick);
           while not fplot do sleep(250);
         end;
@@ -371,6 +305,7 @@ var
     i, j: longint;
   entity: tventity;
     page: tvpage;
+    path: tvppath;
 begin
   result := tvppaths.create;
   for i := 0 to vec.getpagecount - 1 do
@@ -378,17 +313,27 @@ begin
     page := vec.getpageasvectorial(i);
     for j := 0 to page.getentitiescount - 1 do
     begin
+      path   := nil;
       entity := page.getentity(j);
       if entity is tvcircle then
-        result.add(interpolate_circle(tvcircle(entity)))
+        path := interpolate_circle(tvcircle(entity))
       else
       if entity is tvcirculararc then
-        result.add(interpolate_circlearc(tvcirculararc(entity)))
+        path := interpolate_circlearc(tvcirculararc(entity))
       else
       if entity is tpath then
-        result.add(interpolate_path(tpath(entity)))
+        path := interpolate_path(tpath(entity))
       else
         writeln(entity.classname);
+
+
+      if assigned(path) then
+      begin
+        if path.getlen > 0.25 then
+          result.add(path)
+        else
+          freeandnil(path);
+      end;
     end;
   end;
   result.zerocenter;

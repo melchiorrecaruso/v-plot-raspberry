@@ -32,9 +32,7 @@ type
   tvppoint = packed record
     x: double;
     y: double;
-    z: double;
   end;
-
   pvppoint = ^tvppoint;
 
   tvpline = packed record
@@ -42,6 +40,7 @@ type
     b: double;
     c: double;
   end;
+  pvpline = ^tvpline;
 
   tvppath = class(tobject)
   private
@@ -58,6 +57,7 @@ type
     procedure   clear;
     procedure   invert;
     function    isaloop: boolean;
+    function    getlen: double;
   public
     property count:                longint  read getcount;
     property item[index: longint]: pvppoint read get;
@@ -85,7 +85,16 @@ type
     property item[index: longint]: tvppath read get;
   end;
 
-  function comparepoint(p1, p2: pvppoint): boolean;
+
+  function  translatepoint(const cc, p: tvppoint): tvppoint;
+  function  rotatepoint(const p: tvppoint; const alpha: double): tvppoint;
+  function  distancebetween(const p0, p1: tvppoint): double;
+  function  linebetween    (const p0, p1: tvppoint): tvpline;
+  function  lineangle(var line: tvpline): double;
+  function  intersectlines(const l0, l1: tvpline): tvppoint;
+
+
+  function  comparepoint(p1, p2: pvppoint): boolean;
 
 
 implementation
@@ -94,15 +103,63 @@ implementation
 uses
   math;
 
-const
-  toll = 0.25;
+// geometry routines
+
+function translatepoint(const cc, p: tvppoint): tvppoint;
+begin
+  result.x := cc.x + p.x;
+  result.y := cc.y + p.y;
+end;
+
+function rotatepoint(const p: tvppoint; const alpha: double): tvppoint;
+var
+  sinus, cosinus : double;
+begin
+  sincos(alpha, sinus, cosinus);
+  result.x := p.x * cosinus - p.y *   sinus;
+  result.y := p.x *   sinus + p.y * cosinus;
+end;
+
+function distancebetween(const p0, p1: tvppoint): double;
+begin
+  result := sqrt(sqr(p1.x - p0.x) + sqr(p1.y - p0.y));
+end;
+
+function linebetween(const p0, p1: tvppoint): tvpline;
+begin
+  result.a :=  p1.y - p0.y;
+  result.b :=  p0.x - p1.x;
+  result.c := (p1.x - p0.x) * p0.y - (p1.y - p0.y) * p0.x;
+end;
+
+function lineangle(var line: tvpline): double;
+begin
+  if line.b = 0 then
+  begin
+    if line.a > 0 then
+      result := +pi / 2
+    else
+      result := -pi / 2;
+  end else
+    result := arctan2(line.a, -line.b);
+end;
+
+function intersectlines(const l0, l1: tvpline): tvppoint;
+begin
+  if (l0.a * l1.b) <> (l0.b * l1.a) then
+  begin
+    result.x := (-l0.c * l1.b + l0.b * l1.c) / (l0.a * l1.b - l0.b * l1.a);
+    result.y := (-l0.c - l0.a * result.x) / (l0.b);
+  end else
+    raise exception.create('Intersectlines routine exception');
+end;
 
 function comparepoint(p1, p2: pvppoint): boolean;
 begin
-  result := abs(p2^.x - p1^.x) < toll;
+  result := abs(p2^.x - p1^.x) < 0.1;
   if result then
   begin
-    result := abs(p2^.y - p1^.y) < toll;
+    result := abs(p2^.y - p1^.y) < 0.1;
   end;
 end;
 
@@ -143,7 +200,6 @@ begin
   new(p);
   p^.x := point.x;
   p^.y := point.y;
-  p^.z := point.z;
   flist.add(p);
 end;
 
@@ -160,7 +216,22 @@ end;
 
 function tvppath.isaloop: boolean;
 begin
-  result := comparepoint(pvppoint(flist.first), pvppoint(flist.last));
+  if flist.count > 1 then
+    result := comparepoint(pvppoint(flist.first), pvppoint(flist.last))
+  else
+    result := false;
+end;
+
+function tvppath.getlen: double;
+var
+  i: longint;
+begin
+  result := 0;
+  for i := 1 to flist.count - 1 do
+  begin
+    result := result + distancebetween(pvppoint(flist[i  ])^,
+                                       pvppoint(flist[i-1])^);
+  end;
 end;
 
 function tvppath.getfirst: pvppoint;
@@ -223,10 +294,7 @@ end;
 
 procedure tvppaths.add(const path: tvppath);
 begin
-  if path.count > 0 then
-  begin
-    flist.add(path);
-  end;
+  flist.add(path);
 end;
 
 procedure tvppaths.zerocenter;
