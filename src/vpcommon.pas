@@ -46,6 +46,8 @@ type
   tvppath = class(tobject)
   private
     flist: tlist;
+    function getfirst: pvppoint;
+    function getlast:  pvppoint;
     function getcount: longint;
     function get(index: longint): pvppoint;
   public
@@ -55,8 +57,7 @@ type
     procedure   delete(index: longint);
     procedure   clear;
     procedure   invert;
-    function    firstis(point: pvppoint): boolean;
-    function    lastis (point: pvppoint): boolean;
+    function    isaloop: boolean;
   public
     property count:                longint  read getcount;
     property item[index: longint]: pvppoint read get;
@@ -64,11 +65,11 @@ type
 
   tvppaths = class(tobject)
   private
-    flist:   tlist;
-    fheight: double;
-    fwidth:  double;
-    function getcount:  longint;
-    function get(index: longint): tvppath;
+    flist:    tlist;
+    fheight:  double;
+    fwidth:   double;
+    function  getcount:  longint;
+    function  get(index: longint): tvppath;
   public
     constructor create;
     destructor  destroy; override;
@@ -76,6 +77,7 @@ type
     procedure   delete(index: longint);
     procedure   clear;
     procedure   update;
+    procedure zerocenter;
   public
     property height:               double  read fheight;
     property width:                double  read fwidth;
@@ -83,12 +85,26 @@ type
     property item[index: longint]: tvppath read get;
   end;
 
+  function comparepoint(p1, p2: pvppoint): boolean;
+
 
 implementation
 
 
 uses
   math;
+
+const
+  toll = 0.25;
+
+function comparepoint(p1, p2: pvppoint): boolean;
+begin
+  result := abs(p2^.x - p1^.x) < toll;
+  if result then
+  begin
+    result := abs(p2^.y - p1^.y) < toll;
+  end;
+end;
 
 // tvppath
 
@@ -142,30 +158,25 @@ begin
   alist.destroy;
 end;
 
-function tvppath.firstis(point: pvppoint): boolean;
-var
-  dx, dy: double;
+function tvppath.isaloop: boolean;
 begin
-  result := false;
-  if flist.count > 0 then
-  begin
-    dx := abs(point^.x - pvppoint(flist.first)^.x);
-    dy := abs(point^.y - pvppoint(flist.first)^.y);
-    result := (dx < 0.1) and (dy < 0.1);
-  end;
+  result := comparepoint(pvppoint(flist.first), pvppoint(flist.last));
 end;
 
-function tvppath.lastis(point: pvppoint): boolean;
-var
-  dx, dy: double;
+function tvppath.getfirst: pvppoint;
 begin
-  result := false;
   if flist.count > 0 then
-  begin
-    dx := abs(point^.x - pvppoint(flist.last)^.x);
-    dy := abs(point^.y - pvppoint(flist.last)^.y);
-    result := (dx < 0.1) and (dy < 0.1);
-  end;
+    result := pvppoint(flist.first)
+  else
+    result := nil;
+end;
+
+function tvppath.getlast:  pvppoint;
+begin
+  if flist.count > 0 then
+    result := pvppoint(flist.last)
+  else
+    result := nil;
 end;
 
 function tvppath.getcount: longint;
@@ -218,10 +229,9 @@ begin
   end;
 end;
 
-procedure tvppaths.update;
+procedure tvppaths.zerocenter;
 var
      i, j: longint;
-        p: pvppoint;
      xmin: double;
      xmax: double;
      ymin: double;
@@ -230,18 +240,14 @@ var
   offsety: double;
      path: tvppath;
     point: pvppoint;
-    list1:  tlist;
-    list2:  tlist;
-
 begin
   xmin  := + maxint;
   xmax  := - maxint;
   ymin  := + maxint;
   ymax  := - maxint;
-
   for i := 0 to flist.count - 1 do
   begin
-    path := get(i);
+    path := tvppath(flist[i]);
     for j := 0 to path.count - 1 do
     begin
       point := path.item[j];
@@ -256,7 +262,7 @@ begin
 
   for i := 0 to flist.count - 1 do
   begin
-    path := get(i);
+    path := tvppath(flist[i]);
     for j := 0 to path.count - 1 do
     begin
       point    := path.item[j];
@@ -264,48 +270,77 @@ begin
       point^.y := point^.y + offsety;
     end;
   end;
-
   fheight := ymax - ymin;
   fwidth  := xmax - xmin;
+end;
 
-
-  // sort path
-
+procedure tvppaths.update;
+var
+       i: longint;
+  index1: longint;
+  index2: longint;
+   list1: tlist;
+   list2: tlist;
+    path: tvppath;
+begin
+  writeln('update start');
   list1 := tlist.create;
   list2 := tlist.create;
-  for i := 0 to flist.count - 1 do
-    list1.add(flist[i]);
 
+  //move loop path
+  for i := 0 to flist.count - 1 do
+    if tvppath(flist[i]).isaloop then
+      list2.add(flist[i])
+    else
+      list1.add(flist[i]);
+
+  // move other path
   while list1.count > 0 do
   begin
-    path := tvppath(list1[0]);
+    index1 := 0;
+    path   := tvppath(list1[index1]);
+
+    writeln('walkback');
+    for i := 1 to list1.count - 1 do
+    begin
+      if comparepoint(path.getfirst, tvppath(list1[i]).getlast) then
+      begin
+        index1 := i;
+        path   := tvppath(list1[index1]);
+      end else
+      if comparepoint(path.getfirst, tvppath(list1[i]).getfirst) then
+      begin
+        index1 := i;
+        path   := tvppath(list1[index1]);
+        path.invert;
+      end;
+    end;
     list2.add(path);
-    list1.delete(0);
+    list1.delete(index1);
 
+    writeln('walknext');
     repeat
-      j := -1;
-
+      index2 := -1;
       for i := 0 to list1.count - 1 do
-        if tvppath(list1[i]).firstis(path.get(path.count - 1)) then
+        if comparepoint(path.getlast, tvppath(list1[i]).getfirst) then
         begin
-          j := i;
+          index2 := i;
           break;
         end else
-        if tvppath(list1[i]).lastis(path.get(path.count - 1)) then
+        if comparepoint(path.getlast, tvppath(list1[i]).getlast) then
         begin
           tvppath(list1[i]).invert;
-          j := i;
+          index2 := i;
           break;
         end;
 
-      if j <> -1 then
+      if index2 <> -1 then
       begin
-        path := tvppath(list1[j]);
+        path := tvppath(list1[index2]);
         list2.add(path);
-        list1.delete(j);
+        list1.delete(index2);
       end;
-
-    until j = -1;
+    until index2 = -1;
 
   end;
 
@@ -314,6 +349,7 @@ begin
 
   list2.destroy;
   list1.destroy;
+  writeln('update end');
 end;
 
 function tvppaths.getcount: longint;

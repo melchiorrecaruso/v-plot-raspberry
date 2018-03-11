@@ -102,6 +102,7 @@ type
     paths:    tvppaths;
       vec:    tvvectorialdocument;
 
+   progress:  longint;
  mouseisdown: boolean;
    px: longint;
    py: longint;
@@ -173,37 +174,37 @@ end;
 procedure tmainform.leftupbtnclick(Sender: TObject);
 begin
   driver.enabled := true;
-  driver.move4(-leftedit.value, 0, 0);
+  driver.move4(-leftedit.value, 0);
 end;
 
 procedure tmainform.leftdownbtnclick(sender: tobject);
 begin
   driver.enabled := true;
-  driver.move4(+leftedit.value, 0, 0);
+  driver.move4(+leftedit.value, 0);
 end;
 
 procedure tmainform.pendownbtnclick(Sender: TObject);
 begin
   driver.enabled := true;
-  driver.move4(0, 0, -1);
+  driver.pen := true;
 end;
 
 procedure tmainform.penupbtnclick(sender: tobject);
 begin
   driver.enabled := true;
-  driver.move4(0, 0, +1);
+  driver.pen := false;
 end;
 
 procedure tmainform.rightupbtnclick(sender: tobject);
 begin
   driver.enabled := true;
-  driver.move4(0, -rightedit.value, 0);
+  driver.move4(0, -rightedit.value);
 end;
 
 procedure tmainform.rightdownbtnclick(sender: tobject);
 begin
   driver.enabled := true;
-  driver.move4(0, +rightedit.value, 0);
+  driver.move4(0, +rightedit.value);
 end;
 
 procedure tmainform.sethomebtnclick(sender: tobject);
@@ -212,7 +213,7 @@ var
   m1: longint;
 begin
   optimize(layout.p09, layout, m0, m1);
-  driver.init(m0, m1, 1);
+  driver.init(m0, m1);
 end;
 
 procedure tmainform.bordersbtnclick(sender: tobject);
@@ -235,7 +236,7 @@ var
 begin
   driver.enabled := true;
   optimize(layout.p09, layout, m0, m1);
-  driver.move2(m0, m1, 1);
+  driver.move2(m0, m1);
 end;
 
 procedure tmainform.imagemousedown(sender: tobject; button: tmousebutton;
@@ -307,9 +308,6 @@ begin
   verticalcbeditingdone(sender);
   // ---
   driver.enabled := sender = startbtn;
-  if driver.enabled then
-    driver.move4(0, 0, -driver.cntz);
-
   if sender <> nil then
   begin
     plotter         := tvplotter.create(paths);
@@ -421,6 +419,8 @@ begin
   papersizegb      .enabled := false;
   drawingcontrolgb .enabled := true;
   application.processmessages;
+
+  progress := 0;
 end;
 
 procedure tmainform.onplotterstop;
@@ -457,10 +457,16 @@ begin
     p.y := layout.p08.y + offsetyse.value + (plotter.py);
     optimize(p, layout, m0, m1);
 
-    driver.move2(m0, m1, round(plotter.pz));
+    driver.move2(m0, m1);
   end;
-  image.canvas.draw(0,0, bitmap);
-  sleep(5);
+
+  inc(progress);
+  // if progress mod (25) = 0 then
+  begin
+    image.canvas.draw(0,0, bitmap);
+    progress := 0;
+  end;
+  sleep(2);
 
   caption := inttostr(plotter.progress);
   application.processmessages;

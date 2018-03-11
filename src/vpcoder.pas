@@ -76,7 +76,7 @@ implementation
 uses
   math, sysutils;
 
-// geometry routines //
+// geometry routines
 
 function translatepoint(const cc, p: tvppoint): tvppoint;
 begin
@@ -130,7 +130,7 @@ begin
     raise exception.create('Intersectlines routine exception');
 end;
 
-// toolpath routines //
+// toolpath routines
 
 function interpolate_line(const p0, p1: tvppoint): tvppath;
 var
@@ -151,7 +151,6 @@ begin
     p   := translatepoint(p0, p);
     result.add(p);
   end;
-  writeln('interpolate_line');
 end;
 
 function interpolate_circle(const entity: tvcircle ): tvppath;
@@ -180,7 +179,6 @@ begin
     p := translatepoint(cc, p);
     result.add(p);
   end;
-  writeln('interpolate_circle');
 end;
 
 function interpolate_circlearc(const entity: tvcirculararc): tvppath;
@@ -210,7 +208,6 @@ begin
     p := translatepoint(cc, p);
     result.add(p);
   end;
-  writeln('interpolate_circlearc');
 end;
 
 function interpolate_path(const entity: tpath): tvppath;
@@ -223,7 +220,6 @@ var
   segment: tpathsegment;
 begin
   result := tvppath.create;
-
   entity.prepareforsequentialreading;
   for i := 0 to entity.len - 1 do
   begin
@@ -260,11 +256,9 @@ begin
         writeln(segment.segmenttype);
     end;
   end;
-
-  writeln('interpolate_path');
 end;
 
-//
+// ---
 
 procedure optimize(const p: tvppoint; const l: tvplayout; var m0, m1: longint);
 var
@@ -342,23 +336,20 @@ end;
 
 procedure tvplotter.execute;
 var
-       i: longint;
-       j: longint;
-    page: tvppath;
-   point: pvppoint;
+      i: longint;
+      j: longint;
+   page: tvppath;
+  point: pvppoint;
 begin
   if assigned(fonstart) then
     synchronize(fonstart);
-
   if assigned(fontick) then
     for i := 0 to fpaths.count - 1 do
     begin
       page := fpaths.item[i];
-
       for j := 0 to page.count - 1 do
       begin
         point := page.item[j];
-
         if not terminated then
         begin
           fpx := point^.x;
@@ -367,20 +358,17 @@ begin
           synchronize(fontick);
           while not fplot do sleep(250);
         end;
-
       end;
     end;
-
   if assigned(fonstop) then
     synchronize(fonstop);
 end;
 
-// ---
+// createvppaths
 
 function createvppaths(vec: tvvectorialdocument): tvppaths;
 var
     i, j: longint;
-       p: pvppoint;
   entity: tventity;
     page: tvpage;
 begin
@@ -401,9 +389,9 @@ begin
         result.add(interpolate_path(tpath(entity)))
       else
         writeln(entity.classname);
-
     end;
   end;
+  result.zerocenter;
   result.update;
 end;
 

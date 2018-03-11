@@ -32,27 +32,29 @@ uses
 type
   tvpdriver = class
   private
-    fcnt0:  longint;
-    fcnt1:  longint;
-    fcntz:  longint;
+    fcnt0:    longint;
+    fcnt1:    longint;
     fdelayms: longint;
-    fenabled: boolean;
     ffault:   longint;
+    fenabled: boolean;
+    fpen:     boolean;
+    procedure setpen(value: boolean);
     procedure largedisplacements(cnt0, cnt1: longint);
     procedure smalldisplacements(cnt0, cnt1: longint);
   public
     constructor create(mode: longint);
     destructor  destroy; override;
-    procedure   init (cnt0, cnt1, cntz: longint);
-    procedure   move2(cnt0, cnt1, cntz: longint);
-    procedure   move4(cnt0, cnt1, cntz: longint);
+    procedure   init (cnt0, cnt1: longint);
+    procedure   move2(cnt0, cnt1: longint);
+    procedure   move4(cnt0, cnt1: longint);
+
   published
     property cnt0:    longint read fcnt0;
     property cnt1:    longint read fcnt1;
-    property cntz:    longint read fcntz;
     property delayms: longint read fdelayms write fdelayms;
-    property enabled: boolean read fenabled write fenabled;
     property fault:   longint read ffault;
+    property enabled: boolean read fenabled write fenabled;
+    property pen:     boolean read fpen     write setpen;
   end;
 
 
@@ -177,6 +179,7 @@ begin
   {$endif}
   fdelayms := 2000;
   fenabled := false;
+  fpen     := false;
 end;
 
 destructor tvpdriver.destroy;
@@ -184,33 +187,15 @@ begin
   inherited destroy;
 end;
 
-procedure  tvpdriver.init(cnt0, cnt1, cntz: longint);
+procedure  tvpdriver.init(cnt0, cnt1: longint);
 begin
-  {$ifdef cpuarm}
   fcnt0 := cnt0;
   fcnt1 := cnt1;
-  fcntz := cntz;
-
-  if fcntz < 0 then
-    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq))
-  else
-  if fcntz > 0 then
-    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_minvalue, motz_freq))
-  else
-    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
-  delay(500);
-  {$endif}
-end;
-
-procedure tvpdriver.move2(cnt0, cnt1, cntz: longint);
-begin
-  {$ifdef cpuarm}
-  move4(cnt0 - fcnt0, cnt1 - fcnt1, cntz - fcntz);
-  {$endif}
 end;
 
 procedure tvpdriver.largedisplacements(cnt0, cnt1: longint);
 begin
+  setpen(false);
   {$ifdef cpuarm}
   inc(fcnt0, cnt0);
   inc(fcnt1, cnt1);
@@ -250,6 +235,7 @@ var
   i: longint;
 {$endif}
 begin
+  setpen(true);
   {$ifdef cpuarm}
   inc(fcnt0, cnt0);
   inc(fcnt1, cnt1);
@@ -284,24 +270,35 @@ begin
   {$endif}
 end;
 
-procedure tvpdriver.move4(cnt0, cnt1, cntz: longint);
+procedure tvpdriver.setpen(value: boolean);
+begin
+  {$ifdef cpuarm}
+  if fpen <> value then
+  begin
+    fpen := value;
+
+    if fpen then
+      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq))
+    else
+     pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
+
+    delay(500);
+  end;
+  {$endif}
+end;
+
+procedure tvpdriver.move2(cnt0, cnt1: longint);
+begin
+  {$ifdef cpuarm}
+  move4(cnt0 - fcnt0, cnt1 - fcnt1);
+  {$endif}
+end;
+
+procedure tvpdriver.move4(cnt0, cnt1: longint);
 begin
   {$ifdef cpuarm}
   if not fenabled then exit;
   if ffault  = -1 then exit;
-  // move pwm motz
-  if fcntz <> min(1, max(-1, fcntz + cntz)) then
-  begin
-    fcntz := min(1, max(-1, fcntz + cntz));
-    if fcntz < 0 then
-      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq))
-    else
-    if fcntz > 0 then
-      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_minvalue, motz_freq))
-    else
-      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
-    delay(500);
-  end;
   // mode step motors
   if (cnt0 <> 0) or
      (cnt1 <> 0) then
