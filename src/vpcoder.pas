@@ -326,7 +326,6 @@ begin
       else
         writeln(entity.classname);
 
-
       if assigned(path) then
       begin
         if path.getlen > 0.25 then

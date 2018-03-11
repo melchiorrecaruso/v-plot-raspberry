@@ -457,7 +457,7 @@ begin
   end;
 
   inc(progress);
-  // if progress mod (25) = 0 then
+  if progress mod (25) = 0 then
   begin
     image.canvas.draw(0,0, bitmap);
     progress := 0;
