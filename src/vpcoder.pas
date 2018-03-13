@@ -337,7 +337,7 @@ begin
     end;
   end;
   result.zerocenter;
-  result.update;
+  result.createtoolpath;
 end;
 
 end.

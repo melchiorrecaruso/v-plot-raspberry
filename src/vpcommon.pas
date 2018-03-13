@@ -56,7 +56,6 @@ type
     procedure   delete(index: longint);
     procedure   clear;
     procedure   invert;
-    function    isaloop: boolean;
     function    getlen: double;
   public
     property count:                longint  read getcount;
@@ -76,8 +75,8 @@ type
     procedure   add(const path: tvppath);
     procedure   delete(index: longint);
     procedure   clear;
-    procedure   update;
-    procedure zerocenter;
+    procedure   createtoolpath;
+    procedure   zerocenter;
   public
     property height:               double  read fheight;
     property width:                double  read fwidth;
@@ -153,11 +152,16 @@ end;
 
 function comparepoint(p0, p1: pvppoint): boolean;
 begin
-  result := abs(p1^.x - p0^.x) < 0.1;
+  result := abs(p1^.x - p0^.x) < 0.15;
   if result then
   begin
-    result := abs(p1^.y - p0^.y) < 0.1;
+    result := abs(p1^.y - p0^.y) < 0.15;
   end;
+end;
+
+function comparepath(p0, p1: pointer): longint;
+begin
+  result := round(tvppath(p1).getlen - tvppath(p0).getlen);
 end;
 
 function walkback(p0: pvppoint; list: tlist): longint;
@@ -249,11 +253,6 @@ begin
   alist.destroy;
 end;
 
-function tvppath.isaloop: boolean;
-begin
-  result := comparepoint(pvppoint(flist.first), pvppoint(flist.last))
-end;
-
 function tvppath.getlen: double;
 var
   i: longint;
@@ -274,7 +273,7 @@ begin
     result := nil;
 end;
 
-function tvppath.getlast:  pvppoint;
+function tvppath.getlast: pvppoint;
 begin
   if flist.count > 0 then
     result := pvppoint(flist.last)
@@ -374,22 +373,22 @@ begin
   fwidth  := xmax - xmin;
 end;
 
-procedure tvppaths.update;
+procedure tvppaths.createtoolpath;
 var
-       i: longint;
-   index: longint;
-   list1: tlist;
-   list2: tlist;
-   list3: tlist;
-    path: tvppath;
+      i: longint;
+  index: longint;
+  list1: tlist;
+  list2: tlist;
+  list3: tlist;
+   path: tvppath;
 begin
   list1 := tlist.create;
   list2 := tlist.create;
   list3 := tlist.create;
   for i := 0 to flist.count - 1 do
     list1.add(flist[i]);
-
-  // move other path
+  list1.sort(@comparepath);
+  // create toolpath
   while list1.count > 0 do
   begin
     path := tvppath(list1[0]);
@@ -415,14 +414,11 @@ begin
         list2.add(path);
       end;
     until index = -1;
-    // movepath
+    // move toolpath
     for i := 0 to list2.count - 1 do
       list3.add(list2[i]);
     list2.clear;
   end;
-
-  writeln(flist.count);
-  writeln(list3.count);
 
   for i := 0 to flist.count - 1 do
     flist[i] := list3[i];

@@ -458,6 +458,7 @@ begin
 
     driver.move2(m0, m1);
   end;
+  sleep(2);
 
   inc(progress);
   //if progress mod (25) = 0 then
