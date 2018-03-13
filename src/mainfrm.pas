@@ -443,6 +443,9 @@ var
   m0: longint;
   m1: longint;
 begin
+  //if (abs(plotter.px) <= (widthse .value div 2)) and
+  //   (abs(plotter.py) <= (heightse.value div 2)) then exit;
+
   p.x := (widthse .value div 2) + offsetxse.value + (plotter.px);
   p.y := (heightse.value div 2) - offsetyse.value - (plotter.py);
   bitmap.canvas.pixels[trunc(p.x), trunc(p.y)] := clblack;
@@ -457,7 +460,7 @@ begin
   end;
 
   inc(progress);
-  if progress mod (25) = 0 then
+  //if progress mod (25) = 0 then
   begin
     image.canvas.draw(0,0, bitmap);
     progress := 0;

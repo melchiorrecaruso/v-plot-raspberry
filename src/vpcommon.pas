@@ -44,7 +44,7 @@ type
 
   tvppath = class(tobject)
   private
-    flist: tlist;
+    flist:   tlist;
     function getfirst: pvppoint;
     function getlast:  pvppoint;
     function getcount: longint;
@@ -92,9 +92,6 @@ type
   function  linebetween    (const p0, p1: tvppoint): tvpline;
   function  lineangle(var line: tvpline): double;
   function  intersectlines(const l0, l1: tvpline): tvppoint;
-
-
-  function  comparepoint(p1, p2: pvppoint): boolean;
 
 
 implementation
@@ -154,13 +151,51 @@ begin
     raise exception.create('Intersectlines routine exception');
 end;
 
-function comparepoint(p1, p2: pvppoint): boolean;
+function comparepoint(p0, p1: pvppoint): boolean;
 begin
-  result := abs(p2^.x - p1^.x) < 0.1;
+  result := abs(p1^.x - p0^.x) < 0.1;
   if result then
   begin
-    result := abs(p2^.y - p1^.y) < 0.1;
+    result := abs(p1^.y - p0^.y) < 0.1;
   end;
+end;
+
+function walkback(p0: pvppoint; list: tlist): longint;
+var
+  i: longint;
+begin
+  result := -1;
+  for i := 0 to list.count - 1 do
+    if comparepoint(p0, tvppath(list[i]).getlast) then
+    begin
+      result := i;
+      exit;
+    end else
+    if comparepoint(p0, tvppath(list[i]).getfirst) then
+    begin
+      tvppath(list[i]).invert;
+      result := i;
+      exit;
+    end;
+end;
+
+function walknext(p0: pvppoint; list: tlist): longint;
+var
+  i: longint;
+begin
+  result := -1;
+  for i := 0 to list.count - 1 do
+    if comparepoint(p0, tvppath(list[i]).getfirst) then
+    begin
+      result := i;
+      exit;
+    end else
+    if comparepoint(p0, tvppath(list[i]).getlast) then
+    begin
+      tvppath(list[i]).invert;
+      result := i;
+      exit;
+    end;
 end;
 
 // tvppath
@@ -216,10 +251,7 @@ end;
 
 function tvppath.isaloop: boolean;
 begin
-  if flist.count > 1 then
-    result := comparepoint(pvppoint(flist.first), pvppoint(flist.last))
-  else
-    result := false;
+  result := comparepoint(pvppoint(flist.first), pvppoint(flist.last))
 end;
 
 function tvppath.getlen: double;
@@ -345,76 +377,57 @@ end;
 procedure tvppaths.update;
 var
        i: longint;
-  index1: longint;
-  index2: longint;
+   index: longint;
    list1: tlist;
    list2: tlist;
+   list3: tlist;
     path: tvppath;
 begin
-  writeln('update start');
   list1 := tlist.create;
   list2 := tlist.create;
-
-  //move loop path
+  list3 := tlist.create;
   for i := 0 to flist.count - 1 do
-    if tvppath(flist[i]).isaloop then
-      list2.add(flist[i])
-    else
-      list1.add(flist[i]);
+    list1.add(flist[i]);
 
   // move other path
   while list1.count > 0 do
   begin
-    index1 := 0;
-    path   := tvppath(list1[index1]);
-
-    writeln('walkback');
-    for i := 1 to list1.count - 1 do
-    begin
-      if comparepoint(path.getfirst, tvppath(list1[i]).getlast) then
-      begin
-        index1 := i;
-        path   := tvppath(list1[index1]);
-      end else
-      if comparepoint(path.getfirst, tvppath(list1[i]).getfirst) then
-      begin
-        index1 := i;
-        path   := tvppath(list1[index1]);
-        path.invert;
-      end;
-    end;
+    path := tvppath(list1[0]);
+    list1.delete(0);
     list2.add(path);
-    list1.delete(index1);
-
-    writeln('walknext');
     repeat
-      index2 := -1;
-      for i := 0 to list1.count - 1 do
-        if comparepoint(path.getlast, tvppath(list1[i]).getfirst) then
-        begin
-          index2 := i;
-          break;
-        end else
-        if comparepoint(path.getlast, tvppath(list1[i]).getlast) then
-        begin
-          tvppath(list1[i]).invert;
-          index2 := i;
-          break;
-        end;
-
-      if index2 <> -1 then
+      index := walkback(pvppoint(path.getfirst), list1);
+      if index <> -1 then
       begin
-        path := tvppath(list1[index2]);
-        list2.add(path);
-        list1.delete(index2);
+        path := tvppath(list1[index]);
+        list1.delete(index);
+        list2.insert(0, path);
       end;
-    until index2 = -1;
+    until index = -1;
 
+    path := tvppath(list2.last);
+    repeat
+      index := walknext(pvppoint(path.getlast), list1);
+      if index <> -1 then
+      begin
+        path := tvppath(list1[index]);
+        list1.delete(index);
+        list2.add(path);
+      end;
+    until index = -1;
+    // movepath
+    for i := 0 to list2.count - 1 do
+      list3.add(list2[i]);
+    list2.clear;
   end;
 
-  for i := 0 to flist.count - 1 do
-    flist[i] := list2[i];
+  writeln(flist.count);
+  writeln(list3.count);
 
+  for i := 0 to flist.count - 1 do
+    flist[i] := list3[i];
+
+  list3.destroy;
   list2.destroy;
   list1.destroy;
   writeln('update end');
