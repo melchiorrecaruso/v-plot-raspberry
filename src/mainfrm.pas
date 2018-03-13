@@ -34,13 +34,8 @@ type
   { tmainform }
 
   tmainform = class(tform)
-    aboutbtn: tbitbtn;
-    aboutgb: tgroupbox;
     image: TImage;
     leftedit: tspinedit;
-    mainmenu: TMainMenu;
-    MenuItem1: TMenuItem;
-    MenuItem2: TMenuItem;
     rightedit: tspinedit;
     verticalcb: tcheckbox;
     redrawbtn: tbitbtn;
@@ -105,7 +100,7 @@ type
     paths:    tvppaths;
       vec:    tvvectorialdocument;
 
-   progress:  longint;
+     tick:    longint;
  mouseisdown: boolean;
    px: longint;
    py: longint;
@@ -422,8 +417,7 @@ begin
   papersizegb      .enabled := false;
   drawingcontrolgb .enabled := true;
   application.processmessages;
-
-  progress := 0;
+  tick := 0;
 end;
 
 procedure tmainform.onplotterstop;
@@ -436,41 +430,36 @@ begin
   drawingcontrolgb .enabled := true;
   image.canvas.draw(0,0, bitmap);
   application.processmessages;
-
   plotter := nil;
 end;
 
 procedure tmainform.onplottertick;
 var
-   p: tvppoint;
   m0: longint;
   m1: longint;
+   p: tvppoint;
 begin
-  if (abs(plotter.px) > ( widthse.value div 2)) then exit;
-  if (abs(plotter.py) > (heightse.value div 2)) then exit;
+  p.x := offsetxse.value + plotter.px;
+  p.y := offsetyse.value + plotter.py;
 
-  p.x := (widthse .value div 2) + offsetxse.value + (plotter.px);
-  p.y := (heightse.value div 2) - offsetyse.value - (plotter.py);
-  bitmap.canvas.pixels[trunc(p.x), trunc(p.y)] := clblack;
+  if abs(p.x) > ( widthse.value div 2) then exit;
+  if abs(p.y) > (heightse.value div 2) then exit;
+
+  bitmap.canvas.pixels[
+    trunc(( widthse.value div 2) + offsetxse.value + plotter.px),
+    trunc((heightse.value div 2) - offsetyse.value - plotter.py)] := clblack;
 
   if driver.enabled then
   begin
-    p.x := layout.p08.x + offsetxse.value + (plotter.px);
-    p.y := layout.p08.y + offsetyse.value + (plotter.py);
+    p.x := layout.p08.x + p.x;
+    p.y := layout.p08.y + p.y;
     optimize(p, layout, m0, m1);
-
     driver.move2(m0, m1);
   end;
-  sleep(2);
 
-  inc(progress);
-  //if progress mod (25) = 0 then
-  begin
-    image.canvas.draw(0,0, bitmap);
-    progress := 0;
-  end;
-
-  caption := inttostr(plotter.progress);
+  inc(tick);
+  if tick mod 25 = 0 then
+    image.canvas.draw(0, 0, bitmap);
   application.processmessages;
 end;
 

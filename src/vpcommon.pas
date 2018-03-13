@@ -152,10 +152,10 @@ end;
 
 function comparepoint(p0, p1: pvppoint): boolean;
 begin
-  result := abs(p1^.x - p0^.x) < 0.15;
+  result := abs(p1^.x - p0^.x) < 0.25;
   if result then
   begin
-    result := abs(p1^.y - p0^.y) < 0.15;
+    result := abs(p1^.y - p0^.y) < 0.25;
   end;
 end;
 
@@ -260,8 +260,9 @@ begin
   result := 0;
   for i := 1 to flist.count - 1 do
   begin
-    result := result + distancebetween(pvppoint(flist[i  ])^,
-                                       pvppoint(flist[i-1])^);
+    result := result +
+      distancebetween(pvppoint(flist[i    ])^,
+                      pvppoint(flist[i - 1])^);
   end;
 end;
 
@@ -387,7 +388,7 @@ begin
   list3 := tlist.create;
   for i := 0 to flist.count - 1 do
     list1.add(flist[i]);
-  list1.sort(@comparepath);
+  //list1.sort(@comparepath);
   // create toolpath
   while list1.count > 0 do
   begin
@@ -421,12 +422,12 @@ begin
   end;
 
   for i := 0 to flist.count - 1 do
+  begin
     flist[i] := list3[i];
-
+  end;
   list3.destroy;
   list2.destroy;
   list1.destroy;
-  writeln('update end');
 end;
 
 function tvppaths.getcount: longint;
