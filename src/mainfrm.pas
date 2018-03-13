@@ -38,6 +38,9 @@ type
     aboutgb: tgroupbox;
     image: TImage;
     leftedit: tspinedit;
+    mainmenu: TMainMenu;
+    MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
     rightedit: tspinedit;
     verticalcb: tcheckbox;
     redrawbtn: tbitbtn;
