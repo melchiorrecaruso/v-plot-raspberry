@@ -177,7 +177,7 @@ begin
   {$else}
   ffault   := -1;
   {$endif}
-  fdelayms := 2000;
+  fdelayms := 4000;
   fenabled := false;
   fpen     := false;
 end;
@@ -278,9 +278,12 @@ begin
     fpen := value;
 
     if fpen then
+    begin
       pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq))
-    else
+    end else
+    begin
      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
+    end;
 
     delay(500);
   end;

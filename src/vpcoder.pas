@@ -328,11 +328,11 @@ begin
 
       if assigned(path) then
       begin
-        result.add(path);
-        //if path.getlen > 0.25 then
-        // result.add(path)
-        //else
-        //  freeandnil(path);
+        // result.add(path);
+        if path.getlen > 0.25 then
+         result.add(path)
+        else
+          freeandnil(path);
       end;
     end;
   end;
