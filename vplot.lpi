@@ -35,7 +35,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="88">
+    <Units Count="87">
       <Unit0>
         <Filename Value="vplot.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -676,19 +676,12 @@
         <Loaded Value="True"/>
       </Unit85>
       <Unit86>
-        <Filename Value="../../../../../FPC/3.0.4/source/rtl/objpas/classes/classesh.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="235"/>
-        <CursorPos X="21" Y="253"/>
-        <UsageCount Value="10"/>
-      </Unit86>
-      <Unit87>
-        <Filename Value="../../../../../FPC/3.0.4/source/rtl/objpas/classes/lists.inc"/>
+        <Filename Value="/FPC/3.0.4/source/rtl/objpas/classes/lists.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="238"/>
         <CursorPos X="3" Y="240"/>
         <UsageCount Value="10"/>
-      </Unit87>
+      </Unit86>
     </Units>
     <JumpHistory Count="27" HistoryIndex="26">
       <Position1>
