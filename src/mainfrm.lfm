@@ -15,7 +15,7 @@ object mainform: Tmainform
   object image: TImage
     Left = 376
     Height = 432
-    Top = 96
+    Top = 80
     Width = 512
     Anchors = []
     AutoSize = True
