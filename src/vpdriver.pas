@@ -210,22 +210,23 @@ begin
   else
     digitalwrite(mot1_dir, HIGH);
 
-  // move step motor0
+  // move step motor0 and motor1
   cnt0 := abs(cnt0);
-  while cnt0 > 0 do
-  begin
-    digitalwrite(mot0_step, HIGH);  delaymicroseconds(fdelayms);
-    digitalwrite(mot0_step,  LOW);  delaymicroseconds(fdelayms);
-    dec(cnt0);
-  end;
-  // move step motor1
   cnt1 := abs(cnt1);
-  while cnt1 > 0 do
-  begin
-    digitalwrite(mot1_step, HIGH);  delaymicroseconds(fdelayms);
-    digitalwrite(mot1_step,  LOW);  delaymicroseconds(fdelayms);
-    dec(cnt1);
-  end;
+  repeat
+    if cnt0 > 0 then
+    begin
+      digitalwrite(mot0_step, HIGH);  delaymicroseconds(fdelayms div 2);
+      digitalwrite(mot0_step,  LOW);  delaymicroseconds(fdelayms div 2);
+      dec(cnt0);
+    end;
+    if cnt1 > 0 then
+    begin
+      digitalwrite(mot1_step, HIGH);  delaymicroseconds(fdelayms div 2);
+      digitalwrite(mot1_step,  LOW);  delaymicroseconds(fdelayms div 2);
+      dec(cnt1);
+    end;
+  until (cnt0 = 0) and (cnt1 = 0);
   {$endif}
 end;
 
