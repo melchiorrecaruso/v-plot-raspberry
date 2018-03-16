@@ -38,7 +38,9 @@ type
     ffault:   longint;
     fenabled: boolean;
     fpen:     boolean;
+    fpenoff:  boolean;
     procedure setpen(value: boolean);
+    procedure setpenoff(value: boolean);
     procedure largedisplacements(cnt0, cnt1: longint);
     procedure smalldisplacements(cnt0, cnt1: longint);
   public
@@ -55,6 +57,7 @@ type
     property fault:   longint read ffault;
     property enabled: boolean read fenabled write fenabled;
     property pen:     boolean read fpen     write setpen;
+    property penoff:  boolean read fpenoff  write setpenoff;
   end;
 
 
@@ -180,6 +183,7 @@ begin
   fdelayms := 4000;
   fenabled := false;
   fpen     := false;
+  fpenoff  := false;
 end;
 
 destructor tvpdriver.destroy;
@@ -273,22 +277,27 @@ end;
 
 procedure tvpdriver.setpen(value: boolean);
 begin
-  {$ifdef cpuarm}
-  if fpen <> value then
-  begin
-    fpen := value;
-
-    if fpen then
+  if fpenoff = false then
+    if fpen <> value then
     begin
-      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq))
-    end else
-    begin
-     pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
+      fpen := value;
+      {$ifdef cpuarm}
+      if fpen then
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq))
+      else
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
+      {$endif}
+      delay(500);
     end;
+end;
 
-    delay(500);
+procedure tvpdriver.setpenoff(value: boolean);
+begin
+  fpenoff := value;
+  if fpenoff then
+  begin
+    setpen(false);
   end;
-  {$endif}
 end;
 
 procedure tvpdriver.move2(cnt0, cnt1: longint);

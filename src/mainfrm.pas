@@ -172,37 +172,41 @@ end;
 procedure tmainform.leftupbtnclick(Sender: TObject);
 begin
   driver.enabled := true;
+  driver.pen     := false;
   driver.move4(-leftedit.value, 0);
 end;
 
 procedure tmainform.leftdownbtnclick(sender: tobject);
 begin
   driver.enabled := true;
+  driver.pen     := false;
   driver.move4(+leftedit.value, 0);
-end;
-
-procedure tmainform.pendownbtnclick(Sender: TObject);
-begin
-  driver.enabled := true;
-  driver.pen := true;
-end;
-
-procedure tmainform.penupbtnclick(sender: tobject);
-begin
-  driver.enabled := true;
-  driver.pen := false;
 end;
 
 procedure tmainform.rightupbtnclick(sender: tobject);
 begin
   driver.enabled := true;
+  driver.pen     := false;
   driver.move4(0, -rightedit.value);
 end;
 
 procedure tmainform.rightdownbtnclick(sender: tobject);
 begin
   driver.enabled := true;
+  driver.pen     := false;
   driver.move4(0, +rightedit.value);
+end;
+
+procedure tmainform.pendownbtnclick(Sender: TObject);
+begin
+  driver.enabled := true;
+  driver.pen     := true;
+end;
+
+procedure tmainform.penupbtnclick(sender: tobject);
+begin
+  driver.enabled := true;
+  driver.pen     := false;
 end;
 
 procedure tmainform.sethomebtnclick(sender: tobject);
@@ -233,6 +237,7 @@ var
   m1: longint;
 begin
   driver.enabled := true;
+  driver.pen     := false;
   optimize(layout.p09, layout, m0, m1);
   driver.move2(m0, m1);
 end;
@@ -288,7 +293,9 @@ begin
     try
       vec.readfromfile(opendialog.filename,
         vec.getformatfromextension(opendialog.filename));
-    finally
+    except
+      freeandnil(vec);
+      vec := tvvectorialdocument.create;
     end;
     paths := createvppaths(vec);
 
@@ -304,7 +311,6 @@ end;
 procedure tmainform.reloadbtnclick(sender: tobject);
 begin
   verticalcbeditingdone(sender);
-  // ---
   driver.enabled := sender = startbtn;
   if sender <> nil then
   begin
@@ -355,31 +361,31 @@ begin
     widthse .value := amax;
   end;
   // ---
-  bitmap.canvas.pen.color   := clltgray;
+  bitmap.canvas.pen  .color := clltgray;
   bitmap.canvas.brush.color := clltgray;
   bitmap.canvas.brush.style := bssolid;
   bitmap.setsize(
-     widthse.value,
-    heightse.value);
+     widthse.value * 1,
+    heightse.value * 1);
   bitmap.canvas.fillrect(0, 0,
-     widthse.value,
-    heightse.value);
+     widthse.value * 1,
+    heightse.value * 1);
   // ---
-  image.canvas.pen.color   := clltgray;
+  image.canvas.pen  .color := clltgray;
   image.canvas.brush.color := clltgray;
   image.canvas.brush.style := bssolid;
   image.picture.bitmap.setsize(
-     widthse.value,
-    heightse.value);
+     widthse.value * 1,
+    heightse.value * 1);
   image.canvas.fillrect(0, 0,
-     widthse.value,
-    heightse.value);
+     widthse.value * 1,
+    heightse.value * 1);
 
   image.center            := true;
   image.proportional      := true;
-  image.stretchinenabled  := false;
-  image.stretchoutenabled := false;
-  image.stretch           := false;
+  image.stretchinenabled  := true;
+  image.stretchoutenabled := true;
+  image.stretch           := true;
 end;
 
 procedure tmainform.playorstopbtnclick(sender: tobject);
@@ -411,26 +417,28 @@ end;
 
 procedure tmainform.onplotterstart;
 begin
+  tick := 0;
+  // ---
   startbtn.caption          := 'Pause';
   manualdrivinggb  .enabled := false;
   creativecontrolgb.enabled := false;
   papersizegb      .enabled := false;
   drawingcontrolgb .enabled := true;
   application.processmessages;
-  tick := 0;
 end;
 
 procedure tmainform.onplotterstop;
 begin
-  caption                   := 'VPlot Driver';
+  image.canvas.draw(0,0, bitmap);
+  gohomebtnclick(nil);
+  plotter := nil;
+  // ---
   startbtn.caption          := 'Play';
   manualdrivinggb  .enabled := true;
   creativecontrolgb.enabled := true;
   papersizegb      .enabled := true;
   drawingcontrolgb .enabled := true;
-  image.canvas.draw(0,0, bitmap);
   application.processmessages;
-  plotter := nil;
 end;
 
 procedure tmainform.onplottertick;
