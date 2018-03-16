@@ -34,6 +34,7 @@ type
   { tmainform }
 
   tmainform = class(tform)
+    clearbtn: TBitBtn;
     image: TImage;
     leftedit: tspinedit;
     rightedit: tspinedit;
@@ -67,8 +68,8 @@ type
     drawingcontrolgb: tgroupbox;
     opendialog: topendialog;
 
+    procedure clearbtnclick(sender: tobject);
     procedure bordersbtnclick(sender: tobject);
-    procedure creativecontrolgbclick(sender: tobject);
 
     procedure formatcbchange(sender: tobject);
     procedure formcreate(sender: tobject);
@@ -83,13 +84,13 @@ type
       shift: tshiftstate; x, y: integer);
     procedure leftdownbtnclick(sender: tobject);
 
-    procedure leftupbtnclick(sender: tobject);
-    procedure pendownbtnclick(sender: tobject);
-    procedure penupbtnclick(sender: tobject);
-    procedure reloadbtnclick(sender: tobject);
+    procedure leftupbtnclick   (sender: tobject);
+    procedure pendownbtnclick  (sender: tobject);
+    procedure penupbtnclick    (sender: tobject);
+    procedure reloadbtnclick   (sender: tobject);
     procedure rightdownbtnclick(sender: tobject);
-    procedure rightupbtnclick(sender: tobject);
-    procedure sethomebtnclick(sender: tobject);
+    procedure rightupbtnclick  (sender: tobject);
+    procedure sethomebtnclick  (sender: tobject);
 
     procedure loadbtnclick(sender: tobject);
     procedure playorstopbtnclick(sender: tobject);
@@ -219,16 +220,17 @@ begin
 end;
 
 procedure tmainform.bordersbtnclick(sender: tobject);
+var
+  m0: longint;
+  m1: longint;
 begin
-
-
-
-
-end;
-
-procedure tmainform.creativecontrolgbclick(sender: TObject);
-begin
-
+  driver.enabled := true;
+  driver.pen     := false;
+  optimize(layout.p10, layout, m0, m1); driver.move2(m0, m1);
+  optimize(layout.p11, layout, m0, m1); driver.move2(m0, m1);
+  optimize(layout.p12, layout, m0, m1); driver.move2(m0, m1);
+  optimize(layout.p13, layout, m0, m1); driver.move2(m0, m1);
+  optimize(layout.p09, layout, m0, m1); driver.move2(m0, m1);
 end;
 
 procedure tmainform.gohomebtnclick(sender: tobject);
@@ -263,6 +265,11 @@ begin
   begin
     nleft := image.left + (x - px);
     ntop  := image.top  + (y - py);
+
+    if nleft                >  width - 150 then nleft :=  width - 150;
+    if  ntop                > height - 150 then  ntop := height - 150;
+    if nleft + image. width <          150 then nleft :=          150 - image.width;
+    if  ntop + image.height <          150 then  ntop :=          150 - image.height;
 
     image.left := nleft;
     image.top  := ntop;
@@ -304,8 +311,37 @@ begin
     papersizegb      .enabled := true;
     drawingcontrolgb .enabled := true;
 
-    formatcbchange(nil);
+    //formatcbchange(nil);
   end;
+end;
+
+procedure tmainform.clearbtnclick(sender: tobject);
+begin
+  bitmap.canvas.pen  .color := clltgray;
+  bitmap.canvas.brush.color := clltgray;
+  bitmap.canvas.brush.style := bssolid;
+  bitmap.setsize(
+     widthse.value,
+    heightse.value);
+  bitmap.canvas.fillrect(0, 0,
+     widthse.value,
+    heightse.value);
+  // ---
+  image.canvas.pen  .color := clltgray;
+  image.canvas.brush.color := clltgray;
+  image.canvas.brush.style := bssolid;
+  image.picture.bitmap.setsize(
+     widthse.value,
+    heightse.value);
+  image.canvas.fillrect(0, 0,
+     widthse.value,
+    heightse.value);
+  // ---
+  image.center            := true;
+  image.proportional      := false;
+  image.stretchinenabled  := false;
+  image.stretchoutenabled := false;
+  image.stretch           := false;
 end;
 
 procedure tmainform.reloadbtnclick(sender: tobject);
@@ -340,52 +376,29 @@ begin
          widthse   .enabled := true;
        end;
   end;
-
-  if verticalcb.enabled then
-    verticalcbeditingdone(formatcb);
+  verticalcbeditingdone(formatcb);
 end;
 
 procedure tmainform.verticalcbeditingdone(sender: tobject);
 var
-  amin, amax: longint;
+  amin: longint;
+  amax: longint;
 begin
-  amin := min(heightse.value, widthse.value);
-  amax := max(heightse.value, widthse.value);
-  if verticalcb.checked then
+  if verticalcb.enabled then
   begin
-    heightse.value := amax;
-    widthse .value := amin;
-  end else
-  begin
-    heightse.value := amin;
-    widthse .value := amax;
+    amin := min(heightse.value, widthse.value);
+    amax := max(heightse.value, widthse.value);
+    if verticalcb.checked then
+    begin
+      heightse.value := amax;
+      widthse .value := amin;
+    end else
+    begin
+      heightse.value := amin;
+      widthse .value := amax;
+    end;
   end;
-  // ---
-  bitmap.canvas.pen  .color := clltgray;
-  bitmap.canvas.brush.color := clltgray;
-  bitmap.canvas.brush.style := bssolid;
-  bitmap.setsize(
-     widthse.value * 1,
-    heightse.value * 1);
-  bitmap.canvas.fillrect(0, 0,
-     widthse.value * 1,
-    heightse.value * 1);
-  // ---
-  image.canvas.pen  .color := clltgray;
-  image.canvas.brush.color := clltgray;
-  image.canvas.brush.style := bssolid;
-  image.picture.bitmap.setsize(
-     widthse.value * 1,
-    heightse.value * 1);
-  image.canvas.fillrect(0, 0,
-     widthse.value * 1,
-    heightse.value * 1);
-
-  image.center            := true;
-  image.proportional      := true;
-  image.stretchinenabled  := true;
-  image.stretchoutenabled := true;
-  image.stretch           := true;
+  clearbtnclick(sender);
 end;
 
 procedure tmainform.playorstopbtnclick(sender: tobject);
@@ -417,8 +430,6 @@ end;
 
 procedure tmainform.onplotterstart;
 begin
-  tick := 0;
-  // ---
   startbtn.caption          := 'Pause';
   manualdrivinggb  .enabled := false;
   creativecontrolgb.enabled := false;
@@ -470,8 +481,6 @@ begin
     image.canvas.draw(0, 0, bitmap);
   application.processmessages;
 end;
-
-
 
 end.
 

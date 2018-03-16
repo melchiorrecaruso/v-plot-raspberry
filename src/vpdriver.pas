@@ -286,8 +286,8 @@ begin
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq))
       else
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
-      {$endif}
       delay(500);
+      {$endif}
     end;
 end;
 
