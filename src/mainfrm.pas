@@ -154,8 +154,8 @@ var
   m0: longint;
   m1: longint;
 begin
-  manualdrivinggb  .enabled := true;
-  pagesizegb      .enabled := false;
+  manualdrivinggb.enabled := true;
+  pagesizegb     .enabled := true;
   // ---
   loadlayout(layout, changefileext(paramstr(0), '.ini'));
   driver    := tvpdriver.create(layout.mode);
@@ -198,7 +198,7 @@ var
   m1: longint;
 begin
   driver.enabled := true;
-  driver.pen     := false;
+  driver.penoff  := true;
   driver.move4(-leftedit.value, 0);
   optimize(layout.p09, layout, m0, m1);
   driver.init(m0, m1);
@@ -210,7 +210,7 @@ var
   m1: longint;
 begin
   driver.enabled := true;
-  driver.pen     := false;
+  driver.penoff  := true;
   driver.move4(+leftedit.value, 0);
   optimize(layout.p09, layout, m0, m1);
   driver.init(m0, m1);
@@ -222,7 +222,7 @@ var
   m1: longint;
 begin
   driver.enabled := true;
-  driver.pen     := false;
+  driver.penoff  := true;
   driver.move4(0, -rightedit.value);
   optimize(layout.p09, layout, m0, m1);
   driver.init(m0, m1);
@@ -234,7 +234,7 @@ var
   m1: longint;
 begin
   driver.enabled := true;
-  driver.pen     := false;
+  driver.penoff  := true;
   driver.move4(0, +rightedit.value);
   optimize(layout.p09, layout, m0, m1);
   driver.init(m0, m1);
@@ -243,12 +243,14 @@ end;
 procedure tmainform.pendownbtnclick(Sender: TObject);
 begin
   driver.enabled := true;
+  driver.penoff  := false;
   driver.pen     := true;
 end;
 
 procedure tmainform.penupbtnclick(sender: tobject);
 begin
   driver.enabled := true;
+  driver.penoff  := false;
   driver.pen     := false;
 end;
 
@@ -258,7 +260,7 @@ var
   m1: longint;
 begin
   driver.enabled := true;
-  driver.pen     := false;
+  driver.penoff  := true;
   optimize(layout.p10, layout, m0, m1); driver.move2(m0, m1);
   optimize(layout.p11, layout, m0, m1); driver.move2(m0, m1);
   optimize(layout.p12, layout, m0, m1); driver.move2(m0, m1);
@@ -272,7 +274,7 @@ var
   m1: longint;
 begin
   driver.enabled := true;
-  driver.pen     := false;
+  driver.penoff  := true;
   optimize(layout.p09, layout, m0, m1);
   driver.move2(m0, m1);
 end;
@@ -446,6 +448,7 @@ begin
   end else
   begin
     driver.enabled  := (sender = startmi);
+    driver.penoff   := false;
     plotter         := tvplotter.create(paths);
     plotter.onstart := @onplotterstart;
     plotter.onstop  := @onplotterstop;
@@ -578,7 +581,6 @@ begin
     optimize(p, layout, m0, m1);
     driver.move2(m0, m1);
   end;
-  sleep(5);
 
   inc(tick);
   if tick mod 25 = 0 then
