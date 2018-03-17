@@ -1,6 +1,6 @@
-{ Description: vPlot Application.
+{ Description: vPlot application.
 
-  Copyright (C) 2014-2017 Melchiorre Caruso <melchiorrecaruso@gmail.com>
+  Copyright (C) 2017-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
   This source is free software; you can redistribute it and/or modify it under
   the terms of the GNU General Public License as published by the Free
@@ -20,13 +20,13 @@
 
 program vplot;
 
-{$mode objfpc}{$H+}
+{$mode objfpc}
 
 uses
-  {$ifdef unix} cthreads, {$endif} interfaces, forms, fpvectorialpkg,
-  mainfrm, vplayout, vpcommon;
+  {$ifdef unix} cthreads, {$endif} interfaces, forms, mainfrm,
+  fpvectorialpkg, vplayout, vpcommon;
 
-{$R *.res}
+  {$R *.res}
 
 begin
   requirederivedformresource := true;

@@ -1,5 +1,5 @@
 {
-  Description: vPlot list class.
+  Description: vPlot common unit.
 
   Copyright (C) 2017-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 

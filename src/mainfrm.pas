@@ -1,7 +1,7 @@
 {
-  Description: vPlot Main Form.
+  Description: vPlot main form.
 
-  Copyright (C) 2014-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
+  Copyright (C) 2017-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
   This source is free software; you can redistribute it and/or modify it under
   the terms of the GNU General Public License as published by the Free
@@ -21,7 +21,7 @@
 
 unit mainfrm;
 
-{$mode objfpc}{$H+}
+{$mode objfpc}
 
 interface
 
@@ -559,7 +559,7 @@ end;
 procedure tmainform.onplotterstop;
 begin
   image.canvas.draw(0,0, bitmap);
-  gohomebtnclick(nil);
+  penupbtnclick(nil);
   plotter := nil;
   // ---
   openmi    .enabled := true;

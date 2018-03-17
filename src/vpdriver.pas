@@ -22,7 +22,7 @@
 unit vpdriver;
 
 {$mode objfpc}
-{$define debug}
+{*$define debug}
 
 interface
 
@@ -34,7 +34,9 @@ type
   private
     fcnt0:    longint;
     fcnt1:    longint;
-    fdelayms: longint;
+    fdelay1:  longint;
+    fdelay2:  longint;
+    fdelay3:  longint;
     ffault:   longint;
     fenabled: boolean;
     fpen:     boolean;
@@ -53,7 +55,9 @@ type
   published
     property cnt0:    longint read fcnt0;
     property cnt1:    longint read fcnt1;
-    property delayms: longint read fdelayms write fdelayms;
+    property delay1:  longint read fdelay1 write fdelay1;
+    property delay2:  longint read fdelay2 write fdelay2;
+    property delay3:  longint read fdelay3 write fdelay3;
     property fault:   longint read ffault;
     property enabled: boolean read fenabled write fenabled;
     property pen:     boolean read fpen     write setpen;
@@ -108,9 +112,9 @@ begin
   if ffault <> -1 then
   begin
     // init servo
-    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_minvalue, motz_freq)); delay(500);
-    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq)); delay(500);
-    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq)); delay(500);
+    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_minvalue, motz_freq)); delaymicroseconds(fdelay3);
+    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq)); delaymicroseconds(fdelay3);
+    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq)); delaymicroseconds(fdelay3);
     // init mode
     pinmode(motx_mod0,    OUTPUT);
     pinmode(motx_mod1,    OUTPUT);
@@ -180,7 +184,9 @@ begin
   {$else}
   ffault   := -1;
   {$endif}
-  fdelayms := 4000;
+  fdelay1  := 2500;
+  fdelay2  := 5000;
+  fdelay3  := 600;
   fenabled := false;
   fpen     := false;
   fpenoff  := false;
@@ -220,14 +226,14 @@ begin
   repeat
     if cnt0 > 0 then
     begin
-      digitalwrite(mot0_step, HIGH);  delaymicroseconds(fdelayms div 2);
-      digitalwrite(mot0_step,  LOW);  delaymicroseconds(fdelayms div 2);
+      digitalwrite(mot0_step, HIGH);  delaymicroseconds(fdelay1);
+      digitalwrite(mot0_step,  LOW);  delaymicroseconds(fdelay1);
       dec(cnt0);
     end;
     if cnt1 > 0 then
     begin
-      digitalwrite(mot1_step, HIGH);  delaymicroseconds(fdelayms div 2);
-      digitalwrite(mot1_step,  LOW);  delaymicroseconds(fdelayms div 2);
+      digitalwrite(mot1_step, HIGH);  delaymicroseconds(fdelay1);
+      digitalwrite(mot1_step,  LOW);  delaymicroseconds(fdelay1);
       dec(cnt1);
     end;
   until (cnt0 = 0) and (cnt1 = 0);
@@ -262,14 +268,14 @@ begin
     // move step motor0
     if vplotmatrix[cnt0, i] = 1 then
     begin
-      digitalwrite(mot0_step, HIGH);  delaymicroseconds(fdelayms);
-      digitalwrite(mot0_step,  LOW);  delaymicroseconds(fdelayms);
+      digitalwrite(mot0_step, HIGH);  delaymicroseconds(fdelay2);
+      digitalwrite(mot0_step,  LOW);  delaymicroseconds(fdelay2);
     end;
     // move step motor1
     if vplotmatrix[cnt1, i] = 1 then
     begin
-      digitalwrite(mot1_step, HIGH);  delaymicroseconds(fdelayms);
-      digitalwrite(mot1_step,  LOW);  delaymicroseconds(fdelayms);
+      digitalwrite(mot1_step, HIGH);  delaymicroseconds(fdelay2);
+      digitalwrite(mot1_step,  LOW);  delaymicroseconds(fdelay2);
     end;
   end;
   {$endif}
@@ -286,7 +292,7 @@ begin
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq))
       else
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
-      delay(500);
+      delaymicroseconds(fdelay3);
       {$endif}
     end;
 end;
@@ -302,7 +308,7 @@ begin
       pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq))
     else
       pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
-    delay(500);
+    delaymicroseconds(fdelay3);
     {$endif}
   end;
 end;
@@ -316,9 +322,9 @@ end;
 
 procedure tvpdriver.move4(cnt0, cnt1: longint);
 begin
-  {$ifdef cpuarm}
   if not fenabled then exit;
   if ffault  = -1 then exit;
+  {$ifdef cpuarm}
   // mode step motors
   if (cnt0 <> 0) or
      (cnt1 <> 0) then

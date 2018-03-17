@@ -1,7 +1,7 @@
 {
   Description: vPlot coder.
 
-  Copyright (C) 2014-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
+  Copyright (C) 2017-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
   This source is free software; you can redistribute it and/or modify it under
   the terms of the GNU General Public License as published by the Free
@@ -22,7 +22,7 @@
 unit vpcoder;
 
 {$mode objfpc}
-{$define debug}
+{*$define debug}
 
 interface
 
@@ -324,7 +324,9 @@ begin
         path := interpolate_path(tpath(entity))
       end else
       begin
-        writeln(tvblock(entity).GetEntitiesCount);
+        {$ifdef debug}
+        writeln(entity.classname);
+        {$endif}
       end;
 
       if assigned(path) then
