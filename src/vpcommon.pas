@@ -65,11 +65,11 @@ type
 
   tvppaths = class(tobject)
   private
-    flist:    tlist;
-    fheight:  double;
-    fwidth:   double;
-    function  getcount:  longint;
-    function  get(index: longint): tvppath;
+    flist:   tlist;
+    fheight: double;
+    fwidth:  double;
+    function getcount:  longint;
+    function get(index: longint): tvppath;
   public
     constructor create;
     destructor  destroy; override;

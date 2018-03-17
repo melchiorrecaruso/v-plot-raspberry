@@ -58,7 +58,7 @@ type
 
 
 
-function createvppaths(vec: tvvectorialdocument): tvppaths;
+function createvppaths(vec: tvvectorialdocument; zerocenter: boolean): tvppaths;
 
 procedure optimize(const p: tvppoint; const l: tvplayout; var m0, m1: longint);
 
@@ -296,7 +296,7 @@ end;
 
 // createvppaths
 
-function createvppaths(vec: tvvectorialdocument): tvppaths;
+function createvppaths(vec: tvvectorialdocument; zerocenter: boolean): tvppaths;
 var
     i, j: longint;
   entity: tventity;
@@ -306,7 +306,6 @@ begin
   result := tvppaths.create;
   for i := 0 to vec.getpagecount - 1 do
   begin
-    writeln('PAGE = ', i);
     page := vec.getpageasvectorial(i);
     for j := 0 to page.getentitiescount - 1 do
     begin
@@ -314,28 +313,27 @@ begin
       entity := page.getentity(j);
       if entity is tvcircle then
       begin
-        tvcircle(entity).
         path := interpolate_circle(tvcircle(entity))
       end else
       if entity is tvcirculararc then
       begin
-        writeln('tvcirculararc');
         path := interpolate_circlearc(tvcirculararc(entity))
       end else
       if entity is tpath then
       begin
-        writeln('tpath');
         path := interpolate_path(tpath(entity))
       end else
       begin
-        writeln(entity.classname);
+        writeln(tvblock(entity).GetEntitiesCount);
       end;
 
       if assigned(path) then
         result.add(path);
     end;
   end;
-  result.zerocenter;
+
+  if zerocenter then
+    result.zerocenter;
   result.createtoolpath;
 end;
 

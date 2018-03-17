@@ -34,28 +34,30 @@ type
   { tmainform }
 
   tmainform = class(tform)
-    image: TImage;
+    image: timage;
     leftedit: tspinedit;
-    mainmenu: TMainMenu;
-    filemi: TMenuItem;
-    line2mi: TMenuItem;
-    killmi: TMenuItem;
-    startmi: TMenuItem;
-    stopmi: TMenuItem;
-    infomi: TMenuItem;
-    aboutmi: TMenuItem;
-    previewmi: TMenuItem;
-    updatemi: TMenuItem;
-    clearallmi: TMenuItem;
-    MenuItem19: TMenuItem;
-    openmi: TMenuItem;
-    closemi: TMenuItem;
-    line1mi: TMenuItem;
-    exitmi: TMenuItem;
-    viewmi: TMenuItem;
-    showmanualdrivingmi: TMenuItem;
-    showpagemi: TMenuItem;
-    plotmi: TMenuItem;
+    mainmenu: tmainmenu;
+    filemi: tmenuitem;
+    line2mi: tmenuitem;
+    killmi: tmenuitem;
+    menuitem1: tmenuitem;
+    zerocentermi: tmenuitem;
+    startmi: tmenuitem;
+    stopmi: tmenuitem;
+    infomi: tmenuitem;
+    aboutmi: tmenuitem;
+    previewmi: tmenuitem;
+    updatemi: tmenuitem;
+    clearallmi: tmenuitem;
+    menuitem19: tmenuitem;
+    openmi: tmenuitem;
+    closemi: tmenuitem;
+    line1mi: tmenuitem;
+    exitmi: tmenuitem;
+    viewmi: tmenuitem;
+    showmanualdrivingmi: tmenuitem;
+    showpagemi: tmenuitem;
+    plotmi: tmenuitem;
     rightedit: tspinedit;
     verticalcb: tcheckbox;
     formatcb: tcombobox;
@@ -112,10 +114,11 @@ type
 
     procedure openbtnclick(sender: tobject);
 
-    procedure stopmiClick(Sender: TObject);
-    procedure updatemiClick(Sender: TObject);
+    procedure stopmiclick(sender: tobject);
+    procedure updatemiclick(sender: tobject);
 
     procedure verticalcbeditingdone(sender: tobject);
+    procedure zerocentermiclick(sender: tobject);
   private
    bitmap:    tbitmap;
     paths:    tvppaths;
@@ -160,7 +163,7 @@ begin
   loadlayout(layout, changefileext(paramstr(0), '.ini'));
   driver    := tvpdriver.create(layout.mode);
   vec       := tvvectorialdocument.create;
-  paths     := createvppaths(vec);
+  paths     := createvppaths(vec, zerocentermi.checked);
   bitmap    := tbitmap.create;
   // ---
   showtoolbarclick(nil);
@@ -342,7 +345,7 @@ begin
       freeandnil(vec);
       vec := tvvectorialdocument.create;
     end;
-    paths := createvppaths(vec);
+    paths := createvppaths(vec, zerocentermi.checked);
 
     manualdrivinggb.enabled := true;
     pagesizegb    .enabled := true;
@@ -356,7 +359,7 @@ begin
   freeandnil(paths);
   freeandnil(vec);
   vec   := tvvectorialdocument.create;
-  paths := createvppaths(vec);
+  paths := createvppaths(vec, zerocentermi.checked);
 end;
 
 procedure tmainform.exitmiclick(sender: tobject);
@@ -472,6 +475,17 @@ begin
   begin
     plotter.plot := true;
     plotter.terminate;
+  end;
+end;
+
+// OPTION menumenu
+
+procedure tmainform.zerocentermiclick(sender: tobject);
+begin
+  zerocentermi.checked := not zerocentermi.checked;
+  begin
+    freeandnil(paths);
+    paths := createvppaths(vec, zerocentermi.checked);
   end;
 end;
 
