@@ -261,6 +261,7 @@ var
 begin
   driver.enabled := true;
   driver.penoff  := true;
+  optimize(layout.p13, layout, m0, m1); driver.move2(m0, m1);
   optimize(layout.p10, layout, m0, m1); driver.move2(m0, m1);
   optimize(layout.p11, layout, m0, m1); driver.move2(m0, m1);
   optimize(layout.p12, layout, m0, m1); driver.move2(m0, m1);

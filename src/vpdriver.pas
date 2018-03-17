@@ -296,7 +296,14 @@ begin
   fpenoff := value;
   if fpenoff then
   begin
-    setpen(false);
+    fpen := false;
+    {$ifdef cpuarm}
+    if fpen then
+      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq))
+    else
+      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
+    delay(500);
+    {$endif}
   end;
 end;
 

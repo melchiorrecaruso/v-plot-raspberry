@@ -70,10 +70,6 @@ uses
   math, sysutils;
 
 
-
-
-
-
 // toolpath routines
 
 function interpolate_line(const p0, p1: tvppoint): tvppath;
@@ -118,7 +114,7 @@ begin
   begin
     p := rotatepoint(start, (i * (sweep / len)));
     p := translatepoint(cc, p);
-    result.add(p);
+    result.insert(0, p);
   end;
 end;
 
@@ -145,7 +141,7 @@ begin
   begin
     p := rotatepoint(start, (i * (sweep / len)));
     p := translatepoint(cc, p);
-    result.add(p);
+    result.insert(0, p);
   end;
 end;
 
@@ -310,30 +306,33 @@ begin
   result := tvppaths.create;
   for i := 0 to vec.getpagecount - 1 do
   begin
+    writeln('PAGE = ', i);
     page := vec.getpageasvectorial(i);
     for j := 0 to page.getentitiescount - 1 do
     begin
       path   := nil;
       entity := page.getentity(j);
       if entity is tvcircle then
+      begin
+        tvcircle(entity).
         path := interpolate_circle(tvcircle(entity))
-      else
+      end else
       if entity is tvcirculararc then
+      begin
+        writeln('tvcirculararc');
         path := interpolate_circlearc(tvcirculararc(entity))
-      else
+      end else
       if entity is tpath then
+      begin
+        writeln('tpath');
         path := interpolate_path(tpath(entity))
-      else
+      end else
+      begin
         writeln(entity.classname);
+      end;
 
       if assigned(path) then
-      begin
-        // result.add(path);
-        if path.getlen > 0.25 then
-         result.add(path)
-        else
-          freeandnil(path);
-      end;
+        result.add(path);
     end;
   end;
   result.zerocenter;

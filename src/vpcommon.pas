@@ -53,6 +53,7 @@ type
     constructor create;
     destructor  destroy; override;
     procedure   add(const point: tvppoint);
+    procedure   insert(index: longint; const point: tvppoint);
     procedure   delete(index: longint);
     procedure   clear;
     procedure   invert;
@@ -240,6 +241,16 @@ begin
   p^.x := point.x;
   p^.y := point.y;
   flist.add(p);
+end;
+
+procedure tvppath.insert(index: longint; const point: tvppoint);
+var
+  p: pvppoint;
+begin
+  new(p);
+  p^.x := point.x;
+  p^.y := point.y;
+  flist.insert(index, p);
 end;
 
 procedure tvppath.invert;

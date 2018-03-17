@@ -35,7 +35,7 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="88">
+    <Units Count="91">
       <Unit0>
         <Filename Value="vplot.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -57,9 +57,11 @@
       </Unit1>
       <Unit2>
         <Filename Value="src/vpcoder.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="265"/>
-        <CursorPos X="89" Y="310"/>
+        <TopLine Value="294"/>
+        <CursorPos X="26" Y="317"/>
+        <FoldState Value=" T3iV0I3 pj5jX0r_"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -384,11 +386,9 @@
         <ComponentName Value="mainform"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="550"/>
-        <CursorPos X="7" Y="583"/>
-        <FoldState Value=" T3l0087143153!"/>
+        <TopLine Value="246"/>
+        <CursorPos X="69" Y="264"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -592,15 +592,15 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <FoldState Value=" T0jK624c"/>
-        <UsageCount Value="149"/>
+        <UsageCount Value="151"/>
       </Unit75>
       <Unit76>
         <Filename Value="src/vpdriver.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="275"/>
-        <CursorPos X="98" Y="272"/>
-        <UsageCount Value="149"/>
+        <TopLine Value="272"/>
+        <CursorPos X="13" Y="306"/>
+        <UsageCount Value="151"/>
         <Loaded Value="True"/>
       </Unit76>
       <Unit77>
@@ -609,7 +609,7 @@
         <EditorIndex Value="2"/>
         <TopLine Value="59"/>
         <CursorPos X="17" Y="48"/>
-        <UsageCount Value="149"/>
+        <UsageCount Value="151"/>
         <Loaded Value="True"/>
       </Unit77>
       <Unit78>
@@ -664,15 +664,16 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="17"/>
         <CursorPos X="37" Y="23"/>
-        <UsageCount Value="113"/>
+        <UsageCount Value="115"/>
       </Unit84>
       <Unit85>
         <Filename Value="src/vpcommon.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="353"/>
-        <CursorPos X="90" Y="420"/>
-        <UsageCount Value="110"/>
+        <TopLine Value="379"/>
+        <CursorPos X="26" Y="456"/>
+        <FoldState Value=" T3jI049 piYjH04Bi"/>
+        <UsageCount Value="112"/>
         <Loaded Value="True"/>
       </Unit85>
       <Unit86>
@@ -690,128 +691,144 @@
         <CursorPos X="85" Y="166"/>
         <UsageCount Value="10"/>
       </Unit87>
+      <Unit88>
+        <Filename Value="../../lazarus/components/fpvectorial/fpvectorial.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="5929"/>
+        <CursorPos X="3" Y="5960"/>
+        <UsageCount Value="10"/>
+      </Unit88>
+      <Unit89>
+        <Filename Value="../../fpc/source/packages/fcl-image/src/fpimage.pp"/>
+        <UnitName Value="FPimage"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="529"/>
+        <CursorPos X="3" Y="33"/>
+        <UsageCount Value="10"/>
+      </Unit89>
+      <Unit90>
+        <Filename Value="../../lazarus/components/fpvectorial/fpvtocanvas.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit90>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="373" Column="7" TopLine="368"/>
+        <Caret Line="187" Column="22" TopLine="161"/>
       </Position1>
       <Position2>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="85" Column="48" TopLine="69"/>
+        <Caret Line="291" Column="62" TopLine="248"/>
       </Position2>
       <Position3>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="402" TopLine="351"/>
+        <Caret Line="290" Column="62" TopLine="247"/>
       </Position3>
       <Position4>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="373" TopLine="360"/>
+        <Caret Line="388" Column="49" TopLine="369"/>
       </Position4>
       <Position5>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="410" Column="36" TopLine="360"/>
+        <Caret Line="390" Column="32" TopLine="321"/>
       </Position5>
       <Position6>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="109" TopLine="92"/>
+        <Caret Line="541" Column="42" TopLine="523"/>
       </Position6>
       <Position7>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="165" Column="24" TopLine="148"/>
+        <Caret Line="451" Column="31" TopLine="429"/>
       </Position7>
       <Position8>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="445" TopLine="372"/>
+        <Filename Value="src/vpcoder.pas"/>
+        <Caret Line="121" Column="26" TopLine="113"/>
       </Position8>
       <Position9>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="166" Column="70" TopLine="159"/>
+        <Filename Value="src/vpcommon.pas"/>
+        <Caret Line="55" Column="20" TopLine="39"/>
       </Position9>
       <Position10>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="167" Column="70" TopLine="160"/>
+        <Filename Value="src/vpcommon.pas"/>
+        <Caret Line="68" Column="11" TopLine="40"/>
       </Position10>
       <Position11>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="166" Column="70" TopLine="159"/>
+        <Filename Value="src/vpcommon.pas"/>
+        <Caret Line="311" Column="9" TopLine="288"/>
       </Position11>
       <Position12>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="168" Column="30" TopLine="158"/>
+        <Filename Value="src/vpcommon.pas"/>
+        <Caret Line="68" Column="10" TopLine="60"/>
       </Position12>
       <Position13>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="369" Column="6" TopLine="307"/>
+        <Filename Value="src/vpcommon.pas"/>
+        <Caret Line="325" Column="16" TopLine="288"/>
       </Position13>
       <Position14>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="97" Column="12" TopLine="84"/>
+        <Filename Value="src/vpcommon.pas"/>
+        <Caret Line="326" Column="8" TopLine="305"/>
       </Position14>
       <Position15>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="369" Column="33" TopLine="352"/>
+        <Filename Value="src/vpcommon.pas"/>
+        <Caret Line="333" Column="18" TopLine="310"/>
       </Position15>
       <Position16>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="364" Column="15" TopLine="352"/>
+        <Filename Value="src/vpcommon.pas"/>
+        <Caret Line="340" Column="8" TopLine="313"/>
       </Position16>
       <Position17>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="363" Column="15" TopLine="351"/>
+        <Filename Value="src/vpcommon.pas"/>
+        <Caret Line="361" Column="26" TopLine="338"/>
       </Position17>
       <Position18>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="364" Column="15" TopLine="352"/>
+        <Filename Value="src/vpcommon.pas"/>
+        <Caret Line="376" Column="26" TopLine="354"/>
       </Position18>
       <Position19>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="363" Column="15" TopLine="351"/>
+        <Filename Value="src/vpcoder.pas"/>
+        <Caret Line="326" Column="15" TopLine="292"/>
       </Position19>
       <Position20>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="237" TopLine="167"/>
+        <Filename Value="src/vpcoder.pas"/>
+        <Caret Line="120" Column="3" TopLine="67"/>
       </Position20>
       <Position21>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="309" TopLine="130"/>
+        <Filename Value="src/vpcommon.pas"/>
+        <Caret Line="388" Column="34" TopLine="367"/>
       </Position21>
       <Position22>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="226" TopLine="188"/>
+        <Filename Value="src/vpcommon.pas"/>
+        <Caret Line="401" Column="16" TopLine="379"/>
       </Position22>
       <Position23>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="111" Column="3" TopLine="94"/>
+        <Filename Value="src/vpcommon.pas"/>
+        <Caret Line="439" Column="21" TopLine="411"/>
       </Position23>
       <Position24>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="187" Column="22" TopLine="161"/>
+        <Filename Value="src/vpcommon.pas"/>
+        <Caret Line="456" Column="26" TopLine="418"/>
       </Position24>
       <Position25>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="291" Column="62" TopLine="248"/>
+        <Filename Value="src/vpcoder.pas"/>
+        <Caret Line="120" Column="11" TopLine="100"/>
       </Position25>
       <Position26>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="290" Column="62" TopLine="247"/>
+        <Filename Value="src/vpcoder.pas"/>
+        <Caret Line="202" Column="30" TopLine="178"/>
       </Position26>
       <Position27>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="388" Column="49" TopLine="369"/>
+        <Filename Value="src/vpcoder.pas"/>
+        <Caret Line="317" Column="57" TopLine="301"/>
       </Position27>
       <Position28>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="390" Column="32" TopLine="321"/>
+        <Filename Value="src/vpcoder.pas"/>
+        <Caret Line="31" Column="51" TopLine="16"/>
       </Position28>
       <Position29>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="541" Column="42" TopLine="523"/>
+        <Filename Value="src/vpcoder.pas"/>
+        <Caret Line="317" Column="33" TopLine="301"/>
       </Position29>
-      <Position30>
-        <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="451" Column="31" TopLine="429"/>
-      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
