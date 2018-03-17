@@ -1,51 +1,57 @@
 object mainform: Tmainform
-  Left = 282
-  Height = 645
-  Top = 30
-  Width = 966
+  Left = 264
+  Height = 622
+  Top = 24
+  Width = 923
   Anchors = []
   Caption = 'VPlot Driver'
-  ClientHeight = 645
-  ClientWidth = 966
+  ClientHeight = 602
+  ClientWidth = 923
   Color = clWindow
+  Menu = mainmenu
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   LCLVersion = '1.9.0.0'
-  object manualdrivinggb: TGroupBox
+  object image: TImage
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = Owner
-    AnchorSideRight.Control = image
-    Left = 5
-    Height = 191
-    Top = 5
-    Width = 294
+    AnchorSideRight.Control = manualdrivinggb
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 0
+    Height = 602
+    Top = 0
+    Width = 624
+    Align = alCustom
+    Anchors = [akTop, akLeft, akRight, akBottom]
     AutoSize = True
-    BorderSpacing.Left = 5
-    BorderSpacing.Top = 5
+    Center = True
+    OnMouseDown = imageMouseDown
+    OnMouseMove = imageMouseMove
+    OnMouseUp = imageMouseUp
+    Proportional = True
+    Stretch = True
+    StretchOutEnabled = False
+  end
+  object manualdrivinggb: TGroupBox
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 624
+    Height = 184
+    Top = 4
+    Width = 294
+    Anchors = [akRight]
     BorderSpacing.Right = 5
     Caption = 'Manual Driving'
-    ClientHeight = 171
+    ClientHeight = 164
     ClientWidth = 290
     Color = clWindow
+    Constraints.MaxWidth = 294
+    Constraints.MinWidth = 294
     ParentColor = False
     TabOrder = 0
-    object sethomebtn: TBitBtn
-      AnchorSideLeft.Control = penupbtn
-      AnchorSideTop.Control = leftedit
-      AnchorSideRight.Control = penupbtn
-      AnchorSideRight.Side = asrBottom
-      AnchorSideBottom.Control = leftedit
-      AnchorSideBottom.Side = asrBottom
-      Left = 100
-      Height = 23
-      Top = 41
-      Width = 85
-      Anchors = [akTop, akLeft, akRight, akBottom]
-      Caption = 'Set Home'
-      OnClick = sethomebtnClick
-      TabOrder = 0
-    end
+    TabStop = True
     object rightdownbtn: TBitBtn
       AnchorSideLeft.Control = rightupbtn
       AnchorSideTop.Control = pendownbtn
@@ -55,12 +61,12 @@ object mainform: Tmainform
       AnchorSideBottom.Side = asrBottom
       Left = 195
       Height = 30
-      Top = 76
+      Top = 69
       Width = 85
       Anchors = [akTop, akLeft, akRight, akBottom]
       Caption = 'Right Down'
       OnClick = rightdownbtnClick
-      TabOrder = 1
+      TabOrder = 0
     end
     object penupbtn: TBitBtn
       AnchorSideLeft.Control = leftupbtn
@@ -76,7 +82,7 @@ object mainform: Tmainform
       BorderSpacing.Left = 10
       Caption = 'Pen Up'
       OnClick = penupbtnClick
-      TabOrder = 2
+      TabOrder = 1
     end
     object pendownbtn: TBitBtn
       AnchorSideLeft.Control = penupbtn
@@ -87,12 +93,12 @@ object mainform: Tmainform
       AnchorSideBottom.Side = asrBottom
       Left = 100
       Height = 30
-      Top = 76
+      Top = 69
       Width = 85
       Anchors = [akTop, akLeft, akRight, akBottom]
       Caption = 'Pen Down'
       OnClick = pendownbtnClick
-      TabOrder = 3
+      TabOrder = 2
     end
     object gohomebtn: TBitBtn
       AnchorSideLeft.Control = penupbtn
@@ -103,12 +109,12 @@ object mainform: Tmainform
       AnchorSideBottom.Side = asrBottom
       Left = 100
       Height = 30
-      Top = 131
+      Top = 124
       Width = 85
       Anchors = [akTop, akLeft, akRight, akBottom]
       Caption = 'Go Home'
       OnClick = gohomebtnClick
-      TabOrder = 4
+      TabOrder = 3
     end
     object bordersbtn: TBitBtn
       AnchorSideLeft.Control = leftdownbtn
@@ -118,30 +124,31 @@ object mainform: Tmainform
       AnchorSideRight.Side = asrBottom
       Left = 5
       Height = 30
-      Top = 131
+      Top = 124
       Width = 85
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Top = 25
       BorderSpacing.Bottom = 10
       Caption = 'Borders'
       OnClick = bordersbtnClick
-      TabOrder = 5
+      TabOrder = 4
     end
     object leftdownbtn: TBitBtn
       AnchorSideLeft.Control = manualdrivinggb
+      AnchorSideTop.Control = leftedit
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = leftupbtn
       AnchorSideRight.Side = asrBottom
       Left = 5
       Height = 30
-      Top = 76
+      Top = 69
       Width = 85
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 5
       BorderSpacing.Top = 5
       Caption = 'Left Down'
       OnClick = leftdownbtnClick
-      TabOrder = 6
+      TabOrder = 5
     end
     object leftupbtn: TBitBtn
       AnchorSideLeft.Control = manualdrivinggb
@@ -154,7 +161,7 @@ object mainform: Tmainform
       BorderSpacing.Top = 6
       Caption = 'Left Up'
       OnClick = leftupbtnClick
-      TabOrder = 7
+      TabOrder = 6
     end
     object rightupbtn: TBitBtn
       AnchorSideLeft.Control = penupbtn
@@ -171,7 +178,7 @@ object mainform: Tmainform
       BorderSpacing.Right = 10
       Caption = 'Right Up'
       OnClick = rightupbtnClick
-      TabOrder = 8
+      TabOrder = 7
     end
     object leftedit: TSpinEdit
       AnchorSideLeft.Control = manualdrivinggb
@@ -188,14 +195,14 @@ object mainform: Tmainform
       BorderSpacing.Left = 5
       BorderSpacing.Top = 5
       MaxValue = 1000000
-      TabOrder = 9
+      TabOrder = 8
     end
     object rightedit: TSpinEdit
       AnchorSideLeft.Control = rightupbtn
-      AnchorSideTop.Control = sethomebtn
+      AnchorSideTop.Control = leftedit
       AnchorSideRight.Control = rightupbtn
       AnchorSideRight.Side = asrBottom
-      AnchorSideBottom.Control = sethomebtn
+      AnchorSideBottom.Control = leftedit
       AnchorSideBottom.Side = asrBottom
       Left = 195
       Height = 23
@@ -204,132 +211,31 @@ object mainform: Tmainform
       Alignment = taCenter
       Anchors = [akTop, akLeft, akRight, akBottom]
       MaxValue = 1000000
-      TabOrder = 10
+      TabOrder = 9
     end
   end
-  object drawingcontrolgb: TGroupBox
+  object pagesizegb: TGroupBox
     AnchorSideLeft.Control = manualdrivinggb
-    AnchorSideTop.Control = papersizegb
-    AnchorSideTop.Side = asrBottom
-    AnchorSideRight.Control = manualdrivinggb
+    AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    Left = 5
-    Height = 101
-    Top = 492
+    Left = 624
+    Height = 115
+    Top = 198
     Width = 294
-    Anchors = [akTop, akLeft, akRight]
-    AutoSize = True
-    BorderSpacing.Top = 5
-    Caption = 'Drawing Control'
-    ClientHeight = 81
+    Anchors = [akRight]
+    BorderSpacing.Right = 5
+    Caption = 'Page size'
+    ClientHeight = 95
     ClientWidth = 290
     Color = clWindow
+    Constraints.MaxWidth = 294
+    Constraints.MinWidth = 294
     ParentColor = False
     TabOrder = 1
-    object startbtn: TBitBtn
-      AnchorSideLeft.Control = drawingcontrolgb
-      AnchorSideTop.Control = drawingcontrolgb
-      AnchorSideRight.Control = drawingcontrolgb
-      AnchorSideRight.Side = asrBottom
-      Left = 5
-      Height = 30
-      Top = 6
-      Width = 280
-      Anchors = [akTop, akLeft, akRight]
-      BorderSpacing.Left = 5
-      BorderSpacing.Top = 6
-      BorderSpacing.Right = 5
-      Caption = 'Print'
-      OnClick = playorstopbtnclick
-      TabOrder = 0
-    end
-    object stopbtn: TBitBtn
-      AnchorSideLeft.Control = startbtn
-      AnchorSideTop.Control = startbtn
-      AnchorSideTop.Side = asrBottom
-      AnchorSideRight.Control = startbtn
-      AnchorSideRight.Side = asrBottom
-      Left = 5
-      Height = 30
-      Top = 41
-      Width = 280
-      Anchors = [akTop, akLeft, akRight]
-      BorderSpacing.Top = 5
-      BorderSpacing.Bottom = 10
-      Caption = 'Stop'
-      OnClick = playorstopbtnclick
-      TabOrder = 1
-    end
-  end
-  object creativecontrolgb: TGroupBox
-    AnchorSideLeft.Control = manualdrivinggb
-    AnchorSideTop.Control = manualdrivinggb
-    AnchorSideTop.Side = asrBottom
-    AnchorSideRight.Control = manualdrivinggb
-    AnchorSideRight.Side = asrBottom
-    Left = 5
-    Height = 126
-    Top = 201
-    Width = 294
-    Anchors = [akTop, akLeft, akRight]
-    BorderSpacing.Top = 5
-    Caption = 'Creative control'
-    ClientHeight = 106
-    ClientWidth = 290
-    Color = clWindow
-    ParentColor = False
-    TabOrder = 2
-    object loadbtn: TBitBtn
-      AnchorSideLeft.Control = creativecontrolgb
-      AnchorSideTop.Control = creativecontrolgb
-      AnchorSideRight.Control = creativecontrolgb
-      AnchorSideRight.Side = asrBottom
-      Left = 5
-      Height = 30
-      Top = 6
-      Width = 280
-      Anchors = [akTop, akLeft, akRight]
-      BorderSpacing.Left = 5
-      BorderSpacing.Top = 6
-      BorderSpacing.Right = 5
-      BorderSpacing.Bottom = 10
-      Caption = 'Load'
-      OnClick = loadbtnclick
-      TabOrder = 0
-    end
-    object clearbtn: TBitBtn
-      Left = 28
-      Height = 28
-      Top = 54
-      Width = 240
-      Caption = 'clearbtn'
-      OnClick = clearbtnClick
-      TabOrder = 1
-    end
-  end
-  object papersizegb: TGroupBox
-    AnchorSideLeft.Control = creativecontrolgb
-    AnchorSideTop.Control = creativecontrolgb
-    AnchorSideTop.Side = asrBottom
-    AnchorSideRight.Control = creativecontrolgb
-    AnchorSideRight.Side = asrBottom
-    Left = 5
-    Height = 155
-    Top = 332
-    Width = 294
-    Anchors = [akTop, akLeft, akRight]
-    AutoSize = True
-    BorderSpacing.Top = 5
-    Caption = 'Paper size'
-    ClientHeight = 135
-    ClientWidth = 290
-    Color = clWindow
-    ParentColor = False
-    TabOrder = 3
     object offsetxse: TSpinEdit
       AnchorSideLeft.Control = widthse
       AnchorSideTop.Control = heightse
-      AnchorSideRight.Control = papersizegb
+      AnchorSideRight.Control = pagesizegb
       AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Side = asrBottom
       Left = 205
@@ -392,7 +298,7 @@ object mainform: Tmainform
       ParentColor = False
     end
     object heightl: TLabel
-      AnchorSideLeft.Control = papersizegb
+      AnchorSideLeft.Control = pagesizegb
       AnchorSideTop.Control = heightse
       AnchorSideBottom.Control = heightse
       AnchorSideBottom.Side = asrBottom
@@ -407,7 +313,7 @@ object mainform: Tmainform
       ParentColor = False
     end
     object widthl: TLabel
-      AnchorSideLeft.Control = papersizegb
+      AnchorSideLeft.Control = pagesizegb
       AnchorSideTop.Control = widthse
       AnchorSideBottom.Control = widthse
       AnchorSideBottom.Side = asrBottom
@@ -422,7 +328,7 @@ object mainform: Tmainform
       ParentColor = False
     end
     object formatl: TLabel
-      AnchorSideLeft.Control = papersizegb
+      AnchorSideLeft.Control = pagesizegb
       AnchorSideTop.Control = formatcb
       AnchorSideBottom.Control = formatcb
       AnchorSideBottom.Side = asrBottom
@@ -438,8 +344,8 @@ object mainform: Tmainform
       ParentColor = False
     end
     object formatcb: TComboBox
-      AnchorSideLeft.Control = papersizegb
-      AnchorSideTop.Control = papersizegb
+      AnchorSideLeft.Control = pagesizegb
+      AnchorSideTop.Control = pagesizegb
       Left = 60
       Height = 23
       Top = 6
@@ -447,7 +353,7 @@ object mainform: Tmainform
       BorderSpacing.Left = 60
       BorderSpacing.Top = 6
       ItemHeight = 15
-      ItemIndex = 4
+      ItemIndex = 3
       Items.Strings = (
         'A0'
         'A1'
@@ -460,26 +366,7 @@ object mainform: Tmainform
       OnChange = formatcbChange
       Style = csDropDownList
       TabOrder = 2
-      Text = 'A4'
-    end
-    object redrawbtn: TBitBtn
-      AnchorSideLeft.Control = papersizegb
-      AnchorSideTop.Control = widthse
-      AnchorSideTop.Side = asrBottom
-      AnchorSideRight.Control = papersizegb
-      AnchorSideRight.Side = asrBottom
-      Left = 5
-      Height = 30
-      Top = 95
-      Width = 280
-      Anchors = [akTop, akLeft, akRight]
-      BorderSpacing.Left = 5
-      BorderSpacing.Top = 10
-      BorderSpacing.Right = 5
-      BorderSpacing.Bottom = 10
-      Caption = 'Preview'
-      OnClick = reloadbtnClick
-      TabOrder = 3
+      Text = 'A3'
     end
     object heightse: TSpinEdit
       AnchorSideLeft.Control = formatcb
@@ -495,7 +382,7 @@ object mainform: Tmainform
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Top = 5
       MaxValue = 0
-      TabOrder = 4
+      TabOrder = 3
       Value = 297
     end
     object widthse: TSpinEdit
@@ -512,13 +399,13 @@ object mainform: Tmainform
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Top = 5
       MaxValue = 0
-      TabOrder = 5
+      TabOrder = 4
       Value = 210
     end
     object verticalcb: TCheckBox
       AnchorSideLeft.Control = offsetxse
       AnchorSideTop.Control = formatcb
-      AnchorSideRight.Control = papersizegb
+      AnchorSideRight.Control = pagesizegb
       AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Control = formatcb
       AnchorSideBottom.Side = asrBottom
@@ -530,33 +417,85 @@ object mainform: Tmainform
       BorderSpacing.Right = 5
       Caption = 'Vertical'
       OnEditingDone = verticalcbEditingDone
-      TabOrder = 6
+      TabOrder = 5
     end
-  end
-  object image: TImage
-    AnchorSideLeft.Control = manualdrivinggb
-    AnchorSideLeft.Side = asrBottom
-    AnchorSideTop.Control = Owner
-    AnchorSideRight.Control = Owner
-    AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = Owner
-    AnchorSideBottom.Side = asrBottom
-    Left = 300
-    Height = 645
-    Top = 0
-    Width = 666
-    Anchors = []
-    AutoSize = True
-    Center = True
-    OnMouseDown = imageMouseDown
-    OnMouseMove = imageMouseMove
-    OnMouseUp = imageMouseUp
-    Proportional = True
-    Stretch = True
-    StretchOutEnabled = False
   end
   object opendialog: TOpenDialog
     left = 216
     top = 144
+  end
+  object mainmenu: TMainMenu
+    left = 328
+    top = 144
+    object filemi: TMenuItem
+      Caption = 'File'
+      object openmi: TMenuItem
+        Caption = 'Open ...'
+        OnClick = openbtnclick
+      end
+      object closemi: TMenuItem
+        Caption = 'Close'
+        OnClick = closemiClick
+      end
+      object line1mi: TMenuItem
+        Caption = '-'
+      end
+      object exitmi: TMenuItem
+        Caption = 'Exit'
+        OnClick = exitmiClick
+      end
+    end
+    object viewmi: TMenuItem
+      Caption = 'View'
+      object showmanualdrivingmi: TMenuItem
+        Caption = 'Show Manual Driving Toolbar'
+        Checked = True
+        OnClick = showtoolbarclick
+      end
+      object showpagemi: TMenuItem
+        Caption = 'Show Page Toolbar'
+        Checked = True
+        OnClick = showtoolbarclick
+      end
+    end
+    object previewmi: TMenuItem
+      Caption = 'Preview'
+      object updatemi: TMenuItem
+        Caption = 'Update'
+        OnClick = updatemiClick
+      end
+      object MenuItem19: TMenuItem
+        Caption = '-'
+      end
+      object clearallmi: TMenuItem
+        Caption = 'Clear All'
+        OnClick = clearallmiClick
+      end
+    end
+    object plotmi: TMenuItem
+      Caption = 'Plot'
+      object startmi: TMenuItem
+        Caption = 'Start'
+        OnClick = startmiClick
+      end
+      object stopmi: TMenuItem
+        Caption = 'Stop'
+        OnClick = stopmiClick
+      end
+      object line2mi: TMenuItem
+        Caption = '-'
+      end
+      object killmi: TMenuItem
+        Caption = 'Kill'
+        OnClick = killmiClick
+      end
+    end
+    object infomi: TMenuItem
+      Caption = 'Info'
+      object aboutmi: TMenuItem
+        Caption = 'About vPlot ...'
+        OnClick = aboutmiClick
+      end
+    end
   end
 end

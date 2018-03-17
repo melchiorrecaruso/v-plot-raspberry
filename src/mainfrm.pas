@@ -34,28 +34,41 @@ type
   { tmainform }
 
   tmainform = class(tform)
-    clearbtn: TBitBtn;
     image: TImage;
     leftedit: tspinedit;
+    mainmenu: TMainMenu;
+    filemi: TMenuItem;
+    line2mi: TMenuItem;
+    killmi: TMenuItem;
+    startmi: TMenuItem;
+    stopmi: TMenuItem;
+    infomi: TMenuItem;
+    aboutmi: TMenuItem;
+    previewmi: TMenuItem;
+    updatemi: TMenuItem;
+    clearallmi: TMenuItem;
+    MenuItem19: TMenuItem;
+    openmi: TMenuItem;
+    closemi: TMenuItem;
+    line1mi: TMenuItem;
+    exitmi: TMenuItem;
+    viewmi: TMenuItem;
+    showmanualdrivingmi: TMenuItem;
+    showpagemi: TMenuItem;
+    plotmi: TMenuItem;
     rightedit: tspinedit;
     verticalcb: tcheckbox;
-    redrawbtn: tbitbtn;
     formatcb: tcombobox;
-    papersizegb: tgroupbox;
+    pagesizegb: tgroupbox;
     label1: tlabel;
     label2: tlabel;
     heightl: tlabel;
     widthl: tlabel;
     formatl: tlabel;
-    loadbtn: tbitbtn;
     offsetyse: tspinedit;
     offsetxse: tspinedit;
     heightse: tspinedit;
     widthse: tspinedit;
-    startbtn: tbitbtn;
-    stopbtn: tbitbtn;
-    creativecontrolgb: tgroupbox;
-    sethomebtn: tbitbtn;
     bordersbtn: tbitbtn;
     leftdownbtn: tbitbtn;
     rightdownbtn: tbitbtn;
@@ -65,11 +78,13 @@ type
     rightupbtn: tbitbtn;
     gohomebtn: tbitbtn;
     manualdrivinggb: tgroupbox;
-    drawingcontrolgb: tgroupbox;
     opendialog: topendialog;
 
-    procedure clearbtnclick(sender: tobject);
+    procedure aboutmiclick(sender: tobject);
+    procedure clearallmiclick(sender: tobject);
     procedure bordersbtnclick(sender: tobject);
+    procedure closemiclick(sender: tobject);
+    procedure exitmiclick(sender: tobject);
 
     procedure formatcbchange(sender: tobject);
     procedure formcreate(sender: tobject);
@@ -78,22 +93,27 @@ type
     procedure gohomebtnclick(sender: tobject);
     procedure imagemousedown(sender: tobject; button: tmousebutton;
       shift: tshiftstate; x, y: integer);
-    procedure imagemousemove(sender: tobject; shift: tshiftstate; x, y: integer
-      );
+    procedure imagemousemove(sender: tobject; shift: tshiftstate; x, y: integer);
     procedure imagemouseup(sender: tobject; button: tmousebutton;
       shift: tshiftstate; x, y: integer);
+    procedure killmiclick(sender: tobject);
     procedure leftdownbtnclick(sender: tobject);
 
     procedure leftupbtnclick   (sender: tobject);
+
+    procedure showtoolbarclick(sender: tobject);
+    procedure startmiclick(sender: tobject);
     procedure pendownbtnclick  (sender: tobject);
     procedure penupbtnclick    (sender: tobject);
-    procedure reloadbtnclick   (sender: tobject);
+
     procedure rightdownbtnclick(sender: tobject);
     procedure rightupbtnclick  (sender: tobject);
-    procedure sethomebtnclick  (sender: tobject);
 
-    procedure loadbtnclick(sender: tobject);
-    procedure playorstopbtnclick(sender: tobject);
+
+    procedure openbtnclick(sender: tobject);
+
+    procedure stopmiClick(Sender: TObject);
+    procedure updatemiClick(Sender: TObject);
 
     procedure verticalcbeditingdone(sender: tobject);
   private
@@ -127,14 +147,15 @@ var
   plotter: tvplotter = nil;
   driver:  tvpdriver = nil;
 
-// form events //
+// FORM events
 
 procedure tmainform.formcreate(sender: tobject);
+var
+  m0: longint;
+  m1: longint;
 begin
   manualdrivinggb  .enabled := true;
-  creativecontrolgb.enabled := true;
-  papersizegb      .enabled := false;
-  drawingcontrolgb .enabled := false;
+  pagesizegb      .enabled := false;
   // ---
   loadlayout(layout, changefileext(paramstr(0), '.ini'));
   driver    := tvpdriver.create(layout.mode);
@@ -142,9 +163,11 @@ begin
   paths     := createvppaths(vec);
   bitmap    := tbitmap.create;
   // ---
+  showtoolbarclick(nil);
   formatcbchange (nil);
-  sethomebtnclick(nil);
-  reloadbtnclick (nil);
+  // set home
+  optimize(layout.p09, layout, m0, m1);
+  driver.init(m0, m1);
 end;
 
 procedure tmainform.formdestroy(sender: tobject);
@@ -162,40 +185,59 @@ begin
   if assigned(plotter) then
   begin
     closeaction := canone;
-    plotter.plot := true;
-    plotter.terminate;
+    killmiclick(nil);
   end else
     closeaction := cafree;
 end;
 
-// manual driving //
+// MANUAL DRIVING groupbox
 
 procedure tmainform.leftupbtnclick(Sender: TObject);
+var
+  m0: longint;
+  m1: longint;
 begin
   driver.enabled := true;
   driver.pen     := false;
   driver.move4(-leftedit.value, 0);
+  optimize(layout.p09, layout, m0, m1);
+  driver.init(m0, m1);
 end;
 
 procedure tmainform.leftdownbtnclick(sender: tobject);
+var
+  m0: longint;
+  m1: longint;
 begin
   driver.enabled := true;
   driver.pen     := false;
   driver.move4(+leftedit.value, 0);
+  optimize(layout.p09, layout, m0, m1);
+  driver.init(m0, m1);
 end;
 
 procedure tmainform.rightupbtnclick(sender: tobject);
+var
+  m0: longint;
+  m1: longint;
 begin
   driver.enabled := true;
   driver.pen     := false;
   driver.move4(0, -rightedit.value);
+  optimize(layout.p09, layout, m0, m1);
+  driver.init(m0, m1);
 end;
 
 procedure tmainform.rightdownbtnclick(sender: tobject);
+var
+  m0: longint;
+  m1: longint;
 begin
   driver.enabled := true;
   driver.pen     := false;
   driver.move4(0, +rightedit.value);
+  optimize(layout.p09, layout, m0, m1);
+  driver.init(m0, m1);
 end;
 
 procedure tmainform.pendownbtnclick(Sender: TObject);
@@ -208,15 +250,6 @@ procedure tmainform.penupbtnclick(sender: tobject);
 begin
   driver.enabled := true;
   driver.pen     := false;
-end;
-
-procedure tmainform.sethomebtnclick(sender: tobject);
-var
-  m0: longint;
-  m1: longint;
-begin
-  optimize(layout.p09, layout, m0, m1);
-  driver.init(m0, m1);
 end;
 
 procedure tmainform.bordersbtnclick(sender: tobject);
@@ -244,8 +277,10 @@ begin
   driver.move2(m0, m1);
 end;
 
-procedure tmainform.imagemousedown(sender: tobject; button: tmousebutton;
-  shift: tshiftstate; x, y: integer);
+// IMAGE events
+
+procedure tmainform.imagemousedown(sender: tobject;
+  button: tmousebutton; shift: tshiftstate; x, y: integer);
 begin
   if button = mbleft then
   begin
@@ -276,23 +311,23 @@ begin
   end;
 end;
 
-procedure tmainform.imagemouseup(sender: tobject; button: tmousebutton;
-  shift: tshiftstate; x, y: integer);
+procedure tmainform.imagemouseup(sender: tobject;
+  button: tmousebutton; shift: tshiftstate; x, y: integer);
 begin
   mouseisdown := false;
 end;
 
-// creativecontrol groupbox
+// FILE mainmenu
 
-procedure tmainform.loadbtnclick(sender: tobject);
+procedure tmainform.openbtnclick(sender: tobject);
 begin
-  opendialog.filter := 'DXF Files (*.dxf)|*.dxf';
+  if assigned(plotter) then exit;
+
+  opendialog.filter := 'dxf files (*.dxf)|*.dxf';
   if opendialog.execute then
   begin
-    manualdrivinggb  .enabled := false;
-    creativecontrolgb.enabled := false;
-    papersizegb      .enabled := false;
-    drawingcontrolgb .enabled := false;
+    manualdrivinggb.enabled := false;
+    pagesizegb    .enabled := false;
 
     freeandnil(paths);
     freeandnil(vec);
@@ -306,16 +341,71 @@ begin
     end;
     paths := createvppaths(vec);
 
-    manualdrivinggb  .enabled := true;
-    creativecontrolgb.enabled := true;
-    papersizegb      .enabled := true;
-    drawingcontrolgb .enabled := true;
-
-    //formatcbchange(nil);
+    manualdrivinggb.enabled := true;
+    pagesizegb    .enabled := true;
   end;
 end;
 
-procedure tmainform.clearbtnclick(sender: tobject);
+procedure tmainform.closemiclick(sender: tobject);
+begin
+  if assigned(plotter) then exit;
+
+  freeandnil(paths);
+  freeandnil(vec);
+  vec   := tvvectorialdocument.create;
+  paths := createvppaths(vec);
+end;
+
+procedure tmainform.exitmiclick(sender: tobject);
+begin
+  if assigned(plotter) then exit;
+
+  close;
+end;
+
+// VIEW mainmenu
+
+procedure tmainform.showtoolbarclick(sender: tobject);
+begin
+  if sender = showmanualdrivingmi then
+  begin
+    showmanualdrivingmi.checked := not showmanualdrivingmi.checked;
+    manualdrivinggb    .visible :=     showmanualdrivingmi.checked;
+  end else
+  if sender = showpagemi then
+  begin
+    showpagemi.checked := not showpagemi.checked;
+    pagesizegb.visible :=     showpagemi.checked;
+  end;
+
+  if manualdrivinggb.visible then
+  begin
+    manualdrivinggb.anchors := [aktop, akright];
+    manualdrivinggb.top     := 10;
+    if pagesizegb.visible then
+    begin
+      pagesizegb.anchors := [aktop, akright];
+      pagesizegb.top     := manualdrivinggb.top    +
+                            manualdrivinggb.height + 10;
+    end;
+  end else
+  begin
+    if pagesizegb.visible then
+    begin
+      pagesizegb.anchors := [aktop, akright];
+      pagesizegb.top     := 10;
+    end;
+  end;
+end;
+
+// PREVIEW mainmenu
+
+procedure tmainform.updatemiclick(sender: tobject);
+begin
+  startmiclick(nil);
+end;
+
+procedure tmainform.clearallmiclick(sender: tobject);
 begin
   bitmap.canvas.pen  .color := clltgray;
   bitmap.canvas.brush.color := clltgray;
@@ -337,6 +427,8 @@ begin
      widthse.value,
     heightse.value);
   // ---
+  image.align             := alnone;
+  image.anchors           := [];
   image.center            := true;
   image.proportional      := false;
   image.stretchinenabled  := false;
@@ -344,12 +436,16 @@ begin
   image.stretch           := false;
 end;
 
-procedure tmainform.reloadbtnclick(sender: tobject);
+// PLOT mainmenu
+
+procedure tmainform.startmiclick(sender: tobject);
 begin
-  verticalcbeditingdone(sender);
-  driver.enabled := sender = startbtn;
-  if sender <> nil then
+  if assigned(plotter) then
   begin
+    plotter.plot := true;
+  end else
+  begin
+    driver.enabled  := (sender = startmi);
     plotter         := tvplotter.create(paths);
     plotter.onstart := @onplotterstart;
     plotter.onstop  := @onplotterstop;
@@ -357,6 +453,32 @@ begin
     plotter.start;
   end;
 end;
+
+procedure tmainform.stopmiclick(sender: tobject);
+begin
+  if assigned(plotter) then
+  begin
+    plotter.plot := false;
+  end;
+end;
+
+procedure tmainform.killmiclick(sender: tobject);
+begin
+  if assigned(plotter) then
+  begin
+    plotter.plot := true;
+    plotter.terminate;
+  end;
+end;
+
+// INFO mainmenu
+
+procedure tmainform.aboutmiclick(sender: tobject);
+begin
+  showmessage('vPlot Version 1.0');
+end;
+
+// PAGE SIZE groupbox
 
 procedure tmainform.formatcbchange(sender: tobject);
 begin
@@ -398,43 +520,21 @@ begin
       widthse .value := amax;
     end;
   end;
-  clearbtnclick(sender);
+  clearallmiclick(sender);
 end;
 
-procedure tmainform.playorstopbtnclick(sender: tobject);
-begin
-  if assigned(plotter) then
-  begin
-    if sender = stopbtn then
-    begin
-      plotter.plot := true;
-      plotter.terminate;
-    end else
-    if sender = startbtn then
-    begin
-      plotter.plot := not plotter.plot;
-      if plotter.plot then
-        startbtn.caption := 'Pause'
-      else
-        startbtn.caption := 'Play';
-    end;
-
-  end else
-  begin
-    if sender = startbtn then
-    begin
-      reloadbtnclick(startbtn);
-    end;
-  end;
-end;
+// PLOTTER THREAD methods
 
 procedure tmainform.onplotterstart;
 begin
-  startbtn.caption          := 'Pause';
-  manualdrivinggb  .enabled := false;
-  creativecontrolgb.enabled := false;
-  papersizegb      .enabled := false;
-  drawingcontrolgb .enabled := true;
+  openmi    .enabled := false;
+  closemi   .enabled := false;
+  exitmi    .enabled := false;
+  updatemi  .enabled := false;
+  clearallmi.enabled := false;
+
+  manualdrivinggb.enabled := false;
+  pagesizegb     .enabled := false;
   application.processmessages;
 end;
 
@@ -444,11 +544,14 @@ begin
   gohomebtnclick(nil);
   plotter := nil;
   // ---
-  startbtn.caption          := 'Play';
-  manualdrivinggb  .enabled := true;
-  creativecontrolgb.enabled := true;
-  papersizegb      .enabled := true;
-  drawingcontrolgb .enabled := true;
+  openmi    .enabled := true;
+  closemi   .enabled := true;
+  exitmi    .enabled := true;
+  updatemi  .enabled := true;
+  clearallmi.enabled := true;
+
+  manualdrivinggb.enabled := true;
+  pagesizegb     .enabled := true;
   application.processmessages;
 end;
 
@@ -475,6 +578,7 @@ begin
     optimize(p, layout, m0, m1);
     driver.move2(m0, m1);
   end;
+  sleep(5);
 
   inc(tick);
   if tick mod 25 = 0 then

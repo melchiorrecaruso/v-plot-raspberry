@@ -422,9 +422,14 @@ begin
   end;
 
   for i := 0 to flist.count - 1 do
-  begin
     flist[i] := list3[i];
-  end;
+  // delete small paths
+  for i := flist.count - 1 downto 0 do
+    if tvppath(flist[i]).getlen < 0.25 then
+    begin
+      delete(i);
+    end;
+
   list3.destroy;
   list2.destroy;
   list1.destroy;
