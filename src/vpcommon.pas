@@ -22,6 +22,7 @@
 unit vpcommon;
 
 {$mode objfpc}
+{$i include.inc}
 
 interface
 

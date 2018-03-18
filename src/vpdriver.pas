@@ -22,7 +22,7 @@
 unit vpdriver;
 
 {$mode objfpc}
-{*$define debug}
+{$i include.inc}
 
 interface
 

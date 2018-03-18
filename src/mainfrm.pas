@@ -22,6 +22,7 @@
 unit mainfrm;
 
 {$mode objfpc}
+{$i include.inc}
 
 interface
 
@@ -123,8 +124,8 @@ type
    bitmap:    tbitmap;
     paths:    tvppaths;
       vec:    tvvectorialdocument;
+    start:    double;
 
-     tick:    longint;
  mouseisdown: boolean;
    px: longint;
    py: longint;
@@ -143,7 +144,7 @@ implementation
 {$R *.lfm}
 
 uses
-  math, sysutils, dxfvectorialreader;
+  math, sysutils, dxfvectorialreader, aboutfrm;
 
 var
   layout:  tvplayout;
@@ -471,6 +472,7 @@ begin
     plotter.onstop  := @onplotterstop;
     plotter.ontick  := @onplottertick;
     plotter.start;
+    start := now;
   end;
 end;
 
@@ -505,8 +507,12 @@ end;
 // INFO mainmenu
 
 procedure tmainform.aboutmiclick(sender: tobject);
+var
+  about: taboutform;
 begin
-  showmessage('vPlot Version 1.0');
+  about := taboutform.create(nil);
+  about.showmodal;
+  freeandnil(about);
 end;
 
 // PAGE SIZE groupbox
@@ -610,8 +616,7 @@ begin
     driver.move2(m0, m1);
   end;
 
-  inc(tick);
-  if tick mod 25 = 0 then
+  if plotter.index mod 24 = 0 then
     image.canvas.draw(0, 0, bitmap);
   application.processmessages;
 end;

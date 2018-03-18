@@ -1,4 +1,5 @@
-{ Description: vPlotter application.
+{
+  Description: vPlot about form.
 
   Copyright (C) 2017-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
@@ -18,22 +19,40 @@
   MA 02111-1307, USA.
 }
 
-program vplot;
+unit aboutfrm;
 
 {$mode objfpc}
 {$i include.inc}
 
+interface
+
 uses
-  {$ifdef unix} cthreads, {$endif} interfaces, forms, mainfrm,
-  fpvectorialpkg, vplayout, vpcommon, aboutfrm, vpcoder;
+  classes, sysutils, fileutil, lresources, forms, controls, graphics, dialogs,
+  extctrls, stdctrls;
 
-  {$R *.res}
+type
+  { taboutform }
 
-begin
-  requirederivedformresource := true;
-  application.title := 'VPlot Driver';
-  application.initialize;
-  application.createform(tmainform, mainform);
-  application.run;
+  taboutform = class(tform)
+    aboutcopyrigth: tlabel;
+    aboutdescription: tlabel;
+    aboutimage: timage;
+    aboutlicense: tlabel;
+    aboutlink: tlabel;
+    aboutname: tlabel;
+    aboutversion: tlabel;
+  private
+
+  public
+
+  end;
+
+var
+  aboutform: taboutform;
+
+implementation
+
+{$r *.lfm}
+
 end.
 

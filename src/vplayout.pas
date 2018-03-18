@@ -22,7 +22,7 @@
 unit vplayout;
 
 {$mode objfpc}
-{*$define debug}
+{$i include.inc}
 
 interface
 

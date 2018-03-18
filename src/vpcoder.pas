@@ -22,7 +22,7 @@
 unit vpcoder;
 
 {$mode objfpc}
-{*$define debug}
+{$i include.inc}
 
 interface
 
@@ -36,7 +36,8 @@ type
     fpy:       double;
     fpaths:    tvppaths;
     fplot:     boolean;
-    fprogress: longint;
+    findex:    longint;
+    fcount:    longint;
     fonstart:  tthreadmethod;
     fonstop:   tthreadmethod;
     fontick:   tthreadmethod;
@@ -49,7 +50,8 @@ type
     property px:       double        read fpx;
     property py:       double        read fpy;
     property plot:     boolean       read fplot      write fplot;
-    property progress: longint       read fprogress;
+    property index:    longint       read findex;
+    property count:    longint       read fcount;
     property onstart:  tthreadmethod read fonstart   write fonstart;
     property onstop:   tthreadmethod read fonstop    write fonstop;
     property ontick:   tthreadmethod read fontick    write fontick;
@@ -253,9 +255,17 @@ end;
 // tvplotter
 
 constructor tvplotter.create(paths: tvppaths);
+var
+  i: longint;
 begin
   fpaths   := paths;
   fplot    := true;
+  findex   := 0;
+  fcount   := 0;
+
+  for i := 0 to fpaths.count - 1 do
+    inc(fcount, fpaths.item[i].count);
+
   fonstart := nil;
   fonstop  := nil;
   fontick  := nil;
@@ -278,6 +288,8 @@ var
 begin
   if assigned(fonstart) then
     synchronize(fonstart);
+
+  findex := 0;
   if assigned(fontick) then
     for i := 0 to fpaths.count - 1 do
     begin
@@ -287,6 +299,7 @@ begin
         point := page.item[j];
         if not terminated then
         begin
+          inc(findex);
           fpx := point^.x;
           fpy := point^.y;
           synchronize(fontick);
@@ -294,6 +307,7 @@ begin
         end;
       end;
     end;
+
   if assigned(fonstop) then
     synchronize(fonstop);
 end;
