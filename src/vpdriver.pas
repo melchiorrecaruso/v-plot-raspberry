@@ -22,12 +22,12 @@
 unit vpdriver;
 
 {$mode objfpc}
-{$define debug}
+{*$define debug}
 
 interface
 
 uses
-  classes, {$ifdef cpuarm} pca9685, wiringpi, math, {$endif} sysutils;
+  classes, {$ifdef cpuarm} pca9685, wiringpi, {$endif} sysutils;
 
 type
   tvpdriver = class
@@ -185,7 +185,7 @@ begin
   {$endif}
   fdelay1  := 1500;
   fdelay2  := 3500;
-  fdelay3  := 500000;
+  fdelay3  := 400000;
   fenabled := false;
   fpen     := false;
   fpenoff  := false;
@@ -302,16 +302,14 @@ procedure tvpdriver.setpenoff(value: boolean);
 begin
   fpenoff := value;
   if fpenoff then
-  begin
-    fpen := false;
-    {$ifdef cpuarm}
     if fpen then
-      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq))
-    else
+    begin
+      fpen := false;
+      {$ifdef cpuarm}
       pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
-    delaymicroseconds(fdelay3);
-    {$endif}
-  end;
+      delaymicroseconds(fdelay3);
+      {$endif}
+    end;
 end;
 
 procedure tvpdriver.move2(cnt0, cnt1: longint);

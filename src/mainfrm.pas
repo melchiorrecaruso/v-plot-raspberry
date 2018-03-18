@@ -446,6 +446,7 @@ begin
     heightse.value);
   // ---
   image.align             := alnone;
+  image.anchors           := [aktop, akleft, akright, akbottom];
   image.anchors           := [];
   image.center            := true;
   image.proportional      := false;
