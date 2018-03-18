@@ -597,7 +597,7 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="169"/>
-        <CursorPos X="16" Y="188"/>
+        <CursorPos X="18" Y="188"/>
         <FoldState Value=" T3oF05?"/>
         <UsageCount Value="157"/>
         <Loaded Value="True"/>
@@ -709,7 +709,7 @@
         <UsageCount Value="10"/>
       </Unit90>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="src/vpcoder.pas"/>
         <Caret Line="299" Column="69" TopLine="282"/>
@@ -826,10 +826,6 @@
         <Filename Value="src/mainfrm.pas"/>
         <Caret Line="278" Column="23" TopLine="257"/>
       </Position29>
-      <Position30>
-        <Filename Value="src/vpdriver.pas"/>
-        <Caret Line="259" Column="24" TopLine="282"/>
-      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
