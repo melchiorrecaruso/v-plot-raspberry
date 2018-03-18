@@ -1,7 +1,7 @@
 object mainform: Tmainform
-  Left = 264
+  Left = 261
   Height = 622
-  Top = 24
+  Top = 85
   Width = 923
   Anchors = []
   Caption = 'VPlot Driver'

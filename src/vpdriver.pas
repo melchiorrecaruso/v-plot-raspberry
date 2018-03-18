@@ -22,7 +22,7 @@
 unit vpdriver;
 
 {$mode objfpc}
-{*$define debug}
+{$define debug}
 
 interface
 
@@ -112,9 +112,8 @@ begin
   if ffault <> -1 then
   begin
     // init servo
-    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_minvalue, motz_freq)); delaymicroseconds(fdelay3);
-    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq)); delaymicroseconds(fdelay3);
-    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq)); delaymicroseconds(fdelay3);
+    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
+    delaymicroseconds(fdelay3);
     // init mode
     pinmode(motx_mod0,    OUTPUT);
     pinmode(motx_mod1,    OUTPUT);
@@ -184,9 +183,9 @@ begin
   {$else}
   ffault   := -1;
   {$endif}
-  fdelay1  := 2500;
-  fdelay2  := 5000;
-  fdelay3  := 600;
+  fdelay1  := 1500;
+  fdelay2  := 3500;
+  fdelay3  := 500000;
   fenabled := false;
   fpen     := false;
   fpenoff  := false;
@@ -226,16 +225,18 @@ begin
   repeat
     if cnt0 > 0 then
     begin
-      digitalwrite(mot0_step, HIGH);  delaymicroseconds(fdelay1);
-      digitalwrite(mot0_step,  LOW);  delaymicroseconds(fdelay1);
+      digitalwrite(mot0_step, HIGH); delaymicroseconds(fdelay1);
+      digitalwrite(mot0_step,  LOW); delaymicroseconds(fdelay1);
       dec(cnt0);
     end;
+
     if cnt1 > 0 then
     begin
-      digitalwrite(mot1_step, HIGH);  delaymicroseconds(fdelay1);
-      digitalwrite(mot1_step,  LOW);  delaymicroseconds(fdelay1);
+      digitalwrite(mot1_step, HIGH); delaymicroseconds(fdelay1);
+      digitalwrite(mot1_step,  LOW); delaymicroseconds(fdelay1);
       dec(cnt1);
     end;
+
   until (cnt0 = 0) and (cnt1 = 0);
   {$endif}
 end;
@@ -261,21 +262,21 @@ begin
   else
     digitalwrite(mot1_dir, HIGH);
 
+  // move step motor0 and motor1
   cnt0 := abs(cnt0);
   cnt1 := abs(cnt1);
   for i := 0 to 18 do
   begin
-    // move step motor0
     if vplotmatrix[cnt0, i] = 1 then
     begin
-      digitalwrite(mot0_step, HIGH);  delaymicroseconds(fdelay2);
-      digitalwrite(mot0_step,  LOW);  delaymicroseconds(fdelay2);
+      digitalwrite(mot0_step, HIGH); delaymicroseconds(fdelay2);
+      digitalwrite(mot0_step,  LOW); delaymicroseconds(fdelay2);
     end;
-    // move step motor1
+
     if vplotmatrix[cnt1, i] = 1 then
     begin
-      digitalwrite(mot1_step, HIGH);  delaymicroseconds(fdelay2);
-      digitalwrite(mot1_step,  LOW);  delaymicroseconds(fdelay2);
+      digitalwrite(mot1_step, HIGH); delaymicroseconds(fdelay2);
+      digitalwrite(mot1_step,  LOW); delaymicroseconds(fdelay2);
     end;
   end;
   {$endif}
@@ -329,10 +330,15 @@ begin
   if (cnt0 <> 0) or
      (cnt1 <> 0) then
   begin
-    if (abs(cnt0) < 11) and
-       (abs(cnt1) < 11) then
-      smalldisplacements(cnt0, cnt1)
-    else
+    if (not fpenoff) then
+    begin
+      if (abs(cnt0) < 11) and
+         (abs(cnt1) < 11) then
+        smalldisplacements(cnt0, cnt1)
+      else
+        largedisplacements(cnt0, cnt1);
+
+    end else
       largedisplacements(cnt0, cnt1);
   end;
   {$ifdef debug}

@@ -56,11 +56,15 @@ type
   end;
 
 
+  function interpolate_line(const p0, p1: tvppoint): tvppath;
+  function interpolate_circle(const entity: tvcircle ): tvppath;
+  function interpolate_circlearc(const entity: tvcirculararc): tvppath;
+  function interpolate_path(const entity: tpath): tvppath;
 
 
-function createvppaths(vec: tvvectorialdocument; zerocenter: boolean): tvppaths;
+  function createvppaths(vec: tvvectorialdocument; zerocenter: boolean): tvppaths;
 
-procedure optimize(const p: tvppoint; const l: tvplayout; var m0, m1: longint);
+  procedure optimize(const p: tvppoint; const l: tvplayout; var m0, m1: longint);
 
 
 implementation

@@ -259,17 +259,29 @@ end;
 
 procedure tmainform.bordersbtnclick(sender: tobject);
 var
-  m0: longint;
-  m1: longint;
+  m0:   longint;
+  m1:   longint;
+
+  procedure moveto(path: tvppath);
+  var
+    i:    longint;
+  begin
+    for i := 0 to path.count - 1 do
+    begin
+      optimize(path.item[i]^, layout, m0, m1);
+      driver.move2(m0, m1);
+    end;
+    freeandnil(path);
+  end;
+
 begin
-  driver.enabled := true;
-  driver.penoff  := true;
-  optimize(layout.p13, layout, m0, m1); driver.move2(m0, m1);
-  optimize(layout.p10, layout, m0, m1); driver.move2(m0, m1);
-  optimize(layout.p11, layout, m0, m1); driver.move2(m0, m1);
-  optimize(layout.p12, layout, m0, m1); driver.move2(m0, m1);
-  optimize(layout.p13, layout, m0, m1); driver.move2(m0, m1);
-  optimize(layout.p09, layout, m0, m1); driver.move2(m0, m1);
+  gohomebtnclick(nil);
+  moveto(interpolate_line(layout.p09, layout.p13)); // move to point 13
+  moveto(interpolate_line(layout.p13, layout.p10)); // move to point 10
+  moveto(interpolate_line(layout.p10, layout.p11)); // move to point 11
+  moveto(interpolate_line(layout.p11, layout.p12)); // move to point 12
+  moveto(interpolate_line(layout.p12, layout.p13)); // move to point 13
+  moveto(interpolate_line(layout.p13, layout.p09)); // move to point 09
 end;
 
 procedure tmainform.gohomebtnclick(sender: tobject);
