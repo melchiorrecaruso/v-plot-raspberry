@@ -41,23 +41,29 @@ type
     filemi: tmenuitem;
     line2mi: tmenuitem;
     killmi: tmenuitem;
-    menuitem1: tmenuitem;
+    pagemi: tmenuitem;
+    showpagesizepanelmi: TMenuItem;
+    timer: TTimer;
+    updatemi: TMenuItem;
+    clearmi: TMenuItem;
+    calibrationmi: TMenuItem;
+    movebordersmi: TMenuItem;
+    movebottonmi: TMenuItem;
+    line4mi: TMenuItem;
+    movetohomemi: TMenuItem;
+    line3mi: TMenuItem;
+    showcalibrationpanelmi: TMenuItem;
+    line5mi: TMenuItem;
+    skipsmallmi: tmenuitem;
     zerocentermi: tmenuitem;
     startmi: tmenuitem;
     stopmi: tmenuitem;
     infomi: tmenuitem;
     aboutmi: tmenuitem;
-    previewmi: tmenuitem;
-    updatemi: tmenuitem;
-    clearallmi: tmenuitem;
-    menuitem19: tmenuitem;
     openmi: tmenuitem;
     closemi: tmenuitem;
     line1mi: tmenuitem;
     exitmi: tmenuitem;
-    viewmi: tmenuitem;
-    showmanualdrivingmi: tmenuitem;
-    showpagemi: tmenuitem;
     plotmi: tmenuitem;
     rightedit: tspinedit;
     verticalcb: tcheckbox;
@@ -72,14 +78,12 @@ type
     offsetxse: tspinedit;
     heightse: tspinedit;
     widthse: tspinedit;
-    bordersbtn: tbitbtn;
     leftdownbtn: tbitbtn;
     rightdownbtn: tbitbtn;
     penupbtn: tbitbtn;
     pendownbtn: tbitbtn;
     leftupbtn: tbitbtn;
     rightupbtn: tbitbtn;
-    gohomebtn: tbitbtn;
     manualdrivinggb: tgroupbox;
     opendialog: topendialog;
 
@@ -94,6 +98,7 @@ type
     procedure formdestroy(sender: tobject);
     procedure formclose(sender: tobject; var closeaction: tcloseaction);
     procedure gohomebtnclick(sender: tobject);
+    procedure heightseEditingDone(Sender: TObject);
     procedure imagemousedown(sender: tobject; button: tmousebutton;
       shift: tshiftstate; x, y: integer);
     procedure imagemousemove(sender: tobject; shift: tshiftstate; x, y: integer);
@@ -103,8 +108,10 @@ type
     procedure leftdownbtnclick(sender: tobject);
 
     procedure leftupbtnclick   (sender: tobject);
+    procedure movebottonmiClick(Sender: TObject);
 
     procedure showtoolbarclick(sender: tobject);
+    procedure skipsmallmiclick(sender: tobject);
     procedure startmiclick(sender: tobject);
     procedure pendownbtnclick  (sender: tobject);
     procedure penupbtnclick    (sender: tobject);
@@ -116,19 +123,21 @@ type
     procedure openbtnclick(sender: tobject);
 
     procedure stopmiclick(sender: tobject);
+    procedure timerTimer(Sender: TObject);
     procedure updatemiclick(sender: tobject);
 
     procedure verticalcbeditingdone(sender: tobject);
+    procedure widthseEditingDone(Sender: TObject);
     procedure zerocentermiclick(sender: tobject);
   private
-   bitmap:    tbitmap;
-    paths:    tvppaths;
-      vec:    tvvectorialdocument;
-    start:    double;
+      bitmap: tbitmap;
+       paths: tvppaths;
+         vec: tvvectorialdocument;
+     elapsed: longint;
 
  mouseisdown: boolean;
-   px: longint;
-   py: longint;
+          px: longint;
+          py: longint;
     procedure onplotterstart;
     procedure onplotterstop;
     procedure onplottertick;
@@ -164,7 +173,8 @@ begin
   loadlayout(layout, changefileext(paramstr(0), '.ini'));
   driver    := tvpdriver.create(layout.mode);
   vec       := tvvectorialdocument.create;
-  paths     := createvppaths(vec, zerocentermi.checked);
+  paths     := createpaths(vec, zerocentermi.checked,
+                                 skipsmallmi.checked);
   bitmap    := tbitmap.create;
   // ---
   showtoolbarclick(nil);
@@ -259,30 +269,56 @@ begin
 end;
 
 procedure tmainform.bordersbtnclick(sender: tobject);
-var
-  m0:   longint;
-  m1:   longint;
-
-  procedure moveto(path: tvppath);
-  var
-    i:    longint;
-  begin
-    for i := 0 to path.count - 1 do
-    begin
-      optimize(path.item[i]^, layout, m0, m1);
-      driver.move2(m0, m1);
-    end;
-    freeandnil(path);
-  end;
-
 begin
+  if assigned(plotter) then exit;
+
+  formatcb.itemindex := formatcb.items.count - 1;
+  heightse.value     := layout.p11.y;
+   widthse.value     := layout.p11.x;
+  formatcbchange(nil);
   gohomebtnclick(nil);
-  moveto(interpolate_line(layout.p09, layout.p13)); // move to point 13
-  moveto(interpolate_line(layout.p13, layout.p10)); // move to point 10
-  moveto(interpolate_line(layout.p10, layout.p11)); // move to point 11
-  moveto(interpolate_line(layout.p11, layout.p12)); // move to point 12
-  moveto(interpolate_line(layout.p12, layout.p13)); // move to point 13
-  moveto(interpolate_line(layout.p13, layout.p09)); // move to point 09
+  paths.clear;
+  paths.add(interpolate_line(layout.p09, layout.p13));
+  paths.add(interpolate_line(layout.p13, layout.p10));
+  paths.add(interpolate_line(layout.p10, layout.p11));
+  paths.add(interpolate_line(layout.p11, layout.p12));
+  paths.add(interpolate_line(layout.p12, layout.p13));
+  paths.add(interpolate_line(layout.p13, layout.p09));
+  paths.zerocenter;
+
+  driver.enabled  := true;
+  driver.penoff   := false;
+  plotter         := tvplotter.create(paths);
+  plotter.onstart := @onplotterstart;
+  plotter.onstop  := @onplotterstop;
+  plotter.ontick  := @onplottertick;
+  plotter.start;
+  elapsed := 1;
+end;
+
+procedure tmainform.movebottonmiclick(sender: tobject);
+begin
+  if assigned(plotter) then exit;
+
+  formatcb.itemindex := formatcb.items.count - 1;
+  heightse.value     := layout.p11.y;
+   widthse.value     := layout.p11.x;
+  formatcbchange(nil);
+  gohomebtnclick(nil);
+  paths.clear;
+  paths.add(interpolate_line(layout.p09, layout.p13));
+  paths.add(interpolate_line(layout.p13, layout.p12));
+  paths.add(interpolate_line(layout.p12, layout.p09));
+  paths.zerocenter;
+
+  driver.enabled  := true;
+  driver.penoff   := false;
+  plotter         := tvplotter.create(paths);
+  plotter.onstart := @onplotterstart;
+  plotter.onstop  := @onplotterstop;
+  plotter.ontick  := @onplottertick;
+  plotter.start;
+  elapsed := 1;
 end;
 
 procedure tmainform.gohomebtnclick(sender: tobject);
@@ -290,6 +326,8 @@ var
   m0: longint;
   m1: longint;
 begin
+  if assigned(plotter) then exit;
+
   driver.enabled := true;
   driver.penoff  := true;
   optimize(layout.p09, layout, m0, m1);
@@ -358,10 +396,11 @@ begin
       freeandnil(vec);
       vec := tvvectorialdocument.create;
     end;
-    paths := createvppaths(vec, zerocentermi.checked);
+    paths := createpaths(vec, zerocentermi.checked,
+                               skipsmallmi.checked);
 
     manualdrivinggb.enabled := true;
-    pagesizegb    .enabled := true;
+    pagesizegb     .enabled := true;
   end;
 end;
 
@@ -372,7 +411,8 @@ begin
   freeandnil(paths);
   freeandnil(vec);
   vec   := tvvectorialdocument.create;
-  paths := createvppaths(vec, zerocentermi.checked);
+  paths := createpaths(vec, zerocentermi.checked,
+                             skipsmallmi.checked);
 end;
 
 procedure tmainform.exitmiclick(sender: tobject);
@@ -386,15 +426,15 @@ end;
 
 procedure tmainform.showtoolbarclick(sender: tobject);
 begin
-  if sender = showmanualdrivingmi then
+  if sender = showcalibrationpanelmi then
   begin
-    showmanualdrivingmi.checked := not showmanualdrivingmi.checked;
-    manualdrivinggb    .visible :=     showmanualdrivingmi.checked;
+    showcalibrationpanelmi.checked := not showcalibrationpanelmi.checked;
+    manualdrivinggb       .visible :=     showcalibrationpanelmi.checked;
   end else
-  if sender = showpagemi then
+  if sender = showpagesizepanelmi then
   begin
-    showpagemi.checked := not showpagemi.checked;
-    pagesizegb.visible :=     showpagemi.checked;
+    showpagesizepanelmi.checked := not showpagesizepanelmi.checked;
+    pagesizegb         .visible :=     showpagesizepanelmi.checked;
   end;
 
   if manualdrivinggb.visible then
@@ -462,7 +502,8 @@ procedure tmainform.startmiclick(sender: tobject);
 begin
   if assigned(plotter) then
   begin
-    plotter.plot := true;
+    plotter.plot  := true;
+    timer.enabled := true;
   end else
   begin
     driver.enabled  := (sender = startmi);
@@ -472,7 +513,7 @@ begin
     plotter.onstop  := @onplotterstop;
     plotter.ontick  := @onplottertick;
     plotter.start;
-    start := now;
+    elapsed := 1;
   end;
 end;
 
@@ -480,7 +521,8 @@ procedure tmainform.stopmiclick(sender: tobject);
 begin
   if assigned(plotter) then
   begin
-    plotter.plot := false;
+    plotter.plot  := false;
+    timer.enabled := false;
   end;
 end;
 
@@ -500,7 +542,18 @@ begin
   zerocentermi.checked := not zerocentermi.checked;
   begin
     freeandnil(paths);
-    paths := createvppaths(vec, zerocentermi.checked);
+    paths := createpaths(vec, zerocentermi.checked,
+                               skipsmallmi.checked);
+  end;
+end;
+
+procedure tmainform.skipsmallmiclick(sender: tobject);
+begin
+  skipsmallmi.checked := not skipsmallmi.checked;
+  begin
+    freeandnil(paths);
+    paths := createpaths(vec, zerocentermi.checked,
+                               skipsmallmi.checked);
   end;
 end;
 
@@ -538,6 +591,16 @@ begin
   verticalcbeditingdone(formatcb);
 end;
 
+procedure tmainform.heightseeditingdone(sender: tobject);
+begin
+  formatcbchange(nil);
+end;
+
+procedure tmainform.widthseeditingdone(sender: tobject);
+begin
+  formatcbchange(nil);
+end;
+
 procedure tmainform.verticalcbeditingdone(sender: tobject);
 var
   amin: longint;
@@ -564,14 +627,15 @@ end;
 
 procedure tmainform.onplotterstart;
 begin
-  openmi    .enabled := false;
-  closemi   .enabled := false;
-  exitmi    .enabled := false;
-  updatemi  .enabled := false;
-  clearallmi.enabled := false;
+  openmi  .enabled := false;
+  closemi .enabled := false;
+  exitmi  .enabled := false;
+  updatemi.enabled := false;
+  clearmi .enabled := false;
 
   manualdrivinggb.enabled := false;
   pagesizegb     .enabled := false;
+  timer          .enabled := true;
   application.processmessages;
 end;
 
@@ -581,22 +645,24 @@ begin
   penupbtnclick(nil);
   plotter := nil;
   // ---
-  openmi    .enabled := true;
-  closemi   .enabled := true;
-  exitmi    .enabled := true;
-  updatemi  .enabled := true;
-  clearallmi.enabled := true;
+  openmi  .enabled := true;
+  closemi .enabled := true;
+  exitmi  .enabled := true;
+  updatemi.enabled := true;
+  clearmi .enabled := true;
 
   manualdrivinggb.enabled := true;
   pagesizegb     .enabled := true;
+  timer          .enabled := false;
   application.processmessages;
 end;
 
 procedure tmainform.onplottertick;
 var
-  m0: longint;
-  m1: longint;
-   p: tvppoint;
+         m0: longint;
+         m1: longint;
+          p: tvppoint;
+  remaining: longint;
 begin
   p.x := offsetxse.value + plotter.px;
   p.y := offsetyse.value + plotter.py;
@@ -617,8 +683,23 @@ begin
   end;
 
   if plotter.index mod 24 = 0 then
+  begin
     image.canvas.draw(0, 0, bitmap);
+  end;
+
+  if plotter.index mod $FF = 0 then
+  begin
+    remaining := (elapsed * (plotter.count - plotter.index)) div plotter.index;
+    caption := format('Elapsed %u sec - Remaing %u sec', [elapsed, remaining]);
+  end;
   application.processmessages;
+end;
+
+// TIMER events
+
+procedure tmainform.timertimer(sender: tobject);
+begin
+  inc(elapsed);
 end;
 
 end.

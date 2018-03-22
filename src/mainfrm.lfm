@@ -1,11 +1,11 @@
 object mainform: Tmainform
   Left = 261
-  Height = 622
-  Top = 85
+  Height = 593
+  Top = 114
   Width = 923
   Anchors = []
   Caption = 'VPlot Driver'
-  ClientHeight = 602
+  ClientHeight = 573
   ClientWidth = 923
   Color = clWindow
   Menu = mainmenu
@@ -20,7 +20,7 @@ object mainform: Tmainform
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 602
+    Height = 573
     Top = 0
     Width = 624
     Align = alCustom
@@ -38,13 +38,14 @@ object mainform: Tmainform
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 624
-    Height = 184
-    Top = 4
+    Height = 129
+    Top = 27
     Width = 294
     Anchors = [akRight]
+    AutoSize = True
     BorderSpacing.Right = 5
-    Caption = 'Manual Driving'
-    ClientHeight = 164
+    Caption = 'Plotter Calibration'
+    ClientHeight = 109
     ClientWidth = 290
     Color = clWindow
     Constraints.MaxWidth = 294
@@ -100,39 +101,6 @@ object mainform: Tmainform
       OnClick = pendownbtnClick
       TabOrder = 2
     end
-    object gohomebtn: TBitBtn
-      AnchorSideLeft.Control = penupbtn
-      AnchorSideTop.Control = bordersbtn
-      AnchorSideRight.Control = penupbtn
-      AnchorSideRight.Side = asrBottom
-      AnchorSideBottom.Control = bordersbtn
-      AnchorSideBottom.Side = asrBottom
-      Left = 100
-      Height = 30
-      Top = 124
-      Width = 85
-      Anchors = [akTop, akLeft, akRight, akBottom]
-      Caption = 'Go Home'
-      OnClick = gohomebtnClick
-      TabOrder = 3
-    end
-    object bordersbtn: TBitBtn
-      AnchorSideLeft.Control = leftdownbtn
-      AnchorSideTop.Control = leftdownbtn
-      AnchorSideTop.Side = asrBottom
-      AnchorSideRight.Control = leftdownbtn
-      AnchorSideRight.Side = asrBottom
-      Left = 5
-      Height = 30
-      Top = 124
-      Width = 85
-      Anchors = [akTop, akLeft, akRight]
-      BorderSpacing.Top = 25
-      BorderSpacing.Bottom = 10
-      Caption = 'Borders'
-      OnClick = bordersbtnClick
-      TabOrder = 4
-    end
     object leftdownbtn: TBitBtn
       AnchorSideLeft.Control = manualdrivinggb
       AnchorSideTop.Control = leftedit
@@ -146,9 +114,10 @@ object mainform: Tmainform
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 5
       BorderSpacing.Top = 5
+      BorderSpacing.Bottom = 10
       Caption = 'Left Down'
       OnClick = leftdownbtnClick
-      TabOrder = 5
+      TabOrder = 3
     end
     object leftupbtn: TBitBtn
       AnchorSideLeft.Control = manualdrivinggb
@@ -161,7 +130,7 @@ object mainform: Tmainform
       BorderSpacing.Top = 6
       Caption = 'Left Up'
       OnClick = leftupbtnClick
-      TabOrder = 6
+      TabOrder = 4
     end
     object rightupbtn: TBitBtn
       AnchorSideLeft.Control = penupbtn
@@ -175,10 +144,10 @@ object mainform: Tmainform
       Width = 85
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 10
-      BorderSpacing.Right = 10
+      BorderSpacing.Right = 5
       Caption = 'Right Up'
       OnClick = rightupbtnClick
-      TabOrder = 7
+      TabOrder = 5
     end
     object leftedit: TSpinEdit
       AnchorSideLeft.Control = manualdrivinggb
@@ -195,7 +164,7 @@ object mainform: Tmainform
       BorderSpacing.Left = 5
       BorderSpacing.Top = 5
       MaxValue = 1000000
-      TabOrder = 8
+      TabOrder = 6
     end
     object rightedit: TSpinEdit
       AnchorSideLeft.Control = rightupbtn
@@ -211,7 +180,7 @@ object mainform: Tmainform
       Alignment = taCenter
       Anchors = [akTop, akLeft, akRight, akBottom]
       MaxValue = 1000000
-      TabOrder = 9
+      TabOrder = 7
     end
   end
   object pagesizegb: TGroupBox
@@ -220,7 +189,7 @@ object mainform: Tmainform
     AnchorSideRight.Side = asrBottom
     Left = 624
     Height = 115
-    Top = 198
+    Top = 186
     Width = 294
     Anchors = [akRight]
     AutoSize = True
@@ -383,6 +352,7 @@ object mainform: Tmainform
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Top = 5
       MaxValue = 0
+      OnEditingDone = heightseEditingDone
       TabOrder = 3
       Value = 297
     end
@@ -400,6 +370,7 @@ object mainform: Tmainform
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Top = 5
       MaxValue = 0
+      OnEditingDone = widthseEditingDone
       TabOrder = 4
       Value = 210
     end
@@ -422,12 +393,12 @@ object mainform: Tmainform
     end
   end
   object opendialog: TOpenDialog
-    left = 216
-    top = 144
+    left = 704
+    top = 320
   end
   object mainmenu: TMainMenu
-    left = 328
-    top = 144
+    left = 776
+    top = 320
     object filemi: TMenuItem
       Caption = 'File'
       object openmi: TMenuItem
@@ -444,33 +415,6 @@ object mainform: Tmainform
       object exitmi: TMenuItem
         Caption = 'Exit'
         OnClick = exitmiClick
-      end
-    end
-    object viewmi: TMenuItem
-      Caption = 'View'
-      object showmanualdrivingmi: TMenuItem
-        Caption = 'Show Manual Driving Toolbar'
-        Checked = True
-        OnClick = showtoolbarclick
-      end
-      object showpagemi: TMenuItem
-        Caption = 'Show Page Toolbar'
-        Checked = True
-        OnClick = showtoolbarclick
-      end
-    end
-    object previewmi: TMenuItem
-      Caption = 'Preview'
-      object updatemi: TMenuItem
-        Caption = 'Update'
-        OnClick = updatemiClick
-      end
-      object MenuItem19: TMenuItem
-        Caption = '-'
-      end
-      object clearallmi: TMenuItem
-        Caption = 'Clear All'
-        OnClick = clearallmiClick
       end
     end
     object plotmi: TMenuItem
@@ -490,13 +434,59 @@ object mainform: Tmainform
         Caption = 'Kill'
         OnClick = killmiClick
       end
+      object line4mi: TMenuItem
+        Caption = '-'
+      end
+      object updatemi: TMenuItem
+        Caption = 'Update Preview'
+        OnClick = startmiClick
+      end
+      object clearmi: TMenuItem
+        Caption = 'Clear Preview'
+        OnClick = clearallmiClick
+      end
     end
-    object MenuItem1: TMenuItem
-      Caption = 'Option'
+    object pagemi: TMenuItem
+      Caption = 'Page'
       object zerocentermi: TMenuItem
-        Caption = 'Zero center'
+        Caption = 'Plot on page centre'
         Checked = True
         OnClick = zerocentermiClick
+      end
+      object skipsmallmi: TMenuItem
+        Caption = 'Skip small paths'
+        OnClick = skipsmallmiClick
+      end
+      object line5mi: TMenuItem
+        Caption = '-'
+      end
+      object showpagesizepanelmi: TMenuItem
+        Caption = 'Show Page Size Panel'
+        Checked = True
+        OnClick = showtoolbarclick
+      end
+    end
+    object calibrationmi: TMenuItem
+      Caption = 'Calibration'
+      object movebordersmi: TMenuItem
+        Caption = 'Move on Borders'
+        OnClick = bordersbtnClick
+      end
+      object movebottonmi: TMenuItem
+        Caption = 'Move on Botton Border'
+        OnClick = movebottonmiClick
+      end
+      object movetohomemi: TMenuItem
+        Caption = 'Move to Home'
+        OnClick = gohomebtnClick
+      end
+      object line3mi: TMenuItem
+        Caption = '-'
+      end
+      object showcalibrationpanelmi: TMenuItem
+        Caption = 'Show Calibration Panel'
+        Checked = True
+        OnClick = showtoolbarclick
       end
     end
     object infomi: TMenuItem
@@ -506,5 +496,10 @@ object mainform: Tmainform
         OnClick = aboutmiClick
       end
     end
+  end
+  object timer: TTimer
+    OnTimer = timerTimer
+    left = 840
+    top = 320
   end
 end

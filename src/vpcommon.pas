@@ -79,6 +79,7 @@ type
     procedure   clear;
     procedure   createtoolpath;
     procedure   zerocenter;
+    procedure   deletesmallpaths;
   public
     property height:               double  read fheight;
     property width:                double  read fwidth;
@@ -386,6 +387,17 @@ begin
   fwidth  := xmax - xmin;
 end;
 
+procedure tvppaths.deletesmallpaths;
+var
+  i: longint;
+begin
+  for i := flist.count - 1 downto 0 do
+    if tvppath(flist[i]).getlen < 0.25 then
+    begin
+      delete(i);
+    end;
+end;
+
 procedure tvppaths.createtoolpath;
 var
       i: longint;
@@ -435,12 +447,6 @@ begin
 
   for i := 0 to flist.count - 1 do
     flist[i] := list3[i];
-  // delete small paths
-  for i := flist.count - 1 downto 0 do
-    if tvppath(flist[i]).getlen < 0.25 then
-    begin
-      delete(i);
-    end;
 
   list3.destroy;
   list2.destroy;
