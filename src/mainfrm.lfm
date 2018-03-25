@@ -4,7 +4,7 @@ object mainform: Tmainform
   Top = 114
   Width = 923
   Anchors = []
-  Caption = 'VPlot Driver'
+  Caption = 'vPlotter'
   ClientHeight = 573
   ClientWidth = 923
   Color = clWindow

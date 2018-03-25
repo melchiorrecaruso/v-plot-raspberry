@@ -466,6 +466,8 @@ end;
 
 procedure tmainform.clearallmiclick(sender: tobject);
 begin
+  caption := 'vPlotter';
+  // ---
   bitmap.canvas.pen  .color := clltgray;
   bitmap.canvas.brush.color := clltgray;
   bitmap.canvas.brush.style := bssolid;
@@ -627,11 +629,16 @@ end;
 
 procedure tmainform.onplotterstart;
 begin
-  openmi  .enabled := false;
-  closemi .enabled := false;
-  exitmi  .enabled := false;
-  updatemi.enabled := false;
-  clearmi .enabled := false;
+  openmi       .enabled := false;
+  closemi      .enabled := false;
+  exitmi       .enabled := false;
+  updatemi     .enabled := false;
+  clearmi      .enabled := false;
+  zerocentermi .enabled := false;
+  skipsmallmi  .enabled := false;
+  movebordersmi.enabled := false;
+  movebottonmi .enabled := false;
+  movetohomemi .enabled := false;
 
   manualdrivinggb.enabled := false;
   pagesizegb     .enabled := false;
@@ -645,11 +652,16 @@ begin
   penupbtnclick(nil);
   plotter := nil;
   // ---
-  openmi  .enabled := true;
-  closemi .enabled := true;
-  exitmi  .enabled := true;
-  updatemi.enabled := true;
-  clearmi .enabled := true;
+  openmi       .enabled := true;
+  closemi      .enabled := true;
+  exitmi       .enabled := true;
+  updatemi     .enabled := true;
+  clearmi      .enabled := true;
+  zerocentermi .enabled := true;
+  skipsmallmi  .enabled := true;
+  movebordersmi.enabled := true;
+  movebottonmi .enabled := true;
+  movetohomemi .enabled := true;
 
   manualdrivinggb.enabled := true;
   pagesizegb     .enabled := true;
