@@ -41,8 +41,10 @@ type
     filemi: tmenuitem;
     line2mi: tmenuitem;
     killmi: tmenuitem;
-    pagemi: tmenuitem;
+    MenuItem1: TMenuItem;
     showpagesizepanelmi: TMenuItem;
+    showcalibrationpanelmi: TMenuItem;
+    pagemi: tmenuitem;
     timer: TTimer;
     updatemi: TMenuItem;
     clearmi: TMenuItem;
@@ -51,9 +53,6 @@ type
     movebottonmi: TMenuItem;
     line4mi: TMenuItem;
     movetohomemi: TMenuItem;
-    line3mi: TMenuItem;
-    showcalibrationpanelmi: TMenuItem;
-    line5mi: TMenuItem;
     skipsmallmi: tmenuitem;
     zerocentermi: tmenuitem;
     startmi: tmenuitem;
@@ -86,7 +85,7 @@ type
     rightupbtn: tbitbtn;
     manualdrivinggb: tgroupbox;
     opendialog: topendialog;
-
+ 
     procedure aboutmiclick(sender: tobject);
     procedure clearallmiclick(sender: tobject);
     procedure bordersbtnclick(sender: tobject);
@@ -98,7 +97,7 @@ type
     procedure formdestroy(sender: tobject);
     procedure formclose(sender: tobject; var closeaction: tcloseaction);
     procedure gohomebtnclick(sender: tobject);
-    procedure heightseEditingDone(Sender: TObject);
+    procedure heightseeditingdone(sender: tobject);
     procedure imagemousedown(sender: tobject; button: tmousebutton;
       shift: tshiftstate; x, y: integer);
     procedure imagemousemove(sender: tobject; shift: tshiftstate; x, y: integer);
@@ -108,7 +107,7 @@ type
     procedure leftdownbtnclick(sender: tobject);
 
     procedure leftupbtnclick   (sender: tobject);
-    procedure movebottonmiClick(Sender: TObject);
+    procedure movebottonmiclick(sender: tobject);
 
     procedure showtoolbarclick(sender: tobject);
     procedure skipsmallmiclick(sender: tobject);
@@ -123,11 +122,11 @@ type
     procedure openbtnclick(sender: tobject);
 
     procedure stopmiclick(sender: tobject);
-    procedure timerTimer(Sender: TObject);
+    procedure timertimer(sender: tobject);
     procedure updatemiclick(sender: tobject);
 
     procedure verticalcbeditingdone(sender: tobject);
-    procedure widthseEditingDone(Sender: TObject);
+    procedure widthseeditingdone(sender: tobject);
     procedure zerocentermiclick(sender: tobject);
   private
       bitmap: tbitmap;
@@ -145,7 +144,7 @@ type
 
 
 var
-  mainform: Tmainform;
+  mainform: tmainform;
 
 
 implementation
@@ -461,11 +460,13 @@ end;
 
 procedure tmainform.updatemiclick(sender: tobject);
 begin
-  startmiclick(nil);
+  updatemi.checked := not updatemi.checked;
 end;
 
 procedure tmainform.clearallmiclick(sender: tobject);
 begin
+  if assigned(plotter) then exit;
+  // ---
   caption := 'vPlotter';
   // ---
   bitmap.canvas.pen  .color := clltgray;
@@ -508,7 +509,7 @@ begin
     timer.enabled := true;
   end else
   begin
-    driver.enabled  := (sender = startmi);
+    driver.enabled  := not updatemi.checked;
     driver.penoff   := false;
     plotter         := tvplotter.create(paths);
     plotter.onstart := @onplotterstart;

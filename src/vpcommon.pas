@@ -91,7 +91,7 @@ type
   function  translatepoint(const cc, p: tvppoint): tvppoint;
   function  rotatepoint(const p: tvppoint; const alpha: double): tvppoint;
   function  distancebetween(const p0, p1: tvppoint): double;
-  function  linebetween    (const p0, p1: tvppoint): tvpline;
+  function  linebetween(const p0, p1: tvppoint): tvpline;
   function  lineangle(var line: tvpline): double;
   function  intersectlines(const l0, l1: tvpline): tvppoint;
 
@@ -101,6 +101,9 @@ implementation
 
 uses
   math;
+
+const
+  smallest = 0.2;
 
 // geometry routines
 
@@ -153,12 +156,14 @@ begin
     raise exception.create('Intersectlines routine exception');
 end;
 
+// ---
+
 function comparepoint(p0, p1: pvppoint): boolean;
 begin
-  result := abs(p1^.x - p0^.x) < 0.25;
+  result := abs(p1^.x - p0^.x) < smallest;
   if result then
   begin
-    result := abs(p1^.y - p0^.y) < 0.25;
+    result := abs(p1^.y - p0^.y) < smallest;
   end;
 end;
 
@@ -392,7 +397,7 @@ var
   i: longint;
 begin
   for i := flist.count - 1 downto 0 do
-    if tvppath(flist[i]).getlen < 0.25 then
+    if tvppath(flist[i]).getlen < smallest then
     begin
       delete(i);
     end;

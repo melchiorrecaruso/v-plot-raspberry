@@ -1,7 +1,7 @@
 object mainform: Tmainform
-  Left = 261
+  Left = 296
   Height = 593
-  Top = 114
+  Top = 104
   Width = 923
   Anchors = []
   Caption = 'vPlotter'
@@ -189,7 +189,7 @@ object mainform: Tmainform
     AnchorSideRight.Side = asrBottom
     Left = 624
     Height = 115
-    Top = 186
+    Top = 184
     Width = 294
     Anchors = [akRight]
     AutoSize = True
@@ -417,6 +417,31 @@ object mainform: Tmainform
         OnClick = exitmiClick
       end
     end
+    object MenuItem1: TMenuItem
+      Caption = 'View'
+      object showpagesizepanelmi: TMenuItem
+        Caption = 'Page Size Panel'
+        Checked = True
+        OnClick = showtoolbarclick
+      end
+      object showcalibrationpanelmi: TMenuItem
+        Caption = 'Calibration Panel'
+        Checked = True
+        OnClick = showtoolbarclick
+      end
+    end
+    object pagemi: TMenuItem
+      Caption = 'Page'
+      object zerocentermi: TMenuItem
+        Caption = 'Plot On Centre'
+        Checked = True
+        OnClick = zerocentermiClick
+      end
+      object skipsmallmi: TMenuItem
+        Caption = 'Skip small paths'
+        OnClick = skipsmallmiClick
+      end
+    end
     object plotmi: TMenuItem
       Caption = 'Plot'
       object startmi: TMenuItem
@@ -438,32 +463,13 @@ object mainform: Tmainform
         Caption = '-'
       end
       object updatemi: TMenuItem
-        Caption = 'Update Preview'
-        OnClick = startmiClick
+        Caption = 'Preview Only'
+        Checked = True
+        OnClick = updatemiClick
       end
       object clearmi: TMenuItem
-        Caption = 'Clear Preview'
+        Caption = 'Clear'
         OnClick = clearallmiClick
-      end
-    end
-    object pagemi: TMenuItem
-      Caption = 'Page'
-      object zerocentermi: TMenuItem
-        Caption = 'Plot on page centre'
-        Checked = True
-        OnClick = zerocentermiClick
-      end
-      object skipsmallmi: TMenuItem
-        Caption = 'Skip small paths'
-        OnClick = skipsmallmiClick
-      end
-      object line5mi: TMenuItem
-        Caption = '-'
-      end
-      object showpagesizepanelmi: TMenuItem
-        Caption = 'Show Page Size Panel'
-        Checked = True
-        OnClick = showtoolbarclick
       end
     end
     object calibrationmi: TMenuItem
@@ -480,19 +486,11 @@ object mainform: Tmainform
         Caption = 'Move to Home'
         OnClick = gohomebtnClick
       end
-      object line3mi: TMenuItem
-        Caption = '-'
-      end
-      object showcalibrationpanelmi: TMenuItem
-        Caption = 'Show Calibration Panel'
-        Checked = True
-        OnClick = showtoolbarclick
-      end
     end
     object infomi: TMenuItem
       Caption = 'Info'
       object aboutmi: TMenuItem
-        Caption = 'About vPlot ...'
+        Caption = 'About vPlotter ...'
         OnClick = aboutmiClick
       end
     end
