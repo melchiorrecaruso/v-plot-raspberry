@@ -98,12 +98,11 @@ type
 
 implementation
 
-
 uses
   math;
 
 const
-  smallest = 0.2;
+  smallest = 0.05;
 
 // geometry routines
 
@@ -208,6 +207,39 @@ begin
       result := i;
       exit;
     end;
+end;
+
+function walknear(path: tvppath; list: tlist): longint;
+var
+     i: longint;
+  curr: double;
+  best: double;
+begin
+  result := 0;
+  if path <> nil then
+  begin
+    best := distancebetween(path.getlast^, tvppath(list[0]).getfirst^);
+
+    for i := 1 to list.count - 1 do
+    begin
+      curr := distancebetween(path.getlast^, tvppath(list[i]).getfirst^);
+      if curr < best then
+      begin
+        best   := curr;
+        result := i;
+      end else
+      begin
+        curr := distancebetween(path.getlast^, tvppath(list[i]).getlast^);
+        if curr < best then
+        begin
+          best   := curr;
+          result := i;
+
+          tvppath(list[i]).invert;
+        end;
+      end;
+    end;
+  end;
 end;
 
 // tvppath
@@ -417,15 +449,18 @@ begin
   list3 := tlist.create;
   for i := 0 to flist.count - 1 do
     list1.add(flist[i]);
-  //list1.sort(@comparepath);
+  // list1.sort(@comparepath);
   // create toolpath
+  path := nil;
   while list1.count > 0 do
   begin
-    path := tvppath(list1[0]);
-    list1.delete(0);
+  //index := 0;
+    index := walknear(path, list1);
+    path  := tvppath(list1[index]);
+    list1.delete(index);
     list2.add(path);
     repeat
-      index := walkback(pvppoint(path.getfirst), list1);
+      index := walkback(path.getfirst, list1);
       if index <> -1 then
       begin
         path := tvppath(list1[index]);
@@ -436,7 +471,7 @@ begin
 
     path := tvppath(list2.last);
     repeat
-      index := walknext(pvppoint(path.getlast), list1);
+      index := walknext(path.getlast, list1);
       if index <> -1 then
       begin
         path := tvppath(list1[index]);

@@ -629,6 +629,9 @@ end;
 // PLOTTER THREAD methods
 
 procedure tmainform.onplotterstart;
+var
+    i: longint;
+  com: tcomponent;
 begin
   openmi       .enabled := false;
   closemi      .enabled := false;
@@ -641,13 +644,37 @@ begin
   movebottonmi .enabled := false;
   movetohomemi .enabled := false;
 
-  manualdrivinggb.enabled := false;
-  pagesizegb     .enabled := false;
-  timer          .enabled := true;
+  for i := 0 to manualdrivinggb.componentcount - 1 do
+  begin
+    com := manualdrivinggb.components[i];
+    if com is tcombobox then
+      tcombobox(com).enabled := false
+    else
+    if com is tspinedit then
+      tspinedit(com).enabled := false
+    else
+    if com is tcheckbox then
+      tcheckbox(com).enabled := false
+  end;
+
+  for i := 0 to pagesizegb.componentcount - 1 do
+  begin
+    com := pagesizegb.components[i];
+    if com is tbitbtn then
+      tbitbtn(com).enabled := false
+    else
+    if com is tspinedit then
+      tspinedit(com).enabled := false;
+  end;
+  timer.enabled := true;
+
   application.processmessages;
 end;
 
 procedure tmainform.onplotterstop;
+var
+    i: longint;
+  com: tcomponent;
 begin
   image.canvas.draw(0,0, bitmap);
   penupbtnclick(nil);
@@ -664,9 +691,30 @@ begin
   movebottonmi .enabled := true;
   movetohomemi .enabled := true;
 
-  manualdrivinggb.enabled := true;
-  pagesizegb     .enabled := true;
-  timer          .enabled := false;
+  for i := 0 to manualdrivinggb.componentcount - 1 do
+  begin
+    com := manualdrivinggb.components[i];
+    if com is tcombobox then
+      tcombobox(com).enabled := true
+    else
+    if com is tspinedit then
+      tspinedit(com).enabled := true
+    else
+    if com is tcheckbox then
+      tcheckbox(com).enabled := true
+  end;
+
+  for i := 0 to pagesizegb.componentcount - 1 do
+  begin
+    com := pagesizegb.components[i];
+    if com is tbitbtn then
+      tbitbtn(com).enabled := true
+    else
+    if com is tspinedit then
+      tspinedit(com).enabled := true;
+  end;
+  timer.enabled := false;
+
   application.processmessages;
 end;
 
@@ -695,15 +743,11 @@ begin
     driver.move2(m0, m1);
   end;
 
-  if plotter.index mod 24 = 0 then
-  begin
-    image.canvas.draw(0, 0, bitmap);
-  end;
-
-  if plotter.index mod $FF = 0 then
+  if plotter.index mod $F = 0 then
   begin
     remaining := (elapsed * (plotter.count - plotter.index)) div plotter.index;
     caption := format('Elapsed %u sec - Remaing %u sec', [elapsed, remaining]);
+    image.canvas.draw(0, 0, bitmap);
   end;
   application.processmessages;
 end;

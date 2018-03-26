@@ -37,7 +37,6 @@ type
     fdelay1:  longint;
     fdelay2:  longint;
     fdelay3:  longint;
-    ffault:   longint;
     fenabled: boolean;
     fpen:     boolean;
     fpenoff:  boolean;
@@ -51,14 +50,12 @@ type
     procedure   init (cnt0, cnt1: longint);
     procedure   move2(cnt0, cnt1: longint);
     procedure   move4(cnt0, cnt1: longint);
-
   published
     property cnt0:    longint read fcnt0;
     property cnt1:    longint read fcnt1;
     property delay1:  longint read fdelay1 write fdelay1;
     property delay2:  longint read fdelay2 write fdelay2;
     property delay3:  longint read fdelay3 write fdelay3;
-    property fault:   longint read ffault;
     property enabled: boolean read fenabled write fenabled;
     property pen:     boolean read fpen     write setpen;
     property penoff:  boolean read fpenoff  write setpenoff;
@@ -104,84 +101,44 @@ begin
   inherited create;
   {$ifdef cpuarm}
   // setup wiringpi library
-  ffault := wiringpisetup;
+  wiringpisetup;
   // setup pca9685 library
-  if ffault <> -1 then
-    ffault := pca9685setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, motz_freq);
+  pca9685setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, motz_freq);
+  // init servo
+  pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
+  delaymicroseconds(fdelay3);
+  // init mode
+  pinmode(motx_mod0, OUTPUT);
+  pinmode(motx_mod1, OUTPUT);
+  pinmode(motx_mod2, OUTPUT);
 
-  if ffault <> -1 then
+  if mode = 1 then
   begin
-    // init servo
-    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
-    delaymicroseconds(fdelay3);
-    // init mode
-    pinmode(motx_mod0,    OUTPUT);
-    pinmode(motx_mod1,    OUTPUT);
-    pinmode(motx_mod2,    OUTPUT);
-
-    if mode = 1 then
-    begin
-      digitalwrite(motx_mod0,  LOW);
-      digitalwrite(motx_mod1,  LOW);
-      digitalwrite(motx_mod2,  LOW);
-    end else
-    if mode = 2 then
-    begin
-      digitalwrite(motx_mod0, HIGH);
-      digitalwrite(motx_mod1,  LOW);
-      digitalwrite(motx_mod2,  LOW);
-    end else
-    if mode = 4 then
-    begin
-      digitalwrite(motx_mod0,  LOW);
-      digitalwrite(motx_mod1, HIGH);
-      digitalwrite(motx_mod2,  LOW);
-    end else
-    if mode = 8 then
-    begin
-      digitalwrite(motx_mod0,  LOW);
-      digitalwrite(motx_mod1, HIGH);
-      digitalwrite(motx_mod2, HIGH);
-    end else
-    if mode = 16 then
-    begin
-      digitalwrite(motx_mod0, HIGH);
-      digitalwrite(motx_mod1,  LOW);
-      digitalwrite(motx_mod2,  LOW);
-    end else
-    if mode = 32 then
-    begin
-      digitalwrite(motx_mod0, HIGH);
-      digitalwrite(motx_mod1,  LOW);
-      digitalwrite(motx_mod2, HIGH);
-    end else
-    if mode = 64 then
-      begin
-      digitalwrite(motx_mod0, HIGH);
-      digitalwrite(motx_mod1, HIGH);
-      digitalwrite(motx_mod2,  LOW);
-    end else
-    if mode = 128 then
-      begin
-      digitalwrite(motx_mod0, HIGH);
-      digitalwrite(motx_mod1, HIGH);
-      digitalwrite(motx_mod2, HIGH);
-    end else
-      ffault := -1;
-
-    // init step motor0
-    pinmode(mot0_dir,    OUTPUT);
-    pinmode(mot0_step,   OUTPUT);
-    digitalwrite(mot0_dir,  LOW);
-    digitalwrite(mot0_step, LOW);
-    // init step motor1
-    pinmode(mot1_dir,    OUTPUT);
-    pinmode(mot1_step,   OUTPUT);
-    digitalwrite(mot1_dir,  LOW);
-    digitalwrite(mot1_step, LOW);
+    digitalwrite(motx_mod0,  LOW);
+    digitalwrite(motx_mod1,  LOW);
+    digitalwrite(motx_mod2,  LOW);
+  end else
+  if mode = 2 then
+  begin
+    digitalwrite(motx_mod0, HIGH);
+    digitalwrite(motx_mod1,  LOW);
+    digitalwrite(motx_mod2,  LOW);
+  end else
+  begin
+    digitalwrite(motx_mod0,  LOW);
+    digitalwrite(motx_mod1, HIGH);
+    digitalwrite(motx_mod2,  LOW);
   end;
-  {$else}
-  ffault   := -1;
+  // init step motor0
+  pinmode(mot0_dir,    OUTPUT);
+  pinmode(mot0_step,   OUTPUT);
+  digitalwrite(mot0_dir,  LOW);
+  digitalwrite(mot0_step, LOW);
+  // init step motor1
+  pinmode(mot1_dir,    OUTPUT);
+  pinmode(mot1_step,   OUTPUT);
+  digitalwrite(mot1_dir,  LOW);
+  digitalwrite(mot1_step, LOW);
   {$endif}
   fdelay1  := 1500;
   fdelay2  := 3500;
@@ -205,10 +162,9 @@ end;
 procedure tvpdriver.largedisplacements(cnt0, cnt1: longint);
 begin
   setpen(false);
-  {$ifdef cpuarm}
   inc(fcnt0, cnt0);
   inc(fcnt1, cnt1);
-
+  {$ifdef cpuarm}
   if cnt0 > 0 then
     digitalwrite(mot0_dir, HIGH)
   else
@@ -248,10 +204,9 @@ var
 {$endif}
 begin
   setpen(true);
-  {$ifdef cpuarm}
   inc(fcnt0, cnt0);
   inc(fcnt1, cnt1);
-
+  {$ifdef cpuarm}
   if cnt0 > 0 then
     digitalwrite(mot0_dir, HIGH)
   else
@@ -284,7 +239,7 @@ end;
 
 procedure tvpdriver.setpen(value: boolean);
 begin
-  if fpenoff = false then
+  if not fpenoff then
     if fpen <> value then
     begin
       fpen := value;
@@ -314,35 +269,29 @@ end;
 
 procedure tvpdriver.move2(cnt0, cnt1: longint);
 begin
-  {$ifdef cpuarm}
   move4(cnt0 - fcnt0, cnt1 - fcnt1);
-  {$endif}
 end;
 
 procedure tvpdriver.move4(cnt0, cnt1: longint);
 begin
-  if not fenabled then exit;
-  if ffault  = -1 then exit;
-  {$ifdef cpuarm}
-  // mode step motors
-  if (cnt0 <> 0) or
-     (cnt1 <> 0) then
-  begin
-    if (not fpenoff) then
+  if fenabled then
+    if (cnt0 <> 0) or
+       (cnt1 <> 0) then
     begin
-      if (abs(cnt0) < 11) and
-         (abs(cnt1) < 11) then
-        smalldisplacements(cnt0, cnt1)
-      else
-        largedisplacements(cnt0, cnt1);
+      if (not fpenoff) then
+      begin
+        if (abs(cnt0) < 11) and
+           (abs(cnt1) < 11) then
+          smalldisplacements(cnt0, cnt1)
+        else
+          largedisplacements(cnt0, cnt1);
 
-    end else
-      largedisplacements(cnt0, cnt1);
-  end;
+      end else
+        largedisplacements(cnt0, cnt1);
+    end;
   {$ifdef debug}
   writeln('fcount0 = ', fcnt0);
   writeln('fcount1 = ', fcnt1);
-  {$endif}
   {$endif}
 end;
 
