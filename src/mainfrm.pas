@@ -137,6 +137,10 @@ type
  mouseisdown: boolean;
           px: longint;
           py: longint;
+
+    procedure lock1(value: boolean);
+    procedure lock2(value: boolean);
+
     procedure onplotterstart;
     procedure onplotterstop;
     procedure onplottertick;
@@ -382,9 +386,7 @@ begin
   opendialog.filter := 'dxf files (*.dxf)|*.dxf';
   if opendialog.execute then
   begin
-    manualdrivinggb.enabled := false;
-    pagesizegb    .enabled := false;
-
+    lock2(false);
     freeandnil(paths);
     freeandnil(vec);
     vec := tvvectorialdocument.create;
@@ -397,9 +399,7 @@ begin
     end;
     paths := createpaths(vec, zerocentermi.checked,
                                skipsmallmi.checked);
-
-    manualdrivinggb.enabled := true;
-    pagesizegb     .enabled := true;
+    lock2(true);
   end;
 end;
 
@@ -407,11 +407,14 @@ procedure tmainform.closemiclick(sender: tobject);
 begin
   if assigned(plotter) then exit;
 
+  lock2(false);
   freeandnil(paths);
   freeandnil(vec);
   vec   := tvvectorialdocument.create;
   paths := createpaths(vec, zerocentermi.checked,
                              skipsmallmi.checked);
+  clearallmiclick(sender);
+  lock2(true);
 end;
 
 procedure tmainform.exitmiclick(sender: tobject);
@@ -628,93 +631,84 @@ end;
 
 // PLOTTER THREAD methods
 
-procedure tmainform.onplotterstart;
-var
-    i: longint;
-  com: tcomponent;
+procedure tmainform.lock1(value: boolean);
 begin
-  openmi       .enabled := false;
-  closemi      .enabled := false;
-  exitmi       .enabled := false;
-  updatemi     .enabled := false;
-  clearmi      .enabled := false;
-  zerocentermi .enabled := false;
-  skipsmallmi  .enabled := false;
-  movebordersmi.enabled := false;
-  movebottonmi .enabled := false;
-  movetohomemi .enabled := false;
+  openmi       .enabled := value;
+  closemi      .enabled := value;
+  exitmi       .enabled := value;
+  updatemi     .enabled := value;
+  clearmi      .enabled := value;
+  zerocentermi .enabled := value;
+  skipsmallmi  .enabled := value;
+  movebordersmi.enabled := value;
+  movebottonmi .enabled := value;
+  movetohomemi .enabled := value;
+  // calibration
+  leftupbtn    .enabled := value;
+  leftdownbtn  .enabled := value;
+  leftedit     .enabled := value;
+  rightupbtn   .enabled := value;
+  rightdownbtn .enabled := value;
+  rightedit    .enabled := value;
+  penupbtn     .enabled := value;
+  pendownbtn   .enabled := value;
+  // page format
+  formatcb     .enabled := value;
+  heightse     .enabled := value;
+  widthse      .enabled := value;
+  offsetxse    .enabled := value;
+  offsetyse    .enabled := value;
+  verticalcb   .enabled := value;
+end;
 
-  for i := 0 to manualdrivinggb.componentcount - 1 do
-  begin
-    com := manualdrivinggb.components[i];
-    if com is tcombobox then
-      tcombobox(com).enabled := false
-    else
-    if com is tspinedit then
-      tspinedit(com).enabled := false
-    else
-    if com is tcheckbox then
-      tcheckbox(com).enabled := false
-  end;
+procedure tmainform.lock2(value: boolean);
+begin
+  openmi       .enabled := value;
+  closemi      .enabled := value;
+  exitmi       .enabled := value;
+  updatemi     .enabled := value;
+  clearmi      .enabled := value;
+  zerocentermi .enabled := value;
+  skipsmallmi  .enabled := value;
+  startmi      .enabled := value;
+  stopmi       .enabled := value;
+  killmi       .enabled := value;
+  movebordersmi.enabled := value;
+  movebottonmi .enabled := value;
+  movetohomemi .enabled := value;
+  // calibration
+  leftupbtn    .enabled := value;
+  leftdownbtn  .enabled := value;
+  leftedit     .enabled := value;
+  rightupbtn   .enabled := value;
+  rightdownbtn .enabled := value;
+  rightedit    .enabled := value;
+  penupbtn     .enabled := value;
+  pendownbtn   .enabled := value;
+  // page format
+  formatcb     .enabled := value;
+  heightse     .enabled := value;
+  widthse      .enabled := value;
+  offsetxse    .enabled := value;
+  offsetyse    .enabled := value;
+  verticalcb   .enabled := value;
+end;
 
-  for i := 0 to pagesizegb.componentcount - 1 do
-  begin
-    com := pagesizegb.components[i];
-    if com is tbitbtn then
-      tbitbtn(com).enabled := false
-    else
-    if com is tspinedit then
-      tspinedit(com).enabled := false;
-  end;
+procedure tmainform.onplotterstart;
+begin
+  lock1(false);
   timer.enabled := true;
-
   application.processmessages;
 end;
 
 procedure tmainform.onplotterstop;
-var
-    i: longint;
-  com: tcomponent;
 begin
   image.canvas.draw(0,0, bitmap);
   penupbtnclick(nil);
   plotter := nil;
-  // ---
-  openmi       .enabled := true;
-  closemi      .enabled := true;
-  exitmi       .enabled := true;
-  updatemi     .enabled := true;
-  clearmi      .enabled := true;
-  zerocentermi .enabled := true;
-  skipsmallmi  .enabled := true;
-  movebordersmi.enabled := true;
-  movebottonmi .enabled := true;
-  movetohomemi .enabled := true;
 
-  for i := 0 to manualdrivinggb.componentcount - 1 do
-  begin
-    com := manualdrivinggb.components[i];
-    if com is tcombobox then
-      tcombobox(com).enabled := true
-    else
-    if com is tspinedit then
-      tspinedit(com).enabled := true
-    else
-    if com is tcheckbox then
-      tcheckbox(com).enabled := true
-  end;
-
-  for i := 0 to pagesizegb.componentcount - 1 do
-  begin
-    com := pagesizegb.components[i];
-    if com is tbitbtn then
-      tbitbtn(com).enabled := true
-    else
-    if com is tspinedit then
-      tspinedit(com).enabled := true;
-  end;
+  lock1(true);
   timer.enabled := false;
-
   application.processmessages;
 end;
 
@@ -742,6 +736,7 @@ begin
     optimize(p, layout, m0, m1);
     driver.move2(m0, m1);
   end;
+  sleep(5);
 
   if plotter.index mod $F = 0 then
   begin

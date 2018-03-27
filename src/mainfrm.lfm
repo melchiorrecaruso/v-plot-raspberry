@@ -1,11 +1,11 @@
 object mainform: Tmainform
-  Left = 296
-  Height = 593
-  Top = 104
+  Left = 246
+  Height = 467
+  Top = 171
   Width = 923
   Anchors = []
   Caption = 'vPlotter'
-  ClientHeight = 573
+  ClientHeight = 447
   ClientWidth = 923
   Color = clWindow
   Menu = mainmenu
@@ -20,7 +20,7 @@ object mainform: Tmainform
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 573
+    Height = 447
     Top = 0
     Width = 624
     Align = alCustom
@@ -39,7 +39,7 @@ object mainform: Tmainform
     AnchorSideRight.Side = asrBottom
     Left = 624
     Height = 129
-    Top = 27
+    Top = 7
     Width = 294
     Anchors = [akRight]
     AutoSize = True
@@ -189,7 +189,7 @@ object mainform: Tmainform
     AnchorSideRight.Side = asrBottom
     Left = 624
     Height = 115
-    Top = 184
+    Top = 144
     Width = 294
     Anchors = [akRight]
     AutoSize = True

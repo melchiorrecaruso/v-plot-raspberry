@@ -242,6 +242,15 @@ begin
   end;
 end;
 
+function isclosed(path: tvppath): boolean;
+begin
+  result := false;
+  if path.count > 1 then
+  begin
+    result := comparepoint(path.getfirst, path.getlast);
+  end;
+end;
+
 // tvppath
 
 constructor tvppath.create;
@@ -449,36 +458,37 @@ begin
   list3 := tlist.create;
   for i := 0 to flist.count - 1 do
     list1.add(flist[i]);
-  // list1.sort(@comparepath);
   // create toolpath
   path := nil;
   while list1.count > 0 do
   begin
-  //index := 0;
     index := walknear(path, list1);
     path  := tvppath(list1[index]);
     list1.delete(index);
     list2.add(path);
-    repeat
-      index := walkback(path.getfirst, list1);
-      if index <> -1 then
-      begin
-        path := tvppath(list1[index]);
-        list1.delete(index);
-        list2.insert(0, path);
-      end;
-    until index = -1;
+    if not isclosed(tvppath(flist[i])) then
+    begin
+      repeat
+        index := walkback(path.getfirst, list1);
+        if index <> -1 then
+        begin
+          path := tvppath(list1[index]);
+          list1.delete(index);
+          list2.insert(0, path);
+        end;
+      until index = -1;
 
-    path := tvppath(list2.last);
-    repeat
-      index := walknext(path.getlast, list1);
-      if index <> -1 then
-      begin
-        path := tvppath(list1[index]);
-        list1.delete(index);
-        list2.add(path);
-      end;
-    until index = -1;
+      path := tvppath(list2.last);
+      repeat
+        index := walknext(path.getlast, list1);
+        if index <> -1 then
+        begin
+          path := tvppath(list1[index]);
+          list1.delete(index);
+          list2.add(path);
+        end;
+      until index = -1;
+    end;
     // move toolpath
     for i := 0 to list2.count - 1 do
       list3.add(list2[i]);
