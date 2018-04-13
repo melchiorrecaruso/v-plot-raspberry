@@ -383,7 +383,7 @@ procedure tmainform.openbtnclick(sender: tobject);
 begin
   if assigned(plotter) then exit;
 
-  opendialog.filter := 'dxf files (*.dxf)|*.dxf';
+  // opendialog.filter := 'dxf files (*.dxf)|*.dxf';
   if opendialog.execute then
   begin
     lock2(false);
@@ -736,7 +736,6 @@ begin
     optimize(p, layout, m0, m1);
     driver.move2(m0, m1);
   end;
-  sleep(5);
 
   if plotter.index mod $F = 0 then
   begin
