@@ -35,11 +35,11 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="98">
+    <Units Count="95">
       <Unit0>
         <Filename Value="vplot.lpr"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="3"/>
+        <IsVisibleTab Value="True"/>
         <CursorPos X="73" Y="10"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -59,7 +59,7 @@
         <Filename Value="src/vpcoder.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="223"/>
+        <TopLine Value="182"/>
         <CursorPos X="40" Y="302"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -385,10 +385,9 @@
         <ComponentName Value="mainform"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="6"/>
         <TopLine Value="374"/>
         <CursorPos X="55" Y="384"/>
-        <FoldState Value=" T3ld0A533k"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -596,7 +595,7 @@
       <Unit76>
         <Filename Value="src/vpdriver.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="185"/>
         <CursorPos X="17" Y="187"/>
         <UsageCount Value="188"/>
@@ -605,7 +604,7 @@
       <Unit77>
         <Filename Value="src/vplayout.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="5"/>
         <TopLine Value="38"/>
         <CursorPos X="17" Y="25"/>
         <UsageCount Value="188"/>
@@ -668,8 +667,8 @@
         <Filename Value="src/vpcommon.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="467"/>
-        <CursorPos X="18" Y="469"/>
+        <TopLine Value="37"/>
+        <CursorPos Y="112"/>
         <UsageCount Value="149"/>
         <Loaded Value="True"/>
       </Unit85>
@@ -710,8 +709,10 @@
       </Unit90>
       <Unit91>
         <Filename Value="src/include.inc"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="3"/>
+        <CursorPos X="8"/>
         <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit91>
       <Unit92>
         <Filename Value="src/aboutfrm.lfm"/>
@@ -725,42 +726,19 @@
         <ComponentName Value="aboutform"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="8"/>
         <CursorPos Y="24"/>
         <UsageCount Value="51"/>
         <Loaded Value="True"/>
       </Unit93>
       <Unit94>
-        <Filename Value="../../../../../FPC/3.0.4/source/rtl/inc/objpash.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="171"/>
-        <CursorPos X="8" Y="189"/>
-        <UsageCount Value="8"/>
-      </Unit94>
-      <Unit95>
-        <Filename Value="../../../../../FPC/3.0.4/source/rtl/objpas/classes/classesh.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="231"/>
-        <CursorPos X="18" Y="254"/>
-        <UsageCount Value="9"/>
-      </Unit95>
-      <Unit96>
-        <Filename Value="../../../../../FPC/3.0.4/source/rtl/objpas/classes/lists.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="249"/>
-        <CursorPos Y="251"/>
-        <UsageCount Value="9"/>
-      </Unit96>
-      <Unit97>
         <Filename Value="src/vpsketch.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="6"/>
-        <TopLine Value="13"/>
-        <CursorPos X="7" Y="37"/>
+        <EditorIndex Value="7"/>
+        <CursorPos X="23" Y="6"/>
         <UsageCount Value="24"/>
         <Loaded Value="True"/>
-      </Unit97>
+      </Unit94>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
