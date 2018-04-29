@@ -158,8 +158,9 @@ begin
   finally
     ini.destroy;
   end;
-  fpoint08.x   := fpoint01.x / 2;
-  fpoint08.y   := fpoint01.y / 2;
+  fpoint08.x   := ((fleft   ) + (fpoint01.x - fright)) / 2;
+  fpoint08.y   := ((fbottom ) + (fpoint01.y - ftop  )) / 2;
+
   fpoint09.x   := fpoint01.x / 2;
   //fpoint09.y   := fpoint01.y - ftop;
   fpoint09.y   := fbottom;

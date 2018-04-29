@@ -319,7 +319,7 @@ begin
 
   paths.zerocenter;
   driver.enabled  := true;
-  driver.penoff   := true;
+  driver.penoff   := false;
   plotter         := tvplotter.create(paths);
   plotter.onstart := @onplotterstart;
   plotter.onstop  := @onplotterstop;
@@ -353,7 +353,7 @@ begin
 
   paths.zerocenter;
   driver.enabled  := true;
-  driver.penoff   := true;
+  driver.penoff   := false;
   plotter         := tvplotter.create(paths);
   plotter.onstart := @onplotterstart;
   plotter.onstop  := @onplotterstop;
