@@ -22,7 +22,6 @@
 unit vpcoder;
 
 {$mode objfpc}
-{$i include.inc}
 
 interface
 
@@ -213,12 +212,12 @@ var
 begin
   alpha    := 0;
   repeat
-    tmp00  := l.p00;
-    tmp01  := l.p01;
-    tmp02  := translatepoint(p, rotatepoint(l.p02, alpha));
-    tmp03  := translatepoint(p, rotatepoint(l.p03, alpha));
-    tmp04  := translatepoint(p, rotatepoint(l.p04, alpha));
-    tmp05  := translatepoint(p, rotatepoint(l.p05, alpha));
+    tmp00  := l.point00;
+    tmp01  := l.point01;
+    tmp02  := translatepoint(p, rotatepoint(l.point02, alpha));
+    tmp03  := translatepoint(p, rotatepoint(l.point03, alpha));
+    tmp04  := translatepoint(p, rotatepoint(l.point04, alpha));
+    tmp05  := translatepoint(p, rotatepoint(l.point05, alpha));
     tmp06  := intersectlines(linebetween(tmp00, tmp03),
                              linebetween(tmp01, tmp04));
 
@@ -236,22 +235,22 @@ begin
 
   m0 := round(l.mode * (distancebetween(tmp00, tmp03) / l.ratio));
   m1 := round(l.mode * (distancebetween(tmp01, tmp04) / l.ratio));
-  {$ifdef debug}
-  writeln('--- OPTIMIZE ---');
-  writeln(format('alpha = %-5.3f', [radtodeg(alpha)]));
-  writeln(format('P02.X = %-5.3f  P02.Y = %-5.3f', [tmp02.x, tmp02.y]));
-  writeln(format('P03.X = %-5.3f  P03.Y = %-5.3f', [tmp03.x, tmp03.y]));
-  writeln(format('P04.X = %-5.3f  P04.Y = %-5.3f', [tmp04.x, tmp04.y]));
-  writeln(format('P05.X = %-5.3f  P05.Y = %-5.3f', [tmp05.x, tmp05.y]));
-  writeln(format('P06.X = %-5.3f  P06.Y = %-5.3f', [tmp06.x, tmp06.y]));
-  writeln(format('D03   = %-5.3f', [distancebetween(tmp00, tmp03)]));
-  writeln(format('D14   = %-5.3f', [distancebetween(tmp01, tmp04)]));
-  writeln(format('CNT0  = %-5.3u', [m0]));
-  writeln(format('CNT1  = %-5.3u', [m1]));
 
-  writeln(format('MODE  = %-5.3u', [l.mode]));
-  writeln(format('R     = %-5.8f', [l.ratio]));
-  {$endif}
+  if enabledebug then
+  begin
+    writeln(format('OPTIMIZE::ALPHA  = %12.5f',                 [radtodeg(alpha) ]));
+    writeln(format('OPTIMIZE::P02.X  = %12.5f  P02.Y = %12.5f', [tmp02.x, tmp02.y]));
+    writeln(format('OPTIMIZE::P03.X  = %12.5f  P03.Y = %12.5f', [tmp03.x, tmp03.y]));
+    writeln(format('OPTIMIZE::P04.X  = %12.5f  P04.Y = %12.5f', [tmp04.x, tmp04.y]));
+    writeln(format('OPTIMIZE::P05.X  = %12.5f  P05.Y = %12.5f', [tmp05.x, tmp05.y]));
+    writeln(format('OPTIMIZE::P06.X  = %12.5f  P06.Y = %12.5f', [tmp06.x, tmp06.y]));
+    writeln(format('OPTIMIZE::D03    = %12.5f', [distancebetween(tmp00, tmp03)]));
+    writeln(format('OPTIMIZE::D14    = %12.5f', [distancebetween(tmp01, tmp04)]));
+    writeln(format('OPTIMIZE::CNT.0  = %12.5u', [m0]));
+    writeln(format('OPTIMIZE::CNT.1  = %12.5u', [m1]));
+    writeln(format('OPTIMIZE::MODE   = %12.3u', [l.mode]));
+    writeln(format('OPTIMIZE::RATIO  = %12.5f', [l.ratio]));
+  end;
 end;
 
 // tvplotter

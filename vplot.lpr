@@ -21,7 +21,6 @@
 program vplot;
 
 {$mode objfpc}
-{$i include.inc}
 
 uses
   {$ifdef unix} cthreads, {$endif} interfaces, forms, mainfrm,
@@ -31,7 +30,7 @@ uses
 
 begin
   requirederivedformresource := true;
-  application.title := 'VPlot Driver';
+  application.title := 'vPlot Driver';
   application.initialize;
   application.createform(tmainform, mainform);
   application.run;

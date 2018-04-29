@@ -22,7 +22,6 @@
 unit vpcommon;
 
 {$mode objfpc}
-{$i include.inc}
 
 interface
 
@@ -95,6 +94,9 @@ type
   function  lineangle(var line: tvpline): double;
   function  intersectlines(const l0, l1: tvpline): tvppoint;
 
+
+var
+  enabledebug: boolean = false;
 
 implementation
 
@@ -384,7 +386,28 @@ begin
 end;
 
 procedure tvppaths.add(const path: tvppath);
+var
+  i: longint;
+  j: longint;
+  k: longint;
+  t: tvppath;
 begin
+
+  i := 0;
+  while i < path.count do
+  begin
+
+
+    //for j := 0 to flist.count - 1 do
+    //  for k := 0 to flist.count -1 do
+    //t := tvppath(flist[i]);
+    // if distancebetween(t.get(k), path[i]) < 0.05 then
+
+
+
+    inc(i);
+  end;
+
   flist.add(path);
 end;
 
@@ -512,6 +535,30 @@ function tvppaths.get(index: longint): tvppath;
 begin
   result := tvppath(flist[index]);
 end;
+
+procedure initializedebug;
+begin
+  if paramcount = 1 then
+  begin
+    enabledebug := paramstr(1) = '-debug';
+    if enabledebug then
+      writeln('VPLOTTER::START-DEBUGGER');
+  end;
+end;
+
+procedure finalizedebug;
+begin
+  if enabledebug then
+    writeln('VPLOTTER::END-DEBUGGER');
+end;
+
+initialization
+
+  initializedebug;
+
+finalization
+
+  finalizedebug;
 
 end.
 

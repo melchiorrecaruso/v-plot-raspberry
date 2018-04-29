@@ -22,7 +22,6 @@
 unit mainfrm;
 
 {$mode objfpc}
-{$i include.inc}
 
 interface
 
@@ -170,30 +169,41 @@ var
   m0: longint;
   m1: longint;
 begin
+  // load layout
+  layout := tvplayout.create;
+  layout.load(changefileext(paramstr(0), '.ini'));
+  // create plotter driver
+  driver := tvpdriver.create(layout.mode);
+  driver.delay1 := layout.delay1;
+  driver.delay2 := layout.delay2;
+  driver.delay3 := layout.delay3;
+
+
+
+  // create preview, vectorial file and paths
+  bitmap := tbitmap.create;
+  vec    := tvvectorialdocument.create;
+  paths  := createpaths(vec, zerocentermi.checked, skipsmallmi.checked);
+  // update preview
+  formatcbchange (nil);
+  showtoolbarclick(nil);
+  // show toolbars
   manualdrivinggb.enabled := true;
   pagesizegb     .enabled := true;
-  // ---
-  loadlayout(layout, changefileext(paramstr(0), '.ini'));
-  driver    := tvpdriver.create(layout.mode);
-  vec       := tvvectorialdocument.create;
-  paths     := createpaths(vec, zerocentermi.checked,
-                                 skipsmallmi.checked);
-  bitmap    := tbitmap.create;
-  // ---
-  showtoolbarclick(nil);
-  formatcbchange (nil);
-  // set home
-  optimize(layout.p09, layout, m0, m1);
+  // initialize driver
+  optimize(layout.point09, layout, m0, m1);
   driver.init(m0, m1);
 end;
 
 procedure tmainform.formdestroy(sender: tobject);
 begin
+  // move to base position
   gohomebtnclick(nil);
   // ---
-  vec.destroy;
-  paths.destroy;
   driver.destroy;
+  layout.destroy;
+  paths.destroy;
+  vec.destroy;
   bitmap.destroy;
 end;
 
@@ -217,7 +227,7 @@ begin
   driver.enabled := true;
   driver.penoff  := true;
   driver.move4(-leftedit.value, 0);
-  optimize(layout.p09, layout, m0, m1);
+  optimize(layout.point09, layout, m0, m1);
   driver.init(m0, m1);
 end;
 
@@ -229,7 +239,7 @@ begin
   driver.enabled := true;
   driver.penoff  := true;
   driver.move4(+leftedit.value, 0);
-  optimize(layout.p09, layout, m0, m1);
+  optimize(layout.point09, layout, m0, m1);
   driver.init(m0, m1);
 end;
 
@@ -241,7 +251,7 @@ begin
   driver.enabled := true;
   driver.penoff  := true;
   driver.move4(0, -rightedit.value);
-  optimize(layout.p09, layout, m0, m1);
+  optimize(layout.point09, layout, m0, m1);
   driver.init(m0, m1);
 end;
 
@@ -253,7 +263,7 @@ begin
   driver.enabled := true;
   driver.penoff  := true;
   driver.move4(0, +rightedit.value);
-  optimize(layout.p09, layout, m0, m1);
+  optimize(layout.point09, layout, m0, m1);
   driver.init(m0, m1);
 end;
 
@@ -272,25 +282,44 @@ begin
 end;
 
 procedure tmainform.bordersbtnclick(sender: tobject);
+var
+  p0:   tvppoint;
+  p1:   tvppoint;
 begin
   if assigned(plotter) then exit;
-
-  formatcb.itemindex := formatcb.items.count - 1;
-  heightse.value     := layout.p11.y;
-   widthse.value     := layout.p11.x;
   formatcbchange(nil);
   gohomebtnclick(nil);
   paths.clear;
-  paths.add(interpolate_line(layout.p09, layout.p13));
-  paths.add(interpolate_line(layout.p13, layout.p10));
-  paths.add(interpolate_line(layout.p10, layout.p11));
-  paths.add(interpolate_line(layout.p11, layout.p12));
-  paths.add(interpolate_line(layout.p12, layout.p13));
-  paths.add(interpolate_line(layout.p13, layout.p09));
-  paths.zerocenter;
+  // left-bottom
+  p0.x := layout.point08.x;
+  p0.y := layout.point08.y - (heightse.value / 2);
+  p1.x := layout.point08.x - (widthse .value / 2);
+  p1.y := layout.point08.y - (heightse.value / 2);
+  paths.add(interpolate_line(p0, p1));
+  // left-top
+  p0   := p1;
+  p1.x := layout.point08.x - (widthse .value / 2);
+  p1.y := layout.point08.y + (heightse.value / 2);
+  paths.add(interpolate_line(p0, p1));
+  // right-top
+  p0   := p1;
+  p1.x := layout.point08.x + (widthse .value / 2);
+  p1.y := layout.point08.y + (heightse.value / 2);
+  paths.add(interpolate_line(p0, p1));
+  // right-bottom
+  p0   := p1;
+  p1.x := layout.point08.x + (widthse .value / 2);
+  p1.y := layout.point08.y - (heightse.value / 2);
+  paths.add(interpolate_line(p0, p1));
+  // middle-bottom
+  p0   := p1;
+  p1.x := layout.point08.x;
+  p1.y := layout.point08.y - (heightse.value / 2);
+  paths.add(interpolate_line(p0, p1));
 
+  paths.zerocenter;
   driver.enabled  := true;
-  driver.penoff   := false;
+  driver.penoff   := true;
   plotter         := tvplotter.create(paths);
   plotter.onstart := @onplotterstart;
   plotter.onstop  := @onplotterstop;
@@ -300,22 +329,31 @@ begin
 end;
 
 procedure tmainform.movebottonmiclick(sender: tobject);
+var
+  p0: tvppoint;
+  p1: tvppoint;
 begin
   if assigned(plotter) then exit;
-
-  formatcb.itemindex := formatcb.items.count - 1;
-  heightse.value     := layout.p11.y;
-   widthse.value     := layout.p11.x;
   formatcbchange(nil);
   gohomebtnclick(nil);
   paths.clear;
-  paths.add(interpolate_line(layout.p09, layout.p13));
-  paths.add(interpolate_line(layout.p13, layout.p12));
-  paths.add(interpolate_line(layout.p12, layout.p09));
-  paths.zerocenter;
+  // left-bottom
+  p0.x := layout.point08.x - (widthse .value / 2);
+  p0.y := layout.point08.y - (heightse.value / 2);
+  p1.x := layout.point08.x + (widthse .value / 2);
+  p1.y := layout.point08.y - (heightse.value / 2);
+  paths.add(interpolate_line(p0, p1));
+  // right-bottom
+  p0.x := layout.point08.x + (widthse .value / 2);
+  p0.y := layout.point08.y - (heightse.value / 2);
+  p1.x := layout.point08.x;
+  p1.y := layout.point08.y + (heightse.value / 2);
 
+  paths.add(interpolate_line(p0, p1));
+
+  paths.zerocenter;
   driver.enabled  := true;
-  driver.penoff   := false;
+  driver.penoff   := true;
   plotter         := tvplotter.create(paths);
   plotter.onstart := @onplotterstart;
   plotter.onstop  := @onplotterstop;
@@ -333,7 +371,7 @@ begin
 
   driver.enabled := true;
   driver.penoff  := true;
-  optimize(layout.p09, layout, m0, m1);
+  optimize(layout.point09, layout, m0, m1);
   driver.move2(m0, m1);
 end;
 
@@ -383,7 +421,7 @@ procedure tmainform.openbtnclick(sender: tobject);
 begin
   if assigned(plotter) then exit;
 
-  // opendialog.filter := 'dxf files (*.dxf)|*.dxf';
+  opendialog.filter := 'dxf files (*.dxf)|*.dxf';
   if opendialog.execute then
   begin
     lock2(false);
@@ -470,27 +508,27 @@ procedure tmainform.clearallmiclick(sender: tobject);
 begin
   if assigned(plotter) then exit;
   // ---
-  caption := 'vPlotter';
+  caption := 'vPlotter 2.0';
   // ---
   bitmap.canvas.pen  .color := clltgray;
   bitmap.canvas.brush.color := clltgray;
   bitmap.canvas.brush.style := bssolid;
   bitmap.setsize(
-     widthse.value,
-    heightse.value);
+     widthse.value + 1,
+    heightse.value + 1);
   bitmap.canvas.fillrect(0, 0,
-     widthse.value,
-    heightse.value);
+     widthse.value + 1,
+    heightse.value + 1);
   // ---
   image.canvas.pen  .color := clltgray;
   image.canvas.brush.color := clltgray;
   image.canvas.brush.style := bssolid;
   image.picture.bitmap.setsize(
-     widthse.value,
-    heightse.value);
+     widthse.value + 1,
+    heightse.value + 1);
   image.canvas.fillrect(0, 0,
-     widthse.value,
-    heightse.value);
+     widthse.value + 1,
+    heightse.value + 1);
   // ---
   image.align             := alnone;
   image.anchors           := [aktop, akleft, akright, akbottom];
@@ -626,6 +664,17 @@ begin
       widthse .value := amax;
     end;
   end;
+
+  if (heightse.value > (layout.height)) or
+     (widthse .value > (layout.width )) then
+  begin
+    messagedlg('vPlotter Error', 'Selected page size is bigger than work area !',
+      mterror, [mbok], 0);
+
+    formatcb.itemindex :=
+      formatcb.items.count - 2;
+    formatcbchange (nil);
+  end;
   clearallmiclick(sender);
 end;
 
@@ -722,8 +771,8 @@ begin
   p.x := offsetxse.value + plotter.px;
   p.y := offsetyse.value + plotter.py;
 
-  if abs(p.x) > ( widthse.value div 2) then exit;
-  if abs(p.y) > (heightse.value div 2) then exit;
+  if abs(p.x) > (bitmap.width  div 2) then exit;
+  if abs(p.y) > (bitmap.height div 2) then exit;
 
   bitmap.canvas.pixels[
     trunc(( widthse.value div 2) + offsetxse.value + plotter.px),
@@ -731,8 +780,8 @@ begin
 
   if driver.enabled then
   begin
-    p.x := layout.p08.x + p.x;
-    p.y := layout.p08.y + p.y;
+    p.x := layout.point08.x + p.x;
+    p.y := layout.point08.y + p.y;
     optimize(p, layout, m0, m1);
     driver.move2(m0, m1);
   end;

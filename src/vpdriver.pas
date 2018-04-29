@@ -22,12 +22,11 @@
 unit vpdriver;
 
 {$mode objfpc}
-{$i include.inc}
 
 interface
 
 uses
-  classes, {$ifdef cpuarm} pca9685, wiringpi, {$endif} sysutils;
+  classes, {$ifdef cpuarm} pca9685, wiringpi, {$endif} sysutils, vpcommon;
 
 type
   tvpdriver = class
@@ -53,9 +52,9 @@ type
   published
     property cnt0:    longint read fcnt0;
     property cnt1:    longint read fcnt1;
-    property delay1:  longint read fdelay1 write fdelay1;
-    property delay2:  longint read fdelay2 write fdelay2;
-    property delay3:  longint read fdelay3 write fdelay3;
+    property delay1:  longint read fdelay1  write fdelay1;
+    property delay2:  longint read fdelay2  write fdelay2;
+    property delay3:  longint read fdelay3  write fdelay3;
     property enabled: boolean read fenabled write fenabled;
     property pen:     boolean read fpen     write setpen;
     property penoff:  boolean read fpenoff  write setpenoff;
@@ -76,10 +75,8 @@ const
   motx_mod1     = P13;
   motx_mod2     = P11;
 
-  motz_maxvalue = 2.50;
+  motz_maxvalue = 1.00;
   motz_minvalue = 0.50;
-  motz_rstvalue = 1.50;
-  motz_incvalue = 0.10;
   motz_freq     = 50;
 
   vplotmatrix : array [0..10, 0..18] of longint = (
@@ -99,13 +96,16 @@ const
 constructor tvpdriver.create(mode: longint);
 begin
   inherited create;
+  fenabled := false;
+  fpen     := false;
+  fpenoff  := false;
   {$ifdef cpuarm}
   // setup wiringpi library
   wiringpisetup;
   // setup pca9685 library
   pca9685setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, motz_freq);
   // init servo
-  pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
+  pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq));
   delaymicroseconds(fdelay3);
   // init mode
   pinmode(motx_mod0, OUTPUT);
@@ -140,12 +140,6 @@ begin
   digitalwrite(mot1_dir,  LOW);
   digitalwrite(mot1_step, LOW);
   {$endif}
-  fdelay1  := 1500;
-  fdelay2  := 3500;
-  fdelay3  := 400000;
-  fenabled := false;
-  fpen     := false;
-  fpenoff  := false;
 end;
 
 destructor tvpdriver.destroy;
@@ -245,9 +239,9 @@ begin
       fpen := value;
       {$ifdef cpuarm}
       if fpen then
-        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq))
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_minvalue, motz_freq))
       else
-        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq));
       delaymicroseconds(fdelay3);
       {$endif}
     end;
@@ -261,7 +255,7 @@ begin
     begin
       fpen := false;
       {$ifdef cpuarm}
-      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_rstvalue, motz_freq));
+      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_maxvalue, motz_freq));
       delaymicroseconds(fdelay3);
       {$endif}
     end;
@@ -289,10 +283,12 @@ begin
       end else
         largedisplacements(cnt0, cnt1);
     end;
-  {$ifdef debug}
-  writeln('fcount0 = ', fcnt0);
-  writeln('fcount1 = ', fcnt1);
-  {$endif}
+
+  if enabledebug then
+  begin
+    writeln(format('  DRIVER::CNT.0  = %12.5u', [fcnt0]));
+    writeln(format('  DRIVER::CNT.1  = %12.5u', [fcnt1]));
+  end;
 end;
 
 end.
