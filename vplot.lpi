@@ -604,9 +604,8 @@
       <Unit77>
         <Filename Value="src/vplayout.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="144"/>
+        <TopLine Value="142"/>
         <CursorPos X="24" Y="39"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -667,9 +666,10 @@
       <Unit85>
         <Filename Value="src/vpcommon.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="516"/>
-        <CursorPos X="29" Y="406"/>
+        <TopLine Value="539"/>
+        <CursorPos X="45" Y="558"/>
         <UsageCount Value="166"/>
         <Loaded Value="True"/>
       </Unit85>
@@ -758,7 +758,7 @@
         <UsageCount Value="10"/>
       </Unit96>
     </Units>
-    <JumpHistory Count="29" HistoryIndex="28">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="src/vpcoder.pas"/>
         <Caret Line="65" Column="25" TopLine="48"/>
@@ -875,6 +875,10 @@
         <Filename Value="src/aboutfrm.pas"/>
         <Caret Line="25" Column="90" TopLine="7"/>
       </Position29>
+      <Position30>
+        <Filename Value="src/vpcommon.pas"/>
+        <Caret Line="557" Column="48" TopLine="543"/>
+      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

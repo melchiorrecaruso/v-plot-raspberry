@@ -554,7 +554,8 @@ procedure initializedebug;
 begin
   if paramcount = 1 then
   begin
-    enabledebug := paramstr(1) = '-debug';
+    enabledebug := (paramstr(1) =  '-debug') or
+                   (paramstr(1) = '--debug');
     if enabledebug then
       writeln('VPLOTTER::START-DEBUGGER');
   end;
