@@ -1,7 +1,6 @@
 unit vpsketch;
 
 {$mode objfpc}
-{$i include.inc}
 
 interface
 
