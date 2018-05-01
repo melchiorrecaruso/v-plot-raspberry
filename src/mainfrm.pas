@@ -41,20 +41,22 @@ type
     line2mi: tmenuitem;
     killmi: tmenuitem;
     MenuItem1: TMenuItem;
-    MenuItem2: TMenuItem;
+    MenuItem3: TMenuItem;
+    movetopmi: TMenuItem;
+    MenuItem5: TMenuItem;
+    MenuItem6: TMenuItem;
+    MenuItem7: TMenuItem;
+    MenuItem8: TMenuItem;
     showpagesizepanelmi: TMenuItem;
     showcalibrationpanelmi: TMenuItem;
-    pagemi: tmenuitem;
     timer: TTimer;
     updatemi: TMenuItem;
     clearmi: TMenuItem;
     calibrationmi: TMenuItem;
     movebordersmi: TMenuItem;
-    movebottonmi: TMenuItem;
+    movebottommi: TMenuItem;
     line4mi: TMenuItem;
     movetohomemi: TMenuItem;
-    skipsmallmi: tmenuitem;
-    zerocentermi: tmenuitem;
     startmi: tmenuitem;
     stopmi: tmenuitem;
     infomi: tmenuitem;
@@ -88,7 +90,8 @@ type
  
     procedure aboutmiclick(sender: tobject);
     procedure clearallmiclick(sender: tobject);
-    procedure bordersbtnclick(sender: tobject);
+
+    procedure movebordersmiclick(sender: tobject);
     procedure closemiclick(sender: tobject);
     procedure exitmiclick(sender: tobject);
 
@@ -108,10 +111,11 @@ type
 
     procedure leftupbtnclick   (sender: tobject);
     procedure MenuItem2Click(Sender: TObject);
-    procedure movebottonmiclick(sender: tobject);
+    procedure movetopmiClick(Sender: TObject);
+    procedure movebottommiClick(sender: tobject);
 
     procedure showtoolbarclick(sender: tobject);
-    procedure skipsmallmiclick(sender: tobject);
+
     procedure startmiclick(sender: tobject);
     procedure pendownbtnclick  (sender: tobject);
     procedure penupbtnclick    (sender: tobject);
@@ -128,7 +132,7 @@ type
 
     procedure verticalcbeditingdone(sender: tobject);
     procedure widthseeditingdone(sender: tobject);
-    procedure zerocentermiclick(sender: tobject);
+
   private
       bitmap: tbitmap;
        paths: tvppaths;
@@ -185,7 +189,7 @@ begin
   // create preview, vectorial file and paths
   bitmap := tbitmap.create;
   vec    := tvvectorialdocument.create;
-  paths  := createpaths(vec, zerocentermi.checked, skipsmallmi.checked);
+  paths  := createpaths(vec);
   // update preview
   formatcbchange (nil);
   showtoolbarclick(nil);
@@ -283,14 +287,13 @@ begin
   driver.pen     := false;
 end;
 
-procedure tmainform.bordersbtnclick(sender: tobject);
+procedure tmainform.movebordersmiclick(sender: tobject);
 var
   p0:   tvppoint;
   p1:   tvppoint;
 begin
   if assigned(plotter) then exit;
-  formatcbchange(nil);
-  gohomebtnclick(nil);
+
   paths.clear;
   // left-bottom
   p0.x := layout.point08.x;
@@ -321,7 +324,7 @@ begin
 
   paths.zerocenter;
   driver.enabled  := true;
-  driver.penoff   := false;
+  driver.penoff   := sender = movebordersmi;
   plotter         := tvplotter.create(paths);
   plotter.onstart := @onplotterstart;
   plotter.onstop  := @onplotterstop;
@@ -330,32 +333,60 @@ begin
   elapsed := 1;
 end;
 
-procedure tmainform.movebottonmiclick(sender: tobject);
+procedure tmainform.movebottommiclick(sender: tobject);
 var
   p0: tvppoint;
   p1: tvppoint;
 begin
   if assigned(plotter) then exit;
-  formatcbchange(nil);
-  gohomebtnclick(nil);
+
   paths.clear;
-  // left-bottom
+  // form left-bottom to right-bottom
   p0.x := layout.point08.x - (widthse .value / 2);
   p0.y := layout.point08.y - (heightse.value / 2);
   p1.x := layout.point08.x + (widthse .value / 2);
   p1.y := layout.point08.y - (heightse.value / 2);
   paths.add(interpolate_line(p0, p1));
-  // right-bottom
-  p0.x := layout.point08.x + (widthse .value / 2);
-  p0.y := layout.point08.y - (heightse.value / 2);
-  p1.x := layout.point08.x;
-  p1.y := layout.point08.y + (heightse.value / 2);
-
+  // form right-bottom to middle-top
+  p0.x := layout.point08.x;
+  p0.y := layout.point08.y + (heightse.value / 2);
+  p1   := p0;
   paths.add(interpolate_line(p0, p1));
 
   paths.zerocenter;
   driver.enabled  := true;
-  driver.penoff   := false;
+  driver.penoff   := sender = movebottommi;
+  plotter         := tvplotter.create(paths);
+  plotter.onstart := @onplotterstart;
+  plotter.onstop  := @onplotterstop;
+  plotter.ontick  := @onplottertick;
+  plotter.start;
+  elapsed := 1;
+end;
+
+procedure tmainform.movetopmiclick(Sender: TObject);
+var
+  p0: tvppoint;
+  p1: tvppoint;
+begin
+  if assigned(plotter) then exit;
+
+  paths.clear;
+  // form left-top to right-top
+  p0.x := layout.point08.x - (widthse .value / 2);
+  p0.y := layout.point08.y + (heightse.value / 2);
+  p1.x := layout.point08.x + (widthse .value / 2);
+  p1.y := layout.point08.y + (heightse.value / 2);
+  paths.add(interpolate_line(p0, p1));
+  // form right-top to middle-bottom
+  p0.x := layout.point08.x;
+  p0.y := layout.point08.y - (heightse.value / 2);
+  p1   := p0;
+  paths.add(interpolate_line(p0, p1));
+
+  paths.zerocenter;
+  driver.enabled  := true;
+  driver.penoff   := sender = movetopmi;
   plotter         := tvplotter.create(paths);
   plotter.onstart := @onplotterstart;
   plotter.onstop  := @onplotterstop;
@@ -437,8 +468,7 @@ begin
       freeandnil(vec);
       vec := tvvectorialdocument.create;
     end;
-    paths := createpaths(vec, zerocentermi.checked,
-                               skipsmallmi.checked);
+    paths := createpaths(vec);
     lock2(true);
   end;
 end;
@@ -459,8 +489,7 @@ begin
       freeandnil(vec);
       vec := tvvectorialdocument.create;
     end;
-    paths := createpaths(vec, zerocentermi.checked,
-                               skipsmallmi.checked);
+    paths := createpaths(vec);
     lock2(true);
   end;
 end;
@@ -473,8 +502,7 @@ begin
   freeandnil(paths);
   freeandnil(vec);
   vec   := tvvectorialdocument.create;
-  paths := createpaths(vec, zerocentermi.checked,
-                             skipsmallmi.checked);
+  paths := createpaths(vec);
   clearallmiclick(sender);
   lock2(true);
 end;
@@ -603,28 +631,6 @@ begin
   end;
 end;
 
-// OPTION menumenu
-
-procedure tmainform.zerocentermiclick(sender: tobject);
-begin
-  zerocentermi.checked := not zerocentermi.checked;
-  begin
-    freeandnil(paths);
-    paths := createpaths(vec, zerocentermi.checked,
-                               skipsmallmi.checked);
-  end;
-end;
-
-procedure tmainform.skipsmallmiclick(sender: tobject);
-begin
-  skipsmallmi.checked := not skipsmallmi.checked;
-  begin
-    freeandnil(paths);
-    paths := createpaths(vec, zerocentermi.checked,
-                               skipsmallmi.checked);
-  end;
-end;
-
 // INFO mainmenu
 
 procedure tmainform.aboutmiclick(sender: tobject);
@@ -711,10 +717,8 @@ begin
   exitmi       .enabled := value;
   updatemi     .enabled := value;
   clearmi      .enabled := value;
-  zerocentermi .enabled := value;
-  skipsmallmi  .enabled := value;
   movebordersmi.enabled := value;
-  movebottonmi .enabled := value;
+  movebottommi .enabled := value;
   movetohomemi .enabled := value;
   // calibration
   leftupbtn    .enabled := value;
@@ -741,13 +745,11 @@ begin
   exitmi       .enabled := value;
   updatemi     .enabled := value;
   clearmi      .enabled := value;
-  zerocentermi .enabled := value;
-  skipsmallmi  .enabled := value;
   startmi      .enabled := value;
   stopmi       .enabled := value;
   killmi       .enabled := value;
   movebordersmi.enabled := value;
-  movebottonmi .enabled := value;
+  movebottommi .enabled := value;
   movetohomemi .enabled := value;
   // calibration
   leftupbtn    .enabled := value;

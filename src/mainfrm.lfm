@@ -1,7 +1,7 @@
 object mainform: Tmainform
-  Left = 203
+  Left = 387
   Height = 467
-  Top = 133
+  Top = 132
   Width = 923
   Anchors = []
   Caption = 'vPlotter 2.0'
@@ -416,10 +416,6 @@ object mainform: Tmainform
         Caption = 'Exit'
         OnClick = exitmiClick
       end
-      object MenuItem2: TMenuItem
-        Caption = 'MenuItem2'
-        OnClick = MenuItem2Click
-      end
     end
     object MenuItem1: TMenuItem
       Caption = 'View'
@@ -432,18 +428,6 @@ object mainform: Tmainform
         Caption = 'Calibration Panel'
         Checked = True
         OnClick = showtoolbarclick
-      end
-    end
-    object pagemi: TMenuItem
-      Caption = 'Page'
-      object zerocentermi: TMenuItem
-        Caption = 'Plot On Centre'
-        Checked = True
-        OnClick = zerocentermiClick
-      end
-      object skipsmallmi: TMenuItem
-        Caption = 'Skip small paths'
-        OnClick = skipsmallmiClick
       end
     end
     object plotmi: TMenuItem
@@ -480,15 +464,37 @@ object mainform: Tmainform
       Caption = 'Calibration'
       object movebordersmi: TMenuItem
         Caption = 'Move on Borders'
-        OnClick = bordersbtnClick
+        OnClick = movebordersmiclick
       end
-      object movebottonmi: TMenuItem
+      object movetopmi: TMenuItem
+        Caption = 'Move on Top Border'
+        OnClick = movetopmiClick
+      end
+      object movebottommi: TMenuItem
         Caption = 'Move on Botton Border'
-        OnClick = movebottonmiClick
+        OnClick = movebottommiClick
+      end
+      object MenuItem3: TMenuItem
+        Caption = '-'
       end
       object movetohomemi: TMenuItem
         Caption = 'Move to Home'
         OnClick = gohomebtnClick
+      end
+      object MenuItem5: TMenuItem
+        Caption = '-'
+      end
+      object MenuItem6: TMenuItem
+        Caption = 'Write Borders'
+        OnClick = movebordersmiclick
+      end
+      object MenuItem7: TMenuItem
+        Caption = 'Write Top Border'
+        OnClick = movetopmiClick
+      end
+      object MenuItem8: TMenuItem
+        Caption = 'Write Bottom Border'
+        OnClick = movebottommiClick
       end
     end
     object infomi: TMenuItem

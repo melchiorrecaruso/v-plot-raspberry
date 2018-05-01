@@ -62,10 +62,7 @@ type
   function interpolate_circlearc(const entity: tvcirculararc): tvppath;
   function interpolate_path(const entity: tpath): tvppath;
 
-  function  createpaths(
-           vec: tvvectorialdocument;
-    zerocenter: boolean;
-     skipsmall: boolean): tvppaths;
+  function  createpaths(vec: tvvectorialdocument): tvppaths;
 
   procedure optimize(const p: tvppoint; const l: tvplayout; var m0, m1: longint);
 
@@ -315,9 +312,7 @@ end;
 
 // createpaths
 
-function  createpaths(vec: tvvectorialdocument;
-  zerocenter: boolean;
-  skipsmall:  boolean): tvppaths;
+function  createpaths(vec: tvvectorialdocument): tvppaths;
 var
     i, j: longint;
   entity: tventity;
@@ -356,10 +351,8 @@ begin
   end;
 
   result.createtoolpath;
-  if zerocenter then
-    result.zerocenter;
-  if skipsmall then
-    result.deletesmallpaths;
+  result.zerocenter;
+//result.deletesmallpaths;
 end;
 
 end.
