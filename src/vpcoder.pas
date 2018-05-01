@@ -327,6 +327,7 @@ begin
   result := tvppaths.create;
   for i := 0 to vec.getpagecount - 1 do
   begin
+
     page := vec.getpageasvectorial(i);
     for j := 0 to page.getentitiescount - 1 do
     begin
@@ -345,9 +346,8 @@ begin
         path := interpolate_path(tpath(entity))
       end else
       begin
-        {$ifdef debug}
-        writeln(entity.classname);
-        {$endif}
+        if enabledebug then
+          writeln(entity.classname);
       end;
 
       if assigned(path) then

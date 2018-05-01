@@ -55,6 +55,7 @@ type
     procedure   add(const point: tvppoint);
     procedure   insert(index: longint; const point: tvppoint);
     procedure   delete(index: longint);
+    function    find(p: pvppoint): longint;
     procedure   clear;
     procedure   invert;
     function    getlen: double;
@@ -73,7 +74,7 @@ type
   public
     constructor create;
     destructor  destroy; override;
-    procedure   add(const path: tvppath);
+    procedure   add(path: tvppath);
     procedure   delete(index: longint);
     procedure   clear;
     procedure   createtoolpath;
@@ -274,6 +275,19 @@ begin
   flist.delete(index);
 end;
 
+function tvppath.find(p: pvppoint): longint;
+var
+  i: longint;
+begin
+  result := -1;
+  for i := 0 to flist.count - 1 do
+    if comparepoint(p, pvppoint(flist[i])) then
+    begin
+      result := i;
+      exit;
+    end;
+end;
+
 procedure tvppath.clear;
 begin
   while flist.count > 0 do
@@ -385,30 +399,30 @@ begin
   end;
 end;
 
-procedure tvppaths.add(const path: tvppath);
-var
-  i: longint;
-  j: longint;
-  k: longint;
-  t: tvppath;
+procedure tvppaths.add(path: tvppath);
+//var
+//  i: longint;
+//  j: longint;
+//  k: longint;
 begin
+// DELETE OVERLAP POINT
+//for i := path.count - 1 downto 0 do
+//  for j := flist.count - 1 downto 0 do
+//  begin
+//    k := tvppath(flist[j]).find(path.item[i]);
+//    if k <> - 1 then
+//    begin
+//      path.delete(i);
+//      break;
+//    end;
+//  end;
+//if path.getlen = 0 then
+//begin
+//  path.destroy;
+//  path := nil;
 
-  i := 0;
-  while i < path.count do
-  begin
-
-
-    //for j := 0 to flist.count - 1 do
-    //  for k := 0 to flist.count -1 do
-    //t := tvppath(flist[i]);
-    // if distancebetween(t.get(k), path[i]) < 0.05 then
-
-
-
-    inc(i);
-  end;
-
-  flist.add(path);
+  if assigned(path) then
+    flist.add(path)
 end;
 
 procedure tvppaths.zerocenter;

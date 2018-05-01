@@ -41,6 +41,7 @@ type
     line2mi: tmenuitem;
     killmi: tmenuitem;
     MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
     showpagesizepanelmi: TMenuItem;
     showcalibrationpanelmi: TMenuItem;
     pagemi: tmenuitem;
@@ -106,6 +107,7 @@ type
     procedure leftdownbtnclick(sender: tobject);
 
     procedure leftupbtnclick   (sender: tobject);
+    procedure MenuItem2Click(Sender: TObject);
     procedure movebottonmiclick(sender: tobject);
 
     procedure showtoolbarclick(sender: tobject);
@@ -428,6 +430,28 @@ begin
     freeandnil(paths);
     freeandnil(vec);
     vec := tvvectorialdocument.create;
+    try
+      vec.readfromfile(opendialog.filename,
+        vec.getformatfromextension(opendialog.filename));
+    except
+      freeandnil(vec);
+      vec := tvvectorialdocument.create;
+    end;
+    paths := createpaths(vec, zerocentermi.checked,
+                               skipsmallmi.checked);
+    lock2(true);
+  end;
+end;
+
+procedure tmainform.MenuItem2Click(Sender: TObject);
+begin
+  if assigned(plotter) then exit;
+
+  opendialog.filter := 'dxf files (*.dxf)|*.dxf';
+  if opendialog.execute then
+  begin
+    lock2(false);
+    freeandnil(paths);
     try
       vec.readfromfile(opendialog.filename,
         vec.getformatfromextension(opendialog.filename));
