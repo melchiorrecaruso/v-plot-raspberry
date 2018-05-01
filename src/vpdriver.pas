@@ -37,14 +37,16 @@ type
     fdelay2:  longint;
     fdelay3:  longint;
     fenabled: boolean;
+    fmode:    longint;
     fpen:     boolean;
     fpenoff:  boolean;
+    procedure setmode(value: longint);
     procedure setpen(value: boolean);
     procedure setpenoff(value: boolean);
     procedure largedisplacements(cnt0, cnt1: longint);
     procedure smalldisplacements(cnt0, cnt1: longint);
   public
-    constructor create(mode: longint);
+    constructor create;
     destructor  destroy; override;
     procedure   init (cnt0, cnt1: longint);
     procedure   move2(cnt0, cnt1: longint);
@@ -56,6 +58,7 @@ type
     property delay2:  longint read fdelay2  write fdelay2;
     property delay3:  longint read fdelay3  write fdelay3;
     property enabled: boolean read fenabled write fenabled;
+    property mode:    longint read fmode    write setmode;
     property pen:     boolean read fpen     write setpen;
     property penoff:  boolean read fpenoff  write setpenoff;
   end;
@@ -93,10 +96,11 @@ const
     (1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1)); // 10
 {$endif}
 
-constructor tvpdriver.create(mode: longint);
+constructor tvpdriver.create;
 begin
   inherited create;
   fenabled := false;
+  fmode    := 1;
   fpen     := false;
   fpenoff  := false;
   {$ifdef cpuarm}
@@ -107,28 +111,13 @@ begin
   // init servo
   pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_up, motz_freq));
   delaymicroseconds(fdelay3);
-  // init mode
+  // init mode = 1
   pinmode(motx_mod0, OUTPUT);
   pinmode(motx_mod1, OUTPUT);
   pinmode(motx_mod2, OUTPUT);
-
-  if mode = 1 then
-  begin
-    digitalwrite(motx_mod0,  LOW);
-    digitalwrite(motx_mod1,  LOW);
-    digitalwrite(motx_mod2,  LOW);
-  end else
-  if mode = 2 then
-  begin
-    digitalwrite(motx_mod0, HIGH);
-    digitalwrite(motx_mod1,  LOW);
-    digitalwrite(motx_mod2,  LOW);
-  end else
-  begin
-    digitalwrite(motx_mod0,  LOW);
-    digitalwrite(motx_mod1, HIGH);
-    digitalwrite(motx_mod2,  LOW);
-  end;
+  digitalwrite(motx_mod0,  LOW);
+  digitalwrite(motx_mod1,  LOW);
+  digitalwrite(motx_mod2,  LOW);
   // init step motor0
   pinmode(mot0_dir,    OUTPUT);
   pinmode(mot0_step,   OUTPUT);
@@ -259,6 +248,36 @@ begin
       delaymicroseconds(fdelay3);
       {$endif}
     end;
+end;
+
+procedure tvpdriver.setmode(value: longint);
+begin
+  if value <> fmode then
+  begin
+    {$ifdef cpuarm}
+    if mode = 1 then
+    begin
+      digitalwrite(motx_mod0,  LOW);
+      digitalwrite(motx_mod1,  LOW);
+      digitalwrite(motx_mod2,  LOW);
+      fmode := value;
+    end else
+    if mode = 2 then
+    begin
+      digitalwrite(motx_mod0, HIGH);
+      digitalwrite(motx_mod1,  LOW);
+      digitalwrite(motx_mod2,  LOW);
+      fmode := value;
+    end else
+    if fmode = 4 then
+    begin
+      digitalwrite(motx_mod0,  LOW);
+      digitalwrite(motx_mod1, HIGH);
+      digitalwrite(motx_mod2,  LOW);
+      fmode := value;
+    end;
+    {$endif}
+  end;
 end;
 
 procedure tvpdriver.move2(cnt0, cnt1: longint);

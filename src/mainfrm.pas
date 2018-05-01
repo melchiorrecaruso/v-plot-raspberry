@@ -41,7 +41,9 @@ type
     line2mi: tmenuitem;
     killmi: tmenuitem;
     MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
     MenuItem3: TMenuItem;
+    layoutmi: TMenuItem;
     movetopmi: TMenuItem;
     MenuItem5: TMenuItem;
     MenuItem6: TMenuItem;
@@ -90,6 +92,7 @@ type
  
     procedure aboutmiclick(sender: tobject);
     procedure clearallmiclick(sender: tobject);
+    procedure layoutmiclick(sender: tobject);
 
     procedure movebordersmiclick(sender: tobject);
     procedure closemiclick(sender: tobject);
@@ -179,13 +182,11 @@ begin
   layout := tvplayout.create;
   layout.load(changefileext(paramstr(0), '.ini'));
   // create plotter driver
-  driver := tvpdriver.create(layout.mode);
+  driver := tvpdriver.create;
+  driver.mode   := layout.mode;
   driver.delay1 := layout.delay1;
   driver.delay2 := layout.delay2;
   driver.delay3 := layout.delay3;
-
-
-
   // create preview, vectorial file and paths
   bitmap := tbitmap.create;
   vec    := tvvectorialdocument.create;
@@ -393,6 +394,27 @@ begin
   plotter.ontick  := @onplottertick;
   plotter.start;
   elapsed := 1;
+end;
+
+procedure tmainform.layoutmiclick(Sender: TObject);
+var
+  m0: longint;
+  m1: longint;
+begin
+  if assigned(plotter) then exit;
+
+  gohomebtnclick(nil);
+  // load configuration
+  layout.clear;
+  layout.load(changefileext(paramstr(0), '.ini'));
+  // update plotter driver
+  driver.mode   := layout.mode;
+  driver.delay1 := layout.delay1;
+  driver.delay2 := layout.delay2;
+  driver.delay3 := layout.delay3;
+
+  optimize(layout.point09, layout, m0, m1);
+  driver.init(m0, m1);
 end;
 
 procedure tmainform.gohomebtnclick(sender: tobject);

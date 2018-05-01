@@ -496,6 +496,13 @@ object mainform: Tmainform
         Caption = 'Write Bottom Border'
         OnClick = movebottommiClick
       end
+      object MenuItem2: TMenuItem
+        Caption = '-'
+      end
+      object layoutmi: TMenuItem
+        Caption = 'Reload Configuration'
+        OnClick = layoutmiClick
+      end
     end
     object infomi: TMenuItem
       Caption = 'Info'

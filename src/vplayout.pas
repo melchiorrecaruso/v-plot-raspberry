@@ -57,6 +57,7 @@ type
     constructor create;
     destructor destroy; override;
     procedure load(const filename: rawbytestring);
+    procedure clear;
  public
     property point00: tvppoint read fpoint00;
     property point01: tvppoint read fpoint01;
@@ -88,6 +89,16 @@ uses
 constructor tvplayout.create;
 begin
   inherited create;
+  clear;
+end;
+
+destructor tvplayout.destroy;
+begin
+  inherited destroy;
+end;
+
+procedure tvplayout.clear;
+begin
   fpoint00.x := 0;
   fpoint00.y := 0;
   fpoint01.x := 0;
@@ -116,11 +127,6 @@ begin
   fdelay1    := 0;
   fdelay2    := 0;
   fdelay3    := 0;
-end;
-
-destructor tvplayout.destroy;
-begin
-  inherited destroy;
 end;
 
 procedure tvplayout.load(const filename: rawbytestring);
