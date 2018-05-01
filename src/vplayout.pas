@@ -37,7 +37,6 @@ type
     fpoint03: tvppoint;
     fpoint04: tvppoint;
     fpoint05: tvppoint;
-
     fpoint08: tvppoint;
     fpoint09: tvppoint;
 
@@ -143,6 +142,8 @@ begin
     fpoint04.y := ini.readfloat  ('Layout',  'P04.Y',  0);
     fpoint05.x := ini.readfloat  ('Layout',  'P05.X',  0);
     fpoint05.y := ini.readfloat  ('Layout',  'P05.Y',  0);
+    fpoint09.x := ini.readfloat  ('Layout',  'P09.X',  0);
+    fpoint09.y := ini.readfloat  ('Layout',  'P09.Y',  0);
 
     ftop       := ini.readfloat  ('Borders', 'TOP',    0);
     fbottom    := ini.readfloat  ('Borders', 'BOTTOM', 0);
@@ -160,10 +161,6 @@ begin
   end;
   fpoint08.x   := ((fleft   ) + (fpoint01.x - fright)) / 2;
   fpoint08.y   := ((fbottom ) + (fpoint01.y - ftop  )) / 2;
-
-  fpoint09.x   := fpoint01.x / 2;
-  //fpoint09.y   := fpoint01.y - ftop;
-  fpoint09.y   := fbottom;
 
   if enabledebug then
   begin

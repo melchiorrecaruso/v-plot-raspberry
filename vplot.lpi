@@ -604,9 +604,10 @@
       <Unit77>
         <Filename Value="src/vplayout.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="143"/>
-        <CursorPos X="64" Y="158"/>
+        <TopLine Value="144"/>
+        <CursorPos X="24" Y="39"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit77>
@@ -735,9 +736,8 @@
       <Unit94>
         <Filename Value="src/vpsketch.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <CursorPos X="15" Y="3"/>
+        <CursorPos X="28" Y="19"/>
         <UsageCount Value="41"/>
         <Loaded Value="True"/>
       </Unit94>
