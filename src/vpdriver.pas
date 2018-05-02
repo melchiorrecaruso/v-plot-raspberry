@@ -255,21 +255,21 @@ begin
   if value <> fmode then
   begin
     {$ifdef cpuarm}
-    if mode = 1 then
+    if value = 1 then
     begin
       digitalwrite(motx_mod0,  LOW);
       digitalwrite(motx_mod1,  LOW);
       digitalwrite(motx_mod2,  LOW);
       fmode := value;
     end else
-    if mode = 2 then
+    if value = 2 then
     begin
       digitalwrite(motx_mod0, HIGH);
       digitalwrite(motx_mod1,  LOW);
       digitalwrite(motx_mod2,  LOW);
       fmode := value;
     end else
-    if fmode = 4 then
+    if value = 4 then
     begin
       digitalwrite(motx_mod0,  LOW);
       digitalwrite(motx_mod1, HIGH);
