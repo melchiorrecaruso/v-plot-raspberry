@@ -482,14 +482,14 @@ object mainform: Tmainform
         Caption = 'Move on Right Border'
         OnClick = moverightmiClick
       end
-      object MenuItem3: TMenuItem
+      object line5mi: TMenuItem
         Caption = '-'
       end
       object movetohomemi: TMenuItem
         Caption = 'Move to Home'
         OnClick = gohomebtnClick
       end
-      object MenuItem5: TMenuItem
+      object line6mi: TMenuItem
         Caption = '-'
       end
       object writebordersmi: TMenuItem
@@ -512,7 +512,7 @@ object mainform: Tmainform
         Caption = 'Write Right Border'
         OnClick = moverightmiClick
       end
-      object MenuItem2: TMenuItem
+      object line7mi: TMenuItem
         Caption = '-'
       end
       object layoutmi: TMenuItem

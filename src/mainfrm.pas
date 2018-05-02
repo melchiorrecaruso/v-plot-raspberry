@@ -43,13 +43,13 @@ type
     MenuItem1: TMenuItem;
     writeleftmi: TMenuItem;
     writerightmi: TMenuItem;
-    MenuItem2: TMenuItem;
-    MenuItem3: TMenuItem;
+    line7mi: TMenuItem;
+    line5mi: TMenuItem;
     layoutmi: TMenuItem;
     moveleftmi: TMenuItem;
     moverightmi: TMenuItem;
     movetopmi: TMenuItem;
-    MenuItem5: TMenuItem;
+    line6mi: TMenuItem;
     writebordersmi: TMenuItem;
     writetopmi: TMenuItem;
     writebottommi: TMenuItem;
@@ -732,7 +732,7 @@ end;
 
 procedure tmainform.killmiclick(sender: tobject);
 begin
-  // driver.enabled := false;
+//driver.enabled := false;
   if assigned(plotter) then
   begin
     plotter.plot := true;
@@ -810,8 +810,7 @@ begin
     messagedlg('vPlotter Error', 'Selected page size is bigger than work area !',
       mterror, [mbok], 0);
 
-    formatcb.itemindex :=
-      formatcb.items.count - 2;
+    formatcb.itemindex := formatcb.items.count - 2;
     formatcbchange (nil);
   end;
   clearallmiclick(sender);
@@ -907,21 +906,21 @@ end;
 
 procedure tmainform.onplotterstop;
 begin
-  image.canvas.draw(0,0, bitmap);
+  caption := format('Elapsed %u sec', [elapsed]);
+  image.canvas.draw(0, 0, bitmap);
   penupbtnclick(nil);
   plotter := nil;
 
-  application.processmessages;
   timer.enabled := false;
   lock1(true);
+  application.processmessages;
 end;
 
 procedure tmainform.onplottertick;
 var
-         m0: longint;
-         m1: longint;
-          p: tvppoint;
-  remaining: longint;
+  m0: longint;
+  m1: longint;
+   p: tvppoint;
 begin
   p.x := offsetxse.value + plotter.px;
   p.y := offsetyse.value + plotter.py;
@@ -948,8 +947,8 @@ begin
   // update progress bar
   if plotter.index mod $FF = 0 then
   begin
-    remaining := (elapsed * (plotter.count - plotter.index)) div plotter.index;
-    caption := format('Elapsed %u sec - Remaing %u sec', [elapsed, remaining]);
+    caption := format('Elapsed %u sec - Remaing %u sec', [elapsed,
+      (elapsed * (plotter.count - plotter.index)) div plotter.index]);
     image.canvas.draw(0, 0, bitmap);
   end;
   application.processmessages;
