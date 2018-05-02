@@ -1,7 +1,7 @@
 object mainform: Tmainform
-  Left = 387
+  Left = 327
   Height = 467
-  Top = 132
+  Top = 131
   Width = 923
   Anchors = []
   Caption = 'vPlotter 2.0'
@@ -474,6 +474,14 @@ object mainform: Tmainform
         Caption = 'Move on Botton Border'
         OnClick = movebottommiClick
       end
+      object moveleftmi: TMenuItem
+        Caption = 'Move on Left Border'
+        OnClick = moveleftmiClick
+      end
+      object moverightmi: TMenuItem
+        Caption = 'Move on Right Border'
+        OnClick = moverightmiClick
+      end
       object MenuItem3: TMenuItem
         Caption = '-'
       end
@@ -484,17 +492,25 @@ object mainform: Tmainform
       object MenuItem5: TMenuItem
         Caption = '-'
       end
-      object MenuItem6: TMenuItem
+      object writebordersmi: TMenuItem
         Caption = 'Write Borders'
         OnClick = movebordersmiclick
       end
-      object MenuItem7: TMenuItem
+      object writetopmi: TMenuItem
         Caption = 'Write Top Border'
         OnClick = movetopmiClick
       end
-      object MenuItem8: TMenuItem
+      object writebottommi: TMenuItem
         Caption = 'Write Bottom Border'
         OnClick = movebottommiClick
+      end
+      object writeleftmi: TMenuItem
+        Caption = 'Write Left Border'
+        OnClick = moveleftmiClick
+      end
+      object writerightmi: TMenuItem
+        Caption = 'Write Right Border'
+        OnClick = moverightmiClick
       end
       object MenuItem2: TMenuItem
         Caption = '-'

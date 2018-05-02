@@ -41,14 +41,18 @@ type
     line2mi: tmenuitem;
     killmi: tmenuitem;
     MenuItem1: TMenuItem;
+    writeleftmi: TMenuItem;
+    writerightmi: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem3: TMenuItem;
     layoutmi: TMenuItem;
+    moveleftmi: TMenuItem;
+    moverightmi: TMenuItem;
     movetopmi: TMenuItem;
     MenuItem5: TMenuItem;
-    MenuItem6: TMenuItem;
-    MenuItem7: TMenuItem;
-    MenuItem8: TMenuItem;
+    writebordersmi: TMenuItem;
+    writetopmi: TMenuItem;
+    writebottommi: TMenuItem;
     showpagesizepanelmi: TMenuItem;
     showcalibrationpanelmi: TMenuItem;
     timer: TTimer;
@@ -114,6 +118,8 @@ type
 
     procedure leftupbtnclick   (sender: tobject);
     procedure MenuItem2Click(Sender: TObject);
+    procedure moveleftmiClick(Sender: TObject);
+    procedure moverightmiClick(Sender: TObject);
     procedure movetopmiClick(Sender: TObject);
     procedure movebottommiClick(sender: tobject);
 
@@ -226,16 +232,20 @@ end;
 
 // MANUAL DRIVING groupbox
 
-procedure tmainform.leftupbtnclick(Sender: TObject);
+procedure tmainform.leftupbtnclick(sender: tobject);
 var
   m0: longint;
   m1: longint;
 begin
-  driver.enabled := true;
-  driver.penoff  := true;
-  driver.move4(-leftedit.value, 0);
-  optimize(layout.point09, layout, m0, m1);
-  driver.init(m0, m1);
+  lock1(false);
+  begin
+    driver.enabled := true;
+    driver.penoff  := true;
+    driver.move4(-leftedit.value, 0);
+    optimize(layout.point09, layout, m0, m1);
+    driver.init(m0, m1);
+  end;
+  lock1(true);
 end;
 
 procedure tmainform.leftdownbtnclick(sender: tobject);
@@ -243,11 +253,15 @@ var
   m0: longint;
   m1: longint;
 begin
-  driver.enabled := true;
-  driver.penoff  := true;
-  driver.move4(+leftedit.value, 0);
-  optimize(layout.point09, layout, m0, m1);
-  driver.init(m0, m1);
+  lock1(false);
+  begin
+    driver.enabled := true;
+    driver.penoff  := true;
+    driver.move4(+leftedit.value, 0);
+    optimize(layout.point09, layout, m0, m1);
+    driver.init(m0, m1);
+  end;
+  lock1(true);
 end;
 
 procedure tmainform.rightupbtnclick(sender: tobject);
@@ -255,11 +269,15 @@ var
   m0: longint;
   m1: longint;
 begin
-  driver.enabled := true;
-  driver.penoff  := true;
-  driver.move4(0, -rightedit.value);
-  optimize(layout.point09, layout, m0, m1);
-  driver.init(m0, m1);
+  lock1(false);
+  begin
+    driver.enabled := true;
+    driver.penoff  := true;
+    driver.move4(0, -rightedit.value);
+    optimize(layout.point09, layout, m0, m1);
+    driver.init(m0, m1);
+  end;
+  lock1(false);
 end;
 
 procedure tmainform.rightdownbtnclick(sender: tobject);
@@ -267,11 +285,15 @@ var
   m0: longint;
   m1: longint;
 begin
-  driver.enabled := true;
-  driver.penoff  := true;
-  driver.move4(0, +rightedit.value);
-  optimize(layout.point09, layout, m0, m1);
-  driver.init(m0, m1);
+  lock1(false);
+  begin
+    driver.enabled := true;
+    driver.penoff  := true;
+    driver.move4(0, +rightedit.value);
+    optimize(layout.point09, layout, m0, m1);
+    driver.init(m0, m1);
+  end;
+  lock1(true);
 end;
 
 procedure tmainform.pendownbtnclick(Sender: TObject);
@@ -334,6 +356,37 @@ begin
   elapsed := 1;
 end;
 
+procedure tmainform.movetopmiclick(Sender: TObject);
+var
+  p0: tvppoint;
+  p1: tvppoint;
+begin
+  if assigned(plotter) then exit;
+
+  paths.clear;
+  // form left-top to right-top
+  p0.x := layout.point08.x - (widthse .value / 2);
+  p0.y := layout.point08.y + (heightse.value / 2);
+  p1.x := layout.point08.x + (widthse .value / 2);
+  p1.y := layout.point08.y + (heightse.value / 2);
+  paths.add(interpolate_line(p0, p1));
+  // form right-top to middle-bottom
+  p0.x := layout.point08.x;
+  p0.y := layout.point08.y - (heightse.value / 2);
+  p1   := p0;
+  paths.add(interpolate_line(p0, p1));
+
+  paths.zerocenter;
+  driver.enabled  := true;
+  driver.penoff   := sender = movetopmi;
+  plotter         := tvplotter.create(paths);
+  plotter.onstart := @onplotterstart;
+  plotter.onstop  := @onplotterstop;
+  plotter.ontick  := @onplottertick;
+  plotter.start;
+  elapsed := 1;
+end;
+
 procedure tmainform.movebottommiclick(sender: tobject);
 var
   p0: tvppoint;
@@ -365,7 +418,7 @@ begin
   elapsed := 1;
 end;
 
-procedure tmainform.movetopmiclick(Sender: TObject);
+procedure tmainform.moveleftmiclick(sender: tobject);
 var
   p0: tvppoint;
   p1: tvppoint;
@@ -373,21 +426,52 @@ begin
   if assigned(plotter) then exit;
 
   paths.clear;
-  // form left-top to right-top
+  // form left-bottom to left-top
   p0.x := layout.point08.x - (widthse .value / 2);
-  p0.y := layout.point08.y + (heightse.value / 2);
-  p1.x := layout.point08.x + (widthse .value / 2);
+  p0.y := layout.point08.y - (heightse.value / 2);
+  p1.x := layout.point08.x - (widthse .value / 2);
   p1.y := layout.point08.y + (heightse.value / 2);
   paths.add(interpolate_line(p0, p1));
-  // form right-top to middle-bottom
-  p0.x := layout.point08.x;
+  // form left-top to right-bottom
+  p0.x := layout.point08.x + (widthse .value / 2);
   p0.y := layout.point08.y - (heightse.value / 2);
   p1   := p0;
   paths.add(interpolate_line(p0, p1));
 
   paths.zerocenter;
   driver.enabled  := true;
-  driver.penoff   := sender = movetopmi;
+  driver.penoff   := sender = moveleftmi;
+  plotter         := tvplotter.create(paths);
+  plotter.onstart := @onplotterstart;
+  plotter.onstop  := @onplotterstop;
+  plotter.ontick  := @onplottertick;
+  plotter.start;
+  elapsed := 1;
+end;
+
+procedure tmainform.moverightmiclick(sender: tobject);
+var
+  p0: tvppoint;
+  p1: tvppoint;
+begin
+  if assigned(plotter) then exit;
+
+  paths.clear;
+  // form right-bottom to right-top
+  p0.x := layout.point08.x + (widthse .value / 2);
+  p0.y := layout.point08.y - (heightse.value / 2);
+  p1.x := layout.point08.x + (widthse .value / 2);
+  p1.y := layout.point08.y + (heightse.value / 2);
+  paths.add(interpolate_line(p0, p1));
+  // form right-top to left-bottom
+  p0.x := layout.point08.x - (widthse .value / 2);
+  p0.y := layout.point08.y - (heightse.value / 2);
+  p1   := p0;
+  paths.add(interpolate_line(p0, p1));
+
+  paths.zerocenter;
+  driver.enabled  := true;
+  driver.penoff   := sender = moverightmi;
   plotter         := tvplotter.create(paths);
   plotter.onstart := @onplotterstart;
   plotter.onstop  := @onplotterstop;
@@ -422,12 +506,14 @@ var
   m0: longint;
   m1: longint;
 begin
-  if assigned(plotter) then exit;
-
-  driver.enabled := true;
-  driver.penoff  := true;
-  optimize(layout.point09, layout, m0, m1);
-  driver.move2(m0, m1);
+  lock1(false);
+  begin
+    driver.enabled := true;
+    driver.penoff  := true;
+    optimize(layout.point09, layout, m0, m1);
+    driver.move2(m0, m1);
+  end;
+  lock1(true);
 end;
 
 // IMAGE events
@@ -646,6 +732,7 @@ end;
 
 procedure tmainform.killmiclick(sender: tobject);
 begin
+  // driver.enabled := false;
   if assigned(plotter) then
   begin
     plotter.plot := true;
@@ -734,61 +821,81 @@ end;
 
 procedure tmainform.lock1(value: boolean);
 begin
-  openmi       .enabled := value;
-  closemi      .enabled := value;
-  exitmi       .enabled := value;
-  updatemi     .enabled := value;
-  clearmi      .enabled := value;
-  movebordersmi.enabled := value;
-  movebottommi .enabled := value;
-  movetohomemi .enabled := value;
+  // main menu
+  openmi        .enabled := value;
+  closemi       .enabled := value;
+  exitmi        .enabled := value;
+  updatemi      .enabled := value;
+  clearmi       .enabled := value;
+  movebordersmi .enabled := value;
+  movebottommi  .enabled := value;
+  movetopmi     .enabled := value;
+  moveleftmi    .enabled := value;
+  moverightmi   .enabled := value;
+  movetohomemi  .enabled := value;
+  writebordersmi.enabled := value;
+  writebottommi .enabled := value;
+  writetopmi    .enabled := value;
+  writeleftmi   .enabled := value;
+  writerightmi  .enabled := value;
+  layoutmi      .enabled := value;
   // calibration
-  leftupbtn    .enabled := value;
-  leftdownbtn  .enabled := value;
-  leftedit     .enabled := value;
-  rightupbtn   .enabled := value;
-  rightdownbtn .enabled := value;
-  rightedit    .enabled := value;
-  penupbtn     .enabled := value;
-  pendownbtn   .enabled := value;
+  leftupbtn     .enabled := value;
+  leftdownbtn   .enabled := value;
+  leftedit      .enabled := value;
+  rightupbtn    .enabled := value;
+  rightdownbtn  .enabled := value;
+  rightedit     .enabled := value;
+  penupbtn      .enabled := value;
+  pendownbtn    .enabled := value;
   // page format
-  formatcb     .enabled := value;
-  heightse     .enabled := value;
-  widthse      .enabled := value;
-  offsetxse    .enabled := value;
-  offsetyse    .enabled := value;
-  verticalcb   .enabled := value;
+  formatcb      .enabled := value;
+  heightse      .enabled := value;
+  widthse       .enabled := value;
+  offsetxse     .enabled := value;
+  offsetyse     .enabled := value;
+  verticalcb    .enabled := value;
 end;
 
 procedure tmainform.lock2(value: boolean);
 begin
-  openmi       .enabled := value;
-  closemi      .enabled := value;
-  exitmi       .enabled := value;
-  updatemi     .enabled := value;
-  clearmi      .enabled := value;
-  startmi      .enabled := value;
-  stopmi       .enabled := value;
-  killmi       .enabled := value;
-  movebordersmi.enabled := value;
-  movebottommi .enabled := value;
-  movetohomemi .enabled := value;
+  // main menu
+  openmi        .enabled := value;
+  closemi       .enabled := value;
+  exitmi        .enabled := value;
+  updatemi      .enabled := value;
+  clearmi       .enabled := value;
+  startmi       .enabled := value;
+  stopmi        .enabled := value;
+  killmi        .enabled := value;
+  movebordersmi .enabled := value;
+  movebottommi  .enabled := value;
+  movetopmi     .enabled := value;
+  moveleftmi    .enabled := value;
+  moverightmi   .enabled := value;
+  movetohomemi  .enabled := value;
+  writebordersmi.enabled := value;
+  writebottommi .enabled := value;
+  writetopmi    .enabled := value;
+  writeleftmi   .enabled := value;
+  writerightmi  .enabled := value;
+  layoutmi      .enabled := value;
   // calibration
-  leftupbtn    .enabled := value;
-  leftdownbtn  .enabled := value;
-  leftedit     .enabled := value;
-  rightupbtn   .enabled := value;
-  rightdownbtn .enabled := value;
-  rightedit    .enabled := value;
-  penupbtn     .enabled := value;
-  pendownbtn   .enabled := value;
+  leftupbtn     .enabled := value;
+  leftdownbtn   .enabled := value;
+  leftedit      .enabled := value;
+  rightupbtn    .enabled := value;
+  rightdownbtn  .enabled := value;
+  rightedit     .enabled := value;
+  penupbtn      .enabled := value;
+  pendownbtn    .enabled := value;
   // page format
-  formatcb     .enabled := value;
-  heightse     .enabled := value;
-  widthse      .enabled := value;
-  offsetxse    .enabled := value;
-  offsetyse    .enabled := value;
-  verticalcb   .enabled := value;
+  formatcb      .enabled := value;
+  heightse      .enabled := value;
+  widthse       .enabled := value;
+  offsetxse     .enabled := value;
+  offsetyse     .enabled := value;
+  verticalcb    .enabled := value;
 end;
 
 procedure tmainform.onplotterstart;
@@ -804,9 +911,9 @@ begin
   penupbtnclick(nil);
   plotter := nil;
 
-  lock1(true);
-  timer.enabled := false;
   application.processmessages;
+  timer.enabled := false;
+  lock1(true);
 end;
 
 procedure tmainform.onplottertick;
@@ -818,14 +925,19 @@ var
 begin
   p.x := offsetxse.value + plotter.px;
   p.y := offsetyse.value + plotter.py;
-
+  // check coordinates
   if abs(p.x) > (bitmap.width  div 2) then exit;
   if abs(p.y) > (bitmap.height div 2) then exit;
-
-  bitmap.canvas.pixels[
-    trunc(( widthse.value div 2) + offsetxse.value + plotter.px),
-    trunc((heightse.value div 2) - offsetyse.value - plotter.py)] := clblack;
-
+  // update preview
+  if driver.pen then
+    bitmap.canvas.pixels[
+      trunc(( widthse.value div 2) + offsetxse.value + plotter.px),
+      trunc((heightse.value div 2) - offsetyse.value - plotter.py)] := clblack
+  else
+    bitmap.canvas.pixels[
+      trunc(( widthse.value div 2) + offsetxse.value + plotter.px),
+      trunc((heightse.value div 2) - offsetyse.value - plotter.py)] := clred;
+  // move plotter
   if driver.enabled then
   begin
     p.x := layout.point08.x + p.x;
@@ -833,8 +945,8 @@ begin
     optimize(p, layout, m0, m1);
     driver.move2(m0, m1);
   end;
-
-  if plotter.index mod $F = 0 then
+  // update progress bar
+  if plotter.index mod $FF = 0 then
   begin
     remaining := (elapsed * (plotter.count - plotter.index)) div plotter.index;
     caption := format('Elapsed %u sec - Remaing %u sec', [elapsed, remaining]);
