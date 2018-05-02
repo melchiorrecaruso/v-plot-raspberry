@@ -176,7 +176,7 @@ begin
       dec(cnt1);
     end;
 
-  until ((cnt0 = 0) and (cnt1 = 0)) or (not fenabled);
+  until (cnt0 = 0) and (cnt1 = 0);
   {$endif}
 end;
 
