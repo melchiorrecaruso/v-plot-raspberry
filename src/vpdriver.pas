@@ -119,7 +119,7 @@ begin
   pca9685setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, motz_freq);
   // init servo
   pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_up, motz_freq));
-  delaymicroseconds(fdelay3);
+  delaymicroseconds(fdelay0);
   // init mode
   pinmode(motx_mod0, OUTPUT);
   pinmode(motx_mod1, OUTPUT);
@@ -256,18 +256,18 @@ var
 {$endif}
 begin
   if fenabled then
-    if (acount0 > 0) or (acount1 > 0) then
+    if (acount0 >= 0) and (acount1 >= 0) then
     begin
       {$ifdef cpuarm}
       for i := 0 to 18 do
       begin
-        if vplotmatrix[cnt0, i] = 1 then
+        if vplotmatrix[acount0, i] = 1 then
         begin
           digitalwrite(mot0_step, HIGH); delaymicroseconds(fdelay1);
           digitalwrite(mot0_step,  LOW); delaymicroseconds(fdelay1);
         end;
 
-        if vplotmatrix[cnt1, i] = 1 then
+        if vplotmatrix[acount1, i] = 1 then
         begin
           digitalwrite(mot1_step, HIGH); delaymicroseconds(fdelay1);
           digitalwrite(mot1_step,  LOW); delaymicroseconds(fdelay1);

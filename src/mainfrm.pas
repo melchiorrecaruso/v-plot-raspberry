@@ -229,15 +229,21 @@ end;
 
 procedure tmainform.leftupbtnclick(sender: tobject);
 var
-  m0: longint = 0;
-  m1: longint = 0;
+  m0, dm0: longint;
+  m1:      longint;
 begin
   lock2(false);
   begin
     driver.enabled    := true;
     driver.penoff     := true;
     driver.clockwise0 := false;
-    driver.step(leftedit.value, 0);
+
+    m0 := abs(leftedit.value);
+    repeat
+      dm0 := min(10, m0);
+      dec(m0, dm0);
+      driver.step(dm0, 0);
+    until (m0 = 0);
     optimize(layout.point09, m0, m1);
     driver.init(m0, m1);
   end;
@@ -246,15 +252,21 @@ end;
 
 procedure tmainform.leftdownbtnclick(sender: tobject);
 var
-  m0: longint = 0;
-  m1: longint = 0;
+  m0, dm0: longint;
+  m1:      longint;
 begin
   lock2(false);
   begin
     driver.enabled    := true;
     driver.penoff     := true;
     driver.clockwise0 := true;
-    driver.step(leftedit.value, 0);
+
+    m0 := abs(leftedit.value);
+    repeat
+      dm0 := min(10, m0);
+      dec(m0, dm0);
+      driver.step(dm0, 0);
+    until (m0 = 0);
     optimize(layout.point09, m0, m1);
     driver.init(m0, m1);
   end;
@@ -263,15 +275,21 @@ end;
 
 procedure tmainform.rightupbtnclick(sender: tobject);
 var
-  m0: longint = 0;
-  m1: longint = 0;
+  m0:      longint;
+  m1, dm1: longint;
 begin
   lock2(false);
   begin
     driver.enabled    := true;
     driver.penoff     := true;
     driver.clockwise1 := false;
-    driver.step(0, rightedit.value);
+
+    m1 := abs(rightedit.value);
+    repeat
+      dm1 := min(10, m1);
+      dec(m1, dm1);
+      driver.step(0, dm1);
+    until (m1 = 0);
     optimize(layout.point09, m0, m1);
     driver.init(m0, m1);
   end;
@@ -280,15 +298,21 @@ end;
 
 procedure tmainform.rightdownbtnclick(sender: tobject);
 var
-  m0: longint = 0;
-  m1: longint = 0;
+  m0:      longint;
+  m1, dm1: longint;
 begin
   lock2(false);
   begin
     driver.enabled    := true;
     driver.penoff     := true;
     driver.clockwise1 := true;
-    driver.step(0, rightedit.value);
+
+    m1 := abs(rightedit.value);
+    repeat
+      dm1 := min(10, m1);
+      dec(m1, dm1);
+      driver.step(0, dm1);
+    until (m1 = 0);
     optimize(layout.point09, m0, m1);
     driver.init(m0, m1);
   end;
