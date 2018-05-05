@@ -49,7 +49,7 @@ type
     fratio:  double;
     fdelay1: longint;
     fdelay2: longint;
-    fdelay3: longint;
+    fdelay0: longint;
 
     function getheight: double;
     function getwidth:  double;
@@ -74,11 +74,15 @@ type
 
     property delay1:  longint  read fdelay1;
     property delay2:  longint  read fdelay2;
-    property delay3:  longint  read fdelay3;
+    property delay0:  longint  read fdelay0;
 
     property height:  double   read getheight;
     property width:   double   read getwidth;
  end;
+
+
+var
+  layout: tvplayout = nil;
 
 
 implementation
@@ -126,7 +130,7 @@ begin
   fratio     := 0;
   fdelay1    := 0;
   fdelay2    := 0;
-  fdelay3    := 0;
+  fdelay0    := 0;
 end;
 
 procedure tvplayout.load(const filename: rawbytestring);
@@ -161,7 +165,7 @@ begin
     fdelay1    := ini.readinteger('Stepper', 'DELAY1', 0);
     fdelay2    := ini.readinteger('Stepper', 'DELAY2', 0);
 
-    fdelay3    := ini.readinteger('Servo',   'DELAY3', 0);
+    fdelay0    := ini.readinteger('Servo',   'DELAY0', 0);
   finally
     ini.destroy;
   end;
@@ -186,9 +190,9 @@ begin
     writeln(format('  LAYOUT::MODE   = %12.5u', [fmode]));
     writeln(format('  LAYOUT::RATIO  = %12.5f', [fratio]));
 
+    writeln(format('  LAYOUT::DELAY0 = %12.5u', [fdelay0]));
     writeln(format('  LAYOUT::DELAY1 = %12.5u', [fdelay1]));
     writeln(format('  LAYOUT::DELAY2 = %12.5u', [fdelay2]));
-    writeln(format('  LAYOUT::DELAY3 = %12.5u', [fdelay3]));
   end;
 end;
 

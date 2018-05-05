@@ -31,37 +31,44 @@ uses
 type
   tvpdriver = class
   private
-    fcnt0:    longint;
-    fcnt1:    longint;
-    fdelay1:  longint;
-    fdelay2:  longint;
-    fdelay3:  longint;
-    fenabled: boolean;
-    fmode:    longint;
-    fpen:     boolean;
-    fpenoff:  boolean;
+    fcount0:     longint;
+    fcount1:     longint;
+    fclockwise0: boolean;
+    fclockwise1: boolean;
+    fdelay0:     longint;
+    fdelay1:     longint;
+    fdelay2:     longint;
+    fenabled:    boolean;
+    fmode:       longint;
+    fpen:        boolean;
+    fpenoff:     boolean;
     procedure setmode(value: longint);
     procedure setpen(value: boolean);
     procedure setpenoff(value: boolean);
-    procedure largedisplacements(cnt0, cnt1: longint);
-    procedure smalldisplacements(cnt0, cnt1: longint);
+    procedure setclockwise0(value: boolean);
+    procedure setclockwise1(value: boolean);
   public
     constructor create;
     destructor  destroy; override;
-    procedure   init (cnt0, cnt1: longint);
-    procedure   move2(cnt0, cnt1: longint);
-    procedure   move4(cnt0, cnt1: longint);
+    procedure   init(acount0, acount1: longint);
+    procedure   step(acount0, acount1: longint);
   published
-    property cnt0:    longint read fcnt0;
-    property cnt1:    longint read fcnt1;
-    property delay1:  longint read fdelay1  write fdelay1;
-    property delay2:  longint read fdelay2  write fdelay2;
-    property delay3:  longint read fdelay3  write fdelay3;
-    property enabled: boolean read fenabled write fenabled;
-    property mode:    longint read fmode    write setmode;
-    property pen:     boolean read fpen     write setpen;
-    property penoff:  boolean read fpenoff  write setpenoff;
+    property count0:     longint read fcount0;
+    property count1:     longint read fcount1;
+    property clockwise0: boolean read fclockwise0 write setclockwise0;
+    property clockwise1: boolean read fclockwise1 write setclockwise1;
+    property delay0:     longint read fdelay0     write fdelay0;
+    property delay1:     longint read fdelay1     write fdelay1;
+    property delay2:     longint read fdelay2     write fdelay2;
+    property enabled:    boolean read fenabled    write fenabled;
+    property mode:       longint read fmode       write setmode;
+    property pen:        boolean read fpen        write setpen;
+    property penoff:     boolean read fpenoff     write setpenoff;
   end;
+
+
+var
+  driver: tvpdriver = nil;
 
 
 implementation
@@ -99,10 +106,12 @@ const
 constructor tvpdriver.create;
 begin
   inherited create;
+  fcount0  := 0;
+  fcount1  := 0;
+  fdelay0  := 300000;
+  fdelay1  := 3000;
+  fdelay2  := 1500;
   fenabled := false;
-  fmode    := 1;
-  fpen     := false;
-  fpenoff  := false;
   {$ifdef cpuarm}
   // setup wiringpi library
   wiringpisetup;
@@ -111,13 +120,13 @@ begin
   // init servo
   pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_up, motz_freq));
   delaymicroseconds(fdelay3);
-  // init mode = 1
+  // init mode
   pinmode(motx_mod0, OUTPUT);
   pinmode(motx_mod1, OUTPUT);
   pinmode(motx_mod2, OUTPUT);
-  digitalwrite(motx_mod0,  LOW);
-  digitalwrite(motx_mod1,  LOW);
-  digitalwrite(motx_mod2,  LOW);
+  digitalwrite(motx_mod0, LOW);
+  digitalwrite(motx_mod1, LOW);
+  digitalwrite(motx_mod2, LOW);
   // init step motor0
   pinmode(mot0_dir,    OUTPUT);
   pinmode(mot0_step,   OUTPUT);
@@ -129,6 +138,16 @@ begin
   digitalwrite(mot1_dir,  LOW);
   digitalwrite(mot1_step, LOW);
   {$endif}
+  setclockwise0(true);
+  setclockwise1(true);
+  setclockwise0(false);
+  setclockwise1(false);
+  setpen(true);
+  setpen(false);
+  setpenoff(true);
+  setpenoff(false);
+  setmode(1);
+  setmode(4);
 end;
 
 destructor tvpdriver.destroy;
@@ -136,88 +155,10 @@ begin
   inherited destroy;
 end;
 
-procedure  tvpdriver.init(cnt0, cnt1: longint);
+procedure  tvpdriver.init(acount0, acount1: longint);
 begin
-  fcnt0 := cnt0;
-  fcnt1 := cnt1;
-end;
-
-procedure tvpdriver.largedisplacements(cnt0, cnt1: longint);
-begin
-  setpen(false);
-  inc(fcnt0, cnt0);
-  inc(fcnt1, cnt1);
-  {$ifdef cpuarm}
-  if cnt0 > 0 then
-    digitalwrite(mot0_dir, HIGH)
-  else
-    digitalwrite(mot0_dir,  LOW);
-
-  if cnt1 > 0 then
-    digitalwrite(mot1_dir,  LOW)
-  else
-    digitalwrite(mot1_dir, HIGH);
-
-  // move step motor0 and motor1
-  cnt0 := abs(cnt0);
-  cnt1 := abs(cnt1);
-  repeat
-    if cnt0 > 0 then
-    begin
-      digitalwrite(mot0_step, HIGH); delaymicroseconds(fdelay1);
-      digitalwrite(mot0_step,  LOW); delaymicroseconds(fdelay1);
-      dec(cnt0);
-    end;
-
-    if cnt1 > 0 then
-    begin
-      digitalwrite(mot1_step, HIGH); delaymicroseconds(fdelay1);
-      digitalwrite(mot1_step,  LOW); delaymicroseconds(fdelay1);
-      dec(cnt1);
-    end;
-
-  until (cnt0 = 0) and (cnt1 = 0);
-  {$endif}
-end;
-
-procedure tvpdriver.smalldisplacements(cnt0, cnt1: longint);
-{$ifdef cpuarm}
-var
-  i: longint;
-{$endif}
-begin
-  setpen(true);
-  inc(fcnt0, cnt0);
-  inc(fcnt1, cnt1);
-  {$ifdef cpuarm}
-  if cnt0 > 0 then
-    digitalwrite(mot0_dir, HIGH)
-  else
-    digitalwrite(mot0_dir,  LOW);
-
-  if cnt1 > 0 then
-    digitalwrite(mot1_dir,  LOW)
-  else
-    digitalwrite(mot1_dir, HIGH);
-
-  // move step motor0 and motor1
-  cnt0 := abs(cnt0);
-  cnt1 := abs(cnt1);
-  for i := 0 to 18 do
-  begin
-    if vplotmatrix[cnt0, i] = 1 then
-    begin
-      digitalwrite(mot0_step, HIGH); delaymicroseconds(fdelay2);
-      digitalwrite(mot0_step,  LOW); delaymicroseconds(fdelay2);
-    end;
-
-    if vplotmatrix[cnt1, i] = 1 then
-    begin
-      digitalwrite(mot1_step, HIGH); delaymicroseconds(fdelay2);
-      digitalwrite(mot1_step,  LOW); delaymicroseconds(fdelay2);
-    end;
-  end;
-  {$endif}
+  fcount0 := acount0;
+  fcount1 := acount1;
 end;
 
 procedure tvpdriver.setpen(value: boolean);
@@ -231,7 +172,7 @@ begin
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_low, motz_freq))
       else
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_up,  motz_freq));
-      delaymicroseconds(fdelay3);
+      delaymicroseconds(fdelay0);
       {$endif}
     end;
 end;
@@ -245,7 +186,7 @@ begin
       fpen := false;
       {$ifdef cpuarm}
       pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_up, motz_freq));
-      delaymicroseconds(fdelay3);
+      delaymicroseconds(fdelay0);
       {$endif}
     end;
 end;
@@ -280,33 +221,74 @@ begin
   end;
 end;
 
-procedure tvpdriver.move2(cnt0, cnt1: longint);
+procedure tvpdriver.setclockwise0(value: boolean);
 begin
-  move4(cnt0 - fcnt0, cnt1 - fcnt1);
+  if value <> fclockwise0 then
+  begin
+    fclockwise0 := value;
+    {$ifdef cpuarm}
+    if fclockwise0 then
+      digitalwrite(mot0_dir, HIGH)
+    else
+      digitalwrite(mot0_dir,  LOW);
+    {$endif}
+  end;
 end;
 
-procedure tvpdriver.move4(cnt0, cnt1: longint);
+procedure tvpdriver.setclockwise1(value: boolean);
+begin
+  if value <> fclockwise1 then
+  begin
+    fclockwise1 := value;
+    {$ifdef cpuarm}
+    if fclockwise1 then
+      digitalwrite(mot1_dir, HIGH)
+    else
+      digitalwrite(mot1_dir,  LOW);
+    {$endif}
+  end;
+end;
+
+procedure tvpdriver.step(acount0, acount1: longint);
+{$ifdef cpuarm}
+var
+  i: longint;
+{$endif}
 begin
   if fenabled then
-    if (cnt0 <> 0) or
-       (cnt1 <> 0) then
+    if (acount0 > 0) or (acount1 > 0) then
     begin
-      if (not fpenoff) then
+      {$ifdef cpuarm}
+      for i := 0 to 18 do
       begin
-        if (abs(cnt0) < 11) and
-           (abs(cnt1) < 11) then
-          smalldisplacements(cnt0, cnt1)
-        else
-          largedisplacements(cnt0, cnt1);
+        if vplotmatrix[cnt0, i] = 1 then
+        begin
+          digitalwrite(mot0_step, HIGH); delaymicroseconds(fdelay1);
+          digitalwrite(mot0_step,  LOW); delaymicroseconds(fdelay1);
+        end;
 
-      end else
-        largedisplacements(cnt0, cnt1);
+        if vplotmatrix[cnt1, i] = 1 then
+        begin
+          digitalwrite(mot1_step, HIGH); delaymicroseconds(fdelay1);
+          digitalwrite(mot1_step,  LOW); delaymicroseconds(fdelay1);
+        end;
+      end;
+      {$endif}
+      if fclockwise0 then
+        inc(fcount0, acount0)
+      else
+        dec(fcount0, acount0);
+
+      if fclockwise1 then
+        dec(fcount1, acount1)
+      else
+        inc(fcount1, acount1);
     end;
 
   if enabledebug then
   begin
-    writeln(format('  DRIVER::CNT.0  = %12.5u', [fcnt0]));
-    writeln(format('  DRIVER::CNT.1  = %12.5u', [fcnt1]));
+    writeln(format('  DRIVER::CNT.0  = %12.5u', [fcount0]));
+    writeln(format('  DRIVER::CNT.1  = %12.5u', [fcount1]));
   end;
 end;
 

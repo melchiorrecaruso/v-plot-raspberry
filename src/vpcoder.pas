@@ -26,17 +26,28 @@ unit vpcoder;
 interface
 
 uses
-  classes, vpcommon, vplayout, fpvectorial;
+  classes, vpcommon, vpdriver, vplayout, fpvectorial;
 
 type
   tvplotter = class(tthread)
   private
-    fpx:       double;
-    fpy:       double;
+    fcheck:    boolean;
+
     fpaths:    tvppaths;
+
     fplot:     boolean;
     findex:    longint;
     fcount:    longint;
+
+    fpoint:    tvppoint;
+    fpy:       double;
+    fmidx:     double;
+    fmidy:     double;
+    fmaxdx:    double;
+    fmaxdy:    double;
+    foffsetx:  double;
+    foffsety:  double;
+
     fonstart:  tthreadmethod;
     fonstop:   tthreadmethod;
     fontick:   tthreadmethod;
@@ -46,11 +57,20 @@ type
     constructor create(paths: tvppaths);
     destructor  destroy; override;
   public
-    property px:       double        read fpx;
-    property py:       double        read fpy;
+    property check:    boolean       read fcheck     write fcheck;
+    property point:    tvppoint      read fpoint     write fpoint;
+    property midx:     double        read fmidx      write fmidx;
+    property midy:     double        read fmidy      write fmidy;
+    property maxdx:    double        read fmaxdx     write fmaxdx;
+    property maxdy:    double        read fmaxdy     write fmaxdy;
+    property offsetx:  double        read foffsetx   write foffsetx;
+    property offsety:  double        read foffsety   write foffsety;
+
     property plot:     boolean       read fplot      write fplot;
     property index:    longint       read findex;
     property count:    longint       read fcount;
+
+
     property onstart:  tthreadmethod read fonstart   write fonstart;
     property onstop:   tthreadmethod read fonstop    write fonstop;
     property ontick:   tthreadmethod read fontick    write fontick;
@@ -64,7 +84,11 @@ type
 
   function  createpaths(vec: tvvectorialdocument): tvppaths;
 
-  procedure optimize(const p: tvppoint; const l: tvplayout; var m0, m1: longint);
+  procedure optimize(const p: tvppoint; var m0, m1: longint);
+
+
+var
+  plotter: tvplotter = nil;
 
 
 implementation
@@ -195,7 +219,7 @@ end;
 
 // ---
 
-procedure optimize(const p: tvppoint; const l: tvplayout; var m0, m1: longint);
+procedure optimize(const p: tvppoint; var m0, m1: longint);
 var
   alpha: double;
   err:   double;
@@ -209,12 +233,12 @@ var
 begin
   alpha    := 0;
   repeat
-    tmp00  := l.point00;
-    tmp01  := l.point01;
-    tmp02  := translatepoint(p, rotatepoint(l.point02, alpha));
-    tmp03  := translatepoint(p, rotatepoint(l.point03, alpha));
-    tmp04  := translatepoint(p, rotatepoint(l.point04, alpha));
-    tmp05  := translatepoint(p, rotatepoint(l.point05, alpha));
+    tmp00  := layout.point00;
+    tmp01  := layout.point01;
+    tmp02  := translatepoint(p, rotatepoint(layout.point02, alpha));
+    tmp03  := translatepoint(p, rotatepoint(layout.point03, alpha));
+    tmp04  := translatepoint(p, rotatepoint(layout.point04, alpha));
+    tmp05  := translatepoint(p, rotatepoint(layout.point05, alpha));
     tmp06  := intersectlines(linebetween(tmp00, tmp03),
                              linebetween(tmp01, tmp04));
 
@@ -230,8 +254,8 @@ begin
       break;
   until false;
 
-  m0 := round(l.mode * (distancebetween(tmp00, tmp03) / l.ratio));
-  m1 := round(l.mode * (distancebetween(tmp01, tmp04) / l.ratio));
+  m0 := round(layout.mode * (distancebetween(tmp00, tmp03) / layout.ratio));
+  m1 := round(layout.mode * (distancebetween(tmp01, tmp04) / layout.ratio));
 
   if enabledebug then
   begin
@@ -245,8 +269,8 @@ begin
     writeln(format('OPTIMIZE::D14    = %12.5f', [distancebetween(tmp01, tmp04)]));
     writeln(format('OPTIMIZE::CNT.0  = %12.5u', [m0]));
     writeln(format('OPTIMIZE::CNT.1  = %12.5u', [m1]));
-    writeln(format('OPTIMIZE::MODE   = %12.3u', [l.mode]));
-    writeln(format('OPTIMIZE::RATIO  = %12.5f', [l.ratio]));
+    writeln(format('OPTIMIZE::MODE   = %12.3u', [layout.mode]));
+    writeln(format('OPTIMIZE::RATIO  = %12.5f', [layout.ratio]));
   end;
 end;
 
@@ -256,6 +280,7 @@ constructor tvplotter.create(paths: tvppaths);
 var
   i: longint;
 begin
+  fcheck   := true;
   fpaths   := paths;
   fplot    := true;
   findex   := 0;
@@ -281,9 +306,20 @@ procedure tvplotter.execute;
 var
       i: longint;
       j: longint;
+m0, dm0, ddm0: longint;
+m1, dm1, ddm1: longint;
    page: tvppath;
-  point: pvppoint;
 begin
+  if enabledebug then
+  begin
+    writeln(format(' EXECUTE::OFF-X  = %12.5f', [foffsetx]));
+    writeln(format(' EXECUTE::OFF-Y  = %12.5f', [foffsety]));
+    writeln(format(' EXECUTE::MID-X  = %12.5f', [fmidx   ]));
+    writeln(format(' EXECUTE::MID-Y  = %12.5f', [fmidy   ]));
+    writeln(format(' EXECUTE::MAX-X  = %12.5f', [fmaxdx  ]));
+    writeln(format(' EXECUTE::MAX-Y  = %12.5f', [fmaxdy  ]));
+  end;
+
   if assigned(fonstart) then
     synchronize(fonstart);
 
@@ -294,13 +330,56 @@ begin
       page := fpaths.item[i];
       for j := 0 to page.count - 1 do
       begin
-        point := page.item[j];
+        fpoint := tvppoint(page.item[j]^);
         if not terminated then
         begin
           inc(findex);
-          fpx := point^.x;
-          fpy := point^.y;
-          synchronize(fontick);
+          // update coordinates
+          fpoint.x := foffsetx + fpoint.x;
+          fpoint.y := foffsety + fpoint.y;
+          // check coordinates
+          if ((abs(point.x) <= (fmaxdx)) and
+              (abs(point.y) <= (fmaxdy))) or (not check) then
+          begin
+            synchronize(fontick);
+            // move plotter
+            if driver.enabled then
+            begin
+              fpoint.x := fmidx + fpoint.x;
+              fpoint.y := fmidy + fpoint.y;
+
+              optimize(point, m0, m1);
+              dm0 := m0 - driver.count0;
+              dm1 := m1 - driver.count1;
+              driver.clockwise0 := dm0 > 0;
+              driver.clockwise1 := dm1 < 0;
+
+              dm0 := abs(dm0);
+              dm1 := abs(dm1);
+              if (dm0 < 10) and
+                 (dm1 < 10) then
+              begin
+                driver.pen    := true;
+                driver.delay1 := layout.delay1;
+              end else
+              begin
+                driver.pen    := false;
+                driver.delay1 := layout.delay2;
+              end;
+
+              repeat
+                ddm0 := min(10, dm0);
+                ddm1 := min(10, dm1);
+
+                dec(dm0, ddm0);
+                dec(dm1, ddm1);
+
+                driver.step(ddm0, ddm1);
+
+              until ((dm0 = 0) and (dm1 = 0)) or terminated;
+            end;
+          end;
+
           while not fplot do sleep(250);
         end;
       end;
@@ -322,7 +401,6 @@ begin
   result := tvppaths.create;
   for i := 0 to vec.getpagecount - 1 do
   begin
-
     page := vec.getpageasvectorial(i);
     for j := 0 to page.getentitiescount - 1 do
     begin
