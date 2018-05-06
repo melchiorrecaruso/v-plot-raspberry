@@ -282,7 +282,7 @@ begin
   begin
     driver.enabled    := true;
     driver.penoff     := true;
-    driver.clockwise1 := false;
+    driver.clockwise1 := true;
 
     m1 := abs(rightedit.value);
     repeat
@@ -305,7 +305,7 @@ begin
   begin
     driver.enabled    := true;
     driver.penoff     := true;
-    driver.clockwise1 := true;
+    driver.clockwise1 := false;
 
     m1 := abs(rightedit.value);
     repeat

@@ -360,11 +360,11 @@ begin
                  (dm1 < 10) then
               begin
                 driver.pen    := true;
-                driver.delay1 := layout.delay1;
+                driver.delay1 := layout.delay2;
               end else
               begin
                 driver.pen    := false;
-                driver.delay1 := layout.delay2;
+                driver.delay1 := layout.delay1;
               end;
 
               repeat
