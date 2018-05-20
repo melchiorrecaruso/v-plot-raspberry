@@ -31,16 +31,13 @@ uses
 type
   tvplotter = class(tthread)
   private
-    fcheck:    boolean;
-
-    fpaths:    tvppaths;
-
-    fplot:     boolean;
     findex:    longint;
     fcount:    longint;
+    fcheck:    boolean;
+    fpaths:    tvppaths;
+    fplot:     boolean;
 
     fpoint:    tvppoint;
-    fpy:       double;
     fmidx:     double;
     fmidy:     double;
     fmaxdx:    double;
@@ -57,6 +54,8 @@ type
     constructor create(paths: tvppaths);
     destructor  destroy; override;
   public
+    property index:    longint       read findex;
+    property count:    longint       read fcount;
     property check:    boolean       read fcheck     write fcheck;
     property point:    tvppoint      read fpoint     write fpoint;
     property midx:     double        read fmidx      write fmidx;
@@ -67,8 +66,6 @@ type
     property offsety:  double        read foffsety   write foffsety;
 
     property plot:     boolean       read fplot      write fplot;
-    property index:    longint       read findex;
-    property count:    longint       read fcount;
 
 
     property onstart:  tthreadmethod read fonstart   write fonstart;
@@ -280,12 +277,12 @@ constructor tvplotter.create(paths: tvppaths);
 var
   i: longint;
 begin
-  fcheck   := true;
-  fpaths   := paths;
-  fplot    := true;
-  findex   := 0;
-  fcount   := 0;
+  fcheck    := true;
+  fpaths    := paths;
+  fplot     := true;
 
+  findex    := 0;
+  fcount    := 0;
   for i := 0 to fpaths.count - 1 do
     inc(fcount, fpaths.item[i].count);
 
@@ -308,7 +305,7 @@ var
       j: longint;
 m0, dm0, ddm0: longint;
 m1, dm1, ddm1: longint;
-   page: tvppath;
+   path: tvppath;
 begin
   if enabledebug then
   begin
@@ -323,14 +320,13 @@ begin
   if assigned(fonstart) then
     synchronize(fonstart);
 
-  findex := 0;
   if assigned(fontick) then
     for i := 0 to fpaths.count - 1 do
     begin
-      page := fpaths.item[i];
-      for j := 0 to page.count - 1 do
+      path := fpaths.item[i];
+      for j := 0 to path.count - 1 do
       begin
-        fpoint := tvppoint(page.item[j]^);
+        fpoint := tvppoint(path.item[j]^);
         if not terminated then
         begin
           inc(findex);
@@ -338,8 +334,8 @@ begin
           fpoint.x := foffsetx + fpoint.x;
           fpoint.y := foffsety + fpoint.y;
           // check coordinates
-          if ((abs(point.x) <= (fmaxdx)) and
-              (abs(point.y) <= (fmaxdy))) or (not check) then
+          if ((abs(fpoint.x) <= (fmaxdx))  and
+              (abs(fpoint.y) <= (fmaxdy))) or (not check) then
           begin
             synchronize(fontick);
             // move plotter
@@ -348,7 +344,7 @@ begin
               fpoint.x := fmidx + fpoint.x;
               fpoint.y := fmidy + fpoint.y;
 
-              optimize(point, m0, m1);
+              optimize(fpoint, m0, m1);
               dm0 := m0 - driver.count0;
               dm1 := m1 - driver.count1;
               driver.clockwise0 := dm0 > 0;

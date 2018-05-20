@@ -117,7 +117,6 @@ type
     procedure leftdownbtnclick(sender: tobject);
 
     procedure leftupbtnclick   (sender: tobject);
-    procedure MenuItem2Click(Sender: TObject);
     procedure moveleftmiClick(Sender: TObject);
     procedure moverightmiClick(Sender: TObject);
     procedure movetopmiClick(Sender: TObject);
@@ -240,10 +239,10 @@ begin
 
     m0 := abs(leftedit.value);
     repeat
-      dm0 := min(10, m0);
-      dec(m0, dm0);
+      dm0 :=  min(10, m0);
       driver.step(dm0, 0);
-    until (m0 = 0);
+      dec (m0, dm0);
+    until (m0 =  0);
     optimize(layout.point09, m0, m1);
     driver.init(m0, m1);
   end;
@@ -263,10 +262,10 @@ begin
 
     m0 := abs(leftedit.value);
     repeat
-      dm0 := min(10, m0);
-      dec(m0, dm0);
+      dm0 :=  min(10, m0);
       driver.step(dm0, 0);
-    until (m0 = 0);
+      dec (m0, dm0);
+    until (m0 =  0);
     optimize(layout.point09, m0, m1);
     driver.init(m0, m1);
   end;
@@ -286,10 +285,10 @@ begin
 
     m1 := abs(rightedit.value);
     repeat
-      dm1 := min(10, m1);
-      dec(m1, dm1);
+      dm1 :=  min(10, m1);
       driver.step(0, dm1);
-    until (m1 = 0);
+      dec (m1, dm1);
+    until (m1 =  0);
     optimize(layout.point09, m0, m1);
     driver.init(m0, m1);
   end;
@@ -309,10 +308,10 @@ begin
 
     m1 := abs(rightedit.value);
     repeat
-      dm1 := min(10, m1);
-      dec(m1, dm1);
+      dm1 :=  min(10, m1);
       driver.step(0, dm1);
-    until (m1 = 0);
+      dec (m1, dm1);
+    until (m1 =  0);
     optimize(layout.point09, m0, m1);
     driver.init(m0, m1);
   end;
@@ -371,8 +370,8 @@ begin
   driver.enabled  := true;
   driver.penoff   := sender = movebordersmi;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point08.x;
-  plotter.midy    := layout.point08.y;
+  plotter.midx    := layout.point09.x;
+  plotter.midy    := layout.point09.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -403,8 +402,8 @@ begin
   driver.enabled  := true;
   driver.penoff   := sender = movetopmi;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point08.x;
-  plotter.midy    := layout.point08.y;
+  plotter.midx    := layout.point09.x;
+  plotter.midy    := layout.point09.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -435,8 +434,8 @@ begin
   driver.enabled  := true;
   driver.penoff   := sender = movebottommi;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point08.x;
-  plotter.midy    := layout.point08.y;
+  plotter.midx    := layout.point09.x;
+  plotter.midy    := layout.point09.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -467,8 +466,8 @@ begin
   driver.enabled  := true;
   driver.penoff   := sender = moveleftmi;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point08.x;
-  plotter.midy    := layout.point08.y;
+  plotter.midx    := layout.point09.x;
+  plotter.midy    := layout.point09.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -499,8 +498,8 @@ begin
   driver.enabled  := true;
   driver.penoff   := sender = moverightmi;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point08.x;
-  plotter.midy    := layout.point08.y;
+  plotter.midx    := layout.point09.x;
+  plotter.midy    := layout.point09.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -542,16 +541,17 @@ begin
 
   paths.clear;
   // form x-x to base
-  p0.x := layout.point09.x - layout.point08.x;
-  p0.y := layout.point09.y - layout.point08.y;
-  p1   := p0;
+  p0.x := layout.point09.x;
+  p0.y := layout.point09.y + 10;
+  p1.x := layout.point09.x;
+  p1.y := layout.point09.y;
   paths.add(interpolate_line(p0, p1));
 
   driver.enabled  := true;
   driver.penoff   := true;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point08.x;
-  plotter.midy    := layout.point08.y;
+  plotter.midx    := layout.point09.x;
+  plotter.midy    := layout.point09.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -628,29 +628,10 @@ begin
   end;
 end;
 
-procedure tmainform.MenuItem2Click(Sender: TObject);
-begin
-  if assigned(plotter) then exit;
-  opendialog.filter := 'dxf files (*.dxf)|*.dxf';
-  if opendialog.execute then
-  begin
-    lock2(false);
-    freeandnil(paths);
-    try
-      vec.readfromfile(opendialog.filename,
-        vec.getformatfromextension(opendialog.filename));
-    except
-      freeandnil(vec);
-      vec := tvvectorialdocument.create;
-    end;
-    paths := createpaths(vec);
-    lock2(true);
-  end;
-end;
-
 procedure tmainform.closemiclick(sender: tobject);
 begin
   if assigned(plotter) then exit;
+
   lock2(false);
   freeandnil(paths);
   freeandnil(vec);
@@ -663,6 +644,7 @@ end;
 procedure tmainform.exitmiclick(sender: tobject);
 begin
   if assigned(plotter) then exit;
+
   close;
 end;
 
@@ -757,8 +739,8 @@ begin
     driver.enabled  := not updatemi.checked;
     driver.penoff   := false;
     plotter         := tvplotter.create(paths);
-    plotter.midx    := layout.point08.x;
-    plotter.midy    := layout.point08.y;
+    plotter.midx    := layout.point09.x;
+    plotter.midy    := layout.point09.y + (heightse.value / 2);
     plotter.maxdx   := bitmap.width  div 2;
     plotter.maxdy   := bitmap.height div 2;
     plotter.offsetx := offsetxse.value;
@@ -857,8 +839,7 @@ begin
   if (heightse.value > (layout.height)) or
      (widthse .value > (layout.width )) then
   begin
-    messagedlg('vPlotter Error', 'Selected page size is bigger than work area !',
-      mterror, [mbok], 0);
+    messagedlg('vPlotter Error', 'Selected page size is bigger than work area !', mterror, [mbok], 0);
 
     formatcb.itemindex := formatcb.items.count - 2;
     formatcbchange (nil);

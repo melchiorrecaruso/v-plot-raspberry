@@ -37,7 +37,6 @@ type
     fpoint03: tvppoint;
     fpoint04: tvppoint;
     fpoint05: tvppoint;
-    fpoint08: tvppoint;
     fpoint09: tvppoint;
 
     ftop:    double;
@@ -66,7 +65,6 @@ type
     property point04: tvppoint read fpoint04;
     property point05: tvppoint read fpoint05;
 
-    property point08: tvppoint read fpoint08;
     property point09: tvppoint read fpoint09;
 
     property mode:    longint  read fmode;
@@ -116,8 +114,6 @@ begin
   fpoint05.x := 0;
   fpoint05.y := 0;
 
-  fpoint08.x := 0;
-  fpoint08.y := 0;
   fpoint09.x := 0;
   fpoint09.y := 0;
 
@@ -169,8 +165,6 @@ begin
   finally
     ini.destroy;
   end;
-  fpoint08.x   := ((fleft   ) + (fpoint01.x - fright)) / 2;
-  fpoint08.y   := ((fbottom ) + (fpoint01.y - ftop  )) / 2;
 
   if enabledebug then
   begin
@@ -180,7 +174,6 @@ begin
     writeln(format('  LAYOUT::P03.X  = %12.5f  P03.Y = %12.5f', [fpoint03.x, fpoint03.y]));
     writeln(format('  LAYOUT::P04.X  = %12.5f  P04.Y = %12.5f', [fpoint04.x, fpoint04.y]));
     writeln(format('  LAYOUT::P05.X  = %12.5f  P05.Y = %12.5f', [fpoint05.x, fpoint05.y]));
-    writeln(format('  LAYOUT::P08.X  = %12.5f  P08.Y = %12.5f', [fpoint08.x, fpoint08.y]));
     writeln(format('  LAYOUT::P09.X  = %12.5f  P09.Y = %12.5f', [fpoint09.x, fpoint09.y]));
 
     writeln(format('  LAYOUT::TOP    = %12.5f', [ftop   ]));
