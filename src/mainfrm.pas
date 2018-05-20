@@ -370,8 +370,8 @@ begin
   driver.enabled  := true;
   driver.penoff   := sender = movebordersmi;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point09.x;
-  plotter.midy    := layout.point09.y + (heightse.value / 2);
+  plotter.midx    := layout.point08.x;
+  plotter.midy    := layout.point08.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -402,8 +402,8 @@ begin
   driver.enabled  := true;
   driver.penoff   := sender = movetopmi;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point09.x;
-  plotter.midy    := layout.point09.y + (heightse.value / 2);
+  plotter.midx    := layout.point08.x;
+  plotter.midy    := layout.point08.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -434,8 +434,8 @@ begin
   driver.enabled  := true;
   driver.penoff   := sender = movebottommi;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point09.x;
-  plotter.midy    := layout.point09.y + (heightse.value / 2);
+  plotter.midx    := layout.point08.x;
+  plotter.midy    := layout.point08.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -466,8 +466,8 @@ begin
   driver.enabled  := true;
   driver.penoff   := sender = moveleftmi;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point09.x;
-  plotter.midy    := layout.point09.y + (heightse.value / 2);
+  plotter.midx    := layout.point08.x;
+  plotter.midy    := layout.point08.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -498,8 +498,8 @@ begin
   driver.enabled  := true;
   driver.penoff   := sender = moverightmi;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point09.x;
-  plotter.midy    := layout.point09.y + (heightse.value / 2);
+  plotter.midx    := layout.point08.x;
+  plotter.midy    := layout.point08.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -541,17 +541,16 @@ begin
 
   paths.clear;
   // form x-x to base
-  p0.x := layout.point09.x;
-  p0.y := layout.point09.y + 10;
-  p1.x := layout.point09.x;
-  p1.y := layout.point09.y;
+  p0.x := layout.point09.x - layout.point08.x;
+  p0.y := layout.point09.y - layout.point08.y - (heightse.value / 2);
+  p1   := p0;
   paths.add(interpolate_line(p0, p1));
 
   driver.enabled  := true;
   driver.penoff   := true;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point09.x;
-  plotter.midy    := layout.point09.y + (heightse.value / 2);
+  plotter.midx    := layout.point08.x;
+  plotter.midy    := layout.point08.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -739,8 +738,8 @@ begin
     driver.enabled  := not updatemi.checked;
     driver.penoff   := false;
     plotter         := tvplotter.create(paths);
-    plotter.midx    := layout.point09.x;
-    plotter.midy    := layout.point09.y + (heightse.value / 2);
+    plotter.midx    := layout.point08.x;
+    plotter.midy    := layout.point08.y + (heightse.value / 2);
     plotter.maxdx   := bitmap.width  div 2;
     plotter.maxdy   := bitmap.height div 2;
     plotter.offsetx := offsetxse.value;
