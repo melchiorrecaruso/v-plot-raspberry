@@ -954,14 +954,17 @@ end;
 
 procedure tmainform.onplottertick;
 begin
-  writeln(format('    TICK::P.X  = %12.5f', [plotter.point.x]));
-  writeln(format('    TICK::P.Y  = %12.5f', [plotter.point.y]));
+  if enabledebug then
+  begin
+    writeln(format('    TICK::P.X  = %12.5f', [plotter.point.x]));
+    writeln(format('    TICK::P.Y  = %12.5f', [plotter.point.y]));
+  end;
   // update preview
   bitmap.canvas.pixels[
     trunc(( widthse.value div 2) + plotter.point.x),
     trunc((heightse.value div 2) - plotter.point.y)] := clblack;
   // update progress bar
-  if plotter.index mod $F = 0 then
+  if plotter.index mod $FFFF = 0 then
   begin
     caption := format('Elapsed %u sec - Remaing %u sec', [elapsed,
       (elapsed * (plotter.count - plotter.index)) div plotter.index]);

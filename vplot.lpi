@@ -59,7 +59,7 @@
         <Filename Value="src/vpcoder.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="40"/>
+        <TopLine Value="342"/>
         <CursorPos X="39" Y="340"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -387,8 +387,8 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="101"/>
-        <CursorPos X="50" Y="123"/>
+        <TopLine Value="941"/>
+        <CursorPos X="29" Y="967"/>
         <FoldState Value=" T3l40Q024("/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -669,8 +669,8 @@
         <Filename Value="src/vpcommon.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="163"/>
-        <CursorPos X="31" Y="108"/>
+        <TopLine Value="79"/>
+        <CursorPos X="14" Y="100"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit85>
