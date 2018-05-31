@@ -112,6 +112,8 @@ begin
   fdelay1  := 3000;
   fdelay2  := 1500;
   fenabled := false;
+  fpenoff  := false;
+  fpen     := true;
   {$ifdef cpuarm}
   // setup wiringpi library
   wiringpisetup;
@@ -142,10 +144,8 @@ begin
   setclockwise1(true);
   setclockwise0(false);
   setclockwise1(false);
-  setpen(true);
-  setpen(false);
-  setpenoff(true);
   setpenoff(false);
+  setpen(false);
   setmode(1);
   setmode(4);
 end;
