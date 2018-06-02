@@ -178,6 +178,8 @@ procedure tmainform.formcreate(sender: tobject);
 var
   m0: longint;
   m1: longint;
+
+  p: tvppoint;
 begin
   // load layout
   layout := tvplayout.create;
@@ -197,6 +199,8 @@ begin
   // show toolbars
   manualdrivinggb.enabled := true;
   pagesizegb     .enabled := true;
+  // init mirror
+  mirror := tmirror.create(594.5, 420.5, 0, 0, 3.5, 0.25);
   // initialize driver
   optimize(layout.point09, m0, m1);
   driver.init(m0, m1);
@@ -207,6 +211,7 @@ begin
   // move to base position
   gohomebtnclick(nil);
   // ---
+  mirror.destroy;
   driver.destroy;
   layout.destroy;
   paths.destroy;
