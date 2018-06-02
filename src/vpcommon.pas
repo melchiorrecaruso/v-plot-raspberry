@@ -110,6 +110,10 @@ type
     l3: tpolynome;
     l4: tpolynome;
     l5: tpolynome;
+    l6: tpolynome;
+    l7: tpolynome;
+
+
 
   public
     constructor create(dx, dy, ex1, ex2, ey1, ey2: double);
@@ -635,12 +639,23 @@ begin
   l5.coefs[0] := (l1.coefs[2] + l2.coefs[2])/(2);
 
 
-  //writeln(l5.coefs[2]);
-  //writeln(l5.coefs[1]);
-  //writeln(l5.coefs[0]);
-  //writeln(polyeval(l5, -dy):5:10);
-  //writeln(polyeval(l5,   0):5:10);
-  //writeln(polyeval(l5, +dy):5:10);
+  l6.deg:= 2;
+  l6.coefs[2] := 0;
+  l6.coefs[1] := +ex1/(2*dy);
+  l6.coefs[0] := -ex1/(2);
+
+
+  l7.deg:= 2;
+  l7.coefs[2] := 0;
+  l7.coefs[1] := -ex2/(2*dy);
+  l7.coefs[0] := +ex2/(2);
+
+  //writeln(l7.coefs[2]);
+  //writeln(l7.coefs[1]);
+  //writeln(l7.coefs[0]);
+  //writeln(polyeval(l7, -dy):5:10);
+  //writeln(polyeval(l7,   0):5:10);
+  //writeln(polyeval(l7, +dy):5:10);
 end;
 
 destructor tmirror.destroy;
@@ -650,16 +665,22 @@ end;
 
 procedure tmirror.update(var p: tvppoint);
 var
-  l6: tpolynome;
+  l8: tpolynome;
 begin
-  l6.deg :=2;
-  l6.coefs[2] := polyeval(l5, p.y);
-  l6.coefs[1] := polyeval(l4, p.y);
-  l6.coefs[0] := polyeval(l3, p.y);
+  l8.deg :=2;
+  l8.coefs[2] := polyeval(l5, p.y);
+  l8.coefs[1] := polyeval(l4, p.y);
+  l8.coefs[0] := polyeval(l3, p.y);
 
-  writeln('tmirror.update  point.y=', p.y:10:2);
-  p.y := p.y + polyeval(l6, p.x);
-  writeln('tmirror.updated point.y=', p.y:10:2);
+  //writeln('tmirror.update  point.x=', p.x:10:2);
+  //writeln('tmirror.update  point.y=', p.y:10:2);
+
+  if p.x < 0 then p.x := p.x + polyeval(l6, p.y);
+  if p.x > 0 then p.x := p.x + polyeval(l7, p.y);
+                  p.y := p.y + polyeval(l8, p.x);
+
+  //writeln('tmirror.updated point.x=', p.x:10:2);
+  //writeln('tmirror.updated point.y=', p.y:10:2);
 end;
 
 // init unit
