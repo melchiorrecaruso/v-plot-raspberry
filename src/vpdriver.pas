@@ -166,8 +166,11 @@ begin
       fpen := value;
       {$ifdef cpuarm}
       if fpen then
+      begin
+        delaymicroseconds(fdelay0);
+        delaymicroseconds(fdelay0);
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_low, motz_freq))
-      else
+      end else
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_up,  motz_freq));
       delaymicroseconds(fdelay0);
       {$endif}
@@ -250,7 +253,7 @@ procedure tvpdriver.step(acount0, acount1: longint);
 {$ifdef cpuarm}
 var
    i: longint;
-  b0: boolean
+  b0: boolean;
   b1: boolean;
 {$endif}
 begin
