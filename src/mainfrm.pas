@@ -964,7 +964,7 @@ begin
     trunc(( widthse.value div 2) + plotter.point.x),
     trunc((heightse.value div 2) - plotter.point.y)] := clblack;
   // update progress bar
-  if plotter.index mod $FFFF = 0 then
+  if plotter.index mod $FFF = 0 then
   begin
     caption := format('Elapsed %u sec - Remaing %u sec', [elapsed,
       (elapsed * (plotter.count - plotter.index)) div plotter.index]);

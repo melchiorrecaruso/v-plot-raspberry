@@ -365,9 +365,9 @@ begin
 
               repeat
                 ddm0 := min(10, dm0);
-                ddm1 := min(10, dm1);
-
                 dec(dm0, ddm0);
+
+                ddm1 := min(10, dm1);
                 dec(dm1, ddm1);
 
                 driver.step(ddm0, ddm1);

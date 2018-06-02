@@ -37,7 +37,6 @@ type
     fclockwise1: boolean;
     fdelay0:     longint;
     fdelay1:     longint;
-    fdelay2:     longint;
     fenabled:    boolean;
     fmode:       longint;
     fpen:        boolean;
@@ -59,7 +58,6 @@ type
     property clockwise1: boolean read fclockwise1 write setclockwise1;
     property delay0:     longint read fdelay0     write fdelay0;
     property delay1:     longint read fdelay1     write fdelay1;
-    property delay2:     longint read fdelay2     write fdelay2;
     property enabled:    boolean read fenabled    write fenabled;
     property mode:       longint read fmode       write setmode;
     property pen:        boolean read fpen        write setpen;
@@ -110,7 +108,6 @@ begin
   fcount1  := 0;
   fdelay0  := 300000;
   fdelay1  := 3000;
-  fdelay2  := 1500;
   fenabled := false;
   fpenoff  := false;
   fpen     := true;
@@ -252,38 +249,47 @@ end;
 procedure tvpdriver.step(acount0, acount1: longint);
 {$ifdef cpuarm}
 var
-  i: longint;
+   i: longint;
+  b0: boolean
+  b1: boolean;
 {$endif}
 begin
-  if fenabled then
-    if (acount0 >= 0) and (acount1 >= 0) then
+  if enabledebug then
+  begin
+    if acount0 < 0 then raise exception.create('"acount0 < 0" exception');
+    if acount1 < 0 then raise exception.create('"acount1 < 0" exception');
+  end;
+
+  if fenabled and ((acount0 > 0) or (acount1 > 0)) then
+  begin
+    {$ifdef cpuarm}
+    for i := 0 to 18 do
     begin
-      {$ifdef cpuarm}
-      for i := 0 to 18 do
-      begin
-        if vplotmatrix[acount0, i] = 1 then
-        begin
-          digitalwrite(mot0_step, HIGH); delaymicroseconds(fdelay1);
-          digitalwrite(mot0_step,  LOW); delaymicroseconds(fdelay1);
-        end;
+      b0 := (vplotmatrix[acount0, i] = 1);
+      b1 := (vplotmatrix[acount1, i] = 1);
+      if b0 then digitalwrite(mot0_step, HIGH);
+      if b1 then digitalwrite(mot1_step, HIGH);
 
-        if vplotmatrix[acount1, i] = 1 then
-        begin
-          digitalwrite(mot1_step, HIGH); delaymicroseconds(fdelay1);
-          digitalwrite(mot1_step,  LOW); delaymicroseconds(fdelay1);
-        end;
-      end;
-      {$endif}
-      if fclockwise0 then
-        inc(fcount0, acount0)
-      else
-        dec(fcount0, acount0);
+      if b0 or
+         b1 then delaymicroseconds(fdelay1);
 
-      if fclockwise1 then
-        dec(fcount1, acount1)
-      else
-        inc(fcount1, acount1);
+      if b0 then digitalwrite(mot0_step,  LOW);
+      if b1 then digitalwrite(mot1_step,  LOW);
+
+      if b0 or
+         b1 then delaymicroseconds(fdelay1);
     end;
+    {$endif}
+    if fclockwise0 then
+      inc(fcount0, acount0)
+    else
+      dec(fcount0, acount0);
+
+    if fclockwise1 then
+      dec(fcount1, acount1)
+    else
+      inc(fcount1, acount1);
+  end;
 
   if enabledebug then
   begin

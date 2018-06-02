@@ -47,9 +47,9 @@ type
 
     fmode:   longint;
     fratio:  double;
+    fdelay0: longint;
     fdelay1: longint;
     fdelay2: longint;
-    fdelay0: longint;
 
     function getheight: double;
     function getwidth:  double;
@@ -72,9 +72,9 @@ type
     property mode:    longint  read fmode;
     property ratio:   double   read fratio;
 
+    property delay0:  longint  read fdelay0;
     property delay1:  longint  read fdelay1;
     property delay2:  longint  read fdelay2;
-    property delay0:  longint  read fdelay0;
 
     property height:  double   read getheight;
     property width:   double   read getwidth;
@@ -128,9 +128,9 @@ begin
 
   fmode      := 0;
   fratio     := 0;
+  fdelay0    := 0;
   fdelay1    := 0;
   fdelay2    := 0;
-  fdelay0    := 0;
 end;
 
 procedure tvplayout.load(const filename: rawbytestring);
@@ -165,10 +165,11 @@ begin
 
     fmode      := ini.readinteger('Stepper', 'MODE',   0);
     fratio     := ini.readfloat  ('Stepper', 'RATIO',  0);
+
+    fdelay0    := ini.readinteger('Servo',   'DELAY0', 0);
     fdelay1    := ini.readinteger('Stepper', 'DELAY1', 0);
     fdelay2    := ini.readinteger('Stepper', 'DELAY2', 0);
 
-    fdelay0    := ini.readinteger('Servo',   'DELAY0', 0);
   finally
     ini.destroy;
   end;
