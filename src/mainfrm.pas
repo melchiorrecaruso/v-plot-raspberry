@@ -178,6 +178,8 @@ procedure tmainform.formcreate(sender: tobject);
 var
   m0: longint;
   m1: longint;
+  m : tmirrormesh;
+  p : tvppoint;
 begin
   // load layout
   layout := tvplayout.create;
@@ -198,7 +200,33 @@ begin
   manualdrivinggb.enabled := true;
   pagesizegb     .enabled := true;
   // init mirror
-  mirror := tmirror.create(594.5, 420.5, 3, 3, 3.5, 0.25);
+  m[0].x := +0.000;  m[1].x := +0.000;  m[2].x := +0.000;
+  m[0].y := -1.000;  m[1].y := +3.500;  m[2].y := -1.000;
+
+  m[3].x := -2.000;  m[4].x := +0.000;  m[5].x := +2.000;
+  m[3].y := -0.500;  m[4].y := +1.875;  m[5].y := -0.500;
+
+  m[6].x := -4.000;  m[7].x := +0.000;  m[8].x := +4.000;
+  m[6].y := +0.000;  m[7].y := +0.250;  m[8].y := +0.000;
+
+  mirror := tmirror.create(594.5, 420.5, m);
+
+  if enabledebug then
+  begin
+    writeln('Mirroring');
+    writeln('TOP');
+    p.x := -594.5;   p.y := +420.5; mirror.update(p);
+    p.x := +0.000;   p.y := +420.5; mirror.update(p);
+    p.x := +594.5;   p.y := +420.5; mirror.update(p);
+    writeln('MIDDLE');
+    p.x := -594.5;   p.y := +0.000; mirror.update(p);
+    p.x := +0.000;   p.y := +0.000; mirror.update(p);
+    p.x := +594.5;   p.y := +0.000; mirror.update(p);
+    writeln('BOTTOM');
+    p.x := -594.5;   p.y := -420.5; mirror.update(p);
+    p.x := +0.000;   p.y := -420.5; mirror.update(p);
+    p.x := +594.5;   p.y := -420.5; mirror.update(p);
+  end;
   // initialize driver
   optimize(layout.point09, m0, m1);
   driver.init(m0, m1);
@@ -740,6 +768,7 @@ begin
   begin
     driver.enabled  := not updatemi.checked;
     driver.penoff   := false;
+    driver.pen      := false;
     plotter         := tvplotter.create(paths);
     plotter.midx    := layout.point08.x;
     plotter.midy    := layout.point08.y + (heightse.value / 2);
@@ -762,6 +791,7 @@ begin
   begin
     plotter.plot  := false;
     timer.enabled := false;
+    driver.pen    := false;
   end;
 end;
 

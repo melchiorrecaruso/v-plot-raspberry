@@ -26,7 +26,7 @@ unit vpcommon;
 interface
 
 uses
-  classes, sysutils;
+  classes, matrix, sysutils;
 
 type
   tdegres = 0..10;
@@ -95,30 +95,18 @@ type
     property item[index: longint]: tvppath read get;
   end;
 
+type
+  tmirrormesh = array[0..8] of tvppoint;
+
   tmirror = class
   private
-    fdx:  double;
-    fdy:  double;
-    fey1: double;
-    fey2: double;
-    fex1: double;
-    fex2: double;
-
-    l1: tpolynome;
-    l2: tpolynome;
-
-    l3: tpolynome;
-    l4: tpolynome;
-    l5: tpolynome;
-    l6: tpolynome;
-    l7: tpolynome;
-
-
-
+    lax, lay: tpolynome;
+    lbx, lby: tpolynome;
+    lcx, lcy: tpolynome;
   public
-    constructor create(dx, dy, ex1, ex2, ey1, ey2: double);
+    constructor create(xmax, ymax: double; const mesh: tmirrormesh);
     destructor destroy; override;
-    procedure update(var p: tvppoint);
+    function   update(const p: tvppoint): tvppoint;
   end;
 
 
@@ -601,61 +589,72 @@ end;
 
 // tmirror
 
-constructor tmirror.create(dx, dy, ex1, ex2, ey1, ey2: double);
+constructor tmirror.create(xmax, ymax: double; const mesh: tmirrormesh);
+var
+   a, aa: tvector3_double;
+   b, bb: tvector3_double;
+   c, cc: tvector3_double;
+  dy: tvector3_double;
+  dx: tvector3_double;
+   y: tmatrix3_double;
+   x: tmatrix3_double;
 begin
   inherited create;
-  fdx  := dx;
-  fdy  := dy;
-  fey1 := ey1;
-  fey2 := ey2;
-  fex1 := ex1;
-  fex2 := ex2;
+  xmax := abs(xmax);
+  ymax := abs(ymax);
 
-  // init
-  l1.deg :=2;
-  l1.coefs[2] := -ey1/sqr(dx);
-  l1.coefs[1] := 0;
-  l1.coefs[0] := ey1;
+  x.init(1, -xmax, sqr(-xmax), 1, 0, 0, 1, +xmax, sqr(+xmax));
+  y.init(1, +ymax, sqr(+ymax), 1, 0, 0, 1, -ymax, sqr(-ymax));
+  x := x.inverse(x.determinant);
+  y := y.inverse(y.determinant);
 
-  l2.deg :=2;
-  l2.coefs[2] := -ey2/sqr(dx);
-  l2.coefs[1] := 0;
-  l2.coefs[0] := ey2;
+  // calculate y-mirror
+  dy.init(mesh[0].y, mesh[1].y, mesh[2].y);   a := x * dy;
+  dy.init(mesh[3].y, mesh[4].y, mesh[5].y);   b := x * dy;
+  dy.init(mesh[6].y, mesh[7].y, mesh[8].y);   c := x * dy;
 
-  l3.deg :=2;
-  l3.coefs[2] := 0;
-  l3.coefs[1] := (l1.coefs[0] - l2.coefs[0])/(2*dy);
-  l3.coefs[0] := (l1.coefs[0] + l2.coefs[0])/(2);
+  dx.init(a.data[0], b.data[0], c.data[0]);  cc := y * dx;
+  dx.init(a.data[1], b.data[1], c.data[1]);  bb := y * dx;
+  dx.init(a.data[2], b.data[2], c.data[2]);  aa := y * dx;
 
-  l4.deg :=2;
-  l4.coefs[2] := 0;
-  l4.coefs[1] := (l1.coefs[1] - l2.coefs[1])/(2*dy);
-  l4.coefs[0] := (l1.coefs[1] + l2.coefs[1])/(2);
+  lay.deg :=2;
+  lay.coefs[2] := aa.data[2];
+  lay.coefs[1] := aa.data[1];
+  lay.coefs[0] := aa.data[0];
 
+  lby.deg :=2;
+  lby.coefs[2] := bb.data[2];
+  lby.coefs[1] := bb.data[1];
+  lby.coefs[0] := bb.data[0];
 
-  l5.deg :=2;
-  l5.coefs[2] := 0;
-  l5.coefs[1] := (l1.coefs[2] - l2.coefs[2])/(2*dy);
-  l5.coefs[0] := (l1.coefs[2] + l2.coefs[2])/(2);
+  lcy.deg :=2;
+  lcy.coefs[2] := cc.data[2];
+  lcy.coefs[1] := cc.data[1];
+  lcy.coefs[0] := cc.data[0];
 
+  // calculate x-mirror
+  dx.init(mesh[0].x, mesh[3].x, mesh[6].x);   a := y * dx;
+  dx.init(mesh[1].x, mesh[4].x, mesh[7].x);   b := y * dx;
+  dx.init(mesh[2].x, mesh[5].x, mesh[8].x);   c := y * dx;
 
-  l6.deg:= 2;
-  l6.coefs[2] := 0;
-  l6.coefs[1] := +ex1/(2*dy);
-  l6.coefs[0] := -ex1/(2);
+  dy.init(a.data[0], b.data[0], c.data[0]);  cc := x * dy;
+  dy.init(a.data[1], b.data[1], c.data[1]);  bb := x * dy;
+  dy.init(a.data[2], b.data[2], c.data[2]);  aa := x * dy;
 
+  lax.deg :=2;
+  lax.coefs[2] := aa.data[2];
+  lax.coefs[1] := aa.data[1];
+  lax.coefs[0] := aa.data[0];
 
-  l7.deg:= 2;
-  l7.coefs[2] := 0;
-  l7.coefs[1] := -ex2/(2*dy);
-  l7.coefs[0] := +ex2/(2);
+  lbx.deg :=2;
+  lbx.coefs[2] := bb.data[2];
+  lbx.coefs[1] := bb.data[1];
+  lbx.coefs[0] := bb.data[0];
 
-  //writeln(l7.coefs[2]);
-  //writeln(l7.coefs[1]);
-  //writeln(l7.coefs[0]);
-  //writeln(polyeval(l7, -dy):5:10);
-  //writeln(polyeval(l7,   0):5:10);
-  //writeln(polyeval(l7, +dy):5:10);
+  lcx.deg :=2;
+  lcx.coefs[2] := cc.data[2];
+  lcx.coefs[1] := cc.data[1];
+  lcx.coefs[0] := cc.data[0];
 end;
 
 destructor tmirror.destroy;
@@ -663,24 +662,28 @@ begin
   inherited destroy;
 end;
 
-procedure tmirror.update(var p: tvppoint);
+function tmirror.update(const p: tvppoint): tvppoint;
 var
-  l8: tpolynome;
+  ly, lx: tpolynome;
 begin
-  l8.deg :=2;
-  l8.coefs[2] := polyeval(l5, p.y);
-  l8.coefs[1] := polyeval(l4, p.y);
-  l8.coefs[0] := polyeval(l3, p.y);
+  ly.deg :=2;
+  ly.coefs[2] := polyeval(lay, p.y);
+  ly.coefs[1] := polyeval(lby, p.y);
+  ly.coefs[0] := polyeval(lcy, p.y);
 
-  //writeln('tmirror.update  point.x=', p.x:10:2);
-  //writeln('tmirror.update  point.y=', p.y:10:2);
+  lx.deg :=2;
+  lx.coefs[2] := polyeval(lax, p.x);
+  lx.coefs[1] := polyeval(lbx, p.x);
+  lx.coefs[0] := polyeval(lcx, p.x);
 
-  if p.x < 0 then p.x := p.x + polyeval(l6, p.y);
-  if p.x > 0 then p.x := p.x + polyeval(l7, p.y);
-                  p.y := p.y + polyeval(l8, p.x);
+  result.x := p.x + polyeval(lx, p.y);
+  result.y := p.y + polyeval(ly, p.x);
 
-  //writeln('tmirror.updated point.x=', p.x:10:2);
-  //writeln('tmirror.updated point.y=', p.y:10:2);
+  if enabledebug then
+  begin
+    writeln('tmirror.update dx=', result.x - p.x:4:3);
+    writeln('tmirror.update dy=', result.y - p.y:4:3);
+  end;
 end;
 
 // init unit

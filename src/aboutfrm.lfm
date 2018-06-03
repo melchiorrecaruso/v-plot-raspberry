@@ -137,7 +137,7 @@ object aboutform: Taboutform
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 12
-    Caption = 'Build 01062018'
+    Caption = 'Build 03062018'
     Layout = tlCenter
     ParentColor = False
   end
@@ -192,6 +192,14 @@ object aboutform: Taboutform
     BorderSpacing.Top = 10
     Caption = 'Copyright 2017-2018 Melchiorre Caruso'
     Layout = tlCenter
+    ParentColor = False
+  end
+  object Label1: TLabel
+    Left = 196
+    Height = 15
+    Top = 162
+    Width = 34
+    Caption = 'Label1'
     ParentColor = False
   end
 end

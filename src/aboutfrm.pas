@@ -40,6 +40,7 @@ type
     aboutlink: tlabel;
     aboutname: tlabel;
     aboutversion: tlabel;
+    Label1: TLabel;
   private
 
   public
