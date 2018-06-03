@@ -27,7 +27,7 @@ interface
 
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls,
-  comctrls, buttons, menus, spin, vpcommon, vpcoder, vplayout, vpdriver,
+  comctrls, buttons, menus, spin, vpcommon, vpcoder, vpsetting, vpdriver,
   fpvectorial;
 
 type
@@ -181,14 +181,14 @@ var
   m : tmirrormesh;
   p : tvppoint;
 begin
-  // load layout
-  layout := tvplayout.create;
-  layout.load(changefileext(paramstr(0), '.ini'));
+  // load setting
+  setting := tvpsetting.create;
+  setting.load(changefileext(paramstr(0), '.ini'));
   // create plotter driver
   driver := tvpdriver.create;
-  driver.mode   := layout.mode;
-  driver.delay0 := layout.delay0;
-  driver.delay1 := layout.delay1;
+  driver.mode   := setting.mode;
+  driver.delay0 := setting.delay0;
+  driver.delay1 := setting.delay1;
   // create preview, vectorial file and paths
   bitmap := tbitmap.create;
   vec    := tvvectorialdocument.create;
@@ -228,7 +228,7 @@ begin
     p.x := +594.5;   p.y := -420.5; mirror.update(p);
   end;
   // initialize driver
-  optimize(layout.point09, m0, m1);
+  optimize(setting.layout09, m0, m1);
   driver.init(m0, m1);
 end;
 
@@ -239,7 +239,7 @@ begin
   // ---
   mirror.destroy;
   driver.destroy;
-  layout.destroy;
+  setting.destroy;
   paths.destroy;
   vec.destroy;
   bitmap.destroy;
@@ -274,7 +274,7 @@ begin
       driver.step(dm0, 0);
       dec (m0, dm0);
     until (m0 =  0);
-    optimize(layout.point09, m0, m1);
+    optimize(setting.layout09, m0, m1);
     driver.init(m0, m1);
   end;
   lock2(true);
@@ -297,7 +297,7 @@ begin
       driver.step(dm0, 0);
       dec (m0, dm0);
     until (m0 =  0);
-    optimize(layout.point09, m0, m1);
+    optimize(setting.layout09, m0, m1);
     driver.init(m0, m1);
   end;
   lock2(true);
@@ -320,7 +320,7 @@ begin
       driver.step(0, dm1);
       dec (m1, dm1);
     until (m1 =  0);
-    optimize(layout.point09, m0, m1);
+    optimize(setting.layout09, m0, m1);
     driver.init(m0, m1);
   end;
   lock2(true);
@@ -343,7 +343,7 @@ begin
       driver.step(0, dm1);
       dec (m1, dm1);
     until (m1 =  0);
-    optimize(layout.point09, m0, m1);
+    optimize(setting.layout09, m0, m1);
     driver.init(m0, m1);
   end;
   lock2(true);
@@ -401,8 +401,8 @@ begin
   driver.enabled  := true;
   driver.penoff   := sender = movebordersmi;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point08.x;
-  plotter.midy    := layout.point08.y + (heightse.value / 2);
+  plotter.midx    := setting.layout08.x;
+  plotter.midy    := setting.layout08.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -433,8 +433,8 @@ begin
   driver.enabled  := true;
   driver.penoff   := sender = movetopmi;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point08.x;
-  plotter.midy    := layout.point08.y + (heightse.value / 2);
+  plotter.midx    := setting.layout08.x;
+  plotter.midy    := setting.layout08.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -465,8 +465,8 @@ begin
   driver.enabled  := true;
   driver.penoff   := sender = movebottommi;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point08.x;
-  plotter.midy    := layout.point08.y + (heightse.value / 2);
+  plotter.midx    := setting.layout08.x;
+  plotter.midy    := setting.layout08.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -497,8 +497,8 @@ begin
   driver.enabled  := true;
   driver.penoff   := sender = moveleftmi;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point08.x;
-  plotter.midy    := layout.point08.y + (heightse.value / 2);
+  plotter.midx    := setting.layout08.x;
+  plotter.midy    := setting.layout08.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -529,8 +529,8 @@ begin
   driver.enabled  := true;
   driver.penoff   := sender = moverightmi;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point08.x;
-  plotter.midy    := layout.point08.y + (heightse.value / 2);
+  plotter.midx    := setting.layout08.x;
+  plotter.midy    := setting.layout08.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -552,14 +552,14 @@ begin
 
   gohomebtnclick(nil);
   // load configuration
-  layout.clear;
-  layout.load(changefileext(paramstr(0), '.ini'));
+  setting.clear;
+  setting.load(changefileext(paramstr(0), '.ini'));
   // update plotter driver
-  driver.mode   := layout.mode;
-  driver.delay0 := layout.delay0;
-  driver.delay1 := layout.delay1;
+  driver.mode   := setting.mode;
+  driver.delay0 := setting.delay0;
+  driver.delay1 := setting.delay1;
 
-  optimize(layout.point09, m0, m1);
+  optimize(setting.layout09, m0, m1);
   driver.init(m0, m1);
 end;
 
@@ -572,16 +572,16 @@ begin
 
   paths.clear;
   // form x-x to base
-  p0.x := layout.point09.x - layout.point08.x;
-  p0.y := layout.point09.y - layout.point08.y - (heightse.value / 2);
+  p0.x := setting.layout09.x - setting.layout08.x;
+  p0.y := setting.layout09.y - setting.layout08.y - (heightse.value / 2);
   p1   := p0;
   paths.add(interpolate_line(p0, p1));
 
   driver.enabled  := true;
   driver.penoff   := true;
   plotter         := tvplotter.create(paths);
-  plotter.midx    := layout.point08.x;
-  plotter.midy    := layout.point08.y + (heightse.value / 2);
+  plotter.midx    := setting.layout08.x;
+  plotter.midy    := setting.layout08.y + (heightse.value / 2);
   plotter.maxdx   := bitmap.width  div 2;
   plotter.maxdy   := bitmap.height div 2;
   plotter.offsetx := offsetxse.value;
@@ -770,8 +770,8 @@ begin
     driver.penoff   := false;
     driver.pen      := false;
     plotter         := tvplotter.create(paths);
-    plotter.midx    := layout.point08.x;
-    plotter.midy    := layout.point08.y + (heightse.value / 2);
+    plotter.midx    := setting.layout08.x;
+    plotter.midy    := setting.layout08.y + (heightse.value / 2);
     plotter.maxdx   := bitmap.width  div 2;
     plotter.maxdy   := bitmap.height div 2;
     plotter.offsetx := offsetxse.value;
@@ -868,8 +868,8 @@ begin
     end;
   end;
 
-  if (heightse.value > (layout.height)) or
-     (widthse .value > (layout.width )) then
+  if (heightse.value > (setting.ymax)) or
+     (widthse .value > (setting.xmax)) then
   begin
     messagedlg('vPlotter Error', 'Selected page size is bigger than work area !', mterror, [mbok], 0);
 

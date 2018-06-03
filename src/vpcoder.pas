@@ -26,7 +26,7 @@ unit vpcoder;
 interface
 
 uses
-  classes, vpcommon, vpdriver, vplayout, fpvectorial;
+  classes, vpcommon, vpdriver, vpsetting, fpvectorial;
 
 type
   tvplotter = class(tthread)
@@ -231,12 +231,12 @@ var
 begin
   alpha    := 0;
   repeat
-    tmp00  := layout.point00;
-    tmp01  := layout.point01;
-    tmp02  := translatepoint(p, rotatepoint(layout.point02, alpha));
-    tmp03  := translatepoint(p, rotatepoint(layout.point03, alpha));
-    tmp04  := translatepoint(p, rotatepoint(layout.point04, alpha));
-    tmp05  := translatepoint(p, rotatepoint(layout.point05, alpha));
+    tmp00  := setting.layout00;
+    tmp01  := setting.layout01;
+    tmp02  := translatepoint(p, rotatepoint(setting.layout02, alpha));
+    tmp03  := translatepoint(p, rotatepoint(setting.layout03, alpha));
+    tmp04  := translatepoint(p, rotatepoint(setting.layout04, alpha));
+    tmp05  := translatepoint(p, rotatepoint(setting.layout05, alpha));
     tmp06  := intersectlines(linebetween(tmp00, tmp03),
                              linebetween(tmp01, tmp04));
 
@@ -252,8 +252,8 @@ begin
       break;
   until false;
 
-  m0 := round(layout.mode * (distancebetween(tmp00, tmp03) / layout.ratio));
-  m1 := round(layout.mode * (distancebetween(tmp01, tmp04) / layout.ratio));
+  m0 := round(setting.mode * (distancebetween(tmp00, tmp03) / setting.ratio));
+  m1 := round(setting.mode * (distancebetween(tmp01, tmp04) / setting.ratio));
 
   if enabledebug then
   begin
@@ -267,8 +267,8 @@ begin
     writeln(format('OPTIMIZE::D14    = %12.5f', [distancebetween(tmp01, tmp04)]));
     writeln(format('OPTIMIZE::CNT.0  = %12.5u', [m0]));
     writeln(format('OPTIMIZE::CNT.1  = %12.5u', [m1]));
-    writeln(format('OPTIMIZE::MODE   = %12.3u', [layout.mode]));
-    writeln(format('OPTIMIZE::RATIO  = %12.5f', [layout.ratio]));
+    writeln(format('OPTIMIZE::MODE   = %12.3u', [setting.mode]));
+    writeln(format('OPTIMIZE::RATIO  = %12.5f', [setting.ratio]));
   end;
 end;
 
@@ -360,11 +360,11 @@ begin
                  (dm1 < 10) then
               begin
                 driver.pen    := true;
-                driver.delay1 := layout.delay2;
+                driver.delay1 := setting.delay2;
               end else
               begin
                 driver.pen    := false;
-                driver.delay1 := layout.delay1;
+                driver.delay1 := setting.delay1;
               end;
 
               repeat
