@@ -682,7 +682,7 @@ begin
   if enabledebug then
   begin
     writeln(format('  WAVING::P.X    = %12.5f  P''.X = %12.5f', [p.x, result.x]));
-    writeln(format('  WAVING::P.Y    = %12.5f  P''.Y = %12.5f', [p.x, result.y]));
+    writeln(format('  WAVING::P.Y    = %12.5f  P''.Y = %12.5f', [p.y, result.y]));
   end;
 end;
 
