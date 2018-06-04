@@ -96,15 +96,15 @@ type
   end;
 
 type
-  tmirrormesh = array[0..8] of tvppoint;
+  twavemesh = array[0..8] of tvppoint;
 
-  tmirror = class
+  twave = class
   private
     lax, lay: tpolynome;
     lbx, lby: tpolynome;
     lcx, lcy: tpolynome;
   public
-    constructor create(xmax, ymax: double; const mesh: tmirrormesh);
+    constructor create(xmax, ymax: double; const mesh: twavemesh);
     destructor destroy; override;
     function   update(const p: tvppoint): tvppoint;
   end;
@@ -587,9 +587,9 @@ begin
   result := tvppath(flist[index]);
 end;
 
-// tmirror
+// twave
 
-constructor tmirror.create(xmax, ymax: double; const mesh: tmirrormesh);
+constructor twave.create(xmax, ymax: double; const mesh: twavemesh);
 var
    a, aa: tvector3_double;
    b, bb: tvector3_double;
@@ -657,12 +657,12 @@ begin
   lcx.coefs[0] := cc.data[0];
 end;
 
-destructor tmirror.destroy;
+destructor twave.destroy;
 begin
   inherited destroy;
 end;
 
-function tmirror.update(const p: tvppoint): tvppoint;
+function twave.update(const p: tvppoint): tvppoint;
 var
   ly, lx: tpolynome;
 begin
@@ -681,8 +681,8 @@ begin
 
   if enabledebug then
   begin
-    writeln('tmirror.update dx=', result.x - p.x:4:3);
-    writeln('tmirror.update dy=', result.y - p.y:4:3);
+    writeln(format('  WAVING::P.X  = %12.5f  P''.X = %12.5f', [p.x, result.x]));
+    writeln(format('  WAVING::P.Y  = %12.5f  P''.Y = %12.5f', [p.x, result.y]));
   end;
 end;
 

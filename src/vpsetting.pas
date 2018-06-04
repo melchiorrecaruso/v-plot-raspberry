@@ -40,15 +40,7 @@ type
     flayout08: tvppoint;
     flayout09: tvppoint;
 
-    fwave00:   tvppoint;
-    fwave01:   tvppoint;
-    fwave02:   tvppoint;
-    fwave03:   tvppoint;
-    fwave04:   tvppoint;
-    fwave05:   tvppoint;
-    fwave06:   tvppoint;
-    fwave07:   tvppoint;
-    fwave08:   tvppoint;
+    fwave:     twavemesh;
 
     fxmax:     double;
     fymax:     double;
@@ -73,18 +65,10 @@ type
     property layout08: tvppoint read flayout08;
     property layout09: tvppoint read flayout09;
 
+    property wave:     twavemesh read fwave;
+
     property xmax:     double   read fxmax;
     property ymax:     double   read fymax;
-
-    property wave00:   tvppoint read fwave00;
-    property wave01:   tvppoint read fwave01;
-    property wave02:   tvppoint read fwave02;
-    property wave03:   tvppoint read fwave03;
-    property wave04:   tvppoint read fwave04;
-    property wave05:   tvppoint read fwave05;
-    property wave06:   tvppoint read fwave06;
-    property wave07:   tvppoint read fwave07;
-    property wave08:   tvppoint read fwave08;
 
     property mode:     longint  read fmode;
     property ratio:    double   read fratio;
@@ -125,15 +109,15 @@ begin
   flayout08.x := 0;  flayout08.y := 0;
   flayout09.x := 0;  flayout09.y := 0;
 
-  fwave00.x   := 0;  fwave00.y   := 0;
-  fwave01.x   := 0;  fwave01.y   := 0;
-  fwave02.x   := 0;  fwave02.y   := 0;
-  fwave03.x   := 0;  fwave03.y   := 0;
-  fwave04.x   := 0;  fwave04.y   := 0;
-  fwave05.x   := 0;  fwave05.y   := 0;
-  fwave06.x   := 0;  fwave06.y   := 0;
-  fwave07.x   := 0;  fwave07.y   := 0;
-  fwave08.x   := 0;  fwave08.y   := 0;
+  fwave[0].x  := 0;  fwave[0].y  := 0;
+  fwave[1].x  := 0;  fwave[1].y  := 0;
+  fwave[2].x  := 0;  fwave[2].y  := 0;
+  fwave[3].x  := 0;  fwave[3].y  := 0;
+  fwave[4].x  := 0;  fwave[4].y  := 0;
+  fwave[5].x  := 0;  fwave[5].y  := 0;
+  fwave[6].x  := 0;  fwave[6].y  := 0;
+  fwave[7].x  := 0;  fwave[7].y  := 0;
+  fwave[8].x  := 0;  fwave[8].y  := 0;
 
   fxmax       := 0;
   fymax       := 0;
@@ -170,24 +154,24 @@ begin
     flayout09.x := ini.readfloat  ('Layout',  '09.X',  0);
     flayout09.y := ini.readfloat  ('Layout',  '09.Y',  0);
 
-    fwave00.x   := ini.readfloat  ('Wave',    '00.X',  0);
-    fwave00.y   := ini.readfloat  ('Wave',    '00.Y',  0);
-    fwave01.x   := ini.readfloat  ('Wave',    '01.X',  0);
-    fwave01.y   := ini.readfloat  ('Wave',    '01.Y',  0);
-    fwave02.x   := ini.readfloat  ('Wave',    '02.X',  0);
-    fwave02.y   := ini.readfloat  ('Wave',    '02.Y',  0);
-    fwave03.x   := ini.readfloat  ('Wave',    '03.X',  0);
-    fwave03.y   := ini.readfloat  ('Wave',    '03.Y',  0);
-    fwave04.x   := ini.readfloat  ('Wave',    '04.X',  0);
-    fwave04.y   := ini.readfloat  ('Wave',    '04.Y',  0);
-    fwave05.x   := ini.readfloat  ('Wave',    '05.X',  0);
-    fwave05.y   := ini.readfloat  ('Wave',    '05.Y',  0);
-    fwave06.x   := ini.readfloat  ('Wave',    '06.X',  0);
-    fwave06.y   := ini.readfloat  ('Wave',    '06.Y',  0);
-    fwave07.x   := ini.readfloat  ('Wave',    '07.X',  0);
-    fwave07.y   := ini.readfloat  ('Wave',    '07.Y',  0);
-    fwave08.x   := ini.readfloat  ('Wave',    '08.X',  0);
-    fwave08.y   := ini.readfloat  ('Wave',    '08.Y',  0);
+    fwave[0].x  := ini.readfloat  ('Wave',    '00.X',  0);
+    fwave[0].y  := ini.readfloat  ('Wave',    '00.Y',  0);
+    fwave[1].x  := ini.readfloat  ('Wave',    '01.X',  0);
+    fwave[1].y  := ini.readfloat  ('Wave',    '01.Y',  0);
+    fwave[2].x  := ini.readfloat  ('Wave',    '02.X',  0);
+    fwave[2].y  := ini.readfloat  ('Wave',    '02.Y',  0);
+    fwave[3].x  := ini.readfloat  ('Wave',    '03.X',  0);
+    fwave[3].y  := ini.readfloat  ('Wave',    '03.Y',  0);
+    fwave[4].x  := ini.readfloat  ('Wave',    '04.X',  0);
+    fwave[4].y  := ini.readfloat  ('Wave',    '04.Y',  0);
+    fwave[5].x  := ini.readfloat  ('Wave',    '05.X',  0);
+    fwave[5].y  := ini.readfloat  ('Wave',    '05.Y',  0);
+    fwave[6].x  := ini.readfloat  ('Wave',    '06.X',  0);
+    fwave[6].y  := ini.readfloat  ('Wave',    '06.Y',  0);
+    fwave[7].x  := ini.readfloat  ('Wave',    '07.X',  0);
+    fwave[7].y  := ini.readfloat  ('Wave',    '07.Y',  0);
+    fwave[8].x  := ini.readfloat  ('Wave',    '08.X',  0);
+    fwave[8].y  := ini.readfloat  ('Wave',    '08.Y',  0);
 
     fxmax       := ini.readfloat  ('Area',    'XMAX',   0);
     fymax       := ini.readfloat  ('Area',    'YMAX',   0);
@@ -212,15 +196,15 @@ begin
     writeln(format('  LAYOUT::08.X  = %12.5f  08.Y = %12.5f', [flayout08.x, flayout08.y]));
     writeln(format('  LAYOUT::09.X  = %12.5f  09.Y = %12.5f', [flayout09.x, flayout09.y]));
 
-    writeln(format('    WAVE::00.X  = %12.5f  00.Y = %12.5f', [  fwave00.x,   fwave00.y]));
-    writeln(format('    WAVE::01.X  = %12.5f  01.Y = %12.5f', [  fwave01.x,   fwave01.y]));
-    writeln(format('    WAVE::02.X  = %12.5f  02.Y = %12.5f', [  fwave02.x,   fwave02.y]));
-    writeln(format('    WAVE::03.X  = %12.5f  03.Y = %12.5f', [  fwave03.x,   fwave03.y]));
-    writeln(format('    WAVE::04.X  = %12.5f  04.Y = %12.5f', [  fwave04.x,   fwave04.y]));
-    writeln(format('    WAVE::05.X  = %12.5f  05.Y = %12.5f', [  fwave05.x,   fwave05.y]));
-    writeln(format('    WAVE::06.X  = %12.5f  06.Y = %12.5f', [  fwave06.x,   fwave06.y]));
-    writeln(format('    WAVE::07.X  = %12.5f  07.Y = %12.5f', [  fwave07.x,   fwave07.y]));
-    writeln(format('    WAVE::08.X  = %12.5f  08.Y = %12.5f', [  fwave08.x,   fwave08.y]));
+    writeln(format('    WAVE::00.X  = %12.5f  00.Y = %12.5f', [ fwave[0].x,  fwave[0].y]));
+    writeln(format('    WAVE::01.X  = %12.5f  01.Y = %12.5f', [ fwave[1].x,  fwave[1].y]));
+    writeln(format('    WAVE::02.X  = %12.5f  02.Y = %12.5f', [ fwave[2].x,  fwave[2].y]));
+    writeln(format('    WAVE::03.X  = %12.5f  03.Y = %12.5f', [ fwave[3].x,  fwave[3].y]));
+    writeln(format('    WAVE::04.X  = %12.5f  04.Y = %12.5f', [ fwave[4].x,  fwave[4].y]));
+    writeln(format('    WAVE::05.X  = %12.5f  05.Y = %12.5f', [ fwave[5].x,  fwave[5].y]));
+    writeln(format('    WAVE::06.X  = %12.5f  06.Y = %12.5f', [ fwave[6].x,  fwave[6].y]));
+    writeln(format('    WAVE::07.X  = %12.5f  07.Y = %12.5f', [ fwave[7].x,  fwave[7].y]));
+    writeln(format('    WAVE::08.X  = %12.5f  08.Y = %12.5f', [ fwave[8].x,  fwave[8].y]));
 
     writeln(format('    AREA::XMAX  = %12.5f', [fxmax  ]));
     writeln(format('    AREA::YMAX  = %12.5f', [fymax  ]));

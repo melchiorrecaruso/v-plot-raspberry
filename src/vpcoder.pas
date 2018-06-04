@@ -86,7 +86,7 @@ type
 
 var
   plotter: tvplotter = nil;
-  mirror:  tmirror   = nil;
+  wave:    twave     = nil;
 
 
 implementation
@@ -342,8 +342,8 @@ begin
             // move plotter
             if driver.enabled then
             begin
-              if assigned(mirror) then
-                mirror.update(fpoint);
+              if assigned(wave) then
+                wave.update(fpoint);
 
               fpoint.x := fmidx + fpoint.x;
               fpoint.y := fmidy + fpoint.y;
