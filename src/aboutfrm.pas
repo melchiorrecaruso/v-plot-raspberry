@@ -39,8 +39,7 @@ type
     aboutlicense: tlabel;
     aboutlink: tlabel;
     aboutname: tlabel;
-    aboutversion: tlabel;
-    Label1: TLabel;
+    aboutversion: TLabel;
   private
 
   public

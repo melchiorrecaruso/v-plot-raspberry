@@ -20,8 +20,8 @@ object aboutform: Taboutform
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 15
-    Top = 245
+    Height = 16
+    Top = 250
     Width = 400
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
@@ -37,7 +37,7 @@ object aboutform: Taboutform
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 15
+    Height = 16
     Top = 126
     Width = 400
     Alignment = taCenter
@@ -124,23 +124,6 @@ object aboutform: Taboutform
     }
     Transparent = True
   end
-  object aboutversion: TLabel
-    AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = aboutname
-    AnchorSideTop.Side = asrBottom
-    AnchorSideRight.Control = Owner
-    AnchorSideRight.Side = asrBottom
-    Left = 0
-    Height = 15
-    Top = 153
-    Width = 400
-    Alignment = taCenter
-    Anchors = [akTop, akLeft, akRight]
-    BorderSpacing.Top = 12
-    Caption = 'Build 03062018'
-    Layout = tlCenter
-    ParentColor = False
-  end
   object aboutdescription: TLabel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = aboutversion
@@ -148,8 +131,8 @@ object aboutform: Taboutform
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 15
-    Top = 174
+    Height = 16
+    Top = 176
     Width = 400
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
@@ -165,8 +148,8 @@ object aboutform: Taboutform
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 15
-    Top = 199
+    Height = 16
+    Top = 202
     Width = 400
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
@@ -184,8 +167,8 @@ object aboutform: Taboutform
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 15
-    Top = 224
+    Height = 16
+    Top = 228
     Width = 400
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
@@ -194,12 +177,21 @@ object aboutform: Taboutform
     Layout = tlCenter
     ParentColor = False
   end
-  object Label1: TLabel
-    Left = 196
-    Height = 15
-    Top = 162
-    Width = 34
-    Caption = 'Label1'
+  object aboutversion: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = aboutname
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 0
+    Height = 16
+    Top = 154
+    Width = 400
+    Alignment = taCenter
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 12
+    Caption = 'Build 04062018'
+    Layout = tlCenter
     ParentColor = False
   end
 end

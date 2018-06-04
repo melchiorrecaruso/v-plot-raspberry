@@ -199,8 +199,9 @@ begin
   manualdrivinggb.enabled := true;
   pagesizegb     .enabled := true;
   // init wave
-  wave := twave.create(594.5, 420.5, setting.wave);
-
+  wave := twave.create(setting.wavexmax,
+                       setting.waveymax,
+                       setting.wave);
   if enabledebug then
   begin
     p.x := -594.5;   p.y := +420.5; wave.update(p);
@@ -854,8 +855,8 @@ begin
     end;
   end;
 
-  if (heightse.value > (setting.ymax)) or
-     (widthse .value > (setting.xmax)) then
+  if (heightse.value > (2*setting.waveymax)) or
+     (widthse .value > (2*setting.wavexmax)) then
   begin
     messagedlg('vPlotter Error', 'Selected page size is bigger than work area !', mterror, [mbok], 0);
 
