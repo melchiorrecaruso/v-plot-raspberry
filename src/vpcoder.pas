@@ -343,7 +343,7 @@ begin
             if driver.enabled then
             begin
               if assigned(wave) then
-                wave.update(fpoint);
+                fpoint := wave.update(fpoint);
 
               fpoint.x := fmidx + fpoint.x;
               fpoint.y := fmidy + fpoint.y;
