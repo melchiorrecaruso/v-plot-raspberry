@@ -216,6 +216,27 @@ begin
       digitalwrite(motx_mod1, HIGH);
       digitalwrite(motx_mod2,  LOW);
       fmode := value;
+    end else
+    if value = 8 then
+    begin
+      digitalwrite(motx_mod0, HIGH);
+      digitalwrite(motx_mod1, HIGH);
+      digitalwrite(motx_mod2,  LOW);
+      fmode := value;
+    end else
+    if value = 16 then
+    begin
+      digitalwrite(motx_mod0,  LOW);
+      digitalwrite(motx_mod1,  LOW);
+      digitalwrite(motx_mod2, HIGH);
+      fmode := value;
+    end else
+    if value = 32 then
+    begin
+      digitalwrite(motx_mod0, HIGH);
+      digitalwrite(motx_mod1,  LOW);
+      digitalwrite(motx_mod2, HIGH);
+      fmode := value;
     end;
     {$endif}
   end;
