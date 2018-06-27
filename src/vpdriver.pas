@@ -249,9 +249,9 @@ begin
     fclockwise0 := value;
     {$ifdef cpuarm}
     if fclockwise0 then
-      digitalwrite(mot0_dir, HIGH)
+      digitalwrite(mot0_dir,  LOW)
     else
-      digitalwrite(mot0_dir,  LOW);
+      digitalwrite(mot0_dir, HIGH);
     {$endif}
   end;
 end;
@@ -263,9 +263,9 @@ begin
     fclockwise1 := value;
     {$ifdef cpuarm}
     if fclockwise1 then
-      digitalwrite(mot1_dir, HIGH)
+      digitalwrite(mot1_dir,  LOW)
     else
-      digitalwrite(mot1_dir,  LOW);
+      digitalwrite(mot1_dir, HIGH);
     {$endif}
   end;
 end;
