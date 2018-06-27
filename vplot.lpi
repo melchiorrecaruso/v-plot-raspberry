@@ -58,8 +58,8 @@
         <Filename Value="src/vpcoder.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="325"/>
-        <CursorPos X="60" Y="347"/>
+        <TopLine Value="330"/>
+        <CursorPos X="45" Y="327"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -385,8 +385,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="961"/>
-        <CursorPos X="8" Y="994"/>
+        <TopLine Value="179"/>
+        <CursorPos X="72" Y="197"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -594,10 +594,9 @@
       <Unit76>
         <Filename Value="src/vpdriver.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="236"/>
-        <CursorPos X="31" Y="266"/>
+        <TopLine Value="191"/>
+        <CursorPos X="50" Y="254"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit76>
@@ -666,9 +665,10 @@
       <Unit85>
         <Filename Value="src/vpcommon.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="656"/>
-        <CursorPos X="69" Y="685"/>
+        <TopLine Value="130"/>
+        <CursorPos X="45" Y="142"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit85>
@@ -727,7 +727,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="7"/>
         <TopLine Value="9"/>
-        <CursorPos X="27" Y="22"/>
+        <CursorPos X="77" Y="21"/>
         <UsageCount Value="141"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>

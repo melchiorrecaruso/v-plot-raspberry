@@ -67,7 +67,6 @@ type
 
     property plot:     boolean       read fplot      write fplot;
 
-
     property onstart:  tthreadmethod read fonstart   write fonstart;
     property onstop:   tthreadmethod read fonstop    write fonstop;
     property ontick:   tthreadmethod read fontick    write fontick;

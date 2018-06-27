@@ -199,9 +199,9 @@ begin
   manualdrivinggb.enabled := true;
   pagesizegb     .enabled := true;
   // init wave
-  wave := twave.create(setting.wavexmax,
-                       setting.waveymax,
-                       setting.wave);
+  //wave := twave.create(setting.wavexmax,
+  //                     setting.waveymax,
+  //                     setting.wave);
   if enabledebug then
   begin
     p.x := -594.5;   p.y := +420.5; wave.update(p);
