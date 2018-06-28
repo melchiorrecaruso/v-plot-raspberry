@@ -239,7 +239,8 @@ begin
     tmp06  := intersectlines(linebetween(tmp00, tmp03),
                              linebetween(tmp01, tmp04));
 
-    err := abs(tmp06.x - tmp05.x);
+    err := 0;
+  //err := abs(tmp06.x - tmp05.x);
     if  err > 0.001 then
     begin
       if tmp06.x < tmp05.x then

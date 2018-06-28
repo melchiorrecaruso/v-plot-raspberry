@@ -57,9 +57,11 @@
       <Unit2>
         <Filename Value="src/vpcoder.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="330"/>
-        <CursorPos X="45" Y="327"/>
+        <TopLine Value="217"/>
+        <CursorPos X="35" Y="243"/>
+        <FoldState Value=" T3jD0I3#"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -665,9 +667,8 @@
       <Unit85>
         <Filename Value="src/vpcommon.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="130"/>
+        <TopLine Value="196"/>
         <CursorPos X="45" Y="142"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
