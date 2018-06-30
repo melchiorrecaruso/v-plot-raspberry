@@ -199,20 +199,20 @@ begin
   manualdrivinggb.enabled := true;
   pagesizegb     .enabled := true;
   // init wave
-  //wave := twave.create(setting.wavexmax,
-  //                     setting.waveymax,
-  //                     setting.wave);
+  wave := twave.create(setting.wavexmax,
+                       setting.waveymax,
+                       setting.wave);
   if enabledebug then
   begin
-    p.x := -594.5;   p.y := +420.5; wave.update(p);
-    p.x := +0.000;   p.y := +420.5; wave.update(p);
-    p.x := +594.5;   p.y := +420.5; wave.update(p);
-    p.x := -594.5;   p.y := +0.000; wave.update(p);
-    p.x := +0.000;   p.y := +0.000; wave.update(p);
-    p.x := +594.5;   p.y := +0.000; wave.update(p);
-    p.x := -594.5;   p.y := -420.5; wave.update(p);
-    p.x := +0.000;   p.y := -420.5; wave.update(p);
-    p.x := +594.5;   p.y := -420.5; wave.update(p);
+    p.x := -594.5;  p.y := +420.5;  wave.update(p);
+    p.x := +0.000;  p.y := +420.5;  wave.update(p);
+    p.x := +594.5;  p.y := +420.5;  wave.update(p);
+    p.x := -594.5;  p.y := +0.000;  wave.update(p);
+    p.x := +0.000;  p.y := +0.000;  wave.update(p);
+    p.x := +594.5;  p.y := +0.000;  wave.update(p);
+    p.x := -594.5;  p.y := -420.5;  wave.update(p);
+    p.x := +0.000;  p.y := -420.5;  wave.update(p);
+    p.x := +594.5;  p.y := -420.5;  wave.update(p);
   end;
   // initialize driver
   optimize(setting.layout09, m0, m1);

@@ -240,7 +240,7 @@ begin
                              linebetween(tmp01, tmp04));
 
     err := 0;
-  //err := abs(tmp06.x - tmp05.x);
+    //err := abs(tmp06.x - tmp05.x);
     if  err > 0.001 then
     begin
       if tmp06.x < tmp05.x then
@@ -342,8 +342,8 @@ begin
             // move plotter
             if driver.enabled then
             begin
-              if assigned(wave) then
-                fpoint := wave.update(fpoint);
+              //if assigned(wave) then
+              //  fpoint := wave.update(fpoint);
 
               fpoint.x := fmidx + fpoint.x;
               fpoint.y := fmidy + fpoint.y;
