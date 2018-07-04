@@ -106,7 +106,7 @@ type
   public
     constructor create(xmax, ymax: double; const mesh: twavemesh);
     destructor destroy; override;
-    function   update(const p: tvppoint): tvppoint;
+    function update(const p: tvppoint): tvppoint;
   end;
 
 
