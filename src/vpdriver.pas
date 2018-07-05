@@ -159,6 +159,8 @@ begin
 end;
 
 procedure tvpdriver.setpen(value: boolean);
+var
+  i: longint;
 begin
   if not fpenoff then
     if fpen <> value then
@@ -167,12 +169,19 @@ begin
       {$ifdef cpuarm}
       if fpen then
       begin
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_low - 0.6, motz_freq));
         delaymicroseconds(fdelay0);
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_low - 0.4, motz_freq));
         delaymicroseconds(fdelay0);
-        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_low, motz_freq))
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_low - 0.2, motz_freq));
+        delaymicroseconds(fdelay0);
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_low - 0.0, motz_freq));
+        delaymicroseconds(fdelay0);
       end else
-        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_up,  motz_freq));
-      delaymicroseconds(fdelay0);
+      begin
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_up, motz_freq));
+        delaymicroseconds(fdelay0);
+      end;
       {$endif}
     end;
 end;
