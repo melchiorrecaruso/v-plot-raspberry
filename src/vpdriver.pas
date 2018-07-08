@@ -85,6 +85,7 @@ const
 
   motz_up       = 1.80;
   motz_low      = 2.50;
+  motz_inc      = 0.10;
   motz_freq     = 50;
 
   vplotmatrix : array [0..10, 0..18] of longint = (
@@ -169,24 +170,28 @@ begin
       {$ifdef cpuarm}
       if fpen then
       begin
-        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_low - 0.6, motz_freq));
-        delaymicroseconds(fdelay0);
-        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_low - 0.4, motz_freq));
-        delaymicroseconds(fdelay0);
-        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_low - 0.2, motz_freq));
-        delaymicroseconds(fdelay0);
-        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_low - 0.0, motz_freq));
-        delaymicroseconds(fdelay0);
+        i := motz_up;
+        repeat
+          i := min(i + motz_inc, motz_low);;
+          pwmwrite(PCA9685_PIN_BASE + 0, calcticks(i, motz_freq));
+          delaymicroseconds(fdelay0);
+        until i >= motz_low;
       end else
       begin
-        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_up, motz_freq));
-        delaymicroseconds(fdelay0);
+        i := motz_low;
+        repeat
+          i := max(i - motz_inc, motz_up);
+          pwmwrite(PCA9685_PIN_BASE + 0, calcticks(i, motz_freq));
+          delaymicroseconds(fdelay0);
+        until i <= motz_up;
       end;
       {$endif}
     end;
 end;
 
 procedure tvpdriver.setpenoff(value: boolean);
+var
+  i: longint;
 begin
   fpenoff := value;
   if fpenoff then
@@ -194,8 +199,12 @@ begin
     begin
       fpen := false;
       {$ifdef cpuarm}
-      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_up, motz_freq));
-      delaymicroseconds(fdelay0);
+      i := motz_low;
+      repeat
+        i := max(i - motz_inc, motz_up);
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(i, motz_freq));
+        delaymicroseconds(fdelay0);
+      until i <= motz_up;
       {$endif}
     end;
 end;
@@ -246,6 +255,12 @@ begin
       digitalwrite(motx_mod1,  LOW);
       digitalwrite(motx_mod2, HIGH);
       fmode := value;
+    end else
+    begin
+      digitalwrite(motx_mod0,  LOW);
+      digitalwrite(motx_mod1,  LOW);
+      digitalwrite(motx_mod2,  LOW);
+      fmode := 1;
     end;
     {$endif}
   end;
