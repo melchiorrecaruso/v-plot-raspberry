@@ -57,9 +57,10 @@
       <Unit2>
         <Filename Value="src/vpcoder.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="227"/>
-        <CursorPos X="6" Y="252"/>
+        <CursorPos X="5" Y="242"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -594,9 +595,8 @@
       <Unit76>
         <Filename Value="src/vpdriver.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="164"/>
+        <TopLine Value="142"/>
         <CursorPos X="96" Y="177"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
