@@ -26,74 +26,21 @@ unit vpcoder;
 interface
 
 uses
-  classes, vpcommon, vpdriver, vpsetting, fpvectorial;
-
-type
-  tvplotter = class(tthread)
-  private
-    findex:    longint;
-    fcount:    longint;
-    fcheck:    boolean;
-    fpaths:    tvppaths;
-    fplot:     boolean;
-
-    fpoint:    tvppoint;
-    fmidx:     double;
-    fmidy:     double;
-    fmaxdx:    double;
-    fmaxdy:    double;
-    foffsetx:  double;
-    foffsety:  double;
-
-    fonstart:  tthreadmethod;
-    fonstop:   tthreadmethod;
-    fontick:   tthreadmethod;
-  protected
-    procedure execute; override;
-  public
-    constructor create(paths: tvppaths);
-    destructor  destroy; override;
-  public
-    property index:    longint       read findex;
-    property count:    longint       read fcount;
-    property check:    boolean       read fcheck     write fcheck;
-    property point:    tvppoint      read fpoint     write fpoint;
-    property midx:     double        read fmidx      write fmidx;
-    property midy:     double        read fmidy      write fmidy;
-    property maxdx:    double        read fmaxdx     write fmaxdx;
-    property maxdy:    double        read fmaxdy     write fmaxdy;
-    property offsetx:  double        read foffsetx   write foffsetx;
-    property offsety:  double        read foffsety   write foffsety;
-
-    property plot:     boolean       read fplot      write fplot;
-
-    property onstart:  tthreadmethod read fonstart   write fonstart;
-    property onstop:   tthreadmethod read fonstop    write fonstop;
-    property ontick:   tthreadmethod read fontick    write fontick;
-  end;
-
+  classes, fpvectorial, vpcommon, vpmath, vpsetting;
 
   function interpolate_line(const p0, p1: tvppoint): tvppath;
   function interpolate_circle(const entity: tvcircle ): tvppath;
   function interpolate_circlearc(const entity: tvcirculararc): tvppath;
   function interpolate_path(const entity: tpath): tvppath;
 
-  function  createpaths(vec: tvvectorialdocument): tvppaths;
-
-  procedure optimize(const p: tvppoint; var m0, m1: longint);
-
-
-var
-  plotter: tvplotter = nil;
-  wave:    twave     = nil;
-
+  procedure load_paths(paths: tvppaths; vec: tvvectorialdocument);
+  procedure optimize_paths(paths: tvppaths; offsetx, offsety, midx, midy: double);
+  procedure optimize_point(const p: tvppoint; var m0, m1: longint);
 
 implementation
 
-
 uses
   math, sysutils;
-
 
 // toolpath routines
 
@@ -103,7 +50,7 @@ var
   i, len: longint;
        p: tvppoint;
 begin
-  len := max(1, round(distancebetween(p0, p1) / 0.15));
+  len := max(1, round(distance_between_two_points(p0, p1) / 0.15));
    dx := (p1.x - p0.x) / len;
    dy := (p1.y - p0.y) / len;
 
@@ -112,7 +59,7 @@ begin
   begin
     p.x := i * dx;
     p.y := i * dy;
-    p   := translatepoint(p0, p);
+    p   := translate_point(p0, p);
     result.add(p);
   end;
 end;
@@ -137,8 +84,8 @@ begin
   result := tvppath.create;
   for i := 0 to len do
   begin
-    p := rotatepoint(start, (i * (sweep / len)));
-    p := translatepoint(cc, p);
+    p := rotate_point(start, (i * (sweep / len)));
+    p := translate_point(cc, p);
     result.insert(0, p);
   end;
 end;
@@ -156,7 +103,7 @@ begin
   cc.y    := entity.y;
   start.x := entity.radius;
   start.y := +0.0;
-  start   := rotatepoint(start, degtorad(entity.startangle));
+  start   := rotate_point(start, degtorad(entity.startangle));
   sweep   := degtorad(entity.endangle - entity.startangle);
 
   len := max(1, round(abs(sweep) * entity.radius / 0.15));
@@ -164,8 +111,8 @@ begin
   result := tvppath.create;
   for i := 0 to len do
   begin
-    p := rotatepoint(start, (i * (sweep / len)));
-    p := translatepoint(cc, p);
+    p := rotate_point(start, (i * (sweep / len)));
+    p := translate_point(cc, p);
     result.insert(0, p);
   end;
 end;
@@ -195,7 +142,7 @@ begin
         p1.x := t2dsegment(segment).x;
         p1.y := t2dsegment(segment).y;
 
-        len := max(1, round(distancebetween(p0, p1) / 0.15));
+        len := max(1, round(distance_between_two_points(p0, p1) / 0.15));
         dx := (p1.x - p0.x) / len;
         dy := (p1.y - p0.y) / len;
 
@@ -203,7 +150,7 @@ begin
         begin
           p.x := j * dx;
           p.y := j * dy;
-          p   := translatepoint(p0, p);
+          p   := translate_point(p0, p);
           result.add(p);
         end;
         p0 := p1;
@@ -214,190 +161,78 @@ begin
   end;
 end;
 
-// ---
-
-procedure optimize(const p: tvppoint; var m0, m1: longint);
+procedure optimize_point(const p: tvppoint; var m0, m1: longint);
 var
-  alpha: double;
-  err:   double;
-  tmp00: tvppoint;
-  tmp01: tvppoint;
-  tmp02: tvppoint;
-  tmp03: tvppoint;
-  tmp04: tvppoint;
-  tmp05: tvppoint;
-  tmp06: tvppoint;
+  c0, c1, c3, c4: tvpcircle;
+  alpha, alphalo, alphahi, lsx, ldx: double;
+  s00, s01, t00, t01, t02, t03, t04, t05, t06: tvppoint;
 begin
-  alpha    := 0;
-  repeat
-    tmp00  := setting.layout00;
-    tmp01  := setting.layout01;
-    tmp02  := translatepoint(p, rotatepoint(setting.layout02, alpha));
-    tmp03  := translatepoint(p, rotatepoint(setting.layout03, alpha));
-    tmp04  := translatepoint(p, rotatepoint(setting.layout04, alpha));
-    tmp05  := translatepoint(p, rotatepoint(setting.layout05, alpha));
-    tmp06  := intersectlines(linebetween(tmp00, tmp03),
-                             linebetween(tmp01, tmp04));
-
-    err := abs(tmp06.x - tmp05.x);
-    if  err > 0.001 then
-    begin
-      if tmp06.x < tmp05.x then
-        alpha := alpha - (err / 100)
-      else
-      if tmp06.x > tmp05.x then
-        alpha := alpha + (err / 100);
-    end else
-      break;
-  until false;
-
-  m0 := round(setting.mode * (distancebetween(tmp00, tmp03) / setting.ratio));
-  m1 := round(setting.mode * (distancebetween(tmp01, tmp04) / setting.ratio));
-
   if enabledebug then
   begin
-    writeln(format('OPTIMIZE::ALPHA  = %12.5f',                 [radtodeg(alpha) ]));
-    writeln(format('OPTIMIZE::P02.X  = %12.5f  P02.Y = %12.5f', [tmp02.x, tmp02.y]));
-    writeln(format('OPTIMIZE::P03.X  = %12.5f  P03.Y = %12.5f', [tmp03.x, tmp03.y]));
-    writeln(format('OPTIMIZE::P04.X  = %12.5f  P04.Y = %12.5f', [tmp04.x, tmp04.y]));
-    writeln(format('OPTIMIZE::P05.X  = %12.5f  P05.Y = %12.5f', [tmp05.x, tmp05.y]));
-    writeln(format('OPTIMIZE::P06.X  = %12.5f  P06.Y = %12.5f', [tmp06.x, tmp06.y]));
-    writeln(format('OPTIMIZE::D03    = %12.5f', [distancebetween(tmp00, tmp03)]));
-    writeln(format('OPTIMIZE::D14    = %12.5f', [distancebetween(tmp01, tmp04)]));
+    writeln(format('OPTIMIZE::P02.X  = %12.5f  P02.Y = %12.5f', [p.x, p.y]));
+  end;
+
+  alphalo := -pi/2;
+  alphahi := +pi/2;
+  repeat
+    alpha := (alphalo+alphahi)/2;
+    t00 := setting.layout00;
+    t01 := setting.layout01;
+    t02 := translate_point(p, rotate_point(setting.layout02, alpha));
+    t03 := translate_point(p, rotate_point(setting.layout03, alpha));
+    t04 := translate_point(p, rotate_point(setting.layout04, alpha));
+    t05 := translate_point(p, rotate_point(setting.layout05, alpha));
+    //find tangent point t00
+    lsx := sqrt(sqr(distance_between_two_points(t00, t03))-sqr(setting.radius));
+    c0  := circle_by_center_and_radius(setting.layout00, setting.radius);
+    c3  := circle_by_center_and_radius(t03, lsx);
+    if intersection_of_two_circles(c0, c3, s00, s01) = 0 then
+      raise exception.create('intersection_of_two_circles [c0c3]');
+    lsx := lsx + get_line_angle(line_by_two_points(s00, t00))*setting.radius;
+    //find tangent point t01
+    ldx := sqrt(sqr(distance_between_two_points(t01, t04))-sqr(setting.radius));
+    c1  := circle_by_center_and_radius(setting.layout01, setting.radius);
+    c4  := circle_by_center_and_radius(t04, ldx);
+    if intersection_of_two_circles(c1, c4, s00, s01) = 0 then
+      raise exception.create('intersection_of_two_circles [c1c4]');
+    ldx   := ldx + (pi-get_line_angle(line_by_two_points(s00, t01)))*setting.radius;
+    //find intersection point
+    t06 := intersection_of_two_lines(line_by_two_points(t00, t03),
+                                     line_by_two_points(t01, t04));
+    if (t06.x - t05.x) < -0.001 then
+      alphahi := alpha
+    else
+      if (t06.x - t05.x) > +0.001 then
+        alphalo := alpha
+      else
+        break;
+  until false;
+  // optimized
+  m0 := round(setting.mode * (lsx/setting.ratio));
+  m1 := round(setting.mode * (ldx/setting.ratio));
+  if enabledebug then
+  begin
+    writeln(format('OPTIMIZE::ALPHA  = %12.5f',             [radtodeg(alpha) ]));
+    writeln(format('OPTIMIZE::P02.X  = %12.5f  P02.Y = %12.5f', [t02.x, t02.y]));
+    writeln(format('OPTIMIZE::P03.X  = %12.5f  P03.Y = %12.5f', [t03.x, t03.y]));
+    writeln(format('OPTIMIZE::P04.X  = %12.5f  P04.Y = %12.5f', [t04.x, t04.y]));
+    writeln(format('OPTIMIZE::P05.X  = %12.5f  P05.Y = %12.5f', [t05.x, t05.y]));
+    writeln(format('OPTIMIZE::P06.X  = %12.5f  P06.Y = %12.5f', [t06.x, t06.y]));
+    writeln(format('OPTIMIZE::LSX    = %12.5f', [lsx]));
+    writeln(format('OPTIMIZE::LDX    = %12.5f', [ldx]));
     writeln(format('OPTIMIZE::CNT.0  = %12.5u', [m0]));
     writeln(format('OPTIMIZE::CNT.1  = %12.5u', [m1]));
-    writeln(format('OPTIMIZE::MODE   = %12.3u', [setting.mode]));
-    writeln(format('OPTIMIZE::RATIO  = %12.5f', [setting.ratio]));
   end;
 end;
 
-// tvplotter
-
-constructor tvplotter.create(paths: tvppaths);
-var
-  i: longint;
-begin
-  fcheck    := true;
-  fpaths    := paths;
-  fplot     := true;
-
-  findex    := 0;
-  fcount    := 0;
-  for i := 0 to fpaths.count - 1 do
-    inc(fcount, fpaths.item[i].count);
-
-  fonstart := nil;
-  fonstop  := nil;
-  fontick  := nil;
-  freeonterminate := true;
-  inherited create(true);
-end;
-
-destructor tvplotter.destroy;
-begin
-  fpaths := nil;
-  inherited destroy;
-end;
-
-procedure tvplotter.execute;
-var
-      i: longint;
-      j: longint;
-m0, dm0, ddm0: longint;
-m1, dm1, ddm1: longint;
-   path: tvppath;
-begin
-  if enabledebug then
-  begin
-    writeln(format(' EXECUTE::OFF-X  = %12.5f', [foffsetx]));
-    writeln(format(' EXECUTE::OFF-Y  = %12.5f', [foffsety]));
-    writeln(format(' EXECUTE::MID-X  = %12.5f', [fmidx   ]));
-    writeln(format(' EXECUTE::MID-Y  = %12.5f', [fmidy   ]));
-    writeln(format(' EXECUTE::MAX-X  = %12.5f', [fmaxdx  ]));
-    writeln(format(' EXECUTE::MAX-Y  = %12.5f', [fmaxdy  ]));
-  end;
-
-  if assigned(fonstart) then
-    synchronize(fonstart);
-
-  if assigned(fontick) then
-    for i := 0 to fpaths.count - 1 do
-    begin
-      path := fpaths.item[i];
-      for j := 0 to path.count - 1 do
-      begin
-        fpoint := tvppoint(path.item[j]^);
-        if not terminated then
-        begin
-          inc(findex);
-          // update coordinates
-          fpoint.x := foffsetx + fpoint.x;
-          fpoint.y := foffsety + fpoint.y;
-          // check coordinates
-          if ((abs(fpoint.x) <= (fmaxdx))  and
-              (abs(fpoint.y) <= (fmaxdy))) or (not check) then
-          begin
-            synchronize(fontick);
-            // move plotter
-            if driver.enabled then
-            begin
-              //if assigned(wave) then
-              //  fpoint := wave.update(fpoint);
-
-              fpoint.x := fmidx + fpoint.x;
-              fpoint.y := fmidy + fpoint.y;
-
-              optimize(fpoint, m0, m1);
-              dm0 := m0 - driver.count0;
-              dm1 := m1 - driver.count1;
-              driver.clockwise0 := dm0 > 0;
-              driver.clockwise1 := dm1 < 0;
-
-              dm0 := abs(dm0);
-              dm1 := abs(dm1);
-              if (dm0 < 10) and
-                 (dm1 < 10) then
-              begin
-                driver.pen    := true;
-                driver.delay1 := setting.delay2;
-              end else
-              begin
-                driver.pen    := false;
-                driver.delay1 := setting.delay1;
-              end;
-
-              repeat
-                ddm0 := min(10, dm0);
-                dec(dm0, ddm0);
-
-                ddm1 := min(10, dm1);
-                dec(dm1, ddm1);
-
-                driver.step(ddm0, ddm1);
-
-              until ((dm0 = 0) and (dm1 = 0)) or terminated;
-            end;
-          end;
-
-          while not fplot do sleep(250);
-        end;
-      end;
-    end;
-
-  if assigned(fonstop) then
-    synchronize(fonstop);
-end;
-
-// createpaths
-
-function  createpaths(vec: tvvectorialdocument): tvppaths;
+procedure load_paths(paths: tvppaths; vec: tvvectorialdocument);
 var
     i, j: longint;
   entity: tventity;
     page: tvpage;
     path: tvppath;
 begin
-  result := tvppaths.create;
+  paths.clear;
   for i := 0 to vec.getpagecount - 1 do
   begin
     page := vec.getpageasvectorial(i);
@@ -423,14 +258,43 @@ begin
       end;
 
       if assigned(path) then
-        result.add(path);
+        paths.add(path);
+    end;
+  end;
+  paths.createtoolpath;
+  paths.zerocenter;
+//paths.deletesmallpaths;
+end;
+
+procedure optimize_paths(paths: tvppaths; offsetx, offsety, midx, midy: double);
+var
+  i, j: longint;
+  path: tvppath;
+   pos: tvpposition;
+begin
+  if enabledebug then
+  begin
+    writeln(format(' EXECUTE::OFF-X  = %12.5f', [offsetx]));
+    writeln(format(' EXECUTE::OFF-Y  = %12.5f', [offsety]));
+    writeln(format(' EXECUTE::MID-X  = %12.5f', [midx   ]));
+    writeln(format(' EXECUTE::MID-Y  = %12.5f', [midy   ]));
+  end;
+
+  for i := 0 to paths.count - 1 do
+  begin
+    path := paths.item[i];
+    for j := 0 to path.count - 1 do
+    begin
+      pos := path.item[j];
+      pos.pp.x := pos.p .x + offsetx + midx;
+      pos.pp.x := pos.p .y + offsety + midy;
+      optimize_point(pos.pp, pos.m0, pos.m1);
     end;
   end;
 
-  result.createtoolpath;
-  result.zerocenter;
-//result.deletesmallpaths;
 end;
+
+
 
 end.
 

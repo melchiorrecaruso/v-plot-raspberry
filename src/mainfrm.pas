@@ -56,7 +56,6 @@ type
     showpagesizepanelmi: TMenuItem;
     showcalibrationpanelmi: TMenuItem;
     timer: TTimer;
-    updatemi: TMenuItem;
     clearmi: TMenuItem;
     calibrationmi: TMenuItem;
     movebordersmi: TMenuItem;
@@ -136,7 +135,6 @@ type
 
     procedure stopmiclick(sender: tobject);
     procedure timertimer(sender: tobject);
-    procedure updatemiclick(sender: tobject);
 
     procedure verticalcbeditingdone(sender: tobject);
     procedure widthseeditingdone(sender: tobject);
@@ -144,7 +142,7 @@ type
   private
       bitmap: tbitmap;
        paths: tvppaths;
-         vec: tvvectorialdocument;
+
      elapsed: longint;
 
  mouseisdown: boolean;
@@ -169,16 +167,16 @@ implementation
 {$R *.lfm}
 
 uses
-  math, sysutils, dxfvectorialreader, aboutfrm;
+  math, sysutils, dxfvectorialreader, aboutfrm, vpmath, vpwave;
 
 
 // FORM events
 
 procedure tmainform.formcreate(sender: tobject);
 var
-  m0: longint;
-  m1: longint;
-  p : tvppoint;
+  m0: longint = 0;
+  m1: longint = 0;
+   p: tvppoint;
 begin
   // load setting
   setting := tvpsetting.create;
@@ -186,12 +184,11 @@ begin
   // create plotter driver
   driver := tvpdriver.create;
   driver.mode   := setting.mode;
-  driver.delay0 := setting.delay0;
-  driver.delay1 := setting.delay1;
-  // create preview, vectorial file and paths
+  driver.delaym := setting.delaym;
+  driver.delayz := setting.delayz;
+  // create preview and empty paths
   bitmap := tbitmap.create;
-  vec    := tvvectorialdocument.create;
-  paths  := createpaths(vec);
+  paths  := tvppaths.create;
   // update preview
   formatcbchange (nil);
   showtoolbarclick(nil);
@@ -202,39 +199,25 @@ begin
   wave := twave.create(setting.wavexmax,
                        setting.waveymax,
                        setting.wave);
-  if enabledebug then
-  begin
-    p.x := -594.5;  p.y := +420.5;  wave.update(p);
-    p.x := +0.000;  p.y := +420.5;  wave.update(p);
-    p.x := +594.5;  p.y := +420.5;  wave.update(p);
-    p.x := -594.5;  p.y := +0.000;  wave.update(p);
-    p.x := +0.000;  p.y := +0.000;  wave.update(p);
-    p.x := +594.5;  p.y := +0.000;  wave.update(p);
-    p.x := -594.5;  p.y := -420.5;  wave.update(p);
-    p.x := +0.000;  p.y := -420.5;  wave.update(p);
-    p.x := +594.5;  p.y := -420.5;  wave.update(p);
-  end;
+  wave.test;
   // initialize driver
-  optimize(setting.layout09, m0, m1);
+  optimize_point(setting.layout09, m0, m1);
   driver.init(m0, m1);
 end;
 
 procedure tmainform.formdestroy(sender: tobject);
 begin
-  // move to base position
   gohomebtnclick(nil);
-  // ---
   wave.destroy;
+  paths.destroy;
+  bitmap.destroy;
   driver.destroy;
   setting.destroy;
-  paths.destroy;
-  vec.destroy;
-  bitmap.destroy;
 end;
 
 procedure tmainform.formclose(sender: tobject; var closeaction: tcloseaction);
 begin
-  if assigned(plotter) then
+  if assigned(driverthread) then
   begin
     closeaction := canone;
     killmiclick(nil);
@@ -251,9 +234,8 @@ var
 begin
   lock2(false);
   begin
-    driver.enabled    := true;
-    driver.penoff     := true;
-    driver.clockwise0 := false;
+    driver.enabled:= true;
+    driver.penoff := true;
 
     m0 := abs(leftedit.value);
     repeat
@@ -261,7 +243,7 @@ begin
       driver.step(dm0, 0);
       dec (m0, dm0);
     until (m0 =  0);
-    optimize(setting.layout09, m0, m1);
+    optimize_point(setting.layout09, m0, m1);
     driver.init(m0, m1);
   end;
   lock2(true);
@@ -276,7 +258,6 @@ begin
   begin
     driver.enabled    := true;
     driver.penoff     := true;
-    driver.clockwise0 := true;
 
     m0 := abs(leftedit.value);
     repeat
@@ -284,7 +265,7 @@ begin
       driver.step(dm0, 0);
       dec (m0, dm0);
     until (m0 =  0);
-    optimize(setting.layout09, m0, m1);
+    optimize_point(setting.layout09, m0, m1);
     driver.init(m0, m1);
   end;
   lock2(true);
@@ -299,7 +280,6 @@ begin
   begin
     driver.enabled    := true;
     driver.penoff     := true;
-    driver.clockwise1 := true;
 
     m1 := abs(rightedit.value);
     repeat
@@ -307,7 +287,7 @@ begin
       driver.step(0, dm1);
       dec (m1, dm1);
     until (m1 =  0);
-    optimize(setting.layout09, m0, m1);
+    optimize_point(setting.layout09, m0, m1);
     driver.init(m0, m1);
   end;
   lock2(true);
@@ -322,7 +302,6 @@ begin
   begin
     driver.enabled    := true;
     driver.penoff     := true;
-    driver.clockwise1 := false;
 
     m1 := abs(rightedit.value);
     repeat
@@ -330,7 +309,7 @@ begin
       driver.step(0, dm1);
       dec (m1, dm1);
     until (m1 =  0);
-    optimize(setting.layout09, m0, m1);
+    optimize_point(setting.layout09, m0, m1);
     driver.init(m0, m1);
   end;
   lock2(true);
@@ -352,11 +331,9 @@ end;
 
 procedure tmainform.movebordersmiclick(sender: tobject);
 var
-  p0:   tvppoint;
-  p1:   tvppoint;
+  p0: tvppoint;
+  p1: tvppoint;
 begin
-  if assigned(plotter) then exit;
-
   paths.clear;
   // from middle bottom to left-bottom
   p0.x := + 0;
@@ -385,20 +362,20 @@ begin
   p1.y := - (heightse.value / 2);
   paths.add(interpolate_line(p0, p1));
 
-  driver.enabled  := true;
-  driver.penoff   := sender = movebordersmi;
-  plotter         := tvplotter.create(paths);
-  plotter.midx    := setting.layout08.x;
-  plotter.midy    := setting.layout08.y + (heightse.value / 2);
-  plotter.maxdx   := bitmap.width  div 2;
-  plotter.maxdy   := bitmap.height div 2;
-  plotter.offsetx := offsetxse.value;
-  plotter.offsety := offsetyse.value;
-  plotter.onstart := @onplotterstart;
-  plotter.onstop  := @onplotterstop;
-  plotter.ontick  := @onplottertick;
-  plotter.check   := true;
-  plotter.start;
+  optimize_paths(paths,
+    offsetxse.value,
+    offsetyse.value,
+    setting.layout08.x,
+    setting.layout08.y + (heightse.value / 2));
+
+  driver.enabled       := true;
+  driver.penoff        := sender = movebordersmi;
+
+  driverthread         := tvpdriverthread.create(paths);
+  driverthread.onstart := @onplotterstart;
+  driverthread.onstop  := @onplotterstop;
+  driverthread.ontick  := @onplottertick;
+  driverthread.start;
   elapsed := 1;
 end;
 
@@ -407,8 +384,6 @@ var
   p0: tvppoint;
   p1: tvppoint;
 begin
-  if assigned(plotter) then exit;
-
   paths.clear;
   // form left-top to right-top
   p0.x := - (widthse .value / 2);
@@ -417,20 +392,20 @@ begin
   p1.y := + (heightse.value / 2);
   paths.add(interpolate_line(p0, p1));
 
-  driver.enabled  := true;
-  driver.penoff   := sender = movetopmi;
-  plotter         := tvplotter.create(paths);
-  plotter.midx    := setting.layout08.x;
-  plotter.midy    := setting.layout08.y + (heightse.value / 2);
-  plotter.maxdx   := bitmap.width  div 2;
-  plotter.maxdy   := bitmap.height div 2;
-  plotter.offsetx := offsetxse.value;
-  plotter.offsety := offsetyse.value;
-  plotter.onstart := @onplotterstart;
-  plotter.onstop  := @onplotterstop;
-  plotter.ontick  := @onplottertick;
-  plotter.check   := true;
-  plotter.start;
+  optimize_paths(paths,
+    offsetxse.value,
+    offsetyse.value,
+    setting.layout08.x,
+    setting.layout08.y + (heightse.value / 2));
+
+  driver.enabled       := true;
+  driver.penoff        := sender = movetopmi;
+
+  driverthread         := tvpdriverthread.create(paths);
+  driverthread.onstart := @onplotterstart;
+  driverthread.onstop  := @onplotterstop;
+  driverthread.ontick  := @onplottertick;
+  driverthread.start;
   elapsed := 1;
 end;
 
@@ -439,8 +414,6 @@ var
   p0: tvppoint;
   p1: tvppoint;
 begin
-  if assigned(plotter) then exit;
-
   paths.clear;
   // form left-bottom to right-bottom
   p0.x := - (widthse .value / 2);
@@ -449,20 +422,20 @@ begin
   p1.y := - (heightse.value / 2);
   paths.add(interpolate_line(p0, p1));
 
-  driver.enabled  := true;
-  driver.penoff   := sender = movebottommi;
-  plotter         := tvplotter.create(paths);
-  plotter.midx    := setting.layout08.x;
-  plotter.midy    := setting.layout08.y + (heightse.value / 2);
-  plotter.maxdx   := bitmap.width  div 2;
-  plotter.maxdy   := bitmap.height div 2;
-  plotter.offsetx := offsetxse.value;
-  plotter.offsety := offsetyse.value;
-  plotter.onstart := @onplotterstart;
-  plotter.onstop  := @onplotterstop;
-  plotter.ontick  := @onplottertick;
-  plotter.check   := true;
-  plotter.start;
+  optimize_paths(paths,
+    offsetxse.value,
+    offsetyse.value,
+    setting.layout08.x,
+    setting.layout08.y + (heightse.value / 2));
+
+  driver.enabled       := true;
+  driver.penoff        := sender = movebottommi;
+
+  driverthread         := tvpdriverthread.create(paths);
+  driverthread.onstart := @onplotterstart;
+  driverthread.onstop  := @onplotterstop;
+  driverthread.ontick  := @onplottertick;
+  driverthread.start;
   elapsed := 1;
 end;
 
@@ -471,8 +444,6 @@ var
   p0: tvppoint;
   p1: tvppoint;
 begin
-  if assigned(plotter) then exit;
-
   paths.clear;
   // form left-bottom to left-top
   p0.x := - (widthse .value / 2);
@@ -481,20 +452,20 @@ begin
   p1.y := + (heightse.value / 2);
   paths.add(interpolate_line(p0, p1));
 
-  driver.enabled  := true;
-  driver.penoff   := sender = moveleftmi;
-  plotter         := tvplotter.create(paths);
-  plotter.midx    := setting.layout08.x;
-  plotter.midy    := setting.layout08.y + (heightse.value / 2);
-  plotter.maxdx   := bitmap.width  div 2;
-  plotter.maxdy   := bitmap.height div 2;
-  plotter.offsetx := offsetxse.value;
-  plotter.offsety := offsetyse.value;
-  plotter.onstart := @onplotterstart;
-  plotter.onstop  := @onplotterstop;
-  plotter.ontick  := @onplottertick;
-  plotter.check   := true;
-  plotter.start;
+  optimize_paths(paths,
+    offsetxse.value,
+    offsetyse.value,
+    setting.layout08.x,
+    setting.layout08.y + (heightse.value / 2));
+
+  driver.enabled       := true;
+  driver.penoff        := sender = moveleftmi;
+
+  driverthread         := tvpdriverthread.create(paths);
+  driverthread.onstart := @onplotterstart;
+  driverthread.onstop  := @onplotterstop;
+  driverthread.ontick  := @onplottertick;
+  driverthread.start;
   elapsed := 1;
 end;
 
@@ -503,8 +474,6 @@ var
   p0: tvppoint;
   p1: tvppoint;
 begin
-  if assigned(plotter) then exit;
-
   paths.clear;
   // form right-bottom to right-top
   p0.x := + (widthse .value / 2);
@@ -513,20 +482,20 @@ begin
   p1.y := + (heightse.value / 2);
   paths.add(interpolate_line(p0, p1));
 
-  driver.enabled  := true;
-  driver.penoff   := sender = moverightmi;
-  plotter         := tvplotter.create(paths);
-  plotter.midx    := setting.layout08.x;
-  plotter.midy    := setting.layout08.y + (heightse.value / 2);
-  plotter.maxdx   := bitmap.width  div 2;
-  plotter.maxdy   := bitmap.height div 2;
-  plotter.offsetx := offsetxse.value;
-  plotter.offsety := offsetyse.value;
-  plotter.onstart := @onplotterstart;
-  plotter.onstop  := @onplotterstop;
-  plotter.ontick  := @onplottertick;
-  plotter.check   := true;
-  plotter.start;
+  optimize_paths(paths,
+    offsetxse.value,
+    offsetyse.value,
+    setting.layout08.x,
+    setting.layout08.y + (heightse.value / 2));
+
+  driver.enabled       := true;
+  driver.penoff        := sender = moverightmi;
+
+  driverthread         := tvpdriverthread.create(paths);
+  driverthread.onstart := @onplotterstart;
+  driverthread.onstop  := @onplotterstop;
+  driverthread.ontick  := @onplottertick;
+  driverthread.start;
   elapsed := 1;
 end;
 
@@ -535,50 +504,32 @@ var
   m0: longint = 0;
   m1: longint = 0;
 begin
-  if assigned(plotter) then exit;
-
   gohomebtnclick(nil);
   // load configuration
   setting.clear;
   setting.load(changefileext(paramstr(0), '.ini'));
   // update plotter driver
   driver.mode   := setting.mode;
-  driver.delay0 := setting.delay0;
-  driver.delay1 := setting.delay1;
+  driver.delaym := setting.delaym;
+  driver.delayz := setting.delayz;
 
-  optimize(setting.layout09, m0, m1);
+  optimize_point(setting.layout09, m0, m1);
   driver.init(m0, m1);
 end;
 
 procedure tmainform.gohomebtnclick(sender: tobject);
 var
-  p0: tvppoint;
-  p1: tvppoint;
+  m0: longint = 0;
+  m1: longint = 0;
 begin
-  if assigned(plotter) then exit;
-
-  paths.clear;
-  // form x-x to base
-  p0.x := setting.layout09.x - setting.layout08.x;
-  p0.y := setting.layout09.y - setting.layout08.y - (heightse.value / 2);
-  p1   := p0;
-  paths.add(interpolate_line(p0, p1));
-
-  driver.enabled  := true;
-  driver.penoff   := true;
-  plotter         := tvplotter.create(paths);
-  plotter.midx    := setting.layout08.x;
-  plotter.midy    := setting.layout08.y + (heightse.value / 2);
-  plotter.maxdx   := bitmap.width  div 2;
-  plotter.maxdy   := bitmap.height div 2;
-  plotter.offsetx := offsetxse.value;
-  plotter.offsety := offsetyse.value;
-  plotter.onstart := @onplotterstart;
-  plotter.onstop  := @onplotterstop;
-  plotter.ontick  := @onplottertick;
-  plotter.check   := false;
-  plotter.start;
-  elapsed := 1;
+  lock2(false);
+  begin
+    driver.enabled := true;
+    driver.penoff  := true;
+    optimize_point(setting.layout09, m0, m1);
+    driver.step(m0, m1);
+  end;
+  lock2(true);
 end;
 
 // IMAGE events
@@ -624,44 +575,57 @@ end;
 // FILE mainmenu
 
 procedure tmainform.openbtnclick(sender: tobject);
+var
+   i, j: longint;
+   path: tvppath;
+    pos: tvpposition;
+    vec: tvvectorialdocument;
 begin
-  if assigned(plotter) then exit;
   opendialog.filter := 'dxf files (*.dxf)|*.dxf';
   if opendialog.execute then
   begin
     lock2(false);
-    freeandnil(paths);
-    freeandnil(vec);
+    // load file ...
     vec := tvvectorialdocument.create;
     try
       vec.readfromfile(opendialog.filename,
         vec.getformatfromextension(opendialog.filename));
     except
-      freeandnil(vec);
-      vec := tvvectorialdocument.create;
     end;
-    paths := createpaths(vec);
+    load_paths(paths, vec);
+    optimize_paths(paths,
+      offsetxse.value,
+      offsetyse.value,
+      setting.layout08.x,
+      setting.layout08.y + (heightse.value / 2));
+    freeandnil(vec);
+
+    // updtare preview ...
+    for i := 0 to paths.count - 1 do
+    begin
+      path := paths.item[i];
+      for j := 0 to path.count - 1 do
+      begin
+        pos := path.item[j];
+        bitmap.canvas.pixels[
+          trunc(( widthse.value div 2) + pos.p.x + offsetxse.value),
+          trunc((heightse.value div 2) - pos.p.y + offsetyse.value)] := clblack;
+      end;
+    end;
+    image.canvas.draw(0, 0, bitmap);
     lock2(true);
   end;
 end;
 
 procedure tmainform.closemiclick(sender: tobject);
 begin
-  if assigned(plotter) then exit;
-
   lock2(false);
-  freeandnil(paths);
-  freeandnil(vec);
-  vec   := tvvectorialdocument.create;
-  paths := createpaths(vec);
   clearallmiclick(sender);
   lock2(true);
 end;
 
 procedure tmainform.exitmiclick(sender: tobject);
 begin
-  if assigned(plotter) then exit;
-
   close;
 end;
 
@@ -702,15 +666,8 @@ end;
 
 // PREVIEW mainmenu
 
-procedure tmainform.updatemiclick(sender: tobject);
-begin
-  updatemi.checked := not updatemi.checked;
-end;
-
 procedure tmainform.clearallmiclick(sender: tobject);
 begin
-  if assigned(plotter) then exit;
-  // ---
   caption := 'vPlotter 2.0';
   // ---
   bitmap.canvas.pen  .color := clltgray;
@@ -747,47 +704,42 @@ end;
 
 procedure tmainform.startmiclick(sender: tobject);
 begin
-  if assigned(plotter) then
+  if assigned(driverthread) then
   begin
-    plotter.plot  := true;
-    timer.enabled := true;
+    driverthread.enabled := true;
+    timer       .enabled := true;
   end else
   begin
-    driver.enabled  := not updatemi.checked;
-    driver.penoff   := false;
-    driver.pen      := false;
-    plotter         := tvplotter.create(paths);
-    plotter.midx    := setting.layout08.x;
-    plotter.midy    := setting.layout08.y + (heightse.value / 2);
-    plotter.maxdx   := bitmap.width  div 2;
-    plotter.maxdy   := bitmap.height div 2;
-    plotter.offsetx := offsetxse.value;
-    plotter.offsety := offsetyse.value;
-    plotter.onstart := @onplotterstart;
-    plotter.onstop  := @onplotterstop;
-    plotter.ontick  := @onplottertick;
-    plotter.check   := true;
-    plotter.start;
+    driver.enabled       := true;
+    driver.penoff        := false;
+    driver.pen           := false;
+
+    driverthread         := tvpdriverthread.create(paths);
+    timer       .enabled := true;
+    driverthread.onstart := @onplotterstart;
+    driverthread.onstop  := @onplotterstop;
+    driverthread.ontick  := @onplottertick;
+    driverthread.start;
     elapsed := 1;
   end;
 end;
 
 procedure tmainform.stopmiclick(sender: tobject);
 begin
-  if assigned(plotter) then
+  if assigned(driverthread) then
   begin
-    plotter.plot  := false;
-    timer.enabled := false;
-    driver.pen    := false;
+    driverthread.enabled := false;
+    timer       .enabled := false;
+    driver      .pen     := false;
   end;
 end;
 
 procedure tmainform.killmiclick(sender: tobject);
 begin
-  if assigned(plotter) then
+  if assigned(driverthread) then
   begin
-    plotter.plot := true;
-    plotter.terminate;
+    driverthread.enabled := true;
+    driverthread.terminate;
   end;
 end;
 
@@ -874,7 +826,6 @@ begin
   openmi        .enabled := value;
   closemi       .enabled := value;
   exitmi        .enabled := value;
-  updatemi      .enabled := value;
   clearmi       .enabled := value;
   movebordersmi .enabled := value;
   movebottommi  .enabled := value;
@@ -915,7 +866,6 @@ begin
   openmi        .enabled := value;
   closemi       .enabled := value;
   exitmi        .enabled := value;
-  updatemi      .enabled := value;
   clearmi       .enabled := value;
   startmi       .enabled := value;
   stopmi        .enabled := value;
@@ -964,11 +914,10 @@ procedure tmainform.onplotterstop;
 begin
   timer.enabled := false;
   penupbtnclick(nil);
-  plotter := nil;
+  driverthread := nil;
   lock1(true);
 
-  image.canvas.draw(0, 0, bitmap);
-  caption := format('Elapsed %u sec', [elapsed]);
+  caption := format('Finished - %u sec', [elapsed]);
   application.processmessages;
 end;
 
@@ -976,24 +925,12 @@ procedure tmainform.onplottertick;
 begin
   if enabledebug then
   begin
-    writeln(format('    TICK::P.X  = %12.5f', [plotter.point.x]));
-    writeln(format('    TICK::P.Y  = %12.5f', [plotter.point.y]));
-  end;
-  // update preview
-  bitmap.canvas.pixels[
-    trunc(( widthse.value div 2) + plotter.point.x),
-    trunc((heightse.value div 2) - plotter.point.y)] := clblack;
-  // update progress bar
-  if plotter.index mod $FF = 0 then
-  begin
-    caption := format('Elapsed %u sec - Remaing %u sec', [elapsed,
-      (elapsed * (plotter.count - plotter.index)) div plotter.index]);
+    writeln(format('    TICK::P.X    = %12.5f', [driverthread.position.p.x]));
+    writeln(format('    TICK::P.Y    = %12.5f', [driverthread.position.p.y]));
   end;
 
-  if plotter.index mod $FFF = 0 then
-  begin
-    image.canvas.draw(0, 0, bitmap);
-  end;
+  if (elapsed mod 2) = 0 then
+    caption := format('Running - %u sec', [elapsed]);
   application.processmessages;
 end;
 

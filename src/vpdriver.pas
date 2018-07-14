@@ -26,17 +26,15 @@ unit vpdriver;
 interface
 
 uses
-  classes, {$ifdef cpuarm} pca9685, wiringpi, {$endif} sysutils, vpcommon;
+  classes, {$ifdef cpuarm} pca9685, wiringpi, {$endif} sysutils, vpcommon, vpmath;
 
 type
   tvpdriver = class
   private
     fcount0:     longint;
     fcount1:     longint;
-    fclockwise0: boolean;
-    fclockwise1: boolean;
-    fdelay0:     longint;
-    fdelay1:     longint;
+    fdelaym:     longint;
+    fdelayz:     longint;
     fenabled:    boolean;
     fmode:       longint;
     fpen:        boolean;
@@ -44,8 +42,6 @@ type
     procedure setmode(value: longint);
     procedure setpen(value: boolean);
     procedure setpenoff(value: boolean);
-    procedure setclockwise0(value: boolean);
-    procedure setclockwise1(value: boolean);
   public
     constructor create;
     destructor  destroy; override;
@@ -54,23 +50,43 @@ type
   published
     property count0:     longint read fcount0;
     property count1:     longint read fcount1;
-    property clockwise0: boolean read fclockwise0 write setclockwise0;
-    property clockwise1: boolean read fclockwise1 write setclockwise1;
-    property delay0:     longint read fdelay0     write fdelay0;
-    property delay1:     longint read fdelay1     write fdelay1;
+    property delaym:     longint read fdelaym     write fdelaym;
+    property delayz:     longint read fdelayz     write fdelayz;
     property enabled:    boolean read fenabled    write fenabled;
     property mode:       longint read fmode       write setmode;
     property pen:        boolean read fpen        write setpen;
     property penoff:     boolean read fpenoff     write setpenoff;
   end;
 
+  tvpdriverthread = class(tthread)
+  private
+    fenabled:  boolean;
+    fpaths:    tvppaths;
+    fposition: tvpposition;
+    fonstart:  tthreadmethod;
+    fonstop:   tthreadmethod;
+    fontick:   tthreadmethod;
+  protected
+    procedure execute; override;
+  public
+    constructor create(paths: tvppaths);
+    destructor  destroy; override;
+  public
+    property enabled:  boolean       read fenabled   write fenabled;
+    property position: tvpposition   read fposition;
+    property onstart:  tthreadmethod read fonstart   write fonstart;
+    property onstop:   tthreadmethod read fonstop    write fonstop;
+    property ontick:   tthreadmethod read fontick    write fontick;
+  end;
 
 var
-  driver: tvpdriver = nil;
-
+  driver:       tvpdriver       = nil;
+  driverthread: tvpdriverthread = nil;
 
 implementation
 
+uses
+  math;
 
 {$ifdef cpuarm}
 const
@@ -107,9 +123,10 @@ begin
   inherited create;
   fcount0  := 0;
   fcount1  := 0;
-  fdelay0  := 300000;
-  fdelay1  := 3000;
+  fdelayz  := 300000;
+  fdelaym  := 3000;
   fenabled := false;
+  fmode    := 0;
   fpenoff  := false;
   fpen     := true;
   {$ifdef cpuarm}
@@ -119,7 +136,7 @@ begin
   pca9685setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, motz_freq);
   // init servo
   pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_up, motz_freq));
-  delaymicroseconds(fdelay0);
+  delaymicroseconds(fdelayz);
   // init mode
   pinmode(motx_mod0, OUTPUT);
   pinmode(motx_mod1, OUTPUT);
@@ -138,14 +155,9 @@ begin
   digitalwrite(mot1_dir,  LOW);
   digitalwrite(mot1_step, LOW);
   {$endif}
-  setclockwise0(true);
-  setclockwise1(true);
-  setclockwise0(false);
-  setclockwise1(false);
   setpenoff(false);
-  setpen(false);
+  setpen   (false);
   setmode(1);
-  setmode(4);
 end;
 
 destructor tvpdriver.destroy;
@@ -160,8 +172,10 @@ begin
 end;
 
 procedure tvpdriver.setpen(value: boolean);
+{$ifdef cpuarm}
 var
   i: longint;
+{$endif}
 begin
   if not fpenoff then
     if fpen <> value then
@@ -174,7 +188,7 @@ begin
         repeat
           i := min(i + motz_inc, motz_low);;
           pwmwrite(PCA9685_PIN_BASE + 0, calcticks(i, motz_freq));
-          delaymicroseconds(fdelay0);
+          delaymicroseconds(fdelayz);
         until i >= motz_low;
       end else
       begin
@@ -182,7 +196,7 @@ begin
         repeat
           i := max(i - motz_inc, motz_up);
           pwmwrite(PCA9685_PIN_BASE + 0, calcticks(i, motz_freq));
-          delaymicroseconds(fdelay0);
+          delaymicroseconds(fdelayz);
         until i <= motz_up;
       end;
       {$endif}
@@ -190,8 +204,10 @@ begin
 end;
 
 procedure tvpdriver.setpenoff(value: boolean);
+{$ifdef cpuarm}
 var
   i: longint;
+{$endif}
 begin
   fpenoff := value;
   if fpenoff then
@@ -203,7 +219,7 @@ begin
       repeat
         i := max(i - motz_inc, motz_up);
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(i, motz_freq));
-        delaymicroseconds(fdelay0);
+        delaymicroseconds(fdelayz);
       until i <= motz_up;
       {$endif}
     end;
@@ -266,84 +282,112 @@ begin
   end;
 end;
 
-procedure tvpdriver.setclockwise0(value: boolean);
-begin
-  if value <> fclockwise0 then
-  begin
-    fclockwise0 := value;
-    {$ifdef cpuarm}
-    if fclockwise0 then
-      digitalwrite(mot0_dir,  LOW)
-    else
-      digitalwrite(mot0_dir, HIGH);
-    {$endif}
-  end;
-end;
-
-procedure tvpdriver.setclockwise1(value: boolean);
-begin
-  if value <> fclockwise1 then
-  begin
-    fclockwise1 := value;
-    {$ifdef cpuarm}
-    if fclockwise1 then
-      digitalwrite(mot1_dir,  LOW)
-    else
-      digitalwrite(mot1_dir, HIGH);
-    {$endif}
-  end;
-end;
-
 procedure tvpdriver.step(acount0, acount1: longint);
 {$ifdef cpuarm}
 var
-   i: longint;
-  b0: boolean;
-  b1: boolean;
+          i: longint;
+  dm0, ddm0: longint;
+  dm1, ddm1: longint;
 {$endif}
 begin
-  if enabledebug then
+  {$ifdef cpuarm}
+  if enabled then
   begin
-    if acount0 < 0 then raise exception.create('"acount0 < 0" exception');
-    if acount1 < 0 then raise exception.create('"acount1 < 0" exception');
-  end;
+    dm0 := acount0 - fcount0;
+    if dm0 > 0 then
+      digitalwrite(mot0_dir,  LOW)
+    else
+      digitalwrite(mot0_dir, HIGH);
 
-  if fenabled and ((acount0 > 0) or (acount1 > 0)) then
-  begin
-    {$ifdef cpuarm}
-    for i := 0 to 18 do
+    dm1 := acount1 - fcount1;
+    if dm1 > 0 then
+      digitalwrite(mot1_dir, HIGH)
+    else
+      digitalwrite(mot1_dir,  LOW);
+
+    dm0 := abs(dm0);
+    dm1 := abs(dm1);
+    setpen(max(dm0, dm1) < 8);
+
+    while (dm0 > 0) or (dm1 > 0) do
     begin
-      b0 := (vplotmatrix[acount0, i] = 1);
-      b1 := (vplotmatrix[acount1, i] = 1);
-      if b0 then digitalwrite(mot0_step, HIGH);
-      if b1 then digitalwrite(mot1_step, HIGH);
+      ddm0 := min(10, dm0);
+      ddm1 := min(10, dm1);
 
-      if b0 or
-         b1 then delaymicroseconds(fdelay1);
+      for i := 0 to 18 do
+      begin
+        if (vplotmatrix[ddm0, i] = 1) then
+        begin
+          digitalwrite(mot0_step, HIGH);
+          delaymicroseconds(fdelaym);
+          digitalwrite(mot0_step,  LOW);
+        end;
 
-      if b0 then digitalwrite(mot0_step,  LOW);
-      if b1 then digitalwrite(mot1_step,  LOW);
-
-      if b0 or
-         b1 then delaymicroseconds(fdelay1);
+        if (vplotmatrix[ddm1, i] = 1) then
+        begin
+          digitalwrite(mot1_step, HIGH);
+          delaymicroseconds(fdelaym);
+          digitalwrite(mot1_step,  LOW);
+        end;
+        delaymicroseconds(fdelaym*(1+byte(fpen)));
+      end;
+      dec (dm0, ddm0);
+      dec (dm1, ddm1);
     end;
-    {$endif}
-    if fclockwise0 then
-      inc(fcount0, acount0)
-    else
-      dec(fcount0, acount0);
-
-    if fclockwise1 then
-      dec(fcount1, acount1)
-    else
-      inc(fcount1, acount1);
   end;
-
+  {$endif}
+  fcount0 := acount0;
+  fcount1 := acount1;
   if enabledebug then
   begin
     writeln(format('  DRIVER::CNT.0  = %12.5u', [fcount0]));
     writeln(format('  DRIVER::CNT.1  = %12.5u', [fcount1]));
   end;
+end;
+
+// tvpdriverthread
+
+constructor tvpdriverthread.create(paths: tvppaths);
+begin
+  fenabled := true;
+  fpaths   := paths;
+  freeonterminate := true;
+  inherited create(true);
+end;
+
+destructor tvpdriverthread.destroy;
+begin
+  fpaths := nil;
+  inherited destroy;
+end;
+
+procedure tvpdriverthread.execute;
+var
+     i: longint;
+     j: longint;
+  path: tvppath;
+begin
+  if assigned(onstart) then
+    synchronize(fonstart);
+
+  for i := 0 to fpaths.count - 1 do
+  begin
+    path := fpaths.item[i];
+    for j := 0 to path.count - 1 do
+      if not terminated then
+      begin
+        fposition := path.item[j];
+        driver.step(fposition.m0, fposition.m1);
+
+        if assigned(ontick) then
+          synchronize(ontick);
+
+        while not enabled do sleep(250);
+      end;
+    end;
+
+  if assigned(fonstop) then
+    synchronize(fonstop);
 end;
 
 end.

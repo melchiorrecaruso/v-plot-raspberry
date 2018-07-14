@@ -26,7 +26,7 @@ unit vpsetting;
 interface
 
 uses
-  vpcommon;
+  vpcommon, vpmath, vpwave;
 
 type
   tvpsetting = class
@@ -46,9 +46,9 @@ type
 
     fmode:     longint;
     fratio:    double;
-    fdelay0:   longint;
-    fdelay1:   longint;
-    fdelay2:   longint;
+    fradius:   double;
+    fdelaym:   longint;
+    fdelayz:   longint;
  public
     constructor create;
     destructor destroy; override;
@@ -70,9 +70,9 @@ type
 
     property mode:     longint   read fmode;
     property ratio:    double    read fratio;
-    property delay0:   longint   read fdelay0;
-    property delay1:   longint   read fdelay1;
-    property delay2:   longint   read fdelay2;
+    property radius:   double    read fradius;
+    property delaym:   longint   read fdelaym;
+    property delayz:   longint   read fdelayz;
  end;
 
 
@@ -121,9 +121,9 @@ begin
 
   fmode       := 0;
   fratio      := 0;
-  fdelay2     := 0;
-  fdelay1     := 0;
-  fdelay0     := 0;
+  fradius     := 0;
+  fdelaym     := 0;
+  fdelayz     := 0;
 end;
 
 procedure tvpsetting.load(const filename: rawbytestring);
@@ -174,9 +174,9 @@ begin
 
     fmode       := ini.readinteger('Stepper', 'MODE',   0);
     fratio      := ini.readfloat  ('Stepper', 'RATIO',  0);
-    fdelay2     := ini.readinteger('Stepper', 'DELAY2', 0);
-    fdelay1     := ini.readinteger('Stepper', 'DELAY1', 0);
-    fdelay0     := ini.readinteger('Servo',   'DELAY0', 0);
+    fradius     := ini.readfloat  ('Stepper', 'RADIUS', 0);
+    fdelaym     := ini.readinteger('Stepper', 'DELAY',  0);
+    fdelayz     := ini.readinteger('Stepper', 'DELAY',  0);
   finally
     ini.destroy;
   end;
@@ -206,9 +206,9 @@ begin
 
     writeln(format(' STEPPER::MODE   = %12.5u', [fmode    ]));
     writeln(format(' STEPPER::RATIO  = %12.5f', [fratio   ]));
-    writeln(format(' STEPPER::DLY2   = %12.5u', [fdelay2  ]));
-    writeln(format(' STEPPER::DLY1   = %12.5u', [fdelay1  ]));
-    writeln(format('   SERVO::DLY0   = %12.5u', [fdelay0  ]));
+    writeln(format(' STEPPER::RADIUS = %12.5f', [fradius  ]));
+    writeln(format(' STEPPER::DLY-M  = %12.5u', [fdelaym  ]));
+    writeln(format(' STEPPER::DLY-Z  = %12.5u', [fdelayz  ]));
   end;
 end;
 

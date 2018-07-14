@@ -5,7 +5,7 @@ object mainform: Tmainform
   Width = 923
   Anchors = []
   Caption = 'vPlotter 2.0'
-  ClientHeight = 445
+  ClientHeight = 446
   ClientWidth = 923
   Menu = mainmenu
   OnClose = FormClose
@@ -19,7 +19,7 @@ object mainform: Tmainform
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 445
+    Height = 446
     Top = 0
     Width = 624
     Align = alCustom
@@ -37,15 +37,15 @@ object mainform: Tmainform
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 624
-    Height = 131
+    Height = 130
     Top = 5
     Width = 294
     Anchors = [akRight]
     AutoSize = True
     BorderSpacing.Right = 5
     Caption = 'Plotter Calibration'
-    ClientHeight = 114
-    ClientWidth = 292
+    ClientHeight = 113
+    ClientWidth = 290
     Constraints.MaxWidth = 294
     Constraints.MinWidth = 294
     ParentColor = False
@@ -60,7 +60,7 @@ object mainform: Tmainform
       AnchorSideBottom.Side = asrBottom
       Left = 195
       Height = 30
-      Top = 74
+      Top = 73
       Width = 85
       Anchors = [akTop, akLeft, akRight, akBottom]
       Caption = 'Right Down'
@@ -92,7 +92,7 @@ object mainform: Tmainform
       AnchorSideBottom.Side = asrBottom
       Left = 100
       Height = 30
-      Top = 74
+      Top = 73
       Width = 85
       Anchors = [akTop, akLeft, akRight, akBottom]
       Caption = 'Pen Down'
@@ -107,7 +107,7 @@ object mainform: Tmainform
       AnchorSideRight.Side = asrBottom
       Left = 5
       Height = 30
-      Top = 74
+      Top = 73
       Width = 85
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Left = 5
@@ -154,7 +154,7 @@ object mainform: Tmainform
       AnchorSideRight.Control = leftupbtn
       AnchorSideRight.Side = asrBottom
       Left = 5
-      Height = 28
+      Height = 27
       Top = 41
       Width = 85
       Alignment = taCenter
@@ -172,7 +172,7 @@ object mainform: Tmainform
       AnchorSideBottom.Control = leftedit
       AnchorSideBottom.Side = asrBottom
       Left = 195
-      Height = 28
+      Height = 27
       Top = 41
       Width = 85
       Alignment = taCenter
@@ -186,15 +186,15 @@ object mainform: Tmainform
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 624
-    Height = 121
-    Top = 142
+    Height = 122
+    Top = 141
     Width = 294
     Anchors = [akRight]
     AutoSize = True
     BorderSpacing.Right = 5
     Caption = 'Page size'
-    ClientHeight = 104
-    ClientWidth = 292
+    ClientHeight = 105
+    ClientWidth = 290
     Constraints.MaxWidth = 294
     Constraints.MinWidth = 294
     ParentColor = False
@@ -205,9 +205,9 @@ object mainform: Tmainform
       AnchorSideRight.Control = pagesizegb
       AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Side = asrBottom
-      Left = 207
-      Height = 28
-      Top = 33
+      Left = 205
+      Height = 27
+      Top = 36
       Width = 80
       Alignment = taRightJustify
       Anchors = [akTop, akRight]
@@ -221,9 +221,9 @@ object mainform: Tmainform
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = offsetxse
       AnchorSideRight.Side = asrBottom
-      Left = 207
-      Height = 28
-      Top = 66
+      Left = 205
+      Height = 27
+      Top = 68
       Width = 80
       Alignment = taRightJustify
       Anchors = [akTop, akLeft, akRight]
@@ -239,9 +239,9 @@ object mainform: Tmainform
       AnchorSideBottom.Control = offsetxse
       AnchorSideBottom.Side = asrBottom
       Left = 155
-      Height = 28
-      Top = 33
-      Width = 42
+      Height = 27
+      Top = 36
+      Width = 40
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 15
       Caption = 'Offset X'
@@ -255,9 +255,9 @@ object mainform: Tmainform
       AnchorSideBottom.Control = offsetyse
       AnchorSideBottom.Side = asrBottom
       Left = 155
-      Height = 28
-      Top = 66
-      Width = 42
+      Height = 27
+      Top = 68
+      Width = 40
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 15
       Caption = 'Offset Y'
@@ -270,9 +270,9 @@ object mainform: Tmainform
       AnchorSideBottom.Control = heightse
       AnchorSideBottom.Side = asrBottom
       Left = 5
-      Height = 28
-      Top = 33
-      Width = 35
+      Height = 27
+      Top = 36
+      Width = 34
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 5
       Caption = 'Height'
@@ -285,9 +285,9 @@ object mainform: Tmainform
       AnchorSideBottom.Control = widthse
       AnchorSideBottom.Side = asrBottom
       Left = 5
-      Height = 28
-      Top = 66
-      Width = 32
+      Height = 27
+      Top = 68
+      Width = 31
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 5
       Caption = 'Width'
@@ -300,9 +300,9 @@ object mainform: Tmainform
       AnchorSideBottom.Control = formatcb
       AnchorSideBottom.Side = asrBottom
       Left = 5
-      Height = 22
+      Height = 25
       Top = 6
-      Width = 39
+      Width = 37
       Alignment = taRightJustify
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 5
@@ -314,7 +314,7 @@ object mainform: Tmainform
       AnchorSideLeft.Control = pagesizegb
       AnchorSideTop.Control = pagesizegb
       Left = 60
-      Height = 22
+      Height = 25
       Top = 6
       Width = 80
       BorderSpacing.Left = 60
@@ -342,8 +342,8 @@ object mainform: Tmainform
       AnchorSideRight.Control = formatcb
       AnchorSideRight.Side = asrBottom
       Left = 60
-      Height = 28
-      Top = 33
+      Height = 27
+      Top = 36
       Width = 80
       Alignment = taRightJustify
       Anchors = [akTop, akLeft, akRight]
@@ -360,8 +360,8 @@ object mainform: Tmainform
       AnchorSideRight.Control = heightse
       AnchorSideRight.Side = asrBottom
       Left = 60
-      Height = 28
-      Top = 66
+      Height = 27
+      Top = 68
       Width = 80
       Alignment = taRightJustify
       Anchors = [akTop, akLeft, akRight]
@@ -378,8 +378,8 @@ object mainform: Tmainform
       AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Control = formatcb
       AnchorSideBottom.Side = asrBottom
-      Left = 207
-      Height = 22
+      Left = 205
+      Height = 25
       Top = 6
       Width = 80
       Anchors = [akTop, akLeft, akRight, akBottom]
@@ -447,11 +447,6 @@ object mainform: Tmainform
       end
       object line4mi: TMenuItem
         Caption = '-'
-      end
-      object updatemi: TMenuItem
-        Caption = 'Preview Only'
-        Checked = True
-        OnClick = updatemiClick
       end
       object clearmi: TMenuItem
         Caption = 'Clear'

@@ -26,50 +26,36 @@ unit vpcommon;
 interface
 
 uses
-  classes, matrix, sysutils;
+  classes, sysutils, vpmath;
 
 type
-  tdegres = 0..10;
-
-  tpolynome = packed record
-    deg: tdegres;
-    coefs: array[tdegres] of double;
+  tvpposition = class(tobject)
+  public
+     p: tvppoint;
+    pp: tvppoint;
+    m0: longint;
+    m1: longint;
   end;
-
-type
-  tvppoint = packed record
-    x: double;
-    y: double;
-  end;
-  pvppoint = ^tvppoint;
-
-  tvpline = packed record
-    a: double;
-    b: double;
-    c: double;
-  end;
-  pvpline = ^tvpline;
 
   tvppath = class(tobject)
   private
     flist:   tlist;
-    function getfirst: pvppoint;
-    function getlast:  pvppoint;
+    function getfirst: tvpposition;
+    function getlast:  tvpposition;
     function getcount: longint;
-    function get(index: longint): pvppoint;
+    function get(index: longint): tvpposition;
   public
     constructor create;
     destructor  destroy; override;
-    procedure   add(const point: tvppoint);
-    procedure   insert(index: longint; const point: tvppoint);
+    procedure   add(const p: tvppoint);
+    procedure   insert(index: longint; const p: tvppoint);
     procedure   delete(index: longint);
-    function    find(p: pvppoint): longint;
     procedure   clear;
     procedure   invert;
     function    getlen: double;
   public
-    property count:                longint  read getcount;
-    property item[index: longint]: pvppoint read get;
+    property item[index: longint]: tvpposition read get;
+    property count: longint read getcount;
   end;
 
   tvppaths = class(tobject)
@@ -95,30 +81,6 @@ type
     property item[index: longint]: tvppath read get;
   end;
 
-type
-  twavemesh = array[0..8] of tvppoint;
-
-  twave = class
-  private
-    lax, lay: tpolynome;
-    lbx, lby: tpolynome;
-    lcx, lcy: tpolynome;
-  public
-    constructor create(xmax, ymax: double; const mesh: twavemesh);
-    destructor destroy; override;
-    function update(const p: tvppoint): tvppoint;
-  end;
-
-
-  function  translatepoint(const cc, p: tvppoint): tvppoint;
-  function  rotatepoint(const p: tvppoint; const alpha: double): tvppoint;
-  function  distancebetween(const p0, p1: tvppoint): double;
-  function  linebetween(const p0, p1: tvppoint): tvpline;
-  function  lineangle(var line: tvpline): double;
-  function  intersectlines(const l0, l1: tvpline): tvppoint;
-
-  function polyeval(const apoly: tpolynome; x: double): double;
-
 var
   enabledebug: boolean = false;
 
@@ -130,99 +92,32 @@ uses
 const
   smallest = 0.05;
 
-// polynomial evaluation
-
-function polyeval(const apoly: tpolynome; x: double): double;
-var
-  i: tdegres;
+function compareposition(pos0, pos1: tvpposition): boolean;
 begin
-  with apoly do
-  begin
-    result := 0;
-    for i := deg downto low(coefs) do
-      result := result * x + coefs[i];
-  end;
-end;
-
-// geometry routines
-
-function translatepoint(const cc, p: tvppoint): tvppoint;
-begin
-  result.x := cc.x + p.x;
-  result.y := cc.y + p.y;
-end;
-
-function rotatepoint(const p: tvppoint; const alpha: double): tvppoint;
-var
-  sinus, cosinus : double;
-begin
-  sincos(alpha, sinus, cosinus);
-  result.x := p.x * cosinus - p.y *   sinus;
-  result.y := p.x *   sinus + p.y * cosinus;
-end;
-
-function distancebetween(const p0, p1: tvppoint): double;
-begin
-  result := sqrt(sqr(p1.x - p0.x) + sqr(p1.y - p0.y));
-end;
-
-function linebetween(const p0, p1: tvppoint): tvpline;
-begin
-  result.a :=  p1.y - p0.y;
-  result.b :=  p0.x - p1.x;
-  result.c := (p1.x - p0.x) * p0.y - (p1.y - p0.y) * p0.x;
-end;
-
-function lineangle(var line: tvpline): double;
-begin
-  if line.b = 0 then
-  begin
-    if line.a > 0 then
-      result := +pi / 2
-    else
-      result := -pi / 2;
-  end else
-    result := arctan2(line.a, -line.b);
-end;
-
-function intersectlines(const l0, l1: tvpline): tvppoint;
-begin
-  if (l0.a * l1.b) <> (l0.b * l1.a) then
-  begin
-    result.x := (-l0.c * l1.b + l0.b * l1.c) / (l0.a * l1.b - l0.b * l1.a);
-    result.y := (-l0.c - l0.a * result.x) / (l0.b);
-  end else
-    raise exception.create('Intersectlines routine exception');
-end;
-
-// ---
-
-function comparepoint(p0, p1: pvppoint): boolean;
-begin
-  result := abs(p1^.x - p0^.x) < smallest;
+  result := abs(pos1.p.x - pos0.p.x) < smallest;
   if result then
   begin
-    result := abs(p1^.y - p0^.y) < smallest;
+    result := abs(pos1.p.y - pos0.p.y) < smallest;
   end;
 end;
 
-function comparepath(p0, p1: pointer): longint;
+function comparepath(path0, path1: pointer): longint;
 begin
-  result := round(tvppath(p1).getlen - tvppath(p0).getlen);
+  result := round(tvppath(path1).getlen - tvppath(path0).getlen);
 end;
 
-function walkback(p0: pvppoint; list: tlist): longint;
+function walkback(pos0: tvpposition; list: tlist): longint;
 var
   i: longint;
 begin
   result := -1;
   for i := 0 to list.count - 1 do
-    if comparepoint(p0, tvppath(list[i]).getlast) then
+    if compareposition(pos0, tvppath(list[i]).getlast) then
     begin
       result := i;
       exit;
     end else
-    if comparepoint(p0, tvppath(list[i]).getfirst) then
+    if compareposition(pos0, tvppath(list[i]).getfirst) then
     begin
       tvppath(list[i]).invert;
       result := i;
@@ -230,18 +125,18 @@ begin
     end;
 end;
 
-function walknext(p0: pvppoint; list: tlist): longint;
+function walknext(pos0: tvpposition; list: tlist): longint;
 var
   i: longint;
 begin
   result := -1;
   for i := 0 to list.count - 1 do
-    if comparepoint(p0, tvppath(list[i]).getfirst) then
+    if compareposition(pos0, tvppath(list[i]).getfirst) then
     begin
       result := i;
       exit;
     end else
-    if comparepoint(p0, tvppath(list[i]).getlast) then
+    if compareposition(pos0, tvppath(list[i]).getlast) then
     begin
       tvppath(list[i]).invert;
       result := i;
@@ -258,18 +153,23 @@ begin
   result := 0;
   if path <> nil then
   begin
-    best := distancebetween(path.getlast^, tvppath(list[0]).getfirst^);
+    best := distance_between_two_points(
+      path.getlast.p, tvppath(list[0]).getfirst.p);
 
     for i := 1 to list.count - 1 do
     begin
-      curr := distancebetween(path.getlast^, tvppath(list[i]).getfirst^);
+      curr := distance_between_two_points(
+        path.getlast.p, tvppath(list[i]).getfirst.p);
+
       if curr < best then
       begin
         best   := curr;
         result := i;
       end else
       begin
-        curr := distancebetween(path.getlast^, tvppath(list[i]).getlast^);
+        curr := distance_between_two_points(
+          path.getlast.p, tvppath(list[i]).getlast.p);
+
         if curr < best then
         begin
           best   := curr;
@@ -287,7 +187,7 @@ begin
   result := false;
   if path.count > 1 then
   begin
-    result := comparepoint(path.getfirst, path.getlast);
+    result := compareposition(path.getfirst, path.getlast);
   end;
 end;
 
@@ -308,50 +208,31 @@ end;
 
 procedure tvppath.delete(index: longint);
 begin
-  dispose(pvppoint(flist[index]));
+  tvpposition(flist[index]).destroy;
   flist.delete(index);
-end;
-
-function tvppath.find(p: pvppoint): longint;
-var
-  i: longint;
-begin
-  result := -1;
-  for i := 0 to flist.count - 1 do
-    if comparepoint(p, pvppoint(flist[i])) then
-    begin
-      result := i;
-      exit;
-    end;
 end;
 
 procedure tvppath.clear;
 begin
-  while flist.count > 0 do
-  begin
-    dispose(pvppoint(flist[0]));
-    flist.delete(0);
-  end;
+  while flist.count > 0 do delete(0);
 end;
 
-procedure tvppath.add(const point: tvppoint);
+procedure tvppath.add(const p: tvppoint);
 var
-  p: pvppoint;
+  pos: tvpposition;
 begin
-  new(p);
-  p^.x := point.x;
-  p^.y := point.y;
-  flist.add(p);
+  pos   := tvpposition.create;
+  pos.p := p;
+  flist.add(pos);
 end;
 
-procedure tvppath.insert(index: longint; const point: tvppoint);
+procedure tvppath.insert(index: longint; const p: tvppoint);
 var
-  p: pvppoint;
+  pos: tvpposition;
 begin
-  new(p);
-  p^.x := point.x;
-  p^.y := point.y;
-  flist.insert(index, p);
+  pos   := tvpposition.create;
+  pos.p := p;
+  flist.insert(index, pos);
 end;
 
 procedure tvppath.invert;
@@ -373,23 +254,24 @@ begin
   for i := 1 to flist.count - 1 do
   begin
     result := result +
-      distancebetween(pvppoint(flist[i    ])^,
-                      pvppoint(flist[i - 1])^);
+      distance_between_two_points(
+        tvpposition(flist[i    ]).p,
+        tvpposition(flist[i - 1]).p);
   end;
 end;
 
-function tvppath.getfirst: pvppoint;
+function tvppath.getfirst: tvpposition;
 begin
   if flist.count > 0 then
-    result := pvppoint(flist.first)
+    result := tvpposition(flist.first)
   else
     result := nil;
 end;
 
-function tvppath.getlast: pvppoint;
+function tvppath.getlast: tvpposition;
 begin
   if flist.count > 0 then
-    result := pvppoint(flist.last)
+    result := tvpposition(flist.last)
   else
     result := nil;
 end;
@@ -399,9 +281,9 @@ begin
   result := flist.count;
 end;
 
-function tvppath.get(index: longint): pvppoint;
+function tvppath.get(index: longint): tvpposition;
 begin
-  result := pvppoint(flist[index]);
+  result := tvpposition(flist[index]);
 end;
 
 // tvppaths
@@ -429,11 +311,7 @@ end;
 
 procedure tvppaths.clear;
 begin
-  while flist.count > 0 do
-  begin
-    tvppath(flist[0]).destroy;
-    flist.delete(0);
-  end;
+  while flist.count > 0 do delete(0);
 end;
 
 procedure tvppaths.add(path: tvppath);
@@ -483,7 +361,7 @@ begin
     path := tvppath(flist[i]);
     for j := 0 to path.count - 1 do
     begin
-      point := path.item[j];
+      point := @path.item[j].p;
        xmin := min(xmin, point^.x);
        xmax := max(xmax, point^.x);
        ymin := min(ymin, point^.y);
@@ -498,7 +376,7 @@ begin
     path := tvppath(flist[i]);
     for j := 0 to path.count - 1 do
     begin
-      point    := path.item[j];
+      point    := @path.item[j].p;
       point^.x := point^.x + offsetx;
       point^.y := point^.y + offsety;
     end;
@@ -585,105 +463,6 @@ end;
 function tvppaths.get(index: longint): tvppath;
 begin
   result := tvppath(flist[index]);
-end;
-
-// twave
-
-constructor twave.create(xmax, ymax: double; const mesh: twavemesh);
-var
-   a, aa: tvector3_double;
-   b, bb: tvector3_double;
-   c, cc: tvector3_double;
-  dy: tvector3_double;
-  dx: tvector3_double;
-   y: tmatrix3_double;
-   x: tmatrix3_double;
-begin
-  inherited create;
-  xmax := abs(xmax);
-  ymax := abs(ymax);
-
-  x.init(1, -xmax, sqr(-xmax), 1, 0, 0, 1, +xmax, sqr(+xmax));
-  y.init(1, +ymax, sqr(+ymax), 1, 0, 0, 1, -ymax, sqr(-ymax));
-  x := x.inverse(x.determinant);
-  y := y.inverse(y.determinant);
-
-  // calculate y-mirror
-  dy.init(mesh[0].y, mesh[1].y, mesh[2].y);   a := x * dy;
-  dy.init(mesh[3].y, mesh[4].y, mesh[5].y);   b := x * dy;
-  dy.init(mesh[6].y, mesh[7].y, mesh[8].y);   c := x * dy;
-
-  dx.init(a.data[0], b.data[0], c.data[0]);  cc := y * dx;
-  dx.init(a.data[1], b.data[1], c.data[1]);  bb := y * dx;
-  dx.init(a.data[2], b.data[2], c.data[2]);  aa := y * dx;
-
-  lay.deg :=2;
-  lay.coefs[2] := aa.data[2];
-  lay.coefs[1] := aa.data[1];
-  lay.coefs[0] := aa.data[0];
-
-  lby.deg :=2;
-  lby.coefs[2] := bb.data[2];
-  lby.coefs[1] := bb.data[1];
-  lby.coefs[0] := bb.data[0];
-
-  lcy.deg :=2;
-  lcy.coefs[2] := cc.data[2];
-  lcy.coefs[1] := cc.data[1];
-  lcy.coefs[0] := cc.data[0];
-
-  // calculate x-mirror
-  dx.init(mesh[0].x, mesh[3].x, mesh[6].x);   a := y * dx;
-  dx.init(mesh[1].x, mesh[4].x, mesh[7].x);   b := y * dx;
-  dx.init(mesh[2].x, mesh[5].x, mesh[8].x);   c := y * dx;
-
-  dy.init(a.data[0], b.data[0], c.data[0]);  cc := x * dy;
-  dy.init(a.data[1], b.data[1], c.data[1]);  bb := x * dy;
-  dy.init(a.data[2], b.data[2], c.data[2]);  aa := x * dy;
-
-  lax.deg :=2;
-  lax.coefs[2] := aa.data[2];
-  lax.coefs[1] := aa.data[1];
-  lax.coefs[0] := aa.data[0];
-
-  lbx.deg :=2;
-  lbx.coefs[2] := bb.data[2];
-  lbx.coefs[1] := bb.data[1];
-  lbx.coefs[0] := bb.data[0];
-
-  lcx.deg :=2;
-  lcx.coefs[2] := cc.data[2];
-  lcx.coefs[1] := cc.data[1];
-  lcx.coefs[0] := cc.data[0];
-end;
-
-destructor twave.destroy;
-begin
-  inherited destroy;
-end;
-
-function twave.update(const p: tvppoint): tvppoint;
-var
-  ly, lx: tpolynome;
-begin
-  ly.deg :=2;
-  ly.coefs[2] := polyeval(lay, p.y);
-  ly.coefs[1] := polyeval(lby, p.y);
-  ly.coefs[0] := polyeval(lcy, p.y);
-
-  lx.deg :=2;
-  lx.coefs[2] := polyeval(lax, p.x);
-  lx.coefs[1] := polyeval(lbx, p.x);
-  lx.coefs[0] := polyeval(lcx, p.x);
-
-  result.x := p.x + polyeval(lx, p.y);
-  result.y := p.y + polyeval(ly, p.x);
-
-  if enabledebug then
-  begin
-    writeln(format('  WAVING::P.X    = %12.5f  P''.X = %12.5f', [p.x, result.x]));
-    writeln(format('  WAVING::P.Y    = %12.5f  P''.Y = %12.5f', [p.y, result.y]));
-  end;
 end;
 
 // init unit
