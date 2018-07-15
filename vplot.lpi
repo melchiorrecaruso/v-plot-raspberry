@@ -57,7 +57,6 @@
       <Unit2>
         <Filename Value="src/vpcoder.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="245"/>
         <CursorPos X="61" Y="277"/>
@@ -526,9 +525,10 @@
       <Unit66>
         <Filename Value="src/vpdriver.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="351"/>
-        <CursorPos X="71" Y="317"/>
+        <TopLine Value="294"/>
+        <CursorPos X="34" Y="306"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit66>
@@ -579,7 +579,6 @@
         <EditorIndex Value="3"/>
         <TopLine Value="61"/>
         <CursorPos X="44" Y="92"/>
-        <FoldState Value=" T3j8075 pibjF04B73{"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit72>
@@ -704,7 +703,7 @@
         <UsageCount Value="10"/>
       </Unit88>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="src/mainfrm.pas"/>
         <Caret Line="848" Column="35" TopLine="828"/>
@@ -814,17 +813,13 @@
         <Caret Line="291" Column="34" TopLine="257"/>
       </Position27>
       <Position28>
-        <Filename Value="src/vpcoder.pas"/>
-        <Caret Line="164" Column="11" TopLine="257"/>
+        <Filename Value="src/mainfrm.pas"/>
+        <Caret Line="915" Column="33" TopLine="883"/>
       </Position28>
       <Position29>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="915" Column="33" TopLine="883"/>
-      </Position29>
-      <Position30>
-        <Filename Value="src/mainfrm.pas"/>
         <Caret Line="556" Column="3" TopLine="552"/>
-      </Position30>
+      </Position29>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

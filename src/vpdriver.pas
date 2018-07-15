@@ -295,15 +295,15 @@ begin
   begin
     dm0 := acount0 - fcount0;
     if dm0 > 0 then
-      digitalwrite(mot0_dir, HIGH)
+      digitalwrite(mot0_dir,  LOW)
     else
-      digitalwrite(mot0_dir,  LOW);
+      digitalwrite(mot0_dir, HIGH);
 
     dm1 := acount1 - fcount1;
     if dm1 > 0 then
-      digitalwrite(mot1_dir,  LOW)
+      digitalwrite(mot1_dir, HIGH)
     else
-      digitalwrite(mot1_dir, HIGH);
+      digitalwrite(mot1_dir,  LOW);
 
     dm0 := abs(dm0);
     dm1 := abs(dm1);
