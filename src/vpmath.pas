@@ -58,12 +58,9 @@ function intersection_of_two_lines(const l0, l1: tvpline): tvppoint;
 function circle_by_three_points(const p0, p1, p2: tvppoint): tvpcircle;
 function circle_by_center_and_radius(const cc: tvppoint; radius: double): tvpcircle;
 
-
 function intersection_of_two_circles(const c0, c1: tvpcircle; var p1, p2: tvppoint): longint;
 
 function get_line_angle(const line: tvpline): double;
-
-
 
 
 implementation

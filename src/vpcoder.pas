@@ -64,7 +64,7 @@ begin
   end;
 end;
 
-function interpolate_circle(const entity: tvcircle ): tvppath;
+function interpolate_circle(const entity: tvcircle): tvppath;
 var
       i: longint;
     len: longint;
@@ -130,7 +130,7 @@ begin
   entity.prepareforsequentialreading;
   for i := 0 to entity.len - 1 do
   begin
-    segment := tpathsegment(entity.next());
+    segment := tpathsegment(entity.next);
     case segment.segmenttype of
       stmoveto:
       begin
@@ -217,6 +217,7 @@ begin
     writeln(format('OPTIMIZE::LDX    = %12.5f', [ldx]));
     writeln(format('OPTIMIZE::CNT.0  = %12.5u', [m0]));
     writeln(format('OPTIMIZE::CNT.1  = %12.5u', [m1]));
+    readln;
   end;
 end;
 
@@ -258,7 +259,6 @@ begin
   end;
   paths.createtoolpath;
   paths.zerocenter;
-//paths.deletesmallpaths;
 end;
 
 procedure optimize_paths(paths: tvppaths; offsetx, offsety, midx, midy, hmax, wmax: double);
@@ -284,9 +284,8 @@ begin
     begin
       pos := path.item[j];
       pos.pp.x := pos.p.x + offsetx + midx;
-      pos.pp.x := pos.p.y + offsety + midy;
+      pos.pp.y := pos.p.y + offsety + midy;
       optimize_point(pos.pp, pos.m0, pos.m1);
-
 
       pos.c    := true;
     end;

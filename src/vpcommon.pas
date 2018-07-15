@@ -74,7 +74,6 @@ type
     procedure   clear;
     procedure   createtoolpath;
     procedure   zerocenter;
-    procedure   deletesmallpaths;
   public
     property height:               double  read fheight;
     property width:                double  read fwidth;
@@ -351,7 +350,7 @@ var
   offsetx: double;
   offsety: double;
      path: tvppath;
-    point: pvppoint;
+      pos: tvpposition;
 begin
   xmin  := + maxint;
   xmax  := - maxint;
@@ -362,11 +361,11 @@ begin
     path := tvppath(flist[i]);
     for j := 0 to path.count - 1 do
     begin
-      point := @(path.item[j].p);
-       xmin := min(xmin, point^.x);
-       xmax := max(xmax, point^.x);
-       ymin := min(ymin, point^.y);
-       ymax := max(ymax, point^.y);
+        pos := path.item[j];
+       xmin := min(xmin, pos.p.x);
+       xmax := max(xmax, pos.p.x);
+       ymin := min(ymin, pos.p.y);
+       ymax := max(ymax, pos.p.y);
     end;
   end;
   offsetx := - (xmin + xmax) / 2;
@@ -377,24 +376,13 @@ begin
     path := tvppath(flist[i]);
     for j := 0 to path.count - 1 do
     begin
-      point    := @(path.item[j].p);
-      point^.x := point^.x + offsetx;
-      point^.y := point^.y + offsety;
+      pos     := path.item[j];
+      pos.p.x := pos.p.x + offsetx;
+      pos.p.y := pos.p.y + offsety;
     end;
   end;
   fheight := ymax - ymin;
   fwidth  := xmax - xmin;
-end;
-
-procedure tvppaths.deletesmallpaths;
-var
-  i: longint;
-begin
-  for i := flist.count - 1 downto 0 do
-    if tvppath(flist[i]).getlen < smallest then
-    begin
-      delete(i);
-    end;
 end;
 
 procedure tvppaths.createtoolpath;
