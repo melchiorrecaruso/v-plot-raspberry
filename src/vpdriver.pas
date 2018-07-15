@@ -295,15 +295,15 @@ begin
   begin
     dm0 := acount0 - fcount0;
     if dm0 > 0 then
-      digitalwrite(mot0_dir,  LOW)
+      digitalwrite(mot0_dir, HIGH)
     else
-      digitalwrite(mot0_dir, HIGH);
+      digitalwrite(mot0_dir,  LOW);
 
     dm1 := acount1 - fcount1;
     if dm1 > 0 then
-      digitalwrite(mot1_dir, HIGH)
+      digitalwrite(mot1_dir,  LOW)
     else
-      digitalwrite(mot1_dir,  LOW);
+      digitalwrite(mot1_dir, HIGH);
 
     dm0 := abs(dm0);
     dm1 := abs(dm1);
@@ -331,8 +331,8 @@ begin
         end;
         delaymicroseconds(fdelaym*(1+byte(fpen)));
       end;
-      dec (dm0, ddm0);
-      dec (dm1, ddm1);
+      dec(dm0, ddm0);
+      dec(dm1, ddm1);
     end;
   end;
   {$endif}

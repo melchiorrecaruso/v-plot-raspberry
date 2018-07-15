@@ -912,8 +912,8 @@ procedure tmainform.onplottertick;
 begin
   if enabledebug then
   begin
-    writeln(format('    TICK::P.X    = %12.5f', [driverthread.position.p.x]));
-    writeln(format('    TICK::P.Y    = %12.5f', [driverthread.position.p.y]));
+    writeln(format('    TICK::PP.X    = %12.5f', [driverthread.position.pp.x]));
+    writeln(format('    TICK::PP.Y    = %12.5f', [driverthread.position.pp.y]));
   end;
 
   if (elapsed mod 2) = 0 then

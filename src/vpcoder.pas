@@ -273,6 +273,8 @@ begin
     writeln(format(' EXECUTE::OFF-Y  = %12.5f', [offsety]));
     writeln(format(' EXECUTE::MID-X  = %12.5f', [midx   ]));
     writeln(format(' EXECUTE::MID-Y  = %12.5f', [midy   ]));
+    writeln(format(' EXECUTE::MAX-H  = %12.5f', [hmax   ]));
+    writeln(format(' EXECUTE::MAX-W  = %12.5f', [wmax   ]));
   end;
 
   for i := 0 to paths.count - 1 do

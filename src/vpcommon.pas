@@ -362,7 +362,7 @@ begin
     path := tvppath(flist[i]);
     for j := 0 to path.count - 1 do
     begin
-      point := @path.item[j].p;
+      point := @(path.item[j].p);
        xmin := min(xmin, point^.x);
        xmax := max(xmax, point^.x);
        ymin := min(ymin, point^.y);
@@ -377,7 +377,7 @@ begin
     path := tvppath(flist[i]);
     for j := 0 to path.count - 1 do
     begin
-      point    := @path.item[j].p;
+      point    := @(path.item[j].p);
       point^.x := point^.x + offsetx;
       point^.y := point^.y + offsety;
     end;
