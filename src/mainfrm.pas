@@ -235,7 +235,7 @@ begin
   optimize_point(setting.layout09, m0, m1);
   driver.enabled:= true;
   driver.penoff := true;
-  driver.move(driver.count0, driver.count1 + leftedit.value);
+  driver.move(driver.count0 - leftedit.value, driver.count1);
   driver.init(m0, m1);
   lock2(true);
 end;
@@ -249,7 +249,7 @@ begin
   optimize_point(setting.layout09, m0, m1);
   driver.enabled:= true;
   driver.penoff := true;
-  driver.move(driver.count0, driver.count1 - leftedit.value);
+  driver.move(driver.count0 + leftedit.value, driver.count1);
   driver.init(m0, m1);
   lock2(true);
 end;
@@ -263,7 +263,7 @@ begin
   optimize_point(setting.layout09, m0, m1);
   driver.enabled:= true;
   driver.penoff := true;
-  driver.move(driver.count0 - rightedit.value, driver.count1);
+  driver.move(driver.count0, driver.count1 - rightedit.value);
   driver.init(m0, m1);
   lock2(true);
 end;
@@ -277,7 +277,7 @@ begin
   optimize_point(setting.layout09, m0, m1);
   driver.enabled:= true;
   driver.penoff := true;
-  driver.move(driver.count0 + rightedit.value, driver.count1);
+  driver.move(driver.count0, driver.count1 + rightedit.value);
   driver.init(m0, m1);
   lock2(true);
 end;
