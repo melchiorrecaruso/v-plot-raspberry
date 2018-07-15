@@ -228,89 +228,57 @@ end;
 
 procedure tmainform.leftupbtnclick(sender: tobject);
 var
-  m0, dm0: longint;
-  m1:      longint;
+  m0: longint = 0;
+  m1: longint = 0;
 begin
   lock2(false);
-  begin
-    driver.enabled:= true;
-    driver.penoff := true;
-
-    m0 := abs(leftedit.value);
-    repeat
-      dm0 :=  min(10, m0);
-      driver.step(dm0, 0);
-      dec (m0, dm0);
-    until (m0 =  0);
-    optimize_point(setting.layout09, m0, m1);
-    driver.init(m0, m1);
-  end;
+  optimize_point(setting.layout09, m0, m1);
+  driver.enabled:= true;
+  driver.penoff := true;
+  driver.move(driver.count0, driver.count1 + leftedit.value);
+  driver.init(m0, m1);
   lock2(true);
 end;
 
 procedure tmainform.leftdownbtnclick(sender: tobject);
 var
-  m0, dm0: longint;
-  m1:      longint;
+  m0: longint = 0;
+  m1: longint = 0;
 begin
   lock2(false);
-  begin
-    driver.enabled    := true;
-    driver.penoff     := true;
-
-    m0 := abs(leftedit.value);
-    repeat
-      dm0 :=  min(10, m0);
-      driver.step(dm0, 0);
-      dec (m0, dm0);
-    until (m0 =  0);
-    optimize_point(setting.layout09, m0, m1);
-    driver.init(m0, m1);
-  end;
+  optimize_point(setting.layout09, m0, m1);
+  driver.enabled:= true;
+  driver.penoff := true;
+  driver.move(driver.count0, driver.count1 - leftedit.value);
+  driver.init(m0, m1);
   lock2(true);
 end;
 
 procedure tmainform.rightupbtnclick(sender: tobject);
 var
-  m0:      longint;
-  m1, dm1: longint;
+  m0: longint = 0;
+  m1: longint = 0;
 begin
   lock2(false);
-  begin
-    driver.enabled    := true;
-    driver.penoff     := true;
-
-    m1 := abs(rightedit.value);
-    repeat
-      dm1 :=  min(10, m1);
-      driver.step(0, dm1);
-      dec (m1, dm1);
-    until (m1 =  0);
-    optimize_point(setting.layout09, m0, m1);
-    driver.init(m0, m1);
-  end;
+  optimize_point(setting.layout09, m0, m1);
+  driver.enabled:= true;
+  driver.penoff := true;
+  driver.move(driver.count0 - rightedit.value, driver.count1);
+  driver.init(m0, m1);
   lock2(true);
 end;
 
 procedure tmainform.rightdownbtnclick(sender: tobject);
 var
-  m0:      longint;
-  m1, dm1: longint;
+  m0: longint = 0;
+  m1: longint = 0;
 begin
   lock2(false);
-  begin
-    driver.enabled    := true;
-    driver.penoff     := true;
-
-    m1 := abs(rightedit.value);
-    repeat
-      dm1 :=  min(10, m1);
-      driver.step(0, dm1);
-      dec (m1, dm1);
-    until (m1 =  0);
-    optimize_point(setting.layout09, m0, m1);
-    driver.init(m0, m1);
-  end;
+  optimize_point(setting.layout09, m0, m1);
+  driver.enabled:= true;
+  driver.penoff := true;
+  driver.move(driver.count0 + rightedit.value, driver.count1);
+  driver.init(m0, m1);
   lock2(true);
 end;
 
@@ -532,12 +500,10 @@ var
   m1: longint = 0;
 begin
   lock2(false);
-  begin
-    driver.enabled := true;
-    driver.penoff  := true;
-    optimize_point(setting.layout09, m0, m1);
-    driver.step(m0, m1);
-  end;
+  driver.enabled := true;
+  driver.penoff  := true;
+  optimize_point(setting.layout09, m0, m1);
+  driver.move(m0, m1);
   lock2(true);
 end;
 

@@ -46,7 +46,7 @@ type
     constructor create;
     destructor  destroy; override;
     procedure   init(acount0, acount1: longint);
-    procedure   step(acount0, acount1: longint);
+    procedure   move(acount0, acount1: longint);
   published
     property count0:     longint read fcount0;
     property count1:     longint read fcount1;
@@ -282,7 +282,7 @@ begin
   end;
 end;
 
-procedure tvpdriver.step(acount0, acount1: longint);
+procedure tvpdriver.move(acount0, acount1: longint);
 {$ifdef cpuarm}
 var
           i: longint;
@@ -379,7 +379,7 @@ begin
         fposition := path.item[j];
         if fposition.c then
         begin
-          driver.step(fposition.m0, fposition.m1);
+          driver.move(fposition.m0, fposition.m1);
         end;
 
         if assigned(ontick) then
