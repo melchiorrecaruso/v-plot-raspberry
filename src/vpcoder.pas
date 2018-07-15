@@ -165,13 +165,8 @@ procedure optimize_point(const p: tvppoint; var m0, m1: longint);
 var
   c0, c1, c3, c4: tvpcircle;
   alpha, alphalo, alphahi, lsx, ldx: double;
-  s00, s01, t00, t01, t02, t03, t04, t05, t06: tvppoint;
+  s00, s01, sxx, t00, t01, t02, t03, t04, t05, t06: tvppoint;
 begin
-  if enabledebug then
-  begin
-    writeln(format('OPTIMIZE::P02.X  = %12.5f  P02.Y = %12.5f', [p.x, p.y]));
-  end;
-
   alphalo := -pi/2;
   alphahi := +pi/2;
   repeat
@@ -186,23 +181,23 @@ begin
     lsx := sqrt(sqr(distance_between_two_points(t00, t03))-sqr(setting.radius));
     c0  := circle_by_center_and_radius(setting.layout00, setting.radius);
     c3  := circle_by_center_and_radius(t03, lsx);
-    if intersection_of_two_circles(c0, c3, s00, s01) = 0 then
+    if intersection_of_two_circles(c0, c3, s00, sxx) = 0 then
       raise exception.create('intersection_of_two_circles [c0c3]');
     lsx := lsx + get_line_angle(line_by_two_points(s00, t00))*setting.radius;
     //find tangent point t01
     ldx := sqrt(sqr(distance_between_two_points(t01, t04))-sqr(setting.radius));
     c1  := circle_by_center_and_radius(setting.layout01, setting.radius);
     c4  := circle_by_center_and_radius(t04, ldx);
-    if intersection_of_two_circles(c1, c4, s00, s01) = 0 then
+    if intersection_of_two_circles(c1, c4, s01, sxx) = 0 then
       raise exception.create('intersection_of_two_circles [c1c4]');
-    ldx   := ldx + (pi-get_line_angle(line_by_two_points(s00, t01)))*setting.radius;
+    ldx := ldx + (pi-get_line_angle(line_by_two_points(s01, t01)))*setting.radius;
     //find intersection point
-    t06 := intersection_of_two_lines(line_by_two_points(t00, t03),
-                                     line_by_two_points(t01, t04));
-    if (t06.x - t05.x) < -0.001 then
+    t06 := intersection_of_two_lines(line_by_two_points(s00, t03),
+                                     line_by_two_points(s01, t04));
+    if (t06.x - t05.x) < -0.000001 then
       alphahi := alpha
     else
-      if (t06.x - t05.x) > +0.001 then
+      if (t06.x - t05.x) > +0.000001 then
         alphalo := alpha
       else
         break;
@@ -212,7 +207,7 @@ begin
   m1 := round(setting.mode * (ldx/setting.ratio));
   if enabledebug then
   begin
-    writeln(format('OPTIMIZE::ALPHA  = %12.5f',             [radtodeg(alpha) ]));
+    writeln(format('OPTIMIZE::ALPHA  = %12.5f',              [radtodeg(alpha)]));
     writeln(format('OPTIMIZE::P02.X  = %12.5f  P02.Y = %12.5f', [t02.x, t02.y]));
     writeln(format('OPTIMIZE::P03.X  = %12.5f  P03.Y = %12.5f', [t03.x, t03.y]));
     writeln(format('OPTIMIZE::P04.X  = %12.5f  P04.Y = %12.5f', [t04.x, t04.y]));
@@ -286,8 +281,8 @@ begin
     for j := 0 to path.count - 1 do
     begin
       pos := path.item[j];
-      pos.pp.x := pos.p .x + offsetx + midx;
-      pos.pp.x := pos.p .y + offsety + midy;
+      pos.pp.x := pos.p.x + offsetx + midx;
+      pos.pp.x := pos.p.y + offsety + midy;
       optimize_point(pos.pp, pos.m0, pos.m1);
     end;
   end;
