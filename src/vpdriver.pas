@@ -174,7 +174,7 @@ end;
 procedure tvpdriver.setpen(value: boolean);
 {$ifdef cpuarm}
 var
-  i: longint;
+  i: double;
 {$endif}
 begin
   if not fpenoff then
@@ -206,7 +206,7 @@ end;
 procedure tvpdriver.setpenoff(value: boolean);
 {$ifdef cpuarm}
 var
-  i: longint;
+  i: double;
 {$endif}
 begin
   fpenoff := value;

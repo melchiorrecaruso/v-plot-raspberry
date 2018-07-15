@@ -57,11 +57,9 @@ type
     showpagesizepanelmi: TMenuItem;
     showcalibrationpanelmi: TMenuItem;
     timer: TTimer;
-    clearmi: TMenuItem;
     calibrationmi: TMenuItem;
     movebordersmi: TMenuItem;
     movebottommi: TMenuItem;
-    line4mi: TMenuItem;
     movetohomemi: TMenuItem;
     startmi: tmenuitem;
     stopmi: tmenuitem;
@@ -848,7 +846,6 @@ begin
   reloadmi      .enabled := value;
   closemi       .enabled := value;
   exitmi        .enabled := value;
-  clearmi       .enabled := value;
   movebordersmi .enabled := value;
   movebottommi  .enabled := value;
   movetopmi     .enabled := value;
@@ -890,7 +887,6 @@ begin
   reloadmi      .enabled := value;
   closemi       .enabled := value;
   exitmi        .enabled := value;
-  clearmi       .enabled := value;
   startmi       .enabled := value;
   stopmi        .enabled := value;
   killmi        .enabled := value;
