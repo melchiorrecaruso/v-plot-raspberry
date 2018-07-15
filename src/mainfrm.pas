@@ -41,6 +41,7 @@ type
     line2mi: tmenuitem;
     killmi: tmenuitem;
     MenuItem1: TMenuItem;
+    reloadmi: TMenuItem;
     writeleftmi: TMenuItem;
     writerightmi: TMenuItem;
     line7mi: TMenuItem;
@@ -66,7 +67,7 @@ type
     stopmi: tmenuitem;
     infomi: tmenuitem;
     aboutmi: tmenuitem;
-    openmi: tmenuitem;
+    loadmi: tmenuitem;
     closemi: tmenuitem;
     line1mi: tmenuitem;
     exitmi: tmenuitem;
@@ -94,7 +95,6 @@ type
     opendialog: topendialog;
  
     procedure aboutmiclick(sender: tobject);
-    procedure clearallmiclick(sender: tobject);
     procedure layoutmiclick(sender: tobject);
 
     procedure movebordersmiclick(sender: tobject);
@@ -120,6 +120,7 @@ type
     procedure moverightmiClick(Sender: TObject);
     procedure movetopmiClick(Sender: TObject);
     procedure movebottommiClick(sender: tobject);
+    procedure reloadmiClick(Sender: TObject);
 
     procedure showtoolbarclick(sender: tobject);
 
@@ -366,7 +367,9 @@ begin
     offsetxse.value,
     offsetyse.value,
     setting.layout08.x,
-    setting.layout08.y + (heightse.value / 2));
+    setting.layout08.y + (heightse.value / 2),
+    heightse.value,
+    widthse.value);
 
   driver.enabled       := true;
   driver.penoff        := sender = movebordersmi;
@@ -396,7 +399,9 @@ begin
     offsetxse.value,
     offsetyse.value,
     setting.layout08.x,
-    setting.layout08.y + (heightse.value / 2));
+    setting.layout08.y + (heightse.value / 2),
+    heightse.value,
+    widthse.value);
 
   driver.enabled       := true;
   driver.penoff        := sender = movetopmi;
@@ -426,7 +431,9 @@ begin
     offsetxse.value,
     offsetyse.value,
     setting.layout08.x,
-    setting.layout08.y + (heightse.value / 2));
+    setting.layout08.y + (heightse.value / 2),
+    heightse.value,
+    widthse.value);
 
   driver.enabled       := true;
   driver.penoff        := sender = movebottommi;
@@ -456,7 +463,9 @@ begin
     offsetxse.value,
     offsetyse.value,
     setting.layout08.x,
-    setting.layout08.y + (heightse.value / 2));
+    setting.layout08.y + (heightse.value / 2),
+    heightse.value,
+    widthse.value);
 
   driver.enabled       := true;
   driver.penoff        := sender = moveleftmi;
@@ -486,7 +495,9 @@ begin
     offsetxse.value,
     offsetyse.value,
     setting.layout08.x,
-    setting.layout08.y + (heightse.value / 2));
+    setting.layout08.y + (heightse.value / 2),
+    heightse.value,
+    widthse.value);
 
   driver.enabled       := true;
   driver.penoff        := sender = moverightmi;
@@ -576,10 +587,7 @@ end;
 
 procedure tmainform.openbtnclick(sender: tobject);
 var
-   i, j: longint;
-   path: tvppath;
-    pos: tvpposition;
-    vec: tvvectorialdocument;
+  vec: tvvectorialdocument;
 begin
   opendialog.filter := 'dxf files (*.dxf)|*.dxf';
   if opendialog.execute then
@@ -593,34 +601,83 @@ begin
     except
     end;
     load_paths(paths, vec);
-    optimize_paths(paths,
-      offsetxse.value,
-      offsetyse.value,
-      setting.layout08.x,
-      setting.layout08.y + (heightse.value / 2));
+    reloadmiclick(nil);
     freeandnil(vec);
-
-    // updtare preview ...
-    for i := 0 to paths.count - 1 do
-    begin
-      path := paths.item[i];
-      for j := 0 to path.count - 1 do
-      begin
-        pos := path.item[j];
-        bitmap.canvas.pixels[
-          trunc(( widthse.value div 2) + pos.p.x + offsetxse.value),
-          trunc((heightse.value div 2) - pos.p.y + offsetyse.value)] := clblack;
-      end;
-    end;
-    image.canvas.draw(0, 0, bitmap);
-    lock2(true);
   end;
+end;
+
+procedure tmainform.reloadmiclick(sender: tobject);
+var
+  i, j: longint;
+  path: tvppath;
+   pos: tvpposition;
+begin
+  lock2(false);
+  optimize_paths(paths,
+    offsetxse.value,
+    offsetyse.value,
+    setting.layout08.x,
+    setting.layout08.y + (heightse.value / 2),
+    heightse.value,
+    widthse.value);
+
+  // updtare preview ...
+  for i := 0 to paths.count - 1 do
+  begin
+    path := paths.item[i];
+    for j := 0 to path.count - 1 do
+    begin
+      pos := path.item[j];
+      bitmap.canvas.pixels[
+        trunc(( widthse.value div 2) + pos.p.x + offsetxse.value),
+        trunc((heightse.value div 2) - pos.p.y - offsetyse.value)] := clblack;
+    end;
+  end;
+  image.canvas.draw(0, 0, bitmap);
+  lock2(true);
 end;
 
 procedure tmainform.closemiclick(sender: tobject);
 begin
   lock2(false);
-  clearallmiclick(sender);
+  // ---
+  caption := 'vPlotter 2.0';
+  // ---
+  bitmap.canvas.pen  .color := clltgray;
+  bitmap.canvas.brush.color := clltgray;
+  bitmap.canvas.brush.style := bssolid;
+  bitmap.setsize(
+     widthse.value + 2,
+    heightse.value + 2);
+  bitmap.canvas.fillrect(0, 0,
+     widthse.value + 2,
+    heightse.value + 2);
+  // ---
+  image.canvas.pen  .color := clltgray;
+  image.canvas.brush.color := clltgray;
+  image.canvas.brush.style := bssolid;
+  image.picture.bitmap.setsize(
+     widthse.value + 2,
+    heightse.value + 2);
+  image.canvas.fillrect(0, 0,
+     widthse.value + 2,
+    heightse.value + 2);
+  // ---
+  image.align             := alnone;
+  image.anchors           := [aktop, akleft, akright, akbottom];
+  image.anchors           := [];
+  image.center            := true;
+  image.proportional      := false;
+  image.stretchinenabled  := false;
+  image.stretchoutenabled := false;
+  image.stretch           := false;
+
+  if sender = closemi then
+  begin
+    paths.clear
+  end else
+    reloadmiclick(closemi);
+  // ---
   lock2(true);
 end;
 
@@ -662,42 +719,6 @@ begin
       pagesizegb.top     := 10;
     end;
   end;
-end;
-
-// PREVIEW mainmenu
-
-procedure tmainform.clearallmiclick(sender: tobject);
-begin
-  caption := 'vPlotter 2.0';
-  // ---
-  bitmap.canvas.pen  .color := clltgray;
-  bitmap.canvas.brush.color := clltgray;
-  bitmap.canvas.brush.style := bssolid;
-  bitmap.setsize(
-     widthse.value + 2,
-    heightse.value + 2);
-  bitmap.canvas.fillrect(0, 0,
-     widthse.value + 2,
-    heightse.value + 2);
-  // ---
-  image.canvas.pen  .color := clltgray;
-  image.canvas.brush.color := clltgray;
-  image.canvas.brush.style := bssolid;
-  image.picture.bitmap.setsize(
-     widthse.value + 2,
-    heightse.value + 2);
-  image.canvas.fillrect(0, 0,
-     widthse.value + 2,
-    heightse.value + 2);
-  // ---
-  image.align             := alnone;
-  image.anchors           := [aktop, akleft, akright, akbottom];
-  image.anchors           := [];
-  image.center            := true;
-  image.proportional      := false;
-  image.stretchinenabled  := false;
-  image.stretchoutenabled := false;
-  image.stretch           := false;
 end;
 
 // PLOT mainmenu
@@ -815,7 +836,7 @@ begin
     formatcb.itemindex := formatcb.items.count - 2;
     formatcbchange (nil);
   end;
-  clearallmiclick(sender);
+  closemiclick(verticalcb);
 end;
 
 // PLOTTER THREAD methods
@@ -823,7 +844,8 @@ end;
 procedure tmainform.lock1(value: boolean);
 begin
   // main menu
-  openmi        .enabled := value;
+  loadmi        .enabled := value;
+  reloadmi      .enabled := value;
   closemi       .enabled := value;
   exitmi        .enabled := value;
   clearmi       .enabled := value;
@@ -858,12 +880,14 @@ begin
   offsetxse     .enabled := value;
   offsetyse     .enabled := value;
   verticalcb    .enabled := value;
+  application.processmessages;
 end;
 
 procedure tmainform.lock2(value: boolean);
 begin
   // main menu
-  openmi        .enabled := value;
+  loadmi        .enabled := value;
+  reloadmi      .enabled := value;
   closemi       .enabled := value;
   exitmi        .enabled := value;
   clearmi       .enabled := value;
@@ -901,6 +925,7 @@ begin
   offsetxse     .enabled := value;
   offsetyse     .enabled := value;
   verticalcb    .enabled := value;
+  application.processmessages;
 end;
 
 procedure tmainform.onplotterstart;

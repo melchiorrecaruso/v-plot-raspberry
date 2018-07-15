@@ -377,7 +377,10 @@ begin
       if not terminated then
       begin
         fposition := path.item[j];
-        driver.step(fposition.m0, fposition.m1);
+        if fposition.c then
+        begin
+          driver.step(fposition.m0, fposition.m1);
+        end;
 
         if assigned(ontick) then
           synchronize(ontick);

@@ -34,7 +34,7 @@ uses
   function interpolate_path(const entity: tpath): tvppath;
 
   procedure load_paths(paths: tvppaths; vec: tvvectorialdocument);
-  procedure optimize_paths(paths: tvppaths; offsetx, offsety, midx, midy: double);
+  procedure optimize_paths(paths: tvppaths; offsetx, offsety, midx, midy, hmax, wmax: double);
   procedure optimize_point(const p: tvppoint; var m0, m1: longint);
 
 implementation
@@ -261,7 +261,7 @@ begin
 //paths.deletesmallpaths;
 end;
 
-procedure optimize_paths(paths: tvppaths; offsetx, offsety, midx, midy: double);
+procedure optimize_paths(paths: tvppaths; offsetx, offsety, midx, midy, hmax, wmax: double);
 var
   i, j: longint;
   path: tvppath;
@@ -284,6 +284,9 @@ begin
       pos.pp.x := pos.p.x + offsetx + midx;
       pos.pp.x := pos.p.y + offsety + midy;
       optimize_point(pos.pp, pos.m0, pos.m1);
+
+
+      pos.c    := true;
     end;
   end;
 

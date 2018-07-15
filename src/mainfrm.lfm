@@ -399,9 +399,13 @@ object mainform: Tmainform
     top = 320
     object filemi: TMenuItem
       Caption = 'File'
-      object openmi: TMenuItem
-        Caption = 'Open ...'
+      object loadmi: TMenuItem
+        Caption = 'Load ...'
         OnClick = openbtnclick
+      end
+      object reloadmi: TMenuItem
+        Caption = 'Reload'
+        OnClick = reloadmiClick
       end
       object closemi: TMenuItem
         Caption = 'Close'
@@ -450,7 +454,6 @@ object mainform: Tmainform
       end
       object clearmi: TMenuItem
         Caption = 'Clear'
-        OnClick = clearallmiClick
       end
     end
     object calibrationmi: TMenuItem

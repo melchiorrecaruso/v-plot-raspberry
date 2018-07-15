@@ -31,6 +31,7 @@ uses
 type
   tvpposition = class(tobject)
   public
+     c: boolean;
      p: tvppoint;
     pp: tvppoint;
     m0: longint;
