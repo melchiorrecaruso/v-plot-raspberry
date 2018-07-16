@@ -34,14 +34,36 @@ type
   { tmainform }
 
   tmainform = class(tform)
-    image: timage;
-    leftedit: tspinedit;
+    formatcb: TComboBox;
+    formatl: TLabel;
+    heightl: TLabel;
+    heightse: TSpinEdit;
+    image: TImage;
+    Label1: TLabel;
+    Label2: TLabel;
+    leftdownbtn: TBitBtn;
+    leftedit: TSpinEdit;
+    leftupbtn: TBitBtn;
     mainmenu: tmainmenu;
     filemi: tmenuitem;
     line2mi: tmenuitem;
     killmi: tmenuitem;
+    manualdrivinggb: TGroupBox;
     MenuItem1: TMenuItem;
+    offsetxse: TSpinEdit;
+    offsetyse: TSpinEdit;
+    pagesizegb: TGroupBox;
+    imagepanel: TPanel;
+    settingpanel: TPanel;
+    pendownbtn: TBitBtn;
+    penupbtn: TBitBtn;
     reloadmi: TMenuItem;
+    rightdownbtn: TBitBtn;
+    rightedit: TSpinEdit;
+    rightupbtn: TBitBtn;
+    verticalcb: TCheckBox;
+    widthl: TLabel;
+    widthse: TSpinEdit;
     writeleftmi: TMenuItem;
     writerightmi: TMenuItem;
     line7mi: TMenuItem;
@@ -54,8 +76,7 @@ type
     writebordersmi: TMenuItem;
     writetopmi: TMenuItem;
     writebottommi: TMenuItem;
-    showpagesizepanelmi: TMenuItem;
-    showcalibrationpanelmi: TMenuItem;
+    settingmi: TMenuItem;
     timer: TTimer;
     calibrationmi: TMenuItem;
     movebordersmi: TMenuItem;
@@ -70,26 +91,6 @@ type
     line1mi: tmenuitem;
     exitmi: tmenuitem;
     plotmi: tmenuitem;
-    rightedit: tspinedit;
-    verticalcb: tcheckbox;
-    formatcb: tcombobox;
-    pagesizegb: tgroupbox;
-    label1: tlabel;
-    label2: tlabel;
-    heightl: tlabel;
-    widthl: tlabel;
-    formatl: tlabel;
-    offsetyse: tspinedit;
-    offsetxse: tspinedit;
-    heightse: tspinedit;
-    widthse: tspinedit;
-    leftdownbtn: tbitbtn;
-    rightdownbtn: tbitbtn;
-    penupbtn: tbitbtn;
-    pendownbtn: tbitbtn;
-    leftupbtn: tbitbtn;
-    rightupbtn: tbitbtn;
-    manualdrivinggb: tgroupbox;
     opendialog: topendialog;
  
     procedure aboutmiclick(sender: tobject);
@@ -635,8 +636,7 @@ begin
   image.stretchinenabled  := false;
   image.stretchoutenabled := false;
   image.stretch           := false;
-
-  if sender = closemi then
+    if sender = closemi then
   begin
     paths.clear
   end else
@@ -654,35 +654,8 @@ end;
 
 procedure tmainform.showtoolbarclick(sender: tobject);
 begin
-  if sender = showcalibrationpanelmi then
-  begin
-    showcalibrationpanelmi.checked := not showcalibrationpanelmi.checked;
-    manualdrivinggb       .visible :=     showcalibrationpanelmi.checked;
-  end else
-  if sender = showpagesizepanelmi then
-  begin
-    showpagesizepanelmi.checked := not showpagesizepanelmi.checked;
-    pagesizegb         .visible :=     showpagesizepanelmi.checked;
-  end;
-
-  if manualdrivinggb.visible then
-  begin
-    manualdrivinggb.anchors := [aktop, akright];
-    manualdrivinggb.top     := 10;
-    if pagesizegb.visible then
-    begin
-      pagesizegb.anchors := [aktop, akright];
-      pagesizegb.top     := manualdrivinggb.top    +
-                            manualdrivinggb.height + 10;
-    end;
-  end else
-  begin
-    if pagesizegb.visible then
-    begin
-      pagesizegb.anchors := [aktop, akright];
-      pagesizegb.top     := 10;
-    end;
-  end;
+  settingmi.checked    := not settingmi.checked;
+  settingpanel.visible :=     settingmi.checked;
 end;
 
 // PLOT mainmenu
