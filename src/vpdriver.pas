@@ -177,30 +177,31 @@ var
   i: double;
 {$endif}
 begin
-  if not fpenoff then
-    if fpen <> value then
+  if fpenoff then exit;
+
+  if fpen <> value then
+  begin
+    fpen := value;
+    {$ifdef cpuarm}
+    if fpen then
     begin
-      fpen := value;
-      {$ifdef cpuarm}
-      if fpen then
-      begin
-        i := motz_up;
-        repeat
-          i := min(i + motz_inc, motz_low);;
-          pwmwrite(PCA9685_PIN_BASE + 0, calcticks(i, motz_freq));
-          delaymicroseconds(fdelayz);
-        until i >= motz_low;
-      end else
-      begin
-        i := motz_low;
-        repeat
-          i := max(i - motz_inc, motz_up);
-          pwmwrite(PCA9685_PIN_BASE + 0, calcticks(i, motz_freq));
-          delaymicroseconds(fdelayz);
-        until i <= motz_up;
-      end;
-      {$endif}
+      i := motz_up;
+      repeat
+        i := min(i + motz_inc, motz_low);;
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(i, motz_freq));
+        delaymicroseconds(fdelayz);
+      until i >= motz_low;
+    end else
+    begin
+      i := motz_low;
+      repeat
+        i := max(i - motz_inc, motz_up);
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(i, motz_freq));
+        delaymicroseconds(fdelayz);
+      until i <= motz_up;
     end;
+    {$endif}
+  end;
 end;
 
 procedure tvpdriver.setpenoff(value: boolean);
@@ -307,7 +308,7 @@ begin
 
     dm0 := abs(dm0);
     dm1 := abs(dm1);
-    setpen(max(dm0, dm1) < 8);
+    setpen(max(dm0, dm1) <= 10);
 
     while (dm0 > 0) or (dm1 > 0) do
     begin
