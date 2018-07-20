@@ -58,8 +58,8 @@
         <Filename Value="src/vpcoder.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="245"/>
-        <CursorPos X="61" Y="277"/>
+        <TopLine Value="177"/>
+        <CursorPos X="6" Y="187"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -327,10 +327,9 @@
         <ComponentName Value="mainform"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="9"/>
-        <TopLine Value="635"/>
-        <CursorPos X="49" Y="658"/>
+        <TopLine Value="172"/>
+        <CursorPos X="21" Y="179"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -525,8 +524,9 @@
       <Unit66>
         <Filename Value="src/vpdriver.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="124"/>
+        <TopLine Value="261"/>
         <CursorPos X="54" Y="369"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -535,7 +535,6 @@
         <Filename Value="src/vpsetting.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="7"/>
-        <TopLine Value="118"/>
         <CursorPos X="60" Y="162"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -576,7 +575,7 @@
         <Filename Value="src/vpcommon.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="61"/>
+        <TopLine Value="247"/>
         <CursorPos X="44" Y="92"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -636,7 +635,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="8"/>
         <TopLine Value="8"/>
-        <CursorPos X="19" Y="25"/>
+        <CursorPos X="91" Y="27"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>

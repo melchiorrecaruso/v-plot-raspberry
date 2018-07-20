@@ -217,7 +217,6 @@ begin
     writeln(format('OPTIMIZE::LDX    = %12.5f', [ldx]));
     writeln(format('OPTIMIZE::CNT.0  = %12.5u', [m0]));
     writeln(format('OPTIMIZE::CNT.1  = %12.5u', [m1]));
-    readln;
   end;
 end;
 
