@@ -171,11 +171,15 @@ begin
   fcount1 := acount1;
 end;
 
+procedure pen(value: double; ms: longint);
+begin
+  {$ifdef cpuarm}
+  pwmwrite(PCA9685_PIN_BASE + 0, calcticks(value, motz_freq));
+  delaymicroseconds(ms);
+  {$endif}
+end;
+
 procedure tvpdriver.setpen(value: boolean);
-{$ifdef cpuarm}
-var
-  i: double;
-{$endif}
 begin
   if fpenoff then exit;
 
@@ -185,30 +189,30 @@ begin
     {$ifdef cpuarm}
     if fpen then
     begin
-      i := motz_up;
-      repeat
-        i := min(i + motz_inc, motz_low);;
-        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(i, motz_freq));
-        delaymicroseconds(fdelayz);
-      until i >= motz_low;
+      pen(motz_low -0.7, fdelayz);
+      pen(motz_low -0.6, fdelayz);
+      pen(motz_low -0.5, fdelayz);
+      pen(motz_low -0.4, fdelayz);
+      pen(motz_low -0.3, fdelayz);
+      pen(motz_low -0.2, fdelayz);
+      pen(motz_low -0.1, fdelayz);
+      pen(motz_low -0.0, fdelayz);
     end else
     begin
-      i := motz_low;
-      repeat
-        i := max(i - motz_inc, motz_up);
-        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(i, motz_freq));
-        delaymicroseconds(fdelayz);
-      until i <= motz_up;
+      pen(motz_up + 0.7, fdelayz);
+      pen(motz_up + 0.6, fdelayz);
+      pen(motz_up + 0.5, fdelayz);
+      pen(motz_up + 0.4, fdelayz);
+      pen(motz_up + 0.3, fdelayz);
+      pen(motz_up + 0.2, fdelayz);
+      pen(motz_up + 0.1, fdelayz);
+      pen(motz_up + 0.0, fdelayz);
     end;
     {$endif}
   end;
 end;
 
 procedure tvpdriver.setpenoff(value: boolean);
-{$ifdef cpuarm}
-var
-  i: double;
-{$endif}
 begin
   fpenoff := value;
   if fpenoff then
@@ -216,12 +220,14 @@ begin
     begin
       fpen := false;
       {$ifdef cpuarm}
-      i := motz_low;
-      repeat
-        i := max(i - motz_inc, motz_up);
-        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(i, motz_freq));
-        delaymicroseconds(fdelayz);
-      until i <= motz_up;
+      pen(motz_up + 0.7, fdelayz);
+      pen(motz_up + 0.6, fdelayz);
+      pen(motz_up + 0.5, fdelayz);
+      pen(motz_up + 0.4, fdelayz);
+      pen(motz_up + 0.3, fdelayz);
+      pen(motz_up + 0.2, fdelayz);
+      pen(motz_up + 0.1, fdelayz);
+      pen(motz_up + 0.0, fdelayz);
       {$endif}
     end;
 end;

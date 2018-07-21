@@ -176,7 +176,7 @@ begin
     fratio      := ini.readfloat  ('Stepper', 'RATIO',  0);
     fradius     := ini.readfloat  ('Stepper', 'RADIUS', 0);
     fdelaym     := ini.readinteger('Stepper', 'DELAY',  0);
-    fdelayz     := ini.readinteger('Stepper', 'DELAY',  0);
+    fdelayz     := ini.readinteger('Servo',   'DELAY',  0);
   finally
     ini.destroy;
   end;
@@ -204,11 +204,11 @@ begin
     writeln(format('    WAVE::XMAX   = %12.5f', [fwavexmax]));
     writeln(format('    WAVE::YMAX   = %12.5f', [fwaveymax]));
 
-    writeln(format(' STEPPER::MODE   = %12.5u', [fmode    ]));
-    writeln(format(' STEPPER::RATIO  = %12.5f', [fratio   ]));
-    writeln(format(' STEPPER::RADIUS = %12.5f', [fradius  ]));
-    writeln(format(' STEPPER::DLY-M  = %12.5u', [fdelaym  ]));
-    writeln(format(' STEPPER::DLY-Z  = %12.5u', [fdelayz  ]));
+    writeln(format(' STEPPER::MODE   = %12.5u', [fmode  ]));
+    writeln(format(' STEPPER::RATIO  = %12.5f', [fratio ]));
+    writeln(format(' STEPPER::RADIUS = %12.5f', [fradius]));
+    writeln(format(' STEPPER::DLY-M  = %12.5u', [fdelaym]));
+    writeln(format('   SERVO::DLY-Z  = %12.5u', [fdelayz]));
   end;
 end;
 
