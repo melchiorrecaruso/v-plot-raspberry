@@ -116,6 +116,10 @@ const
     (1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1),  //  8
     (0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0),  //  9
     (1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1)); // 10
+
+  vplotmotz : array[0..7] of double = (
+    1.80, 1.90, 2.00, 2.10, 2.20, 2.30, 2.40, 2.50);
+
 {$endif}
 
 constructor tvpdriver.create;
@@ -180,6 +184,10 @@ begin
 end;
 
 procedure tvpdriver.setpen(value: boolean);
+{$ifdef cpuarm}
+var
+  i: longint;
+{$endif}
 begin
   if fpenoff then exit;
 
@@ -188,47 +196,37 @@ begin
     fpen := value;
     {$ifdef cpuarm}
     if fpen then
-    begin
-      pen(motz_low -0.7, fdelayz);
-      pen(motz_low -0.6, fdelayz);
-      pen(motz_low -0.5, fdelayz);
-      pen(motz_low -0.4, fdelayz);
-      pen(motz_low -0.3, fdelayz);
-      pen(motz_low -0.2, fdelayz);
-      pen(motz_low -0.1, fdelayz);
-      pen(motz_low -0.0, fdelayz);
-    end else
-    begin
-      pen(motz_up + 0.7, fdelayz);
-      pen(motz_up + 0.6, fdelayz);
-      pen(motz_up + 0.5, fdelayz);
-      pen(motz_up + 0.4, fdelayz);
-      pen(motz_up + 0.3, fdelayz);
-      pen(motz_up + 0.2, fdelayz);
-      pen(motz_up + 0.1, fdelayz);
-      pen(motz_up + 0.0, fdelayz);
-    end;
+      for i := 0 to 7 do
+      begin
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(vplotmotz[i] , motz_freq));
+        delaymicroseconds(fdelayz);
+      end
+    else
+      for i := 7 downto 0 do
+      begin
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(vplotmotz[i] , motz_freq));
+        delaymicroseconds(fdelayz);
+      end
     {$endif}
   end;
 end;
 
 procedure tvpdriver.setpenoff(value: boolean);
+{$ifdef cpuarm}
+var
+  i: longint;
+{$endif}
 begin
   fpenoff := value;
   if fpenoff then
     if fpen then
     begin
       fpen := false;
-      {$ifdef cpuarm}
-      pen(motz_up + 0.7, fdelayz);
-      pen(motz_up + 0.6, fdelayz);
-      pen(motz_up + 0.5, fdelayz);
-      pen(motz_up + 0.4, fdelayz);
-      pen(motz_up + 0.3, fdelayz);
-      pen(motz_up + 0.2, fdelayz);
-      pen(motz_up + 0.1, fdelayz);
-      pen(motz_up + 0.0, fdelayz);
-      {$endif}
+      for i := 7 downto 0 do
+      begin
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(vplotmotz[i] , motz_freq));
+        delaymicroseconds(fdelayz);
+      end
     end;
 end;
 
