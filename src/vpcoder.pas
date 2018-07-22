@@ -289,17 +289,12 @@ begin
       begin
         pos.pp.x := pos.p.x + offsetx + midx;
         pos.pp.y := pos.p.y + offsety + midy;
+        optimize_point(pos.pp, pos.m0, pos.m1);
 
         if enabledebug then
         begin
           writeln(format('OPT-PATH::PP.X   = %12.5f', [pos.pp.x]));
           writeln(format('OPT-PATH::PP.Y   = %12.5f', [pos.pp.y]));
-        end;
-
-        optimize_point(pos.pp, pos.m0, pos.m1);
-
-        if enabledebug then
-        begin
           writeln(format('OPT-PATH::M0     = %12.5u', [pos.m0  ]));
           writeln(format('OPT-PATH::M1     = %12.5u', [pos.m1  ]));
         end;

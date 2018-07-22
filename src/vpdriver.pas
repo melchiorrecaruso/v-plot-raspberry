@@ -62,6 +62,7 @@ type
   private
     fenabled:  boolean;
     fpaths:    tvppaths;
+    fpoint:    tvppoint;
     fposition: tvpposition;
     fonstart:  tthreadmethod;
     fonstop:   tthreadmethod;
@@ -73,6 +74,7 @@ type
     destructor  destroy; override;
   public
     property enabled:  boolean       read fenabled   write fenabled;
+    property point:    tvppoint      read fpoint;
     property position: tvpposition   read fposition;
     property onstart:  tthreadmethod read fonstart   write fonstart;
     property onstop:   tthreadmethod read fonstop    write fonstop;
@@ -387,10 +389,11 @@ begin
         if fposition.c then
         begin
           driver.move(fposition.m0, fposition.m1);
-        end;
 
-        if assigned(ontick) then
-          synchronize(ontick);
+          fpoint := fposition.p;
+          if assigned(ontick) then
+            synchronize(ontick);
+        end;
 
         while not enabled do sleep(250);
       end;

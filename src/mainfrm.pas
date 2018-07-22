@@ -61,6 +61,7 @@ type
     rightdownbtn: TBitBtn;
     rightedit: TSpinEdit;
     rightupbtn: TBitBtn;
+    shape: TShape;
     verticalcb: TCheckBox;
     widthl: TLabel;
     widthse: TSpinEdit;
@@ -173,7 +174,7 @@ type
 
 var
   mainform: tmainform;
-  // run:      trun;
+  run:      trun;
 
 
 implementation
@@ -220,6 +221,7 @@ var
   m1: longint = 0;
    p: tvppoint;
 begin
+  shape.visible := false;
   // load setting
   setting := tvpsetting.create;
   setting.load(changefileext(paramstr(0), '.ini'));
@@ -560,6 +562,7 @@ begin
     mouseisdown := true;
     px := x;
     py := y;
+    shape.visible := false;
   end;
 end;
 
@@ -567,7 +570,7 @@ procedure tmainform.imagemousemove(sender: tobject;
   shift: tshiftstate; x, y: integer);
 var
   nleft: longint;
-   ntop: longint;
+  ntop:  longint;
 begin
   if mouseisdown then
   begin
@@ -575,9 +578,9 @@ begin
     ntop  := image.top  + (y - py);
 
     if nleft                >  width - 150 then nleft :=  width - 150;
-    if  ntop                > height - 150 then  ntop := height - 150;
+    if ntop                 > height - 150 then ntop  := height - 150;
     if nleft + image. width <          150 then nleft :=          150 - image.width;
-    if  ntop + image.height <          150 then  ntop :=          150 - image.height;
+    if ntop  + image.height <          150 then ntop  :=          150 - image.height;
 
     image.left := nleft;
     image.top  := ntop;
@@ -614,35 +617,11 @@ begin
 end;
 
 procedure tmainform.reloadmiclick(sender: tobject);
-var
-  i, j: longint;
-  path: tvppath;
-   pos: tvpposition;
 begin
-  lock2(false);
-  optimize_paths(paths,
-    offsetxse.value,
-    offsetyse.value,
-    setting.layout08.x,
-    setting.layout08.y + (heightse.value / 2),
-    heightse.value,
-    widthse.value);
-  // updtare preview ...
-  for i := 0 to paths.count - 1 do
-  begin
-    path := paths.item[i];
-    for j := 0 to path.count - 1 do
-    begin
-      pos := path.item[j];
-
-      if pos.c then
-        bitmap.canvas.pixels[
-          trunc(( widthse.value div 2) + pos.p.x + offsetxse.value),
-          trunc((heightse.value div 2) - pos.p.y - offsetyse.value)] := clblack;
-    end;
-  end;
-  image.canvas.draw(0, 0, bitmap);
-  lock2(true);
+  run := trun.create;
+  run.fonloadstart := @onloadstart;
+  run.fonloadend   := @onloadend;
+  run.start;
 end;
 
 procedure tmainform.closemiclick(sender: tobject);
@@ -938,6 +917,7 @@ end;
 
 procedure tmainform.onplotterstop;
 begin
+  shape.visible := false;
   timer.enabled := false;
   penupbtnclick(nil);
   driverthread := nil;
@@ -955,8 +935,17 @@ begin
     writeln(format('    TICK::PP.Y    = %12.5f', [driverthread.position.pp.y]));
   end;
 
+  shape.left := image.left + trunc( widthse.value div 2) +
+    round(driverthread.point.x) + offsetxse.value - shape.width  div 2;
+
+  shape.top  := image.top  + trunc(heightse.value div 2) -
+    round(driverthread.point.y) - offsetyse.value - shape.height div 2;
+  shape.visible := true;
+
   if (elapsed mod 2) = 0 then
+  begin
     caption := format('Running - %u sec', [elapsed]);
+  end;
   application.processmessages;
 end;
 

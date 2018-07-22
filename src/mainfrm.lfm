@@ -1,7 +1,7 @@
 object mainform: Tmainform
-  Left = 308
+  Left = 310
   Height = 467
-  Top = 176
+  Top = 178
   Width = 923
   Anchors = []
   Caption = 'vPlotter 2.0'
@@ -430,6 +430,16 @@ object mainform: Tmainform
       Proportional = True
       Stretch = True
       StretchOutEnabled = False
+    end
+    object shape: TShape
+      Left = 232
+      Height = 24
+      Top = 104
+      Width = 24
+      Brush.Style = bsClear
+      Pen.Color = clRed
+      Pen.Style = psDash
+      Shape = stCircle
     end
   end
   object opendialog: TOpenDialog
