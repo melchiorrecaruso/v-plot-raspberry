@@ -152,14 +152,28 @@ type
     procedure lock1(value: boolean);
     procedure lock2(value: boolean);
 
+
+    procedure onloadstart;
+    procedure onloadend;
     procedure onplotterstart;
     procedure onplotterstop;
     procedure onplottertick;
   end;
 
 
+  trun = class(tthread)
+  private
+    fonloadstart: tthreadmethod;
+    fonloadend:   tthreadmethod;
+    procedure execute; override;
+  public
+    constructor create;
+    destructor destroy; override;
+  end;
+
 var
   mainform: tmainform;
+  // run:      trun;
 
 
 implementation
@@ -169,6 +183,34 @@ implementation
 uses
   math, sysutils, dxfvectorialreader, aboutfrm, vpmath, vpwave;
 
+// THREAD
+
+constructor trun.create;
+begin
+  freeonterminate := true;
+  inherited create(true);
+end;
+
+destructor trun.destroy;
+begin
+  inherited destroy;
+end;
+
+procedure trun.execute;
+begin
+  synchronize(fonloadstart);
+  with mainform do
+  begin
+    optimize_paths(paths,
+      offsetxse.value,
+      offsetyse.value,
+      setting.layout08.x,
+      setting.layout08.y + (heightse.value / 2),
+      heightse.value,
+      widthse.value);
+  end;
+  synchronize(fonloadend);
+end;
 
 // FORM events
 
@@ -585,7 +627,6 @@ begin
     setting.layout08.y + (heightse.value / 2),
     heightse.value,
     widthse.value);
-
   // updtare preview ...
   for i := 0 to paths.count - 1 do
   begin
@@ -593,9 +634,11 @@ begin
     for j := 0 to path.count - 1 do
     begin
       pos := path.item[j];
-      bitmap.canvas.pixels[
-        trunc(( widthse.value div 2) + pos.p.x + offsetxse.value),
-        trunc((heightse.value div 2) - pos.p.y - offsetyse.value)] := clblack;
+
+      if pos.c then
+        bitmap.canvas.pixels[
+          trunc(( widthse.value div 2) + pos.p.x + offsetxse.value),
+          trunc((heightse.value div 2) - pos.p.y - offsetyse.value)] := clblack;
     end;
   end;
   image.canvas.draw(0, 0, bitmap);
@@ -636,7 +679,7 @@ begin
   image.stretchinenabled  := false;
   image.stretchoutenabled := false;
   image.stretch           := false;
-    if sender = closemi then
+  if sender = closemi then
   begin
     paths.clear
   end else
@@ -808,11 +851,8 @@ begin
   pendownbtn    .enabled := value;
   // page format
   formatcb      .enabled := value;
-  if formatcb.itemindex > 5 then
-  begin
-    heightse    .enabled := value;
-    widthse     .enabled := value;
-  end;
+  heightse      .enabled := value;
+  widthse       .enabled := value;
   offsetxse     .enabled := value;
   offsetyse     .enabled := value;
   verticalcb    .enabled := value;
@@ -852,15 +892,41 @@ begin
   pendownbtn    .enabled := value;
   // page format
   formatcb      .enabled := value;
-  if formatcb.itemindex > 5 then
-  begin
-    heightse    .enabled := value;
-    widthse     .enabled := value;
-  end;
+  heightse      .enabled := value;
+  widthse       .enabled := value;
   offsetxse     .enabled := value;
   offsetyse     .enabled := value;
   verticalcb    .enabled := value;
   application.processmessages;
+end;
+
+procedure tmainform.onloadstart;
+begin
+  lock2(false);
+end;
+
+procedure tmainform.onloadend;
+var
+  i, j: longint;
+  path: tvppath;
+   pos: tvpposition;
+begin
+  // updtare preview ...
+  for i := 0 to paths.count - 1 do
+  begin
+    path := paths.item[i];
+    for j := 0 to path.count - 1 do
+    begin
+      pos := path.item[j];
+
+      if pos.c then
+        bitmap.canvas.pixels[
+          trunc(( widthse.value div 2) + pos.p.x + offsetxse.value),
+          trunc((heightse.value div 2) - pos.p.y - offsetyse.value)] := clblack;
+    end;
+  end;
+  image.canvas.draw(0, 0, bitmap);
+  lock2(true);
 end;
 
 procedure tmainform.onplotterstart;

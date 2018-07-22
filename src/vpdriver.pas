@@ -221,12 +221,14 @@ begin
   if fpenoff then
     if fpen then
     begin
+      {$ifdef cpuarm}
       fpen := false;
       for i := 7 downto 0 do
       begin
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(vplotmotz[i] , motz_freq));
         delaymicroseconds(fdelayz);
       end
+      {$endif}
     end;
 end;
 

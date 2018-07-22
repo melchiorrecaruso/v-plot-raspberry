@@ -268,12 +268,12 @@ var
 begin
   if enabledebug then
   begin
-    writeln(format(' EXECUTE::OFF-X  = %12.5f', [offsetx]));
-    writeln(format(' EXECUTE::OFF-Y  = %12.5f', [offsety]));
-    writeln(format(' EXECUTE::MID-X  = %12.5f', [midx   ]));
-    writeln(format(' EXECUTE::MID-Y  = %12.5f', [midy   ]));
-    writeln(format(' EXECUTE::MAX-H  = %12.5f', [hmax   ]));
-    writeln(format(' EXECUTE::MAX-W  = %12.5f', [wmax   ]));
+    writeln(format('OPT-PATH::OFF-X  = %12.5f', [offsetx]));
+    writeln(format('OPT-PATH::OFF-Y  = %12.5f', [offsety]));
+    writeln(format('OPT-PATH::MID-X  = %12.5f', [midx   ]));
+    writeln(format('OPT-PATH::MID-Y  = %12.5f', [midy   ]));
+    writeln(format('OPT-PATH::MAX-H  = %12.5f', [hmax   ]));
+    writeln(format('OPT-PATH::MAX-W  = %12.5f', [wmax   ]));
   end;
 
   for i := 0 to paths.count - 1 do
@@ -281,15 +281,31 @@ begin
     path := paths.item[i];
     for j := 0 to path.count - 1 do
     begin
-      pos := path.item[j];
-      pos.pp.x := pos.p.x + offsetx + midx;
-      pos.pp.y := pos.p.y + offsety + midy;
-      optimize_point(pos.pp, pos.m0, pos.m1);
+      pos   := path.item[j];
+      pos.c := (abs(pos.p.x + offsetx) <= wmax/2) and
+               (abs(pos.p.y + offsety) <= hmax/2);
 
-      pos.c    := true;
+      if pos.c then
+      begin
+        pos.pp.x := pos.p.x + offsetx + midx;
+        pos.pp.y := pos.p.y + offsety + midy;
+
+        if enabledebug then
+        begin
+          writeln(format('OPT-PATH::PP.X   = %12.5f', [pos.pp.x]));
+          writeln(format('OPT-PATH::PP.Y   = %12.5f', [pos.pp.y]));
+        end;
+
+        optimize_point(pos.pp, pos.m0, pos.m1);
+
+        if enabledebug then
+        begin
+          writeln(format('OPT-PATH::M0     = %12.5u', [pos.m0  ]));
+          writeln(format('OPT-PATH::M1     = %12.5u', [pos.m1  ]));
+        end;
+      end;
     end;
   end;
-
 end;
 
 

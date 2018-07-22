@@ -207,8 +207,8 @@ begin
     writeln(format(' STEPPER::MODE   = %12.5u', [fmode  ]));
     writeln(format(' STEPPER::RATIO  = %12.5f', [fratio ]));
     writeln(format(' STEPPER::RADIUS = %12.5f', [fradius]));
-    writeln(format(' STEPPER::DLY-M  = %12.5u', [fdelaym]));
-    writeln(format('   SERVO::DLY-Z  = %12.5u', [fdelayz]));
+    writeln(format(' STEPPER::DELAY  = %12.5u', [fdelaym]));
+    writeln(format('   SERVO::DELAY  = %12.5u', [fdelayz]));
   end;
 end;
 
