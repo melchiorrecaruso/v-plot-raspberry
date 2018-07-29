@@ -40,7 +40,7 @@ uses
 implementation
 
 uses
-  math, sysutils;
+  math, sysutils, vpwave;
 
 // toolpath routines
 
@@ -289,7 +289,8 @@ begin
       begin
         pos.pp.x := pos.p.x + offsetx + midx;
         pos.pp.y := pos.p.y + offsety + midy;
-        optimize_point(pos.pp, pos.m0, pos.m1);
+
+        optimize_point(wave.update(pos.pp), pos.m0, pos.m1);
 
         if enabledebug then
         begin
