@@ -282,15 +282,16 @@ begin
     for j := 0 to path.count - 1 do
     begin
       pos   := path.item[j];
-      pos.c := (abs(pos.p.x + offsetx) <= wmax/2) and
-               (abs(pos.p.y + offsety) <= hmax/2);
+      pos.c := (abs(pos.p.x + offsetx) <= wmax/2+5) and
+               (abs(pos.p.y + offsety) <= hmax/2+5);
 
       if pos.c then
       begin
-        pos.pp.x := pos.p.x + offsetx + midx;
-        pos.pp.y := pos.p.y + offsety + midy;
+        pos.pp   := wave.update(pos.p);
+        pos.pp.x := pos.pp.x + offsetx + midx;
+        pos.pp.y := pos.pp.y + offsety + midy;
 
-        optimize_point(wave.update(pos.pp), pos.m0, pos.m1);
+        optimize_point(pos.pp, pos.m0, pos.m1);
 
         if enabledebug then
         begin
