@@ -142,7 +142,6 @@ begin
   pca9685setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, motz_freq);
   // init servo
   pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_up, motz_freq));
-  delaymicroseconds(fdelayz);
   // init mode
   pinmode(motx_mod0, OUTPUT);
   pinmode(motx_mod1, OUTPUT);
