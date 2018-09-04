@@ -101,9 +101,9 @@ const
   motx_mod1     = P13;
   motx_mod2     = P11;
 
-  motz_up       = 1.80;
-  motz_low      = 2.50;
-  motz_inc      = 0.10;
+//motz_up       = 1.80;
+//motz_low      = 2.50;
+//motz_inc      = 0.10;
   motz_freq     = 50;
 
   vplotmatrix : array [0..10, 0..18] of longint = (
@@ -121,7 +121,6 @@ const
 
   vplotmotz : array[0..7] of double = (
     1.80, 1.90, 2.00, 2.10, 2.20, 2.30, 2.40, 2.50);
-
 {$endif}
 
 constructor tvpdriver.create;
@@ -140,8 +139,6 @@ begin
   wiringpisetup;
   // setup pca9685 library
   pca9685setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, motz_freq);
-  // init servo
-  pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_up, motz_freq));
   // init mode
   pinmode(motx_mod0, OUTPUT);
   pinmode(motx_mod1, OUTPUT);
@@ -174,14 +171,6 @@ procedure  tvpdriver.init(acount0, acount1: longint);
 begin
   fcount0 := acount0;
   fcount1 := acount1;
-end;
-
-procedure pen(value: double; ms: longint);
-begin
-  {$ifdef cpuarm}
-  pwmwrite(PCA9685_PIN_BASE + 0, calcticks(value, motz_freq));
-  delaymicroseconds(ms);
-  {$endif}
 end;
 
 procedure tvpdriver.setpen(value: boolean);
