@@ -287,9 +287,11 @@ begin
 
       if pos.c then
       begin
-        pos.pp   := wave.update(pos.p);
-        pos.pp.x := pos.pp.x + offsetx + midx;
-        pos.pp.y := pos.pp.y + offsety + midy;
+        pos.pp.x := pos.p.x + offsetx;
+        pos.pp.y := pos.p.y + offsety;
+        pos.pp   := wave.update(pos.pp);
+        pos.pp.x := pos.pp.x + midx;
+        pos.pp.y := pos.pp.y + midy;
 
         optimize_point(pos.pp, pos.m0, pos.m1);
 

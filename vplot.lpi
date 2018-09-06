@@ -57,9 +57,10 @@
       <Unit2>
         <Filename Value="src/vpcoder.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="261"/>
-        <CursorPos X="51" Y="285"/>
+        <TopLine Value="263"/>
+        <CursorPos X="30" Y="267"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -524,7 +525,6 @@
       <Unit66>
         <Filename Value="src/vpdriver.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="6"/>
         <TopLine Value="94"/>
         <CursorPos X="53" Y="123"/>
@@ -577,8 +577,9 @@
         <Filename Value="src/vpcommon.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="92"/>
-        <CursorPos X="44" Y="92"/>
+        <TopLine Value="330"/>
+        <CursorPos Y="451"/>
+        <FoldState Value=" T3of0h3n"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit72>
@@ -637,10 +638,9 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="8"/>
         <TopLine Value="7"/>
-        <CursorPos X="17" Y="7"/>
+        <CursorPos X="41" Y="27"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit80>
       <Unit81>
         <Filename Value="src/vpsketch.pas"/>
@@ -648,7 +648,7 @@
         <EditorIndex Value="2"/>
         <TopLine Value="3"/>
         <CursorPos X="7" Y="51"/>
-        <UsageCount Value="188"/>
+        <UsageCount Value="189"/>
         <Loaded Value="True"/>
       </Unit81>
       <Unit82>
@@ -678,7 +678,7 @@
         <EditorIndex Value="5"/>
         <TopLine Value="8"/>
         <CursorPos X="39" Y="32"/>
-        <UsageCount Value="86"/>
+        <UsageCount Value="87"/>
         <Loaded Value="True"/>
       </Unit85>
       <Unit86>
@@ -687,7 +687,7 @@
         <EditorIndex Value="4"/>
         <TopLine Value="132"/>
         <CursorPos X="55" Y="43"/>
-        <UsageCount Value="63"/>
+        <UsageCount Value="64"/>
         <Loaded Value="True"/>
       </Unit86>
       <Unit87>
