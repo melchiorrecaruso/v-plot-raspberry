@@ -196,7 +196,7 @@ begin
       begin
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(vplotmotz[i] , motz_freq));
         delaymicroseconds(fdelayz);
-      end
+      end;
     {$endif}
   end;
 end;
@@ -217,7 +217,7 @@ begin
       begin
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(vplotmotz[i] , motz_freq));
         delaymicroseconds(fdelayz);
-      end
+      end;
       {$endif}
     end;
 end;
