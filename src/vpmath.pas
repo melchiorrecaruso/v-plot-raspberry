@@ -185,9 +185,5 @@ begin
     result := arctan2(line.a, -line.b);
 end;
 
-
-
-
-
 end.
 

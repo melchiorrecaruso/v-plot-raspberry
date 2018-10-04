@@ -12,7 +12,7 @@ object aboutform: Taboutform
   Constraints.MaxWidth = 400
   Constraints.MinHeight = 300
   Constraints.MinWidth = 400
-  LCLVersion = '1.9.0.0'
+  LCLVersion = '2.1.0.0'
   object aboutlicense: TLabel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = aboutcopyrigth
@@ -43,7 +43,7 @@ object aboutform: Taboutform
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 12
-    Caption = 'vPlotter 2.0'
+    Caption = 'vPlotter 3.0'
     Font.Style = [fsBold]
     Layout = tlCenter
     ParentColor = False
@@ -190,7 +190,7 @@ object aboutform: Taboutform
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 12
-    Caption = 'Build 20180906'
+    Caption = 'Build 20181004'
     Layout = tlCenter
     ParentColor = False
   end

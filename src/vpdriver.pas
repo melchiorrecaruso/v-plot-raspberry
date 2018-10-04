@@ -31,54 +31,52 @@ uses
 type
   tvpdriver = class
   private
-    fcount0:     longint;
-    fcount1:     longint;
-    fdelaym:     longint;
-    fdelayz:     longint;
-    fenabled:    boolean;
-    fmode:       longint;
-    fpen:        boolean;
-    fpenoff:     boolean;
+    fcount0:  longint;
+    fcount1:  longint;
+    fdelaym:  longint;
+    fdelayz:  longint;
+    fenabled: boolean;
+    fmode:    longint;
+    fpen:     boolean;
+    fpenoff:  boolean;
+    fpoint:   tvppoint;
     procedure setmode(value: longint);
     procedure setpen(value: boolean);
     procedure setpenoff(value: boolean);
   public
     constructor create;
     destructor  destroy; override;
-    procedure   init(acount0, acount1: longint);
-    procedure   move(acount0, acount1: longint);
+    procedure   init(acount0, acount1: longint; apoint: tvppoint);
+    procedure   move(acount0, acount1: longint; apoint: tvppoint);
+    procedure   getpoint(var apoint: tvppoint);
+    procedure   getcount0(var acount: longint);
+    procedure   getcount1(var acount: longint);
   published
-    property count0:     longint read fcount0;
-    property count1:     longint read fcount1;
-    property delaym:     longint read fdelaym     write fdelaym;
-    property delayz:     longint read fdelayz     write fdelayz;
-    property enabled:    boolean read fenabled    write fenabled;
-    property mode:       longint read fmode       write setmode;
-    property pen:        boolean read fpen        write setpen;
-    property penoff:     boolean read fpenoff     write setpenoff;
+    property delaym:  longint read fdelaym  write fdelaym;
+    property delayz:  longint read fdelayz  write fdelayz;
+    property enabled: boolean read fenabled write fenabled;
+    property mode:    longint read fmode    write setmode;
+    property pen:     boolean read fpen     write setpen;
+    property penoff:  boolean read fpenoff  write setpenoff;
   end;
 
   tvpdriverthread = class(tthread)
   private
-    fenabled:  boolean;
-    fpaths:    tvppaths;
-    fpoint:    tvppoint;
-    fposition: tvpposition;
-    fonstart:  tthreadmethod;
-    fonstop:   tthreadmethod;
-    fontick:   tthreadmethod;
+    fenabled: boolean;
+    fonstart: tthreadmethod;
+    fonstop:  tthreadmethod;
+    fontick:  tthreadmethod;
+    fpaths:   tvppaths;
   protected
     procedure execute; override;
   public
     constructor create(paths: tvppaths);
     destructor  destroy; override;
   public
-    property enabled:  boolean       read fenabled   write fenabled;
-    property point:    tvppoint      read fpoint;
-    property position: tvpposition   read fposition;
-    property onstart:  tthreadmethod read fonstart   write fonstart;
-    property onstop:   tthreadmethod read fonstop    write fonstop;
-    property ontick:   tthreadmethod read fontick    write fontick;
+    property enabled: boolean       read fenabled write fenabled;
+    property onstart: tthreadmethod read fonstart write fonstart;
+    property onstop:  tthreadmethod read fonstop  write fonstop;
+    property ontick:  tthreadmethod read fontick  write fontick;
   end;
 
 var
@@ -134,12 +132,14 @@ begin
   fmode    := 0;
   fpenoff  := false;
   fpen     := true;
+  fpoint.x := 0;
+  fpoint.y := 0;
   {$ifdef cpuarm}
   // setup wiringpi library
   wiringpisetup;
   // setup pca9685 library
   pca9685setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, motz_freq);
-  // init mode
+  // init step mode
   pinmode(motx_mod0, OUTPUT);
   pinmode(motx_mod1, OUTPUT);
   pinmode(motx_mod2, OUTPUT);
@@ -167,10 +167,11 @@ begin
   inherited destroy;
 end;
 
-procedure  tvpdriver.init(acount0, acount1: longint);
+procedure  tvpdriver.init(acount0, acount1: longint; apoint: tvppoint);
 begin
   fcount0 := acount0;
   fcount1 := acount1;
+  fpoint  := apoint;
 end;
 
 procedure tvpdriver.setpen(value: boolean);
@@ -279,7 +280,7 @@ begin
   end;
 end;
 
-procedure tvpdriver.move(acount0, acount1: longint);
+procedure tvpdriver.move(acount0, acount1: longint; apoint: tvppoint);
 {$ifdef cpuarm}
 var
           i: longint;
@@ -335,11 +336,27 @@ begin
   {$endif}
   fcount0 := acount0;
   fcount1 := acount1;
+  fpoint  := apoint;
   if enabledebug then
   begin
     writeln(format('  DRIVER::CNT.0  = %12.5u', [fcount0]));
     writeln(format('  DRIVER::CNT.1  = %12.5u', [fcount1]));
   end;
+end;
+
+procedure tvpdriver.getcount0(var acount: longint);
+begin
+  acount := fcount0;
+end;
+
+procedure tvpdriver.getcount1(var acount: longint);
+begin
+  acount := fcount1;
+end;
+
+procedure tvpdriver.getpoint(var apoint: tvppoint);
+begin
+  apoint := fpoint;
 end;
 
 // tvpdriverthread
@@ -363,6 +380,7 @@ var
      i: longint;
      j: longint;
   path: tvppath;
+   pos: tvpposition;
 begin
   if assigned(onstart) then
     synchronize(fonstart);
@@ -371,21 +389,18 @@ begin
   begin
     path := fpaths.item[i];
     for j := 0 to path.count - 1 do
+    begin
       if not terminated then
       begin
-        fposition := path.item[j];
-        if fposition.c then
-        begin
-          driver.move(fposition.m0, fposition.m1);
-
-          fpoint := fposition.p;
-          if assigned(ontick) then
-            synchronize(ontick);
-        end;
-
+        pos := path.item[j];
+        if pos.c then
+          driver.move(pos.m0, pos.m1, pos.pp);
         while not enabled do sleep(250);
       end;
     end;
+    if assigned(ontick) then
+      synchronize(ontick);
+  end;
 
   if assigned(fonstop) then
     synchronize(fonstop);

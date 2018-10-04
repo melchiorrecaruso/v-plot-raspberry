@@ -44,11 +44,14 @@ type
     lax, lay: tpolynome;
     lbx, lby: tpolynome;
     lcx, lcy: tpolynome;
+    fenabled: boolean;
   public
     constructor create(xmax, ymax: double; const mesh: twavemesh);
     destructor destroy; override;
     function update(const p: tvppoint): tvppoint;
     procedure test;
+  published
+    property enabled: boolean read fenabled write fenabled;
   end;
 
   function polyeval(const apoly: tpolynome; x: double): double;
@@ -87,7 +90,6 @@ var
   dx: tvector3_double;
    y: tmatrix3_double;
    x: tmatrix3_double;
-   p: tvppoint;
 begin
   inherited create;
   xmax := abs(xmax);
@@ -145,6 +147,7 @@ begin
   lcx.coefs[2] := cc.data[2];
   lcx.coefs[1] := cc.data[1];
   lcx.coefs[0] := cc.data[0];
+  fenabled     := true;
 end;
 
 destructor twave.destroy;
@@ -156,18 +159,25 @@ function twave.update(const p: tvppoint): tvppoint;
 var
   ly, lx: tpolynome;
 begin
-  ly.deg :=2;
-  ly.coefs[2] := polyeval(lay, p.y);
-  ly.coefs[1] := polyeval(lby, p.y);
-  ly.coefs[0] := polyeval(lcy, p.y);
+  if enabled then
+  begin
+    ly.deg :=2;
+    ly.coefs[2] := polyeval(lay, p.y);
+    ly.coefs[1] := polyeval(lby, p.y);
+    ly.coefs[0] := polyeval(lcy, p.y);
 
-  lx.deg :=2;
-  lx.coefs[2] := polyeval(lax, p.x);
-  lx.coefs[1] := polyeval(lbx, p.x);
-  lx.coefs[0] := polyeval(lcx, p.x);
+    lx.deg :=2;
+    lx.coefs[2] := polyeval(lax, p.x);
+    lx.coefs[1] := polyeval(lbx, p.x);
+    lx.coefs[0] := polyeval(lcx, p.x);
 
-  result.x := p.x + polyeval(lx, p.y);
-  result.y := p.y + polyeval(ly, p.x);
+    result.x := p.x + polyeval(lx, p.y);
+    result.y := p.y + polyeval(ly, p.x);
+  end else
+  begin
+    result.x := p.x;
+    result.y := p.y;
+  end;
 
   if enabledebug then
   begin

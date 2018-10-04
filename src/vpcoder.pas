@@ -33,9 +33,10 @@ uses
   function interpolate_circlearc(const entity: tvcirculararc): tvppath;
   function interpolate_path(const entity: tpath): tvppath;
 
-  procedure load_paths(paths: tvppaths; vec: tvvectorialdocument);
+  procedure vec2paths(vec: tvvectorialdocument; paths: tvppaths);
   procedure optimize_paths(paths: tvppaths; offsetx, offsety, midx, midy, hmax, wmax: double);
-  procedure optimize_point(const p: tvppoint; var m0, m1: longint);
+  procedure optimize_point_v2(const p: tvppoint; var m0, m1: longint);
+  procedure optimize_point_v3(const p: tvppoint; var m0, m1: longint);
 
 implementation
 
@@ -161,66 +162,7 @@ begin
   end;
 end;
 
-procedure optimize_point(const p: tvppoint; var m0, m1: longint);
-var
-  c0, c1, c3, c4: tvpcircle;
-  alpha, alphalo, alphahi, lsx, ldx: double;
-  s00, s01, sxx, t00, t01, t02, t03, t04, t05, t06: tvppoint;
-begin
-  alphalo := -pi/2;
-  alphahi := +pi/2;
-  repeat
-    alpha := (alphalo+alphahi)/2;
-    t00 := setting.layout00;
-    t01 := setting.layout01;
-    t02 := translate_point(p, rotate_point(setting.layout02, alpha));
-    t03 := translate_point(p, rotate_point(setting.layout03, alpha));
-    t04 := translate_point(p, rotate_point(setting.layout04, alpha));
-    t05 := translate_point(p, rotate_point(setting.layout05, alpha));
-    //find tangent point t00
-    lsx := sqrt(sqr(distance_between_two_points(t00, t03))-sqr(setting.radius));
-    c0  := circle_by_center_and_radius(setting.layout00, setting.radius);
-    c3  := circle_by_center_and_radius(t03, lsx);
-    if intersection_of_two_circles(c0, c3, s00, sxx) = 0 then
-      raise exception.create('intersection_of_two_circles [c0c3]');
-    lsx := lsx + get_line_angle(line_by_two_points(s00, t00))*setting.radius;
-    //find tangent point t01
-    ldx := sqrt(sqr(distance_between_two_points(t01, t04))-sqr(setting.radius));
-    c1  := circle_by_center_and_radius(setting.layout01, setting.radius);
-    c4  := circle_by_center_and_radius(t04, ldx);
-    if intersection_of_two_circles(c1, c4, s01, sxx) = 0 then
-      raise exception.create('intersection_of_two_circles [c1c4]');
-    ldx := ldx + (pi-get_line_angle(line_by_two_points(s01, t01)))*setting.radius;
-    //find intersection point
-    t06 := intersection_of_two_lines(line_by_two_points(s00, t03),
-                                     line_by_two_points(s01, t04));
-    if (t06.x - t05.x) < -0.000001 then
-      alphahi := alpha
-    else
-      if (t06.x - t05.x) > +0.000001 then
-        alphalo := alpha
-      else
-        break;
-  until false;
-  // optimized
-  m0 := round(setting.mode * (lsx/setting.ratio));
-  m1 := round(setting.mode * (ldx/setting.ratio));
-  if enabledebug then
-  begin
-    writeln(format('OPTIMIZE::ALPHA  = %12.5f',              [radtodeg(alpha)]));
-    writeln(format('OPTIMIZE::P02.X  = %12.5f  P02.Y = %12.5f', [t02.x, t02.y]));
-    writeln(format('OPTIMIZE::P03.X  = %12.5f  P03.Y = %12.5f', [t03.x, t03.y]));
-    writeln(format('OPTIMIZE::P04.X  = %12.5f  P04.Y = %12.5f', [t04.x, t04.y]));
-    writeln(format('OPTIMIZE::P05.X  = %12.5f  P05.Y = %12.5f', [t05.x, t05.y]));
-    writeln(format('OPTIMIZE::P06.X  = %12.5f  P06.Y = %12.5f', [t06.x, t06.y]));
-    writeln(format('OPTIMIZE::LSX    = %12.5f', [lsx]));
-    writeln(format('OPTIMIZE::LDX    = %12.5f', [ldx]));
-    writeln(format('OPTIMIZE::CNT.0  = %12.5u', [m0]));
-    writeln(format('OPTIMIZE::CNT.1  = %12.5u', [m1]));
-  end;
-end;
-
-procedure load_paths(paths: tvppaths; vec: tvvectorialdocument);
+procedure vec2paths(vec: tvvectorialdocument; paths: tvppaths);
 var
     i, j: longint;
   entity: tventity;
@@ -281,33 +223,128 @@ begin
     path := paths.item[i];
     for j := 0 to path.count - 1 do
     begin
-      pos   := path.item[j];
-      pos.c := (abs(pos.p.x + offsetx) <= wmax/2+5) and
-               (abs(pos.p.y + offsety) <= hmax/2+5);
+      pos      := path.item[j];
+      pos.pp.x := pos.p.x + offsetx;
+      pos.pp.y := pos.p.y + offsety;
+      pos.pp   := wave.update(pos.pp);
+      pos.c    := (pos.p.x <= wmax/2+1) and
+                  (pos.p.y <= hmax/2+1);
+
+      if not pos.c then
+        pos.c  := (hmax = 0) and
+                  (wmax = 0);
+
+      pos.pp.x := pos.pp.x + midx;
+      pos.pp.y := pos.pp.y + midy;
 
       if pos.c then
+        optimize_point_v3(pos.pp, pos.m0, pos.m1);
+
+      if enabledebug then
       begin
-        pos.pp.x := pos.p.x + offsetx;
-        pos.pp.y := pos.p.y + offsety;
-        pos.pp   := wave.update(pos.pp);
-        pos.pp.x := pos.pp.x + midx;
-        pos.pp.y := pos.pp.y + midy;
-
-        optimize_point(pos.pp, pos.m0, pos.m1);
-
-        if enabledebug then
-        begin
-          writeln(format('OPT-PATH::PP.X   = %12.5f', [pos.pp.x]));
-          writeln(format('OPT-PATH::PP.Y   = %12.5f', [pos.pp.y]));
-          writeln(format('OPT-PATH::M0     = %12.5u', [pos.m0  ]));
-          writeln(format('OPT-PATH::M1     = %12.5u', [pos.m1  ]));
-        end;
+        writeln(format('OPT-PATH::PP.X   = %12.5f', [pos.pp.x]));
+        writeln(format('OPT-PATH::PP.Y   = %12.5f', [pos.pp.y]));
+        writeln(format('OPT-PATH::M0     = %12.5u', [pos.m0  ]));
+        writeln(format('OPT-PATH::M1     = %12.5u', [pos.m1  ]));
       end;
     end;
   end;
 end;
 
+procedure optimize_point_v2(const p: tvppoint; var m0, m1: longint);
+var
+  c0, c1, c3, c4: tvpcircle;
+  alpha, alphalo, alphahi, lsx, ldx: double;
+  s00, s01, sxx, t00, t01, t02, t03, t04, t05, t06: tvppoint;
+begin
+  alphalo := -pi/2;
+  alphahi := +pi/2;
+  repeat
+    alpha := (alphalo+alphahi)/2;
+    t00 := setting.layout00;
+    t01 := setting.layout01;
+    t02 := translate_point(p, rotate_point(setting.layout02, alpha));
+    t03 := translate_point(p, rotate_point(setting.layout03, alpha));
+    t04 := translate_point(p, rotate_point(setting.layout04, alpha));
+    t05 := translate_point(p, rotate_point(setting.layout05, alpha));
+    //find tangent point t00
+    lsx := sqrt(sqr(distance_between_two_points(t00, t03))-sqr(setting.radius));
+    c0  := circle_by_center_and_radius(setting.layout00, setting.radius);
+    c3  := circle_by_center_and_radius(t03, lsx);
+    if intersection_of_two_circles(c0, c3, s00, sxx) = 0 then
+      raise exception.create('intersection_of_two_circles [c0c3]');
+    lsx := lsx + get_line_angle(line_by_two_points(s00, t00))*setting.radius;
+    //find tangent point t01
+    ldx := sqrt(sqr(distance_between_two_points(t01, t04))-sqr(setting.radius));
+    c1  := circle_by_center_and_radius(setting.layout01, setting.radius);
+    c4  := circle_by_center_and_radius(t04, ldx);
+    if intersection_of_two_circles(c1, c4, s01, sxx) = 0 then
+      raise exception.create('intersection_of_two_circles [c1c4]');
+    ldx := ldx + (pi-get_line_angle(line_by_two_points(s01, t01)))*setting.radius;
+    //find intersection point
+    t06 := intersection_of_two_lines(line_by_two_points(s00, t03),
+                                     line_by_two_points(s01, t04));
+    if (t06.x - t05.x) < -0.000001 then
+      alphahi := alpha
+    else
+      if (t06.x - t05.x) > +0.000001 then
+        alphalo := alpha
+      else
+        break;
+  until false;
+  // optimized
+  m0 := round(setting.mode * (lsx/setting.ratio));
+  m1 := round(setting.mode * (ldx/setting.ratio));
+  if enabledebug then
+  begin
+    writeln(format('OPTIMIZE::ALPHA  = %12.5f',              [radtodeg(alpha)]));
+    writeln(format('OPTIMIZE::P02.X  = %12.5f  P02.Y = %12.5f', [t02.x, t02.y]));
+    writeln(format('OPTIMIZE::P03.X  = %12.5f  P03.Y = %12.5f', [t03.x, t03.y]));
+    writeln(format('OPTIMIZE::P04.X  = %12.5f  P04.Y = %12.5f', [t04.x, t04.y]));
+    writeln(format('OPTIMIZE::P05.X  = %12.5f  P05.Y = %12.5f', [t05.x, t05.y]));
+    writeln(format('OPTIMIZE::P06.X  = %12.5f  P06.Y = %12.5f', [t06.x, t06.y]));
+    writeln(format('OPTIMIZE::LSX    = %12.5f', [lsx]));
+    writeln(format('OPTIMIZE::LDX    = %12.5f', [ldx]));
+    writeln(format('OPTIMIZE::CNT.0  = %12.5u', [m0]));
+    writeln(format('OPTIMIZE::CNT.1  = %12.5u', [m1]));
+  end;
+end;
 
+procedure optimize_point_v3(const p: tvppoint; var m0, m1: longint);
+var
+  c0, c1, c2: tvpcircle;
+  lsx, ldx: double;
+  s00, s01, sxx, t00, t01, t02: tvppoint;
+begin
+  t00 := setting.layout00;
+  t01 := setting.layout01;
+  t02 := p;
+  //find tangent point t00
+  lsx := sqrt(sqr(distance_between_two_points(t00, t02))-sqr(setting.radius));
+  c0  := circle_by_center_and_radius(setting.layout00, setting.radius);
+  c2  := circle_by_center_and_radius(t02, lsx);
+  if intersection_of_two_circles(c0, c2, s00, sxx) = 0 then
+    raise exception.create('intersection_of_two_circles [c0c2]');
+  lsx := lsx + get_line_angle(line_by_two_points(s00, t00))*setting.radius;
+  //find tangent point t01
+  ldx := sqrt(sqr(distance_between_two_points(t01, t02))-sqr(setting.radius));
+  c1  := circle_by_center_and_radius(setting.layout01, setting.radius);
+  c2  := circle_by_center_and_radius(t02, ldx);
+  if intersection_of_two_circles(c1, c2, s01, sxx) = 0 then
+    raise exception.create('intersection_of_two_circles [c1c4]');
+  ldx := ldx + (pi-get_line_angle(line_by_two_points(s01, t01)))*setting.radius;
+  // calculate steps
+  m0 := round(setting.mode * (lsx/setting.ratio));
+  m1 := round(setting.mode * (ldx/setting.ratio));
+  if enabledebug then
+  begin
+    writeln(format('OPTIMIZE::P02.X  = %12.5f  P02.Y = %12.5f', [t02.x, t02.y]));
+    writeln(format('OPTIMIZE::LSX    = %12.5f', [lsx]));
+    writeln(format('OPTIMIZE::LDX    = %12.5f', [ldx]));
+    writeln(format('OPTIMIZE::CNT.0  = %12.5u', [m0]));
+    writeln(format('OPTIMIZE::CNT.1  = %12.5u', [m1]));
+  end;
+end;
 
 end.
 
