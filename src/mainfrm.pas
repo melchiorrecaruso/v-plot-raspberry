@@ -273,21 +273,21 @@ begin
   if sender = upbtn then
   begin
     p1.x := p0.x;
-    p1.y := p0.y + moveedit.value;
+    p1.y := p0.y + moveedit.value/10;
   end else
   if sender = downbtn then
   begin
     p1.x := p0.x;
-    p1.y := p0.y - moveedit.value;
+    p1.y := p0.y - moveedit.value/10;
   end else
   if sender = leftbtn then
   begin
-    p1.x := p0.x - moveedit.value;
+    p1.x := p0.x - moveedit.value/10;
     p1.y := p0.y;
   end else
   if sender = rightbtn then
   begin
-    p1.x := p0.x + moveedit.value;
+    p1.x := p0.x + moveedit.value/10;
     p1.y := p0.y;
   end;
 
@@ -297,9 +297,8 @@ begin
     setting.layout08.x,
     setting.layout08.y + (heightse.value/2), 0, 0);
 
-  driver.enabled       := true;
   driver.penoff        := true;
-
+  driver.enabled       := true;
   driverthread         := tvpdriverthread.create(paths);
   driverthread.onstart := @onplotterstart;
   driverthread.onstop  := @onplotterstop;
@@ -692,7 +691,6 @@ procedure tmainform.onplotterstop;
 begin
   timer.enabled := false;
   driverthread  := nil;
-  gohomebtnclick(nil);
   lock1(true);
 
   caption := format('Finished - %u sec', [elapsed]);
