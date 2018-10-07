@@ -31,7 +31,7 @@ uses
 const
   motz_hi       = 2.50;
   motz_lo       = 0.00;
-  motz_inc      = 0.05;
+  motz_inc      = 0.02;
   motz_freq     = 50;
 
 type
@@ -125,7 +125,7 @@ begin
   inherited create;
   fcount0  := 0;
   fcount1  := 0;
-  fcountz  := 0;
+  fcountz  := setting.srvup;
   fdelaym  := 3000;
   fdelayz  := 300000;
   fenabled := false;
@@ -179,23 +179,27 @@ begin
   if value > motz_hi then exit;
   if value < motz_lo then exit;
 
-  while fcountz < value do
-  begin
-    fcountz := min(value, fcountz + motz_inc);
-    {$ifdef cpuarm}
-    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq))
-    delaymicroseconds(fdelayz);
-    {$endif}
-  end;
+  pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
+  delaymicroseconds(fdelayz);
 
-  while fcountz > value do
-  begin
-    fcountz := max(value, fcountz - motz_inc);
-    {$ifdef cpuarm}
-    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq))
-    delaymicroseconds(fdelayz);
-    {$endif}
-  end;
+  if fcountz < value then
+    while fcountz < value do
+    begin
+      fcountz := min(value, fcountz + motz_inc);
+      {$ifdef cpuarm}
+      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
+      delaymicroseconds(fdelayz);
+      {$endif}
+    end
+  else
+    while fcountz > value do
+    begin
+      fcountz := max(value, fcountz - motz_inc);
+      {$ifdef cpuarm}
+      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
+      delaymicroseconds(fdelayz);
+      {$endif}
+    end;
 end;
 
 procedure tvpdriver.setzoff(value: boolean);
@@ -286,9 +290,9 @@ begin
     dm0 := abs(dm0);
     dm1 := abs(dm1);
     if max(dm0, dm1) <= 10 then
-      movez(setting.srvdown)
+      setcountz(setting.srvdown)
     else
-      movez(setting.srvup);
+      setcountz(setting.srvup);
 
     while (dm0 > 0) or (dm1 > 0) do
     begin
@@ -310,7 +314,7 @@ begin
           delaymicroseconds(fdelaym);
           digitalwrite(mot1_step,  LOW);
         end;
-        delaymicroseconds(fdelaym*(1+byte(fpen)));
+        delaymicroseconds(fdelaym);
       end;
       dec(dm0, ddm0);
       dec(dm1, ddm1);

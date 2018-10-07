@@ -184,8 +184,8 @@ begin
     fradius     := ini.readfloat  ('Stepper', 'RADIUS', 0);
     fdelaym     := ini.readinteger('Stepper', 'DELAY',  0);
     fdelayz     := ini.readinteger('Servo',   'DELAY',  0);
-    fsrvup      := ini.readinteger('Servo',   'UP',     0);
-    fsrvdown    := ini.readinteger('Servo',   'DOWN',   0);
+    fsrvup      := ini.readfloat  ('Servo',   'UP',     0);
+    fsrvdown    := ini.readfloat  ('Servo',   'DOWN',   0);
   finally
     ini.destroy;
   end;
@@ -218,8 +218,8 @@ begin
     writeln(format(' STEPPER::RADIUS = %12.5f', [fradius ]));
     writeln(format(' STEPPER::DELAY  = %12.5u', [fdelaym ]));
     writeln(format('   SERVO::DELAY  = %12.5u', [fdelayz ]));
-    writeln(format('   SERVO::UP     = %12.5u', [fsrvup  ]));
-    writeln(format('   SERVO::DOWN   = %12.5u', [fsrvdown]));
+    writeln(format('   SERVO::UP     = %12.5f', [fsrvup  ]));
+    writeln(format('   SERVO::DOWN   = %12.5f', [fsrvdown]));
   end;
 end;
 
