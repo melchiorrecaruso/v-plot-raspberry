@@ -305,6 +305,7 @@ begin
           digitalwrite(mot0_step, HIGH);
           delaymicroseconds(fdelaym);
           digitalwrite(mot0_step,  LOW);
+          delaymicroseconds(fdelaym);
         end;
 
         if (vplotmatrix[ddm1, i] = 1) then
@@ -312,8 +313,8 @@ begin
           digitalwrite(mot1_step, HIGH);
           delaymicroseconds(fdelaym);
           digitalwrite(mot1_step,  LOW);
+          delaymicroseconds(fdelaym);
         end;
-        delaymicroseconds(fdelaym);
       end;
       dec(dm0, ddm0);
       dec(dm1, ddm1);
