@@ -28,12 +28,6 @@ interface
 uses
   classes, {$ifdef cpuarm} pca9685, wiringpi, {$endif} sysutils, vpcommon, vpmath, vpsetting;
 
-const
-  motz_hi       = 2.50;
-  motz_lo       = 0.00;
-  motz_inc      = 0.02;
-  motz_freq     = 50;
-
 type
   tvpdriver = class
   private
@@ -94,8 +88,8 @@ implementation
 uses
   math;
 
-const
 {$ifdef cpuarm}
+const
   mot0_step     = P38;
   mot0_dir      = P40;
   mot1_step     = P29;
@@ -104,6 +98,11 @@ const
   motx_mod0     = P15;
   motx_mod1     = P13;
   motx_mod2     = P11;
+
+  motz_hi       = 2.50;
+  motz_lo       = 0.00;
+  motz_inc      = 0.05;
+  motz_freq     = 50;
 {$endif}
 
   vplotmatrix : array [0..10, 0..18] of longint = (
@@ -125,19 +124,20 @@ begin
   inherited create;
   fcount0  := 0;
   fcount1  := 0;
-  fcountz  := setting.srvdown;
-  fdelaym  := 3000;
-  fdelayz  := 300000;
+  fcountz  := motz_lo;
+  fdelaym  := 1000;
+  fdelayz  := 30000;
   fenabled := false;
   fmode    := 0;
   fpoint.x := 0;
   fpoint.y := 0;
-  fzoff  := false;
+  fzoff    := false;
   {$ifdef cpuarm}
   // setup wiringpi library
   wiringpisetup;
   // setup pca9685 library
   pca9685setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, motz_freq);
+  pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
   // init step mode
   pinmode(motx_mod0, OUTPUT);
   pinmode(motx_mod1, OUTPUT);
@@ -158,7 +158,6 @@ begin
   {$endif}
   setmode(1);
   setzoff(false);
-  setcountz(setting.srvup);
 end;
 
 destructor tvpdriver.destroy;
@@ -181,9 +180,6 @@ begin
 
   if fcountz <> value then
   begin
-    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
-    delaymicroseconds(fdelayz);
-
     if fcountz < value then
       while fcountz < value do
       begin
