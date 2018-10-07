@@ -692,6 +692,7 @@ procedure tmainform.onplotterstop;
 begin
   timer.enabled := false;
   driverthread  := nil;
+  penupbtnclick(nil);
   lock1(true);
 
   caption := format('Finished - %u sec', [elapsed]);

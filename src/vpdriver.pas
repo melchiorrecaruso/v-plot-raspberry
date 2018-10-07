@@ -125,7 +125,7 @@ begin
   inherited create;
   fcount0  := 0;
   fcount1  := 0;
-  fcountz  := setting.srvup;
+  fcountz  := setting.srvdown;
   fdelaym  := 3000;
   fdelayz  := 300000;
   fenabled := false;
@@ -179,27 +179,30 @@ begin
   if value > motz_hi then exit;
   if value < motz_lo then exit;
 
-  pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
-  delaymicroseconds(fdelayz);
+  if fcountz <> value then
+  begin
+    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
+    delaymicroseconds(fdelayz);
 
-  if fcountz < value then
-    while fcountz < value do
-    begin
-      fcountz := min(value, fcountz + motz_inc);
-      {$ifdef cpuarm}
-      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
-      delaymicroseconds(fdelayz);
-      {$endif}
-    end
-  else
-    while fcountz > value do
-    begin
-      fcountz := max(value, fcountz - motz_inc);
-      {$ifdef cpuarm}
-      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
-      delaymicroseconds(fdelayz);
-      {$endif}
-    end;
+    if fcountz < value then
+      while fcountz < value do
+      begin
+        fcountz := min(value, fcountz + motz_inc);
+        {$ifdef cpuarm}
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
+        delaymicroseconds(fdelayz);
+        {$endif}
+      end
+    else
+      while fcountz > value do
+      begin
+        fcountz := max(value, fcountz - motz_inc);
+        {$ifdef cpuarm}
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
+        delaymicroseconds(fdelayz);
+        {$endif}
+      end;
+  end;
 end;
 
 procedure tvpdriver.setzoff(value: boolean);
