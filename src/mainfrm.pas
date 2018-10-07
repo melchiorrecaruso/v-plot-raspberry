@@ -297,8 +297,10 @@ begin
     setting.layout08.x,
     setting.layout08.y + (heightse.value/2), 0, 0);
 
-  driver.penoff        := true;
+  driver.countz        := setting.srvup;
+  driver.zoff          := true;
   driver.enabled       := true;
+
   driverthread         := tvpdriverthread.create(paths);
   driverthread.onstart := @onplotterstart;
   driverthread.onstop  := @onplotterstop;
@@ -319,15 +321,15 @@ end;
 procedure tmainform.pendownbtnclick(Sender: TObject);
 begin
   driver.enabled := true;
-  driver.penoff  := false;
-  driver.pen     := true;
+  driver.zoff    := false;
+  driver.countz  := setting.srvdown;
 end;
 
 procedure tmainform.penupbtnclick(sender: tobject);
 begin
   driver.enabled := true;
-  driver.penoff  := false;
-  driver.pen     := false;
+  driver.zoff    := false;
+  driver.countz  := setting.srvup;
 end;
 
 procedure tmainform.layoutmiclick(Sender: TObject);
@@ -354,11 +356,12 @@ var
   m1: longint = 0;
 begin
   lock2(false);
+  driver.countz  := setting.srvup;
+  driver.zoff    := true;
   driver.enabled := true;
-  driver.penoff  := true;
 
   optimize_point_v3(setting.layout09, m0, m1);
-  driver.move(m0, m1, setting.layout09);
+  driver.movexy(m0, m1, setting.layout09);
   lock2(true);
 end;
 
@@ -485,9 +488,7 @@ begin
     timer       .enabled := true;
   end else
   begin
-    driver.enabled       := true;
-    driver.penoff        := false;
-    driver.pen           := false;
+    penupbtnclick(nil);
 
     driverthread         := tvpdriverthread.create(paths);
     timer       .enabled := true;
@@ -505,7 +506,7 @@ begin
   begin
     driverthread.enabled := false;
     timer       .enabled := false;
-    driver      .pen     := false;
+    penupbtnclick(nil);
   end;
 end;
 
@@ -701,9 +702,9 @@ procedure tmainform.onplottertick;
 var
   p: tvppoint;
 begin
-  driver.getpoint(p);
   if enabledebug then
   begin
+    driver.getpoint(p);
     writeln(format('    TICK::PP.X    = %12.5f', [p.x]));
     writeln(format('    TICK::PP.Y    = %12.5f', [p.y]));
   end;

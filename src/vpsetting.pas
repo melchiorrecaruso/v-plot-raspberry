@@ -49,6 +49,8 @@ type
     fradius:   double;
     fdelaym:   longint;
     fdelayz:   longint;
+    fsrvup:    double;
+    fsrvdown:  double;
  public
     constructor create;
     destructor destroy; override;
@@ -73,6 +75,9 @@ type
     property radius:   double    read fradius;
     property delaym:   longint   read fdelaym;
     property delayz:   longint   read fdelayz;
+
+    property srvup:    double    read fsrvup;
+    property srvdown:  double    read fsrvdown;
  end;
 
 
@@ -124,6 +129,8 @@ begin
   fradius     := 0;
   fdelaym     := 0;
   fdelayz     := 0;
+  fsrvup      := 0;
+  fsrvdown    := 0;
 end;
 
 procedure tvpsetting.load(const filename: rawbytestring);
@@ -177,6 +184,8 @@ begin
     fradius     := ini.readfloat  ('Stepper', 'RADIUS', 0);
     fdelaym     := ini.readinteger('Stepper', 'DELAY',  0);
     fdelayz     := ini.readinteger('Servo',   'DELAY',  0);
+    fsrvup      := ini.readinteger('Servo',   'UP',     0);
+    fsrvdown    := ini.readinteger('Servo',   'DOWN',   0);
   finally
     ini.destroy;
   end;
@@ -204,11 +213,13 @@ begin
     writeln(format('    WAVE::XMAX   = %12.5f', [fwavexmax]));
     writeln(format('    WAVE::YMAX   = %12.5f', [fwaveymax]));
 
-    writeln(format(' STEPPER::MODE   = %12.5u', [fmode  ]));
-    writeln(format(' STEPPER::RATIO  = %12.5f', [fratio ]));
-    writeln(format(' STEPPER::RADIUS = %12.5f', [fradius]));
-    writeln(format(' STEPPER::DELAY  = %12.5u', [fdelaym]));
-    writeln(format('   SERVO::DELAY  = %12.5u', [fdelayz]));
+    writeln(format(' STEPPER::MODE   = %12.5u', [fmode   ]));
+    writeln(format(' STEPPER::RATIO  = %12.5f', [fratio  ]));
+    writeln(format(' STEPPER::RADIUS = %12.5f', [fradius ]));
+    writeln(format(' STEPPER::DELAY  = %12.5u', [fdelaym ]));
+    writeln(format('   SERVO::DELAY  = %12.5u', [fdelayz ]));
+    writeln(format('   SERVO::UP     = %12.5u', [fsrvup  ]));
+    writeln(format('   SERVO::DOWN   = %12.5u', [fsrvdown]));
   end;
 end;
 

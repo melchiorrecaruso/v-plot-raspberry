@@ -26,38 +26,44 @@ unit vpdriver;
 interface
 
 uses
-  classes, {$ifdef cpuarm} pca9685, wiringpi, {$endif} sysutils, vpcommon, vpmath;
+  classes, {$ifdef cpuarm} pca9685, wiringpi, {$endif} sysutils, vpcommon, vpmath, vpsetting;
+
+const
+  motz_hi       = 2.50;
+  motz_lo       = 0.00;
+  motz_inc      = 0.05;
+  motz_freq     = 50;
 
 type
   tvpdriver = class
   private
     fcount0:  longint;
     fcount1:  longint;
+    fcountz:  double;
     fdelaym:  longint;
     fdelayz:  longint;
     fenabled: boolean;
     fmode:    longint;
-    fpen:     boolean;
-    fpenoff:  boolean;
+    fzoff:    boolean;
     fpoint:   tvppoint;
+    procedure setcountz(value: double);
     procedure setmode(value: longint);
-    procedure setpen(value: boolean);
-    procedure setpenoff(value: boolean);
+    procedure setzoff(value: boolean);
   public
     constructor create;
     destructor  destroy; override;
     procedure   init(acount0, acount1: longint; apoint: tvppoint);
-    procedure   move(acount0, acount1: longint; apoint: tvppoint);
+    procedure   movexy(acount0, acount1: longint; apoint: tvppoint);
     procedure   getpoint(var apoint: tvppoint);
-    procedure   getcount0(var acount: longint);
-    procedure   getcount1(var acount: longint);
   published
+    property count0:  longint read fcount0;
+    property count1:  longint read fcount1;
+    property countz:  double  read fcountz  write setcountz;
     property delaym:  longint read fdelaym  write fdelaym;
     property delayz:  longint read fdelayz  write fdelayz;
     property enabled: boolean read fenabled write fenabled;
     property mode:    longint read fmode    write setmode;
-    property pen:     boolean read fpen     write setpen;
-    property penoff:  boolean read fpenoff  write setpenoff;
+    property zoff:    boolean read fzoff    write setzoff;
   end;
 
   tvpdriverthread = class(tthread)
@@ -88,8 +94,8 @@ implementation
 uses
   math;
 
-{$ifdef cpuarm}
 const
+{$ifdef cpuarm}
   mot0_step     = P38;
   mot0_dir      = P40;
   mot1_step     = P29;
@@ -98,11 +104,7 @@ const
   motx_mod0     = P15;
   motx_mod1     = P13;
   motx_mod2     = P11;
-
-  motz_up       = 1.80;
-  motz_low      = 2.50;
-
-  motz_freq     = 50;
+{$endif}
 
   vplotmatrix : array [0..10, 0..18] of longint = (
     (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),  //  0
@@ -117,23 +119,20 @@ const
     (0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0),  //  9
     (1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1)); // 10
 
-  vplotmotz : array[0..7] of double = (
-    1.80, 1.90, 2.00, 2.10, 2.20, 2.30, 2.40, 2.50);
-{$endif}
 
 constructor tvpdriver.create;
 begin
   inherited create;
   fcount0  := 0;
   fcount1  := 0;
-  fdelayz  := 300000;
+  fcountz  := 0;
   fdelaym  := 3000;
+  fdelayz  := 300000;
   fenabled := false;
   fmode    := 0;
-  fpenoff  := false;
-  fpen     := true;
   fpoint.x := 0;
   fpoint.y := 0;
+  fzoff  := false;
   {$ifdef cpuarm}
   // setup wiringpi library
   wiringpisetup;
@@ -157,9 +156,9 @@ begin
   digitalwrite(mot1_dir,  LOW);
   digitalwrite(mot1_step, LOW);
   {$endif}
-  setpenoff(false);
-  setpen   (false);
   setmode(1);
+  setzoff(false);
+  setcountz(setting.srvup);
 end;
 
 destructor tvpdriver.destroy;
@@ -174,43 +173,34 @@ begin
   fpoint  := apoint;
 end;
 
-procedure tvpdriver.setpen(value: boolean);
-{$ifdef cpuarm}
-var
-  i: longint;
-{$endif}
+procedure tvpdriver.setcountz(value: double);
 begin
-  if fpenoff then exit;
+  if fzoff = true    then exit;
+  if value > motz_hi then exit;
+  if value < motz_lo then exit;
 
-  if fpen <> value then
+  while fcountz < value do
   begin
-    fpen := value;
+    fcountz := min(value, fcountz + motz_inc);
     {$ifdef cpuarm}
-    if fpen then
-      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_low , motz_freq))
-    else
-      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_up , motz_freq));
+    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq))
+    delaymicroseconds(fdelayz);
+    {$endif}
+  end;
+
+  while fcountz > value do
+  begin
+    fcountz := max(value, fcountz - motz_inc);
+    {$ifdef cpuarm}
+    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq))
     delaymicroseconds(fdelayz);
     {$endif}
   end;
 end;
 
-procedure tvpdriver.setpenoff(value: boolean);
-{$ifdef cpuarm}
-var
-  i: longint;
-{$endif}
+procedure tvpdriver.setzoff(value: boolean);
 begin
-  fpenoff := value;
-  if fpenoff then
-    if fpen then
-    begin
-      fpen := false;
-      {$ifdef cpuarm}
-      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(motz_up , motz_freq));
-      delaymicroseconds(fdelayz);
-      {$endif}
-    end;
+  fzoff := value;
 end;
 
 procedure tvpdriver.setmode(value: longint);
@@ -270,7 +260,7 @@ begin
   end;
 end;
 
-procedure tvpdriver.move(acount0, acount1: longint; apoint: tvppoint);
+procedure tvpdriver.movexy(acount0, acount1: longint; apoint: tvppoint);
 {$ifdef cpuarm}
 var
           i: longint;
@@ -295,7 +285,10 @@ begin
 
     dm0 := abs(dm0);
     dm1 := abs(dm1);
-    setpen(max(dm0, dm1) <= 10);
+    if max(dm0, dm1) <= 10 then
+      movez(setting.srvdown)
+    else
+      movez(setting.srvup);
 
     while (dm0 > 0) or (dm1 > 0) do
     begin
@@ -332,16 +325,6 @@ begin
     writeln(format('  DRIVER::CNT.0  = %12.5u', [fcount0]));
     writeln(format('  DRIVER::CNT.1  = %12.5u', [fcount1]));
   end;
-end;
-
-procedure tvpdriver.getcount0(var acount: longint);
-begin
-  acount := fcount0;
-end;
-
-procedure tvpdriver.getcount1(var acount: longint);
-begin
-  acount := fcount1;
 end;
 
 procedure tvpdriver.getpoint(var apoint: tvppoint);
@@ -384,7 +367,7 @@ begin
       begin
         pos := path.item[j];
         if pos.c then
-          driver.move(pos.m0, pos.m1, pos.pp);
+          driver.movexy(pos.m0, pos.m1, pos.pp);
         while not enabled do sleep(250);
       end;
     end;
