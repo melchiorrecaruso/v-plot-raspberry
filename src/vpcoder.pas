@@ -169,7 +169,6 @@ var
     page: tvpage;
     path: tvppath;
 begin
-  paths.clear;
   for i := 0 to vec.getpagecount - 1 do
   begin
     page := vec.getpageasvectorial(i);
@@ -193,7 +192,6 @@ begin
         if enabledebug then
           writeln(entity.classname);
       end;
-
       if assigned(path) then
         paths.add(path);
     end;

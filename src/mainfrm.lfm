@@ -1,10 +1,10 @@
 object mainform: Tmainform
   Left = 309
   Height = 580
-  Top = 83
+  Top = 84
   Width = 924
   Anchors = []
-  Caption = 'vPlotter 2.0'
+  Caption = 'vPlotter'
   ClientHeight = 580
   ClientWidth = 924
   Color = clWhite
@@ -58,7 +58,7 @@ object mainform: Tmainform
     AnchorSideTop.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 4
-    Height = 137
+    Height = 135
     Top = 10
     Width = 294
     AutoSize = True
@@ -67,24 +67,23 @@ object mainform: Tmainform
     BorderSpacing.Right = 4
     Caption = 'Plotter Calibration '
     ClientHeight = 118
-    ClientWidth = 292
+    ClientWidth = 290
     Constraints.MaxWidth = 294
     Constraints.MinWidth = 294
     TabOrder = 0
     TabStop = True
-    object upbtn: TBitBtn
-      AnchorSideLeft.Control = leftbtn
-      AnchorSideLeft.Side = asrBottom
+    object leftupbtn: TBitBtn
+      AnchorSideLeft.Control = manualdrivinggb
       AnchorSideTop.Control = manualdrivinggb
       AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Side = asrBottom
-      Left = 97
+      Left = 6
       Height = 30
       Top = 6
       Width = 85
       BorderSpacing.Left = 6
       BorderSpacing.Top = 6
-      Caption = 'Up'
+      Caption = 'Left'
       Glyph.Data = {
         36090000424D3609000000000000360000002800000018000000180000000100
         2000000000000009000064000000640000000000000000000000000000000000
@@ -162,55 +161,57 @@ object mainform: Tmainform
         0000000000000000000000000000000000000000000000000000
       }
       Margin = 5
-      OnClick = upbtnClick
+      OnClick = leftupbtnClick
       TabOrder = 0
     end
     object penupbtn: TBitBtn
-      AnchorSideLeft.Control = leftbtn
-      AnchorSideTop.Control = upbtn
-      AnchorSideRight.Control = leftbtn
+      AnchorSideLeft.Control = leftupbtn
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = leftupbtn
+      AnchorSideRight.Control = rightdownbtn
       AnchorSideRight.Side = asrBottom
-      AnchorSideBottom.Control = upbtn
+      AnchorSideBottom.Control = leftupbtn
       AnchorSideBottom.Side = asrBottom
-      Left = 6
+      Left = 97
       Height = 30
       Top = 6
       Width = 85
-      Anchors = [akTop, akLeft, akRight]
+      Anchors = [akTop, akLeft, akBottom]
+      BorderSpacing.Left = 6
       Caption = 'Pen Up'
       OnClick = penupbtnClick
       TabOrder = 1
     end
     object pendownbtn: TBitBtn
       AnchorSideLeft.Control = penupbtn
-      AnchorSideTop.Control = downbtn
+      AnchorSideTop.Control = leftdownbtn
       AnchorSideRight.Control = penupbtn
       AnchorSideRight.Side = asrBottom
-      AnchorSideBottom.Control = downbtn
+      AnchorSideBottom.Control = leftdownbtn
       AnchorSideBottom.Side = asrBottom
-      Left = 6
+      Left = 97
       Height = 30
       Top = 78
       Width = 85
-      Anchors = [akTop, akLeft, akRight]
+      Anchors = [akTop, akRight, akBottom]
       Caption = 'Pen Down'
       OnClick = pendownbtnClick
       TabOrder = 2
     end
-    object downbtn: TBitBtn
-      AnchorSideLeft.Control = upbtn
-      AnchorSideTop.Control = moveedit
+    object leftdownbtn: TBitBtn
+      AnchorSideLeft.Control = leftupbtn
+      AnchorSideTop.Control = leftedit
       AnchorSideTop.Side = asrBottom
-      AnchorSideRight.Control = upbtn
+      AnchorSideRight.Control = leftupbtn
       AnchorSideRight.Side = asrBottom
-      Left = 97
+      Left = 6
       Height = 30
       Top = 78
       Width = 85
       Anchors = [akTop, akLeft, akRight]
       BorderSpacing.Top = 6
       BorderSpacing.Bottom = 10
-      Caption = 'Down'
+      Caption = 'Left'
       Glyph.Data = {
         36090000424D3609000000000000360000002800000018000000180000000100
         2000000000000009000064000000640000000000000000000000000000000000
@@ -288,21 +289,22 @@ object mainform: Tmainform
         0000000000000000000000000000000000000000000000000000
       }
       Margin = 5
-      OnClick = downbtnClick
+      OnClick = leftdownbtnClick
       TabOrder = 3
     end
-    object leftbtn: TBitBtn
-      AnchorSideLeft.Control = manualdrivinggb
-      AnchorSideTop.Control = upbtn
-      AnchorSideTop.Side = asrBottom
-      AnchorSideRight.Control = upbtn
-      Left = 6
+    object rightdownbtn: TBitBtn
+      AnchorSideLeft.Control = rightupbtn
+      AnchorSideTop.Control = pendownbtn
+      AnchorSideRight.Control = rightupbtn
+      AnchorSideRight.Side = asrBottom
+      AnchorSideBottom.Control = pendownbtn
+      AnchorSideBottom.Side = asrBottom
+      Left = 188
       Height = 30
-      Top = 42
+      Top = 78
       Width = 85
-      BorderSpacing.Left = 6
-      BorderSpacing.Top = 6
-      Caption = 'Left'
+      Anchors = [akTop, akLeft, akRight, akBottom]
+      Caption = 'Right'
       Color = clScrollBar
       Glyph.Data = {
         36090000424D3609000000000000360000002800000018000000180000000100
@@ -317,55 +319,55 @@ object mainform: Tmainform
         0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
+        000000000000000000FF00000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
+        0000000000FF000000FF000000FF000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000FF0000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        00FF000000FF0000000000000000000000000000000000000000000000000000
+        00FF000000FF000000FF000000FF000000FF0000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000FF0000
-        00FF000000FF0000000000000000000000000000000000000000000000000000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
         00000000000000000000000000000000000000000000000000FF000000FF0000
-        00FF000000FF0000000000000000000000000000000000000000000000000000
+        00FF000000FF000000FF000000FF000000FF000000FF000000FF000000000000
         0000000000000000000000000000000000000000000000000000000000000000
         000000000000000000000000000000000000000000FF000000FF000000FF0000
         00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF00000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000FF000000FF000000FF000000FF0000
         00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF00000000000000000000000000000000000000000000
+        00FF000000000000000000000000000000000000000000000000000000000000
         00000000000000000000000000FF000000FF000000FF000000FF000000FF0000
         00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF00000000000000000000000000000000000000000000
-        000000000000000000FF000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF00000000000000000000000000000000000000000000
-        00000000000000000000000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF00000000000000000000000000000000000000000000
-        0000000000000000000000000000000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF00000000000000000000000000000000000000000000
-        000000000000000000000000000000000000000000FF000000FF000000FF0000
-        00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF00000000000000000000000000000000000000000000
-        00000000000000000000000000000000000000000000000000FF000000FF0000
         00FF000000FF0000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000FF0000
-        00FF000000FF0000000000000000000000000000000000000000000000000000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
-        00FF000000FF0000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
-        0000000000FF0000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
@@ -380,18 +382,18 @@ object mainform: Tmainform
         0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000
       }
-      OnClick = leftbtnClick
+      OnClick = rightdownbtnClick
       TabOrder = 4
     end
-    object rightbtn: TBitBtn
-      AnchorSideLeft.Control = upbtn
+    object rightupbtn: TBitBtn
+      AnchorSideLeft.Control = penupbtn
       AnchorSideLeft.Side = asrBottom
-      AnchorSideTop.Control = leftbtn
-      AnchorSideBottom.Control = leftbtn
+      AnchorSideTop.Control = leftupbtn
+      AnchorSideBottom.Control = leftupbtn
       AnchorSideBottom.Side = asrBottom
       Left = 188
       Height = 30
-      Top = 42
+      Top = 6
       Width = 85
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 6
@@ -412,56 +414,56 @@ object mainform: Tmainform
         0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000FF0000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000FF000000FF00000000000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000FF000000FF000000FF000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000FF000000FF000000FF000000FF0000
-        0000000000000000000000000000000000000000000000000000000000000000
-        00000000000000000000000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000000000000000000000000000000000000000000000000000000000
-        00000000000000000000000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF0000000000000000000000000000000000000000000000000000
-        00000000000000000000000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF00000000000000000000000000000000000000000000
-        00000000000000000000000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF000000FF000000000000000000000000000000000000
-        00000000000000000000000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
-        00FF000000FF000000FF00000000000000000000000000000000000000000000
         00000000000000000000000000FF000000FF000000FF000000FF000000FF0000
         00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
         00FF000000FF0000000000000000000000000000000000000000000000000000
-        00000000000000000000000000FF000000FF000000FF000000FF000000FF0000
+        0000000000000000000000000000000000FF000000FF000000FF000000FF0000
         00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
         00FF000000000000000000000000000000000000000000000000000000000000
+        000000000000000000000000000000000000000000FF000000FF000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000
         0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000FF000000FF000000FF000000FF0000
+        00000000000000000000000000000000000000000000000000FF000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF000000FF000000000000
         0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000FF000000FF000000FF000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000FF000000FF00000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000000000000000000000000000000000
-        0000000000000000000000000000000000FF0000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000FF0000
+        00FF000000FF000000FF000000FF000000FF000000FF00000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
+        00FF000000FF000000FF000000FF000000FF0000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000FF000000FF000000FF000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        000000000000000000FF00000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000000000000000
@@ -473,57 +475,60 @@ object mainform: Tmainform
         0000000000000000000000000000000000000000000000000000000000000000
         0000000000000000000000000000000000000000000000000000
       }
-      OnClick = rightbtnClick
+      OnClick = rightupbtnClick
       TabOrder = 5
     end
-    object moveedit: TSpinEdit
-      AnchorSideLeft.Control = upbtn
-      AnchorSideTop.Control = leftbtn
-      AnchorSideRight.Control = upbtn
+    object leftedit: TSpinEdit
+      AnchorSideLeft.Control = leftupbtn
+      AnchorSideTop.Control = leftupbtn
+      AnchorSideTop.Side = asrBottom
+      AnchorSideRight.Control = leftupbtn
       AnchorSideRight.Side = asrBottom
-      AnchorSideBottom.Control = leftbtn
+      AnchorSideBottom.Control = rightdownbtn
       AnchorSideBottom.Side = asrBottom
-      Left = 97
+      Left = 6
       Height = 30
       Top = 42
       Width = 85
       Alignment = taCenter
       Anchors = [akTop, akLeft, akRight]
       AutoSize = False
+      BorderSpacing.Top = 6
       MaxValue = 1000000
       TabOrder = 6
     end
-    object sethomebtn: TBitBtn
-      AnchorSideLeft.Control = rightbtn
-      AnchorSideTop.Control = upbtn
-      AnchorSideRight.Control = rightbtn
+    object gohomebtn: TBitBtn
+      AnchorSideLeft.Control = penupbtn
+      AnchorSideTop.Control = leftedit
+      AnchorSideRight.Control = penupbtn
       AnchorSideRight.Side = asrBottom
-      AnchorSideBottom.Control = upbtn
+      AnchorSideBottom.Control = leftedit
       AnchorSideBottom.Side = asrBottom
-      Left = 188
+      Left = 97
       Height = 30
-      Top = 6
-      Width = 85
-      Anchors = [akTop, akLeft, akRight, akBottom]
-      Caption = 'Set home'
-      Color = clSkyBlue
-      OnClick = sethomebtnClick
-      TabOrder = 7
-    end
-    object gohomrbtn: TBitBtn
-      AnchorSideLeft.Control = sethomebtn
-      AnchorSideTop.Control = downbtn
-      AnchorSideRight.Control = sethomebtn
-      AnchorSideRight.Side = asrBottom
-      AnchorSideBottom.Control = downbtn
-      AnchorSideBottom.Side = asrBottom
-      Left = 188
-      Height = 30
-      Top = 78
+      Top = 42
       Width = 85
       Anchors = [akTop, akLeft, akRight, akBottom]
       Caption = 'Go Home'
+      Color = clSkyBlue
       OnClick = gohomebtnclick
+      TabOrder = 7
+    end
+    object rightedit: TSpinEdit
+      AnchorSideLeft.Control = rightupbtn
+      AnchorSideTop.Control = leftedit
+      AnchorSideRight.Control = rightupbtn
+      AnchorSideRight.Side = asrBottom
+      AnchorSideBottom.Control = leftedit
+      AnchorSideBottom.Side = asrBottom
+      Left = 188
+      Height = 30
+      Top = 42
+      Width = 85
+      Alignment = taCenter
+      Anchors = [akTop, akLeft, akRight, akBottom]
+      AutoSize = False
+      MaxValue = 1000000
       TabOrder = 8
     end
   end
@@ -533,16 +538,16 @@ object mainform: Tmainform
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Side = asrBottom
     Left = 4
-    Height = 129
-    Top = 153
+    Height = 122
+    Top = 151
     Width = 294
     AutoSize = True
     BorderSpacing.Left = 4
     BorderSpacing.Top = 6
     BorderSpacing.Right = 4
     Caption = 'Page size '
-    ClientHeight = 110
-    ClientWidth = 292
+    ClientHeight = 105
+    ClientWidth = 290
     Constraints.MaxWidth = 294
     Constraints.MinWidth = 294
     TabOrder = 2
@@ -552,9 +557,9 @@ object mainform: Tmainform
       AnchorSideRight.Control = pagesizegb
       AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Side = asrBottom
-      Left = 207
-      Height = 30
-      Top = 35
+      Left = 205
+      Height = 27
+      Top = 36
       Width = 80
       Alignment = taRightJustify
       Anchors = [akTop, akRight]
@@ -568,9 +573,9 @@ object mainform: Tmainform
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = offsetxse
       AnchorSideRight.Side = asrBottom
-      Left = 207
-      Height = 30
-      Top = 70
+      Left = 205
+      Height = 27
+      Top = 68
       Width = 80
       Alignment = taRightJustify
       Anchors = [akTop, akLeft, akRight]
@@ -585,10 +590,10 @@ object mainform: Tmainform
       AnchorSideTop.Control = offsetxse
       AnchorSideBottom.Control = offsetxse
       AnchorSideBottom.Side = asrBottom
-      Left = 155
-      Height = 30
-      Top = 35
-      Width = 46
+      Left = 150
+      Height = 27
+      Top = 36
+      Width = 40
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 15
       Caption = 'Offset X'
@@ -601,10 +606,10 @@ object mainform: Tmainform
       AnchorSideTop.Control = offsetyse
       AnchorSideBottom.Control = offsetyse
       AnchorSideBottom.Side = asrBottom
-      Left = 155
-      Height = 30
-      Top = 70
-      Width = 46
+      Left = 150
+      Height = 27
+      Top = 68
+      Width = 40
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 15
       Caption = 'Offset Y'
@@ -617,9 +622,9 @@ object mainform: Tmainform
       AnchorSideBottom.Control = heightse
       AnchorSideBottom.Side = asrBottom
       Left = 5
-      Height = 30
-      Top = 35
-      Width = 37
+      Height = 27
+      Top = 36
+      Width = 34
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 5
       Caption = 'Height'
@@ -632,9 +637,9 @@ object mainform: Tmainform
       AnchorSideBottom.Control = widthse
       AnchorSideBottom.Side = asrBottom
       Left = 5
-      Height = 30
-      Top = 70
-      Width = 33
+      Height = 27
+      Top = 68
+      Width = 31
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 5
       Caption = 'Width'
@@ -647,9 +652,9 @@ object mainform: Tmainform
       AnchorSideBottom.Control = formatcb
       AnchorSideBottom.Side = asrBottom
       Left = 5
-      Height = 24
+      Height = 25
       Top = 6
-      Width = 42
+      Width = 37
       Alignment = taRightJustify
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 5
@@ -660,11 +665,11 @@ object mainform: Tmainform
     object formatcb: TComboBox
       AnchorSideLeft.Control = pagesizegb
       AnchorSideTop.Control = pagesizegb
-      Left = 60
-      Height = 24
+      Left = 55
+      Height = 25
       Top = 6
       Width = 80
-      BorderSpacing.Left = 60
+      BorderSpacing.Left = 55
       BorderSpacing.Top = 6
       ItemHeight = 0
       ItemIndex = 3
@@ -688,9 +693,9 @@ object mainform: Tmainform
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = formatcb
       AnchorSideRight.Side = asrBottom
-      Left = 60
-      Height = 30
-      Top = 35
+      Left = 55
+      Height = 27
+      Top = 36
       Width = 80
       Alignment = taRightJustify
       Anchors = [akTop, akLeft, akRight]
@@ -706,9 +711,9 @@ object mainform: Tmainform
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = heightse
       AnchorSideRight.Side = asrBottom
-      Left = 60
-      Height = 30
-      Top = 70
+      Left = 55
+      Height = 27
+      Top = 68
       Width = 80
       Alignment = taRightJustify
       Anchors = [akTop, akLeft, akRight]
@@ -725,8 +730,8 @@ object mainform: Tmainform
       AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Control = formatcb
       AnchorSideBottom.Side = asrBottom
-      Left = 207
-      Height = 24
+      Left = 205
+      Height = 25
       Top = 6
       Width = 80
       Anchors = [akTop, akLeft, akRight, akBottom]
@@ -743,8 +748,8 @@ object mainform: Tmainform
     AnchorSideRight.Control = pagesizegb
     AnchorSideRight.Side = asrBottom
     Left = 4
-    Height = 63
-    Top = 288
+    Height = 61
+    Top = 279
     Width = 294
     Anchors = [akTop, akLeft, akRight]
     AutoSize = True
@@ -752,7 +757,7 @@ object mainform: Tmainform
     BorderSpacing.InnerBorder = 4
     Caption = 'Load drawing '
     ClientHeight = 44
-    ClientWidth = 292
+    ClientWidth = 290
     TabOrder = 3
     object loadbtn: TBitBtn
       AnchorSideLeft.Control = loadgb
@@ -794,7 +799,7 @@ object mainform: Tmainform
       Top = 6
       Width = 85
       BorderSpacing.Left = 6
-      Caption = 'Preview'
+      Caption = 'Reload'
       OnClick = reloadmiclick
       TabOrder = 2
     end
@@ -806,8 +811,8 @@ object mainform: Tmainform
     AnchorSideRight.Control = loadgb
     AnchorSideRight.Side = asrBottom
     Left = 4
-    Height = 63
-    Top = 357
+    Height = 61
+    Top = 346
     Width = 294
     Anchors = [akTop, akLeft, akRight]
     AutoSize = True
@@ -815,7 +820,7 @@ object mainform: Tmainform
     BorderSpacing.InnerBorder = 4
     Caption = 'Control '
     ClientHeight = 44
-    ClientWidth = 292
+    ClientWidth = 290
     TabOrder = 4
     object startbtn: TBitBtn
       AnchorSideLeft.Control = controlgb
@@ -871,7 +876,7 @@ object mainform: Tmainform
     AnchorSideRight.Side = asrBottom
     Left = 12
     Height = 29
-    Top = 462
+    Top = 449
     Width = 267
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Left = 8
@@ -889,7 +894,7 @@ object mainform: Tmainform
     AnchorSideRight.Side = asrBottom
     Left = 12
     Height = 30
-    Top = 426
+    Top = 413
     Width = 267
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Left = 8

@@ -39,19 +39,19 @@ type
     fenabled: boolean;
     fmode:    longint;
     fzoff:    boolean;
-    fpoint:   tvppoint;
+    procedure setcount0(value: longint);
+    procedure setcount1(value: longint);
     procedure setcountz(value: double);
-    procedure setmode(value: longint);
-    procedure setzoff(value: boolean);
+    procedure setmode  (value: longint);
+    procedure setzoff  (value: boolean);
   public
     constructor create;
     destructor  destroy; override;
-    procedure   init(acount0, acount1: longint; apoint: tvppoint);
-    procedure   movexy(acount0, acount1: longint; apoint: tvppoint);
-    procedure   getpoint(var apoint: tvppoint);
+    procedure   init(acount0, acount1: longint);
+    procedure   move(acount0, acount1: longint);
   published
-    property count0:  longint read fcount0;
-    property count1:  longint read fcount1;
+    property count0:  longint read fcount0  write setcount0;
+    property count1:  longint read fcount1  write setcount1;
     property countz:  double  read fcountz  write setcountz;
     property delaym:  longint read fdelaym  write fdelaym;
     property delayz:  longint read fdelayz  write fdelayz;
@@ -88,8 +88,13 @@ implementation
 uses
   math;
 
-{$ifdef cpuarm}
 const
+  motz_hi       = 2.50;
+  motz_lo       = 0.00;
+  motz_inc      = 0.05;
+  motz_freq     = 50;
+
+{$ifdef cpuarm}
   mot0_step     = P38;
   mot0_dir      = P40;
   mot1_step     = P29;
@@ -98,12 +103,6 @@ const
   motx_mod0     = P15;
   motx_mod1     = P13;
   motx_mod2     = P11;
-
-  motz_hi       = 2.50;
-  motz_lo       = 0.00;
-  motz_inc      = 0.05;
-  motz_freq     = 50;
-{$endif}
 
   vplotmatrix : array [0..10, 0..18] of longint = (
     (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),  //  0
@@ -117,7 +116,7 @@ const
     (1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1),  //  8
     (0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0),  //  9
     (1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1)); // 10
-
+{$endif}
 
 constructor tvpdriver.create;
 begin
@@ -129,8 +128,6 @@ begin
   fdelayz  := 30000;
   fenabled := false;
   fmode    := 0;
-  fpoint.x := 0;
-  fpoint.y := 0;
   fzoff    := false;
   {$ifdef cpuarm}
   // setup wiringpi library
@@ -157,7 +154,6 @@ begin
   digitalwrite(mot1_step, LOW);
   {$endif}
   setmode(1);
-  setzoff(false);
 end;
 
 destructor tvpdriver.destroy;
@@ -165,45 +161,10 @@ begin
   inherited destroy;
 end;
 
-procedure  tvpdriver.init(acount0, acount1: longint; apoint: tvppoint);
+procedure  tvpdriver.init(acount0, acount1: longint);
 begin
   fcount0 := acount0;
   fcount1 := acount1;
-  fpoint  := apoint;
-end;
-
-procedure tvpdriver.setcountz(value: double);
-begin
-  if fzoff = true    then exit;
-  if value > motz_hi then exit;
-  if value < motz_lo then exit;
-
-  if fcountz <> value then
-  begin
-    if fcountz < value then
-      while fcountz < value do
-      begin
-        fcountz := min(value, fcountz + motz_inc);
-        {$ifdef cpuarm}
-        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
-        delaymicroseconds(fdelayz);
-        {$endif}
-      end
-    else
-      while fcountz > value do
-      begin
-        fcountz := max(value, fcountz - motz_inc);
-        {$ifdef cpuarm}
-        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
-        delaymicroseconds(fdelayz);
-        {$endif}
-      end;
-  end;
-end;
-
-procedure tvpdriver.setzoff(value: boolean);
-begin
-  fzoff := value;
 end;
 
 procedure tvpdriver.setmode(value: longint);
@@ -263,7 +224,7 @@ begin
   end;
 end;
 
-procedure tvpdriver.movexy(acount0, acount1: longint; apoint: tvppoint);
+procedure tvpdriver.move(acount0, acount1: longint);
 {$ifdef cpuarm}
 var
           i: longint;
@@ -323,7 +284,6 @@ begin
   {$endif}
   fcount0 := acount0;
   fcount1 := acount1;
-  fpoint  := apoint;
   if enabledebug then
   begin
     writeln(format('  DRIVER::CNT.0  = %12.5u', [fcount0]));
@@ -331,9 +291,48 @@ begin
   end;
 end;
 
-procedure tvpdriver.getpoint(var apoint: tvppoint);
+procedure tvpdriver.setcount0(value: longint);
 begin
-  apoint := fpoint;
+  move(value, fcount1);
+end;
+
+procedure tvpdriver.setcount1(value: longint);
+begin
+  move(fcount0, value);
+end;
+
+procedure tvpdriver.setcountz(value: double);
+begin
+  if fzoff = true    then exit;
+  if value > motz_hi then exit;
+  if value < motz_lo then exit;
+
+  if fcountz <> value then
+  begin
+    if fcountz < value then
+      while fcountz < value do
+      begin
+        fcountz := min(value, fcountz + motz_inc);
+        {$ifdef cpuarm}
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
+        delaymicroseconds(fdelayz);
+        {$endif}
+      end
+    else
+      while fcountz > value do
+      begin
+        fcountz := max(value, fcountz - motz_inc);
+        {$ifdef cpuarm}
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
+        delaymicroseconds(fdelayz);
+        {$endif}
+      end;
+  end;
+end;
+
+procedure tvpdriver.setzoff(value: boolean);
+begin
+  fzoff := value;
 end;
 
 // tvpdriverthread
@@ -371,7 +370,8 @@ begin
       begin
         pos := path.item[j];
         if pos.c then
-          driver.movexy(pos.m0, pos.m1, pos.pp);
+          driver.move(pos.m0, pos.m1);
+
         while not enabled do sleep(250);
       end;
     end;
