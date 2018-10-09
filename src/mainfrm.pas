@@ -26,9 +26,8 @@ unit mainfrm;
 interface
 
 uses
-  classes, forms, controls, graphics, dialogs, extctrls, stdctrls,
-  comctrls, buttons, menus, spin, vpcommon, vpcoder, vpsetting, vpdriver,
-  fpvectorial;
+  classes, forms, controls, graphics, dialogs, extctrls, stdctrls, comctrls,
+  buttons, menus, spin, vpcommon, vpcoder, vpsetting, vpdriver, fpvectorial;
 
 type
   { tmainform }
@@ -64,74 +63,61 @@ type
     pendownbtn: tbitbtn;
     penupbtn: tbitbtn;
     rightupbtn: tbitbtn;
-    timer: ttimer;
     opendialog: topendialog;
     leftupbtn: tbitbtn;
     verticalcb: tcheckbox;
     widthl: tlabel;
     widthse: tspinedit;
 
-    procedure aboutmiclick(sender: tobject);
-    procedure layoutmiclick(sender: tobject);
-
-
-    procedure closemiclick(sender: tobject);
-    procedure exitmiclick(sender: tobject);
-
-    procedure formatcbchange(sender: tobject);
     procedure formcreate(sender: tobject);
     procedure formdestroy(sender: tobject);
     procedure formclose(sender: tobject; var closeaction: tcloseaction);
-    procedure gohomebtnclick(sender: tobject);
-    procedure heightseeditingdone(sender: tobject);
-    procedure imagemousedown(sender: tobject; button: tmousebutton;
-      shift: tshiftstate; x, y: integer);
-    procedure imagemousemove(sender: tobject; shift: tshiftstate; x, y: integer);
-    procedure imagemouseup(sender: tobject; button: tmousebutton;
-      shift: tshiftstate; x, y: integer);
-    procedure killmiclick(sender: tobject);
-    procedure leftdownbtnclick(sender: tobject);
-
-    procedure rightdownbtnclick(sender: tobject);
-
-    procedure reloadmiclick(sender: tobject);
-    procedure startmiclick(sender: tobject);
-    procedure pendownbtnclick  (sender: tobject);
-    procedure penupbtnclick    (sender: tobject);
+    procedure formatcbchange(sender: tobject);
 
     procedure leftupbtnclick(sender: tobject);
-    procedure rightupbtnclick  (sender: tobject);
+    procedure leftdownbtnclick(sender: tobject);
+    procedure rightupbtnclick(sender: tobject);
+    procedure rightdownbtnclick(sender: tobject);
+    procedure penupbtnclick(sender: tobject);
+    procedure pendownbtnclick(sender: tobject);
+    procedure gohomebtnclick(sender: tobject);
 
+    procedure heightseeditingdone(sender: tobject);
+    procedure widthseeditingdone(sender: tobject);
+    procedure verticalcbeditingdone(sender: tobject);
 
     procedure openbtnclick(sender: tobject);
+    procedure reloadmiclick(sender: tobject);
+    procedure clearmiclick(sender: tobject);
 
+    procedure startmiclick(sender: tobject);
     procedure stopmiclick(sender: tobject);
-    procedure timertimer(sender: tobject);
+    procedure killmiclick(sender: tobject);
 
-    procedure verticalcbeditingdone(sender: tobject);
-    procedure widthseeditingdone(sender: tobject);
+    procedure layoutmiclick(sender: tobject);
+    procedure aboutmiclick(sender: tobject);
+
+    procedure imagemouseup  (sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
+    procedure imagemousedown(sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
+    procedure imagemousemove(sender: tobject; shift: tshiftstate; x, y: integer);
 
   private
       bitmap: tbitmap;
        paths: tvppaths;
-
-     elapsed: longint;
-
  mouseisdown: boolean;
           px: longint;
           py: longint;
 
-    procedure lock1(value: boolean);
-    procedure lock2(value: boolean);
-
-
     procedure onloadstart;
     procedure onloadend;
+    // ---
     procedure onplotterstart;
     procedure onplotterstop;
     procedure onplottertick;
+    // ---
+    procedure lock1(value: boolean);
+    procedure lock2(value: boolean);
   end;
-
 
   tloader = class(tthread)
   private
@@ -148,7 +134,6 @@ var
   mainform: tmainform;
   loader:   tloader;
 
-
 implementation
 
 {$R *.lfm}
@@ -156,7 +141,7 @@ implementation
 uses
   math, sysutils, dxfvectorialreader, aboutfrm, vpmath, vpwave;
 
-// THREAD
+// LOADER THREAD
 
 constructor tloader.create;
 begin
@@ -175,17 +160,15 @@ begin
   with mainform do
   begin
     optimize_paths(paths,
-      offsetxse.value,
-      offsetyse.value,
+      offsetxse.value, offsetyse.value,
       setting.layout08.x,
       setting.layout08.y + (heightse.value/2),
-      heightse.value,
-      widthse.value);
+      heightse.value, widthse.value);
   end;
   synchronize(fonloadend);
 end;
 
-// FORM events
+// FORM EVENTS
 
 procedure tmainform.formcreate(sender: tobject);
 var
@@ -196,7 +179,7 @@ begin
   setting := tvpsetting.create;
   setting.load(changefileext(paramstr(0), '.ini'));
   // create plotter driver
-  driver := tvpdriver.create;
+  driver        := tvpdriver.create;
   driver.mode   := setting.mode;
   driver.delaym := setting.delaym;
   driver.delayz := setting.delayz;
@@ -239,7 +222,7 @@ begin
     closeaction := cafree;
 end;
 
-// MANUAL DRIVING groupbox
+// CALIBRATION EVENTS
 
 procedure tmainform.rightdownbtnclick(sender: tobject);
 begin
@@ -295,24 +278,6 @@ begin
   lock2(true);
 end;
 
-procedure tmainform.layoutmiclick(Sender: TObject);
-var
-  m0: longint = 0;
-  m1: longint = 0;
-begin
-  gohomebtnclick(nil);
-  // load configuration
-  setting.clear;
-  setting.load(changefileext(paramstr(0), '.ini'));
-  // update plotter driver
-  driver.mode   := setting.mode;
-  driver.delaym := setting.delaym;
-  driver.delayz := setting.delayz;
-
-  optimize_point_v3(setting.layout09, m0, m1);
-  driver.init(m0, m1);
-end;
-
 procedure tmainform.gohomebtnclick(sender: tobject);
 var
   m0: longint = 0;
@@ -329,7 +294,7 @@ begin
   lock2(true);
 end;
 
-// IMAGE events
+// PREVIEW EVENTS
 
 procedure tmainform.imagemousedown(sender: tobject;
   button: tmousebutton; shift: tshiftstate; x, y: integer);
@@ -369,7 +334,7 @@ begin
   mouseisdown := false;
 end;
 
-// FILE mainmenu
+// LOAD EVENTS
 
 procedure tmainform.openbtnclick(sender: tobject);
 var
@@ -404,7 +369,7 @@ begin
   loader.start;
 end;
 
-procedure tmainform.closemiclick(sender: tobject);
+procedure tmainform.clearmiclick(sender: tobject);
 begin
   lock2(false);
   // ---
@@ -440,28 +405,20 @@ begin
   lock2(true);
 end;
 
-procedure tmainform.exitmiclick(sender: tobject);
-begin
-  close;
-end;
-
-// PLOT mainmenu
+// PLOT EVENTS
 
 procedure tmainform.startmiclick(sender: tobject);
 begin
   if assigned(driverthread) then
   begin
     driverthread.enabled := true;
-    timer       .enabled := true;
   end else
   begin
     driverthread         := tvpdriverthread.create(paths);
-    timer       .enabled := true;
     driverthread.onstart := @onplotterstart;
     driverthread.onstop  := @onplotterstop;
     driverthread.ontick  := @onplottertick;
     driverthread.start;
-    elapsed := 1;
   end;
 end;
 
@@ -470,7 +427,6 @@ begin
   if assigned(driverthread) then
   begin
     driverthread.enabled := false;
-    timer       .enabled := false;
   end;
   penupbtnclick(nil);
 end;
@@ -484,7 +440,27 @@ begin
   end;
 end;
 
-// INFO mainmenu
+// SETTING EVENTS
+
+procedure tmainform.layoutmiclick(Sender: TObject);
+var
+  m0: longint = 0;
+  m1: longint = 0;
+begin
+  gohomebtnclick(nil);
+  // load configuration
+  setting.clear;
+  setting.load(changefileext(paramstr(0), '.ini'));
+  // update plotter driver
+  driver.mode   := setting.mode;
+  driver.delaym := setting.delaym;
+  driver.delayz := setting.delayz;
+
+  optimize_point_v3(setting.layout09, m0, m1);
+  driver.init(m0, m1);
+end;
+
+// INFO EVENTS
 
 procedure tmainform.aboutmiclick(sender: tobject);
 var
@@ -495,7 +471,7 @@ begin
   about.destroy;
 end;
 
-// PAGE SIZE groupbox
+// PAGE SIZE EVENTS
 
 procedure tmainform.formatcbchange(sender: tobject);
 begin
@@ -556,10 +532,10 @@ begin
     formatcb.itemindex := formatcb.items.count - 2;
     formatcbchange (nil);
   end;
-  closemiclick(verticalcb);
+  clearmiclick(verticalcb);
 end;
 
-// PLOTTER THREAD methods
+// LOCK/UNLOCK EVENTS
 
 procedure tmainform.lock1(value: boolean);
 begin
@@ -623,6 +599,8 @@ begin
   application  .processmessages;
 end;
 
+// LOADER/PLOTTER THREAD EVENTS
+
 procedure tmainform.onloadstart;
 begin
   lock2(false);
@@ -655,30 +633,21 @@ end;
 procedure tmainform.onplotterstart;
 begin
   lock1(false);
-  timer.enabled := true;
   application.processmessages;
 end;
 
 procedure tmainform.onplotterstop;
 begin
-  timer.enabled := false;
-  driverthread  := nil;
+  driverthread := nil;
   penupbtnclick(nil);
-  lock1(true);
 
+  lock1(true);
   application.processmessages;
 end;
 
 procedure tmainform.onplottertick;
 begin
   application.processmessages;
-end;
-
-// TIMER events
-
-procedure tmainform.timertimer(sender: tobject);
-begin
-  inc(elapsed);
 end;
 
 end.

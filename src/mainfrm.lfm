@@ -785,7 +785,7 @@ object mainform: Tmainform
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 6
       Caption = 'Clear'
-      OnClick = closemiclick
+      OnClick = clearmiclick
       TabOrder = 1
     end
     object reloadbtn: TBitBtn
@@ -906,11 +906,6 @@ object mainform: Tmainform
   end
   object opendialog: TOpenDialog
     left = 696
-    top = 360
-  end
-  object timer: TTimer
-    OnTimer = timerTimer
-    left = 840
     top = 360
   end
 end

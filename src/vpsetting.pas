@@ -75,7 +75,6 @@ type
     property radius:   double    read fradius;
     property delaym:   longint   read fdelaym;
     property delayz:   longint   read fdelayz;
-
     property srvup:    double    read fsrvup;
     property srvdown:  double    read fsrvdown;
  end;
