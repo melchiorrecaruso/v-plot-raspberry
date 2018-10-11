@@ -253,7 +253,7 @@ begin
   if sender = leftupbtn    then driver.count0 := driver.count0 - leftedit .value;
   if sender = leftdownbtn  then driver.count0 := driver.count0 + leftedit .value;
   if sender = rightupbtn   then driver.count1 := driver.count1 - rightedit.value;
-  if sender = rightdownbtn then driver.count1 := driver.count1 - rightedit.value;
+  if sender = rightdownbtn then driver.count1 := driver.count1 + rightedit.value;
 
   optimize_point_v3(setting.layout09, m0, m1);
   driver.init(m0, m1);

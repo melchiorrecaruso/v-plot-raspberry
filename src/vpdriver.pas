@@ -92,7 +92,7 @@ const
   motz_hi       = 2.50;
   motz_lo       = 0.00;
   motz_inc      = 0.05;
-  motz_freq     = 50;
+  motz_freq     = 60;
 
 {$ifdef cpuarm}
   mot0_step     = P38;
@@ -315,7 +315,6 @@ begin
         fcountz := min(value, fcountz + motz_inc);
         {$ifdef cpuarm}
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
-        writeln(fcountz);
         delaymicroseconds(fdelayz);
         {$endif}
       end
@@ -325,7 +324,6 @@ begin
         fcountz := max(value, fcountz - motz_inc);
         {$ifdef cpuarm}
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
-        writeln(fcountz);
         delaymicroseconds(fdelayz);
         {$endif}
       end;
