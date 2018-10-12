@@ -91,8 +91,8 @@ uses
 const
   motz_hi       = 2.50;
   motz_lo       = 0.00;
-  motz_inc      = 0.05;
-  motz_freq     = 60;
+  motz_inc      = 0.02;
+  motz_freq     = 50;
 
 {$ifdef cpuarm}
   mot0_step     = P38;
@@ -123,7 +123,7 @@ begin
   inherited create;
   fcount0  := 0;
   fcount1  := 0;
-  fcountz  := motz_lo;
+  fcountz  := motz_lo + motz_inc;
   fdelaym  := 1000;
   fdelayz  := 30000;
   fenabled := false;
@@ -154,6 +154,7 @@ begin
   digitalwrite(mot1_step, LOW);
   {$endif}
   setmode(1);
+  setcountz(motz_lo);
 end;
 
 destructor tvpdriver.destroy;
@@ -309,7 +310,9 @@ begin
 
   if fcountz <> value then
   begin
+
     if fcountz < value then
+    begin
       while fcountz < value do
       begin
         fcountz := min(value, fcountz + motz_inc);
@@ -318,7 +321,8 @@ begin
         delaymicroseconds(fdelayz);
         {$endif}
       end
-    else
+    end else
+    begin
       while fcountz > value do
       begin
         fcountz := max(value, fcountz - motz_inc);
@@ -327,6 +331,7 @@ begin
         delaymicroseconds(fdelayz);
         {$endif}
       end;
+    end;
   end;
 end;
 

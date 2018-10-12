@@ -183,6 +183,7 @@ begin
   driver.mode   := setting.mode;
   driver.delaym := setting.delaym;
   driver.delayz := setting.delayz;
+  driver.countz := setting.srvup;
   // create preview and empty paths
   bitmap := tbitmap.create;
    paths := tvppaths.create;
