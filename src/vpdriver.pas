@@ -318,7 +318,8 @@ begin
         fcountz := min(value, fcountz + motz_inc);
         {$ifdef cpuarm}
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
-        delaymicroseconds(fdelayz);
+        if fcountz < value then
+          delaymicroseconds(fdelayz);
         {$endif}
       end
     end else
@@ -328,7 +329,8 @@ begin
         fcountz := max(value, fcountz - motz_inc);
         {$ifdef cpuarm}
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
-        delaymicroseconds(fdelayz);
+        if fcountz > value then
+          delaymicroseconds(fdelayz);
         {$endif}
       end;
     end;

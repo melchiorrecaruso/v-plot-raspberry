@@ -60,7 +60,6 @@
         <EditorIndex Value="5"/>
         <TopLine Value="240"/>
         <CursorPos X="9" Y="254"/>
-        <FoldState Value=" T3i30I3 pj5jV0a3"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit2>
@@ -328,7 +327,6 @@
         <ComponentName Value="mainform"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="436"/>
         <CursorPos X="17" Y="460"/>
@@ -526,9 +524,10 @@
       <Unit66>
         <Filename Value="src/vpdriver.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="341"/>
-        <CursorPos X="38" Y="311"/>
+        <TopLine Value="309"/>
+        <CursorPos X="20" Y="332"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit66>
