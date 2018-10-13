@@ -199,7 +199,7 @@ begin
   wave.enabled := false;
   wave.test;
   // initialize driver
-  optimize_point_v3(setting.layout09, m0, m1);
+  optimize_point(setting.layout09, m0, m1);
   driver.init(m0, m1);
 end;
 
@@ -256,7 +256,7 @@ begin
   if sender = rightupbtn   then driver.count1 := driver.count1 - rightedit.value;
   if sender = rightdownbtn then driver.count1 := driver.count1 + rightedit.value;
 
-  optimize_point_v3(setting.layout09, m0, m1);
+  optimize_point(setting.layout09, m0, m1);
   driver.init(m0, m1);
   lock2(true);
 end;
@@ -290,7 +290,7 @@ begin
   driver.countz  := setting.srvup;
   driver.zoff    := true;
 
-  optimize_point_v3(setting.layout09, m0, m1);
+  optimize_point(setting.layout09, m0, m1);
   driver.move(m0, m1);
   lock2(true);
 end;
@@ -457,7 +457,7 @@ begin
   driver.delaym := setting.delaym;
   driver.delayz := setting.delayz;
 
-  optimize_point_v3(setting.layout09, m0, m1);
+  optimize_point(setting.layout09, m0, m1);
   driver.init(m0, m1);
 end;
 

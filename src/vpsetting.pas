@@ -51,6 +51,7 @@ type
     fdelayz:   longint;
     fsrvup:    double;
     fsrvdown:  double;
+    fweight:   double;
  public
     constructor create;
     destructor destroy; override;
@@ -77,6 +78,7 @@ type
     property delayz:   longint   read fdelayz;
     property srvup:    double    read fsrvup;
     property srvdown:  double    read fsrvdown;
+    property weight:   double    read fweight;
  end;
 
 
@@ -130,6 +132,7 @@ begin
   fdelayz     := 0;
   fsrvup      := 0;
   fsrvdown    := 0;
+  fweight     := 0;
 end;
 
 procedure tvpsetting.load(const filename: rawbytestring);
@@ -185,6 +188,7 @@ begin
     fdelayz     := ini.readinteger('Servo',   'DELAY',  0);
     fsrvup      := ini.readfloat  ('Servo',   'UP',     0);
     fsrvdown    := ini.readfloat  ('Servo',   'DOWN',   0);
+    fweight     := ini.readfloat  ('Machine', 'WEIGHT', 0);
   finally
     ini.destroy;
   end;
@@ -219,6 +223,7 @@ begin
     writeln(format('   SERVO::DELAY  = %12.5u', [fdelayz ]));
     writeln(format('   SERVO::UP     = %12.5f', [fsrvup  ]));
     writeln(format('   SERVO::DOWN   = %12.5f', [fsrvdown]));
+    writeln(format(' MACHINE::WEIGHT = %12.5f', [fweight]));
   end;
 end;
 
