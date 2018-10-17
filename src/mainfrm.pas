@@ -35,6 +35,7 @@ type
   tmainform = class(tform)
     aboutbtn: tbitbtn;
     layoutbtn: tbitbtn;
+    progressbar: TProgressBar;
     rightedit: tspinedit;
     startbtn: tbitbtn;
     stopbtn: tbitbtn;
@@ -157,14 +158,6 @@ end;
 procedure tloader.execute;
 begin
   synchronize(fonloadstart);
-  with mainform do
-  begin
-    optimize_paths(paths,
-      offsetxse.value, offsetyse.value,
-      setting.layout08.x,
-      setting.layout08.y + (heightse.value/2),
-      heightse.value, widthse.value);
-  end;
   synchronize(fonloadend);
 end;
 
@@ -175,6 +168,7 @@ var
   m0: longint = 0;
   m1: longint = 0;
 begin
+  progressbar.visible := false;
   // load setting
   setting := tvpsetting.create;
   setting.load(changefileext(paramstr(0), '.ini'));
@@ -193,13 +187,13 @@ begin
   manualdrivinggb.enabled := true;
   pagesizegb     .enabled := true;
   // init wave
-  wave := twave.create(setting.wavexmax,
-                       setting.waveymax,
+  wave := twave.create(setting.wavemaxdx,
+                       setting.wavemaxdy,
                        setting.wave);
   wave.enabled := false;
   wave.test;
   // initialize driver
-  optimize_point(setting.layout09, m0, m1);
+  optimize(setting.layout09, m0, m1);
   driver.init(m0, m1);
 end;
 
@@ -256,7 +250,7 @@ begin
   if sender = rightupbtn   then driver.count1 := driver.count1 - rightedit.value;
   if sender = rightdownbtn then driver.count1 := driver.count1 + rightedit.value;
 
-  optimize_point(setting.layout09, m0, m1);
+  optimize(setting.layout09, m0, m1);
   driver.init(m0, m1);
   lock2(true);
 end;
@@ -290,7 +284,7 @@ begin
   driver.countz  := setting.srvup;
   driver.zoff    := true;
 
-  optimize_point(setting.layout09, m0, m1);
+  optimize(setting.layout09, m0, m1);
   driver.move(m0, m1);
   lock2(true);
 end;
@@ -416,6 +410,12 @@ begin
   end else
   begin
     driverthread         := tvpdriverthread.create(paths);
+    driverthread.midx    := setting.layout08.x;
+    driverthread.midy    := setting.layout08.y + (heightse.value/2);
+    driverthread.maxdx   := widthse.value;
+    driverthread.maxdy   := heightse.value;
+    driverthread.offsetx := offsetxse.value;
+    driverthread.offsety := offsetyse.value;
     driverthread.onstart := @onplotterstart;
     driverthread.onstop  := @onplotterstop;
     driverthread.ontick  := @onplottertick;
@@ -429,7 +429,9 @@ begin
   begin
     driverthread.enabled := false;
   end;
-  penupbtnclick(nil);
+  driver.enabled := true;
+  driver.zoff    := false;
+  driver.countz  := setting.srvup;
 end;
 
 procedure tmainform.killmiclick(sender: tobject);
@@ -457,7 +459,7 @@ begin
   driver.delaym := setting.delaym;
   driver.delayz := setting.delayz;
 
-  optimize_point(setting.layout09, m0, m1);
+  optimize(setting.layout09, m0, m1);
   driver.init(m0, m1);
 end;
 
@@ -524,7 +526,7 @@ begin
       widthse .value := amax;
     end;
   end;
-
+  (*
   if (heightse.value > (2*setting.waveymax)) or
      (widthse .value > (2*setting.wavexmax)) then
   begin
@@ -533,7 +535,9 @@ begin
     formatcb.itemindex := formatcb.items.count - 2;
     formatcbchange (nil);
   end;
+  *)
   clearmiclick(verticalcb);
+  reloadmiclick(verticalcb);
 end;
 
 // LOCK/UNLOCK EVENTS
@@ -620,11 +624,9 @@ begin
     for j := 0 to path.count - 1 do
     begin
       pos := path.item[j];
-
-      if pos.c then
-        bitmap.canvas.pixels[
-          trunc(( widthse.value div 2) + pos.p.x + offsetxse.value),
-          trunc((heightse.value div 2) - pos.p.y - offsetyse.value)] := clblack;
+      bitmap.canvas.pixels[
+        trunc(( widthse.value div 2) + pos.x + offsetxse.value + 1),
+        trunc((heightse.value div 2) - pos.y - offsetyse.value + 1)] := clblack;
     end;
   end;
   image.canvas.draw(0, 0, bitmap);
@@ -634,6 +636,8 @@ end;
 procedure tmainform.onplotterstart;
 begin
   lock1(false);
+
+  progressbar.visible:= true;
   application.processmessages;
 end;
 
@@ -643,11 +647,13 @@ begin
   penupbtnclick(nil);
 
   lock1(true);
+  progressbar.visible:= false;
   application.processmessages;
 end;
 
 procedure tmainform.onplottertick;
 begin
+  progressbar.position := driverthread.progress;
   application.processmessages;
 end;
 

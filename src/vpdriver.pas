@@ -26,7 +26,8 @@ unit vpdriver;
 interface
 
 uses
-  classes, {$ifdef cpuarm} pca9685, wiringpi, {$endif} sysutils, vpcommon, vpmath, vpsetting;
+  classes, {$ifdef cpuarm} pca9685, wiringpi, {$endif} sysutils,
+  vpcommon, vpmath, vpsetting, vpwave;
 
 type
   tvpdriver = class
@@ -62,22 +63,38 @@ type
 
   tvpdriverthread = class(tthread)
   private
-    fenabled: boolean;
-    fonstart: tthreadmethod;
-    fonstop:  tthreadmethod;
-    fontick:  tthreadmethod;
-    fpaths:   tvppaths;
+    fenabled:  boolean;
+    fmaxdx:    double;
+    fmaxdy:    double;
+    fmidx:     double;
+    fmidy:     double;
+    foffsetx:  double;
+    foffsety:  double;
+    fonstart:  tthreadmethod;
+    fonstop:   tthreadmethod;
+    fontick:   tthreadmethod;
+    fpaths:    tvppaths;
+    fprogress: longint;
   protected
     procedure execute; override;
   public
     constructor create(paths: tvppaths);
     destructor  destroy; override;
   public
-    property enabled: boolean       read fenabled write fenabled;
-    property onstart: tthreadmethod read fonstart write fonstart;
-    property onstop:  tthreadmethod read fonstop  write fonstop;
-    property ontick:  tthreadmethod read fontick  write fontick;
+    property enabled:  boolean       read fenabled  write fenabled;
+    property maxdx:    double        read fmaxdx    write fmaxdx;
+    property maxdy:    double        read fmaxdy    write fmaxdy;
+    property midx:     double        read fmidx     write fmidx;
+    property midy:     double        read fmidy     write fmidy;
+    property offsetx:  double        read foffsetx  write foffsetx;
+    property offsety:  double        read foffsety  write foffsety;
+    property onstart:  tthreadmethod read fonstart  write fonstart;
+    property onstop:   tthreadmethod read fonstop   write fonstop;
+    property ontick:   tthreadmethod read fontick   write fontick;
+    property progress: longint       read fprogress;
   end;
+
+  procedure optimize(const p: tvppoint; var m0, m1: longint);
 
 var
   driver:       tvpdriver       = nil;
@@ -318,12 +335,17 @@ begin
         fcountz := min(value, fcountz + motz_inc);
         {$ifdef cpuarm}
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
-        if fcountz < value then
-          delaymicroseconds(fdelayz);
+        delaymicroseconds(fdelayz);
         {$endif}
       end
     end else
     begin
+      {$ifdef cpuarm}
+      delaymicroseconds(fdelayz);
+      delaymicroseconds(fdelayz);
+      delaymicroseconds(fdelayz);
+      delaymicroseconds(fdelayz);
+      {$endif}
       while fcountz > value do
       begin
         fcountz := max(value, fcountz - motz_inc);
@@ -347,7 +369,14 @@ end;
 constructor tvpdriverthread.create(paths: tvppaths);
 begin
   fenabled := true;
+  fmaxdx   := 0;
+  fmaxdy   := 0;
+  fmidx    := 0;
+  fmidy    := 0;
+  foffsetx := 0;
+  foffsety := 0;
   fpaths   := paths;
+
   freeonterminate := true;
   inherited create(true);
 end;
@@ -358,16 +387,81 @@ begin
   inherited destroy;
 end;
 
+procedure optimize(const p: tvppoint; var m0, m1: longint);
+var
+   c0,  c1,  c2: tvpcircle;
+       f01, fxx: tvpline;
+        l0,  l1: double;
+  s00, s01, sxx: tvppoint;
+  t00, t01, txx: tvppoint;
+begin
+  t00 := setting.layout00;
+  t01 := setting.layout01;
+  //find tangent point t00
+  l0  := sqrt(sqr(distance_between_two_points(t00, p))-sqr(setting.radius));
+  c0  := circle_by_center_and_radius(t00, setting.radius);
+  c2  := circle_by_center_and_radius(p, l0);
+  if intersection_of_two_circles(c0, c2, s00, sxx) = 0 then
+    raise exception.create('intersection_of_two_circles [c0c2]');
+  l0  := l0 + get_line_angle(line_by_two_points(s00, t00))*setting.radius;
+  //find tangent point t01
+  l1  := sqrt(sqr(distance_between_two_points(t01, p))-sqr(setting.radius));
+  c1  := circle_by_center_and_radius(t01, setting.radius);
+  c2  := circle_by_center_and_radius(p, l1);
+  if intersection_of_two_circles(c1, c2, s01, sxx) = 0 then
+    raise exception.create('intersection_of_two_circles [c1c2]');
+  l1  := l1 + (pi-get_line_angle(line_by_two_points(s01, t01)))*setting.radius;
+  // calculate steps
+  m0 := round(setting.mode*(l0/setting.ratio));
+  m1 := round(setting.mode*(l1/setting.ratio));
+
+  if enabledebug then
+  begin
+    txx.x := s00.x;
+    txx.y := p.y;
+
+    f01 := line_by_two_points(s01, p);
+    fxx := line_by_two_points(s00, txx);
+    txx := intersection_of_two_lines(f01, fxx);
+
+    writeln(format('OPTIMIZE::P.X    = %12.5f  P.Y   = %12.5f', [p.x, p.y]));
+    writeln(format('OPTIMIZE::LEN0   = %12.5f  LEN1  = %12.5f', [l0, l1]));
+    writeln(format('OPTIMIZE::CNT0   = %12.5u  CNT1  = %12.5u', [m0, m1]));
+
+    writeln(format('OPTIMIZE::F0     = %12.5u  F1    = %12.5u', [
+      trunc(setting.weight/
+        distance_between_two_points(s00, txx)*
+        distance_between_two_points(s00, p)),
+      trunc(setting.weight/
+        distance_between_two_points(s00, txx)*
+        distance_between_two_points(txx, p))]));
+  end;
+end;
+
 procedure tvpdriverthread.execute;
 var
      i: longint;
      j: longint;
+    m0: longint;
+    m1: longint;
   path: tvppath;
    pos: tvpposition;
+     p: tvppoint;
 begin
   if assigned(onstart) then
     synchronize(fonstart);
 
+  if enabledebug then
+  begin
+    writeln(format('DRIVER.THREAD::OFF-X  = %12.5f', [foffsetx]));
+    writeln(format('DRIVER.THREAD::OFF-Y  = %12.5f', [foffsety]));
+    writeln(format('DRIVER.THREAD::MAX-DX = %12.5f', [fmaxdx  ]));
+    writeln(format('DRIVER.THREAD::MAX-DY = %12.5f', [fmaxdy  ]));
+    writeln(format('DRIVER.THREAD::MID-X  = %12.5f', [fmidx   ]));
+    writeln(format('DRIVER.THREAD::MID-Y  = %12.5f', [fmidy   ]));
+  end;
+
+  fprogress := 0;
   for i := 0 to fpaths.count - 1 do
   begin
     path := fpaths.item[i];
@@ -376,14 +470,26 @@ begin
       if not terminated then
       begin
         pos := path.item[j];
-        if pos.c then
-          driver.move(pos.m0, pos.m1);
+        p.x := pos.x + foffsetx;
+        p.y := pos.y + foffsety;
+        p   := wave.update(p);
+
+        if (abs(p.x) < (maxdx+2)) and
+           (abs(p.y) < (maxdy+2)) then
+        begin
+          p.x := p.x + midx;
+          p.y := p.y + midy;
+          optimize(p, m0, m1);
+          driver.move(m0, m1);
+        end;
+
+        if assigned(ontick) then
+          synchronize(ontick);
 
         while not enabled do sleep(250);
       end;
+      fprogress := (100*i) div fpaths.count;
     end;
-    if assigned(ontick) then
-      synchronize(ontick);
   end;
 
   if assigned(fonstop) then

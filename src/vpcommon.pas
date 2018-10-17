@@ -30,12 +30,14 @@ uses
 
 type
   tvpposition = class(tobject)
+  private
+    fx: double;
+    fy: double;
   public
-     c: boolean;
-     p: tvppoint;
-    pp: tvppoint;
-    m0: longint;
-    m1: longint;
+    constructor create(p: tvppoint);
+  published
+    property x: double read fx;
+    property y: double read fy;
   end;
 
   tvppath = class(tobject)
@@ -92,12 +94,17 @@ uses
 const
   smallest = 0.05;
 
+function distance_between_two_position(p0, p1: tvpposition): double;
+begin
+  result := sqrt(sqr(p1.x - p0.x) + sqr(p1.y - p0.y));
+end;
+
 function compareposition(pos0, pos1: tvpposition): boolean;
 begin
-  result := abs(pos1.p.x - pos0.p.x) < smallest;
+  result := abs(pos1.x - pos0.x) < smallest;
   if result then
   begin
-    result := abs(pos1.p.y - pos0.p.y) < smallest;
+    result := abs(pos1.y - pos0.y) < smallest;
   end;
 end;
 
@@ -153,13 +160,13 @@ begin
   result := 0;
   if path <> nil then
   begin
-    best := distance_between_two_points(
-      path.getlast.p, tvppath(list[0]).getfirst.p);
+    best := distance_between_two_position(
+      path.getlast, tvppath(list[0]).getfirst);
 
     for i := 1 to list.count - 1 do
     begin
-      curr := distance_between_two_points(
-        path.getlast.p, tvppath(list[i]).getfirst.p);
+      curr := distance_between_two_position(
+        path.getlast, tvppath(list[i]).getfirst);
 
       if curr < best then
       begin
@@ -167,8 +174,8 @@ begin
         result := i;
       end else
       begin
-        curr := distance_between_two_points(
-          path.getlast.p, tvppath(list[i]).getlast.p);
+        curr := distance_between_two_position(
+          path.getlast, tvppath(list[i]).getlast);
 
         if curr < best then
         begin
@@ -189,6 +196,15 @@ begin
   begin
     result := compareposition(path.getfirst, path.getlast);
   end;
+end;
+
+// tvpposition
+
+constructor tvpposition.create(p: tvppoint);
+begin
+  inherited create;
+  fx := p.x;
+  fy := p.y;
 end;
 
 // tvppath
@@ -218,21 +234,13 @@ begin
 end;
 
 procedure tvppath.add(const p: tvppoint);
-var
-  pos: tvpposition;
 begin
-  pos   := tvpposition.create;
-  pos.p := p;
-  flist.add(pos);
+  flist.add(tvpposition.create(p));
 end;
 
 procedure tvppath.insert(index: longint; const p: tvppoint);
-var
-  pos: tvpposition;
 begin
-  pos   := tvpposition.create;
-  pos.p := p;
-  flist.insert(index, pos);
+  flist.insert(index, tvpposition.create(p));
 end;
 
 procedure tvppath.invert;
@@ -254,9 +262,9 @@ begin
   for i := 1 to flist.count - 1 do
   begin
     result := result +
-      distance_between_two_points(
-        tvpposition(flist[i    ]).p,
-        tvpposition(flist[i - 1]).p);
+      distance_between_two_position(
+        tvpposition(flist[i    ]),
+        tvpposition(flist[i - 1]));
   end;
 end;
 
@@ -362,10 +370,10 @@ begin
     for j := 0 to path.count - 1 do
     begin
         pos := path.item[j];
-       xmin := min(xmin, pos.p.x);
-       xmax := max(xmax, pos.p.x);
-       ymin := min(ymin, pos.p.y);
-       ymax := max(ymax, pos.p.y);
+       xmin := min(xmin, pos.x);
+       xmax := max(xmax, pos.x);
+       ymin := min(ymin, pos.y);
+       ymax := max(ymax, pos.y);
     end;
   end;
   offsetx := - (xmin + xmax) / 2;
@@ -376,9 +384,9 @@ begin
     path := tvppath(flist[i]);
     for j := 0 to path.count - 1 do
     begin
-      pos     := path.item[j];
-      pos.p.x := pos.p.x + offsetx;
-      pos.p.y := pos.p.y + offsety;
+      pos    := path.item[j];
+      pos.fx := pos.fx + offsetx;
+      pos.fy := pos.fy + offsety;
     end;
   end;
   fheight := ymax - ymin;

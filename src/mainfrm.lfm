@@ -1,12 +1,12 @@
 object mainform: Tmainform
-  Left = 309
-  Height = 580
-  Top = 84
-  Width = 924
+  Left = 312
+  Height = 566
+  Top = 127
+  Width = 921
   Anchors = []
   Caption = 'vPlotter'
-  ClientHeight = 580
-  ClientWidth = 924
+  ClientHeight = 566
+  ClientWidth = 921
   Color = clWhite
   OnClose = FormClose
   OnCreate = FormCreate
@@ -21,13 +21,13 @@ object mainform: Tmainform
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 302
-    Height = 580
+    Height = 566
     Top = 0
-    Width = 622
+    Width = 619
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelOuter = bvNone
-    ClientHeight = 580
-    ClientWidth = 622
+    ClientHeight = 566
+    ClientWidth = 619
     Color = clForm
     ParentColor = False
     TabOrder = 1
@@ -39,9 +39,9 @@ object mainform: Tmainform
       AnchorSideBottom.Control = imagepanel
       AnchorSideBottom.Side = asrBottom
       Left = 0
-      Height = 580
+      Height = 566
       Top = 0
-      Width = 622
+      Width = 619
       Anchors = [akTop, akLeft, akRight, akBottom]
       AutoSize = True
       Center = True
@@ -557,13 +557,13 @@ object mainform: Tmainform
       AnchorSideRight.Control = pagesizegb
       AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Side = asrBottom
-      Left = 205
+      Left = 200
       Height = 27
       Top = 36
       Width = 80
       Alignment = taRightJustify
       Anchors = [akTop, akRight]
-      BorderSpacing.Right = 5
+      BorderSpacing.Right = 10
       MaxValue = 0
       TabOrder = 0
     end
@@ -573,7 +573,7 @@ object mainform: Tmainform
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = offsetxse
       AnchorSideRight.Side = asrBottom
-      Left = 205
+      Left = 200
       Height = 27
       Top = 68
       Width = 80
@@ -730,10 +730,10 @@ object mainform: Tmainform
       AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Control = formatcb
       AnchorSideBottom.Side = asrBottom
-      Left = 205
+      Left = 200
       Height = 25
       Top = 6
-      Width = 80
+      Width = 85
       Anchors = [akTop, akLeft, akRight, akBottom]
       BorderSpacing.Right = 5
       Caption = 'Vertical'
@@ -903,6 +903,22 @@ object mainform: Tmainform
     Caption = 'Reload setting'
     OnClick = layoutmiclick
     TabOrder = 6
+  end
+  object progressbar: TProgressBar
+    AnchorSideLeft.Control = imagepanel
+    AnchorSideRight.Control = imagepanel
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 306
+    Height = 26
+    Top = 540
+    Width = 611
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Left = 4
+    BorderSpacing.Right = 4
+    Step = 1
+    TabOrder = 7
   end
   object opendialog: TOpenDialog
     left = 696
