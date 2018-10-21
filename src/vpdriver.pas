@@ -335,7 +335,8 @@ begin
         fcountz := min(value, fcountz + motz_inc);
         {$ifdef cpuarm}
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
-        delaymicroseconds(fdelayz);
+        if fcountz < value then
+          delaymicroseconds(fdelayz);
         {$endif}
       end
     end else
@@ -474,11 +475,11 @@ begin
         p.y := pos.y + foffsety;
         p   := wave.update(p);
 
-        if (abs(p.x) < (maxdx+2)) and
-           (abs(p.y) < (maxdy+2)) then
+        if (abs(p.x) <= (fmaxdx)) and
+           (abs(p.y) <= (fmaxdy)) then
         begin
-          p.x := p.x + midx;
-          p.y := p.y + midy;
+          p.x := p.x + fmidx;
+          p.y := p.y + fmidy;
           optimize(p, m0, m1);
           driver.move(m0, m1);
         end;

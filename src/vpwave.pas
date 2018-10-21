@@ -178,29 +178,30 @@ begin
     result.x := p.x;
     result.y := p.y;
   end;
-
-  if enabledebug then
-  begin
-    writeln(format('  WAVING::P.X    = %12.5f  P''.X = %12.5f', [p.x, result.x]));
-    writeln(format('  WAVING::P.Y    = %12.5f  P''.Y = %12.5f', [p.y, result.y]));
-  end;
 end;
 
 procedure twave.test;
 var
-  p: tvppoint;
+  p0,p1: tvppoint;
+
+procedure test_print;
+begin
+  writeln(format('  WAVING::P.X    = %12.5f  P''.X = %12.5f', [p0.x, p1.x]));
+  writeln(format('  WAVING::P.Y    = %12.5f  P''.Y = %12.5f', [p0.y, p1.y]));
+end;
+
 begin
   if enabledebug then
   begin
-    p.x := -594.5;  p.y := +420.5; wave.update(p);
-    p.x := +0.000;  p.y := +420.5; wave.update(p);
-    p.x := +594.5;  p.y := +420.5; wave.update(p);
-    p.x := -594.5;  p.y := +0.000; wave.update(p);
-    p.x := +0.000;  p.y := +0.000; wave.update(p);
-    p.x := +594.5;  p.y := +0.000; wave.update(p);
-    p.x := -594.5;  p.y := -420.5; wave.update(p);
-    p.x := +0.000;  p.y := -420.5; wave.update(p);
-    p.x := +594.5;  p.y := -420.5; wave.update(p);
+    p0.x := -594.5;  p0.y := +420.5; p1 := wave.update(p0); test_print;
+    p0.x := +0.000;  p0.y := +420.5; p1 := wave.update(p0); test_print;
+    p0.x := +594.5;  p0.y := +420.5; p1 := wave.update(p0); test_print;
+    p0.x := -594.5;  p0.y := +0.000; p1 := wave.update(p0); test_print;
+    p0.x := +0.000;  p0.y := +0.000; p1 := wave.update(p0); test_print;
+    p0.x := +594.5;  p0.y := +0.000; p1 := wave.update(p0); test_print;
+    p0.x := -594.5;  p0.y := -420.5; p1 := wave.update(p0); test_print;
+    p0.x := +0.000;  p0.y := -420.5; p1 := wave.update(p0); test_print;
+    p0.x := +594.5;  p0.y := -420.5; p1 := wave.update(p0); test_print;
   end;
 end;
 

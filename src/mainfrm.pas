@@ -411,7 +411,7 @@ begin
   begin
     driverthread         := tvpdriverthread.create(paths);
     driverthread.midx    := setting.layout08.x;
-    driverthread.midy    := setting.layout08.y+(heightse.value/2);
+    driverthread.midy    := setting.layout08.y+heightse.value/2;
     driverthread.maxdx   := widthse.value/2;
     driverthread.maxdy   := heightse.value/2;
     driverthread.offsetx := offsetxse.value;
