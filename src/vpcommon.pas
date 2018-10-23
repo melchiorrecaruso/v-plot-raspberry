@@ -31,13 +31,16 @@ uses
 type
   tvpposition = class(tobject)
   private
+    fb: boolean;
     fx: double;
     fy: double;
   public
     constructor create(p: tvppoint);
   published
-    property x: double read fx;
-    property y: double read fy;
+    property b: boolean read fb write fb;
+    property x: double  read fx;
+    property y: double  read fy;
+
   end;
 
   tvppath = class(tobject)
@@ -203,6 +206,7 @@ end;
 constructor tvpposition.create(p: tvppoint);
 begin
   inherited create;
+  fb := true;
   fx := p.x;
   fy := p.y;
 end;

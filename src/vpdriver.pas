@@ -330,6 +330,10 @@ begin
 
     if fcountz < value then
     begin
+      {$ifdef cpuarm}
+      delaymicroseconds(fdelayz);
+      delaymicroseconds(fdelayz);
+      {$endif}
       while fcountz < value do
       begin
         fcountz := min(value, fcountz + motz_inc);
@@ -337,10 +341,12 @@ begin
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
         delaymicroseconds(fdelayz);
         {$endif}
-      end
+      end;
     end else
     begin
       {$ifdef cpuarm}
+      delaymicroseconds(fdelayz);
+      delaymicroseconds(fdelayz);
       {$endif}
       while fcountz > value do
       begin
@@ -351,6 +357,7 @@ begin
         {$endif}
       end;
     end;
+
   end;
 end;
 
@@ -363,14 +370,15 @@ end;
 
 constructor tvpdriverthread.create(paths: tvppaths);
 begin
-  fenabled := true;
-  fmaxdx   := 0;
-  fmaxdy   := 0;
-  fmidx    := 0;
-  fmidy    := 0;
-  foffsetx := 0;
-  foffsety := 0;
-  fpaths   := paths;
+  fenabled  := true;
+  fmaxdx    := 0;
+  fmaxdy    := 0;
+  fmidx     := 0;
+  fmidy     := 0;
+  foffsetx  := 0;
+  foffsety  := 0;
+  fpaths    := paths;
+  fprogress := 0;
 
   freeonterminate := true;
   inherited create(true);
@@ -462,26 +470,39 @@ begin
     path := fpaths.item[i];
     for j := 0 to path.count - 1 do
     begin
+      pos   := path.item[j];
+      p.x   := pos.x + foffsetx;
+      p.y   := pos.y + foffsety;
+      p     := wave.update(p);
+      pos.b := (abs(p.x) <= (fmaxdx)) and
+               (abs(p.y) <= (fmaxdy));
+    end;
+    fprogress := (100*i) div fpaths.count;
+  end;
+
+  fprogress := 0;
+  for i := 0 to fpaths.count - 1 do
+  begin
+    path := fpaths.item[i];
+    for j := 0 to path.count - 1 do
+    begin
       if not terminated then
       begin
         pos := path.item[j];
-        p.x := pos.x + foffsetx;
-        p.y := pos.y + foffsety;
-        p   := wave.update(p);
-
-        if (abs(p.x) <= (fmaxdx)) and
-           (abs(p.y) <= (fmaxdy)) then
+        if pos.b then
         begin
+          p.x := pos.x + foffsetx;
+          p.y := pos.y + foffsety;
+          p   := wave.update(p);
           p.x := p.x + fmidx;
           p.y := p.y + fmidy;
           optimize(p, m0, m1);
           driver.move(m0, m1);
+          if assigned(ontick) then
+            synchronize(ontick);
         end;
-
-        if assigned(ontick) then
-          synchronize(ontick);
-
         while not enabled do sleep(250);
+
       end;
       fprogress := (100*i) div fpaths.count;
     end;

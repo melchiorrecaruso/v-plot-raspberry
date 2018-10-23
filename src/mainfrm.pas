@@ -404,6 +404,8 @@ end;
 
 procedure tmainform.startmiclick(sender: tobject);
 begin
+  driver.enabled := true;
+  driver.zoff    := false;
   if assigned(driverthread) then
   begin
     driverthread.enabled := true;
