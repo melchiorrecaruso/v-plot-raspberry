@@ -45,10 +45,10 @@ type
     fradius:    double;
     fdelaym:    longint;
     fdelayz:    longint;
+    fsrvcount:  longint;
     fsrvdef0:   double;
     fsrvdef1:   double;
     fsrvdir:    longint;
-    fsrvcount:  longint;
     fweight:    double;
  public
     constructor create;
@@ -70,10 +70,10 @@ type
     property radius:    double    read fradius;
     property delaym:    longint   read fdelaym;
     property delayz:    longint   read fdelayz;
+    property srvcount:  longint   read fsrvcount;
     property srvdef0:   double    read fsrvdef0;
     property srvdef1:   double    read fsrvdef1;
     property srvdir:    longint   read fsrvdir;
-    property srvcount:  longint   read fsrvcount;
     property weight:    double    read fweight;
  end;
 
@@ -122,10 +122,10 @@ begin
   fradius     := 0;
   fdelaym     := 0;
   fdelayz     := 0;
+  fsrvcount   := 0;
   fsrvdef0    := 0;
   fsrvdef1    := 0;
   fsrvdir     := 0;
-  fsrvcount   := 0;
   fweight     := 0;
 end;
 

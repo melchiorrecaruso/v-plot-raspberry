@@ -524,20 +524,20 @@
       <Unit66>
         <Filename Value="src/vpdriver.pas"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="9"/>
-        <TopLine Value="302"/>
-        <CursorPos X="41" Y="305"/>
-        <FoldState Value=" T3lG0tW"/>
+        <TopLine Value="142"/>
+        <CursorPos X="17" Y="174"/>
+        <FoldState Value=" T3lF0t="/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit66>
       <Unit67>
         <Filename Value="src/vpsetting.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="26"/>
-        <CursorPos X="32" Y="50"/>
+        <TopLine Value="32"/>
+        <CursorPos X="48" Y="76"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit67>
