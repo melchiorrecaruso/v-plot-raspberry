@@ -45,8 +45,9 @@ type
     fradius:    double;
     fdelaym:    longint;
     fdelayz:    longint;
-    fsrvup:     double;
-    fsrvdown:   double;
+    fsrvdef0:   double;
+    fsrvdef1:   double;
+    fsrvcount:  longint;
     fweight:    double;
  public
     constructor create;
@@ -68,8 +69,9 @@ type
     property radius:    double    read fradius;
     property delaym:    longint   read fdelaym;
     property delayz:    longint   read fdelayz;
-    property srvup:     double    read fsrvup;
-    property srvdown:   double    read fsrvdown;
+    property srvdef0:   double    read fsrvdef0;
+    property srvdef1:   double    read fsrvdef1;
+    property srvcount:  longint   read fsrvcount;
     property weight:    double    read fweight;
  end;
 
@@ -118,8 +120,9 @@ begin
   fradius     := 0;
   fdelaym     := 0;
   fdelayz     := 0;
-  fsrvup      := 0;
-  fsrvdown    := 0;
+  fsrvdef0    := 0;
+  fsrvdef1    := 0;
+  fsrvcount   := 0;
   fweight     := 0;
 end;
 
@@ -165,8 +168,9 @@ begin
     fradius     := ini.readfloat  ('Stepper', 'RADIUS', 0);
     fdelaym     := ini.readinteger('Stepper', 'DELAY',  0);
     fdelayz     := ini.readinteger('Servo',   'DELAY',  0);
-    fsrvup      := ini.readfloat  ('Servo',   'UP',     0);
-    fsrvdown    := ini.readfloat  ('Servo',   'DOWN',   0);
+    fsrvdef0    := ini.readfloat  ('Servo',   'DEF0',   0);
+    fsrvdef1    := ini.readfloat  ('Servo',   'DEF1',   0);
+    fsrvcount   := ini.readinteger('Servo',   'COUNT',  0);
     fweight     := ini.readfloat  ('Machine', 'WEIGHT', 0);
   finally
     ini.destroy;
@@ -191,14 +195,15 @@ begin
     writeln(format('    WAVE::MAXDX  = %12.5f', [fwavemaxdx]));
     writeln(format('    WAVE::MAXDY  = %12.5f', [fwavemaxdy]));
 
-    writeln(format(' STEPPER::MODE   = %12.5u', [fmode   ]));
-    writeln(format(' STEPPER::RATIO  = %12.5f', [fratio  ]));
-    writeln(format(' STEPPER::RADIUS = %12.5f', [fradius ]));
-    writeln(format(' STEPPER::DELAY  = %12.5u', [fdelaym ]));
-    writeln(format('   SERVO::DELAY  = %12.5u', [fdelayz ]));
-    writeln(format('   SERVO::UP     = %12.5f', [fsrvup  ]));
-    writeln(format('   SERVO::DOWN   = %12.5f', [fsrvdown]));
-    writeln(format(' MACHINE::WEIGHT = %12.5f', [fweight]));
+    writeln(format(' STEPPER::MODE   = %12.5u', [fmode    ]));
+    writeln(format(' STEPPER::RATIO  = %12.5f', [fratio   ]));
+    writeln(format(' STEPPER::RADIUS = %12.5f', [fradius  ]));
+    writeln(format(' STEPPER::DELAY  = %12.5u', [fdelaym  ]));
+    writeln(format('   SERVO::DELAY  = %12.5u', [fdelayz  ]));
+    writeln(format('   SERVO::DEF0   = %12.5f', [fsrvdef0 ]));
+    writeln(format('   SERVO::DEF1   = %12.5f', [fsrvdef1 ]));
+    writeln(format('   SERVO::COUNT  = %12.5u', [fsrvcount]));
+    writeln(format(' MACHINE::WEIGHT = %12.5f', [fweight  ]));
   end;
 end;
 

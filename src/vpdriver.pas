@@ -34,16 +34,16 @@ type
   private
     fcount0:  longint;
     fcount1:  longint;
-    fcountz:  double;
     fdelaym:  longint;
     fdelayz:  longint;
     fenabled: boolean;
     fmode:    longint;
+    fpen:     boolean;
     fzoff:    boolean;
     procedure setcount0(value: longint);
     procedure setcount1(value: longint);
-    procedure setcountz(value: double);
     procedure setmode  (value: longint);
+    procedure setpen   (value: boolean);
     procedure setzoff  (value: boolean);
   public
     constructor create;
@@ -53,11 +53,11 @@ type
   published
     property count0:  longint read fcount0  write setcount0;
     property count1:  longint read fcount1  write setcount1;
-    property countz:  double  read fcountz  write setcountz;
     property delaym:  longint read fdelaym  write fdelaym;
     property delayz:  longint read fdelayz  write fdelayz;
     property enabled: boolean read fenabled write fenabled;
     property mode:    longint read fmode    write setmode;
+    property pen:     boolean read fpen     write setpen;
     property zoff:    boolean read fzoff    write setzoff;
   end;
 
@@ -140,18 +140,19 @@ begin
   inherited create;
   fcount0  := 0;
   fcount1  := 0;
-  fcountz  := motz_lo + motz_inc;
   fdelaym  := 1000;
   fdelayz  := 30000;
   fenabled := false;
   fmode    := 0;
+  fpen     := true;
   fzoff    := false;
   {$ifdef cpuarm}
   // setup wiringpi library
   wiringpisetup;
   // setup pca9685 library
-  pca9685setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, motz_freq);
-  pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
+  pca9685setup(PCA9685_PIN_BASE,               PCA9685_ADDRESS, motz_freq);
+  pwmwrite    (PCA9685_PIN_BASE + 0, calcticks(setting.srvdef0, motz_freq));
+  pwmwrite    (PCA9685_PIN_BASE + 1, calcticks(setting.srvdef1, motz_freq));
   // init step mode
   pinmode(motx_mod0, OUTPUT);
   pinmode(motx_mod1, OUTPUT);
@@ -171,7 +172,7 @@ begin
   digitalwrite(mot1_step, LOW);
   {$endif}
   setmode(1);
-  setcountz(motz_lo);
+  setpen(false);
 end;
 
 destructor tvpdriver.destroy;
@@ -309,6 +310,59 @@ begin
   end;
 end;
 
+procedure tvpdriver.setpen(value: boolean);
+var
+  cnt0: double;
+  cnt1: double;
+     i: longint;
+begin
+  if fzoff = true  then exit;
+  if fpen  = value then exit;
+
+  fpen := value;
+  if fpen then
+  begin
+    cnt0 := setting.srvdef0;
+    cnt1 := setting.srvdef1;
+    //writeln('DOWN0 = ', cnt0);
+    //writeln('DOWN1 = ', cnt1);
+    for i := 1 to setting.srvcount do
+    begin
+      cnt0 := cnt0 - motz_inc;
+      cnt1 := cnt1 + motz_inc;
+      {$ifdef cpuarm}
+      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(cnt0, motz_freq));
+      pwmwrite(PCA9685_PIN_BASE + 1, calcticks(cnt1, motz_freq));
+      delaymicroseconds(fdelayz);
+      {$endif}
+      //writeln('DOWN0 -> ', cnt0);
+      //writeln('DOWN1 -> ', cnt1);
+      //readln;
+    end;
+
+  end else
+  begin
+    cnt0 := setting.srvdef0 - setting.srvcount * motz_inc;
+    cnt1 := setting.srvdef1 + setting.srvcount * motz_inc;
+    //writeln('UP0 = ', cnt0);
+    //writeln('UP1 = ', cnt1);
+    for i := 1 to setting.srvcount do
+    begin
+      cnt0 := cnt0 + motz_inc;
+      cnt1 := cnt1 - motz_inc;
+      {$ifdef cpuarm}
+      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(cnt0, motz_freq));
+      pwmwrite(PCA9685_PIN_BASE + 1, calcticks(cnt1, motz_freq));
+      delaymicroseconds(fdelayz);
+      {$endif}
+      //writeln('UP0 -> ', cnt0);
+      //writeln('UP1 -> ', cnt1);
+      //readln;
+    end;
+
+  end;
+end;
+
 procedure tvpdriver.setcount0(value: longint);
 begin
   move(value, fcount1);
@@ -317,48 +371,6 @@ end;
 procedure tvpdriver.setcount1(value: longint);
 begin
   move(fcount0, value);
-end;
-
-procedure tvpdriver.setcountz(value: double);
-begin
-  if fzoff = true    then exit;
-  if value > motz_hi then exit;
-  if value < motz_lo then exit;
-
-  if fcountz <> value then
-  begin
-
-    if fcountz < value then
-    begin
-      {$ifdef cpuarm}
-      delaymicroseconds(fdelayz);
-      delaymicroseconds(fdelayz);
-      {$endif}
-      while fcountz < value do
-      begin
-        fcountz := min(value, fcountz + motz_inc);
-        {$ifdef cpuarm}
-        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
-        delaymicroseconds(fdelayz);
-        {$endif}
-      end;
-    end else
-    begin
-      {$ifdef cpuarm}
-      delaymicroseconds(fdelayz);
-      delaymicroseconds(fdelayz);
-      {$endif}
-      while fcountz > value do
-      begin
-        fcountz := max(value, fcountz - motz_inc);
-        {$ifdef cpuarm}
-        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fcountz , motz_freq));
-        delaymicroseconds(fdelayz);
-        {$endif}
-      end;
-    end;
-
-  end;
 end;
 
 procedure tvpdriver.setzoff(value: boolean);

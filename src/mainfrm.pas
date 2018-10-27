@@ -173,11 +173,11 @@ begin
   setting := tvpsetting.create;
   setting.load(changefileext(paramstr(0), '.ini'));
   // create plotter driver
-  driver        := tvpdriver.create;
-  driver.mode   := setting.mode;
-  driver.delaym := setting.delaym;
-  driver.delayz := setting.delayz;
-  driver.countz := setting.srvup;
+  driver         := tvpdriver.create;
+  driver.mode    := setting.mode;
+  driver.delaym  := setting.delaym;
+  driver.delayz  := setting.delayz;
+  driver.pen     := false;
   // create preview and empty paths
   bitmap := tbitmap.create;
    paths := tvppaths.create;
@@ -242,7 +242,7 @@ begin
   lock2(false);
   driver.enabled := true;
   driver.zoff    := false;
-  driver.countz  := setting.srvup;
+  driver.pen     := false;
   driver.zoff    := true;
 
   if sender = leftupbtn    then driver.count0 := driver.count0 - leftedit .value;
@@ -260,7 +260,7 @@ begin
   lock2(false);
   driver.enabled := true;
   driver.zoff    := false;
-  driver.countz  := setting.srvdown;
+  driver.pen     := true;
   lock2(true);
 end;
 
@@ -269,7 +269,7 @@ begin
   lock2(false);
   driver.enabled := true;
   driver.zoff    := false;
-  driver.countz  := setting.srvup;
+  driver.pen     := false;
   lock2(true);
 end;
 
@@ -281,7 +281,7 @@ begin
   lock2(false);
   driver.enabled := true;
   driver.zoff    := false;
-  driver.countz  := setting.srvup;
+  driver.pen     := false;
   driver.zoff    := true;
 
   optimize(setting.layout09, m0, m1);
@@ -433,7 +433,7 @@ begin
   end;
   driver.enabled := true;
   driver.zoff    := false;
-  driver.countz  := setting.srvup;
+  driver.pen     := false;
 end;
 
 procedure tmainform.killmiclick(sender: tobject);
