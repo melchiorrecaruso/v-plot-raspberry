@@ -47,6 +47,7 @@ type
     fdelayz:    longint;
     fsrvdef0:   double;
     fsrvdef1:   double;
+    fsrvdir:    longint;
     fsrvcount:  longint;
     fweight:    double;
  public
@@ -71,6 +72,7 @@ type
     property delayz:    longint   read fdelayz;
     property srvdef0:   double    read fsrvdef0;
     property srvdef1:   double    read fsrvdef1;
+    property srvdir:    longint   read fsrvdir;
     property srvcount:  longint   read fsrvcount;
     property weight:    double    read fweight;
  end;
@@ -122,6 +124,7 @@ begin
   fdelayz     := 0;
   fsrvdef0    := 0;
   fsrvdef1    := 0;
+  fsrvdir     := 0;
   fsrvcount   := 0;
   fweight     := 0;
 end;
@@ -170,6 +173,7 @@ begin
     fdelayz     := ini.readinteger('Servo',   'DELAY',  0);
     fsrvdef0    := ini.readfloat  ('Servo',   'DEF0',   0);
     fsrvdef1    := ini.readfloat  ('Servo',   'DEF1',   0);
+    fsrvdir     := ini.readinteger('Servo',   'DIR',    0);
     fsrvcount   := ini.readinteger('Servo',   'COUNT',  0);
     fweight     := ini.readfloat  ('Machine', 'WEIGHT', 0);
   finally
@@ -202,6 +206,7 @@ begin
     writeln(format('   SERVO::DELAY  = %12.5u', [fdelayz  ]));
     writeln(format('   SERVO::DEF0   = %12.5f', [fsrvdef0 ]));
     writeln(format('   SERVO::DEF1   = %12.5f', [fsrvdef1 ]));
+    writeln(format('   SERVO::DIR    = %12.5u', [fsrvdir  ]));
     writeln(format('   SERVO::COUNT  = %12.5u', [fsrvcount]));
     writeln(format(' MACHINE::WEIGHT = %12.5f', [fweight  ]));
   end;

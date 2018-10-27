@@ -268,10 +268,7 @@ begin
 
     dm0 := abs(dm0);
     dm1 := abs(dm1);
-    if max(dm0, dm1) <= 10 then
-      setcountz(setting.srvdown)
-    else
-      setcountz(setting.srvup);
+    setpen(max(dm0, dm1) <= 10);
 
     while (dm0 > 0) or (dm1 > 0) do
     begin
@@ -315,17 +312,24 @@ var
   cnt0: double;
   cnt1: double;
      i: longint;
+
+ function clockwise(value: boolean): boolean;
+ begin
+   if setting.srvdir = 0 then
+     result := value
+   else
+     result := not value;
+ end;
+
 begin
   if fzoff = true  then exit;
   if fpen  = value then exit;
 
   fpen := value;
-  if fpen then
+  if clockwise(fpen) then
   begin
     cnt0 := setting.srvdef0;
     cnt1 := setting.srvdef1;
-    //writeln('DOWN0 = ', cnt0);
-    //writeln('DOWN1 = ', cnt1);
     for i := 1 to setting.srvcount do
     begin
       cnt0 := cnt0 - motz_inc;
@@ -335,17 +339,12 @@ begin
       pwmwrite(PCA9685_PIN_BASE + 1, calcticks(cnt1, motz_freq));
       delaymicroseconds(fdelayz);
       {$endif}
-      //writeln('DOWN0 -> ', cnt0);
-      //writeln('DOWN1 -> ', cnt1);
-      //readln;
     end;
 
   end else
   begin
     cnt0 := setting.srvdef0 - setting.srvcount * motz_inc;
     cnt1 := setting.srvdef1 + setting.srvcount * motz_inc;
-    //writeln('UP0 = ', cnt0);
-    //writeln('UP1 = ', cnt1);
     for i := 1 to setting.srvcount do
     begin
       cnt0 := cnt0 + motz_inc;
@@ -355,9 +354,6 @@ begin
       pwmwrite(PCA9685_PIN_BASE + 1, calcticks(cnt1, motz_freq));
       delaymicroseconds(fdelayz);
       {$endif}
-      //writeln('UP0 -> ', cnt0);
-      //writeln('UP1 -> ', cnt1);
-      //readln;
     end;
 
   end;
