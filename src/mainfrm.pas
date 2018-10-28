@@ -75,8 +75,11 @@ type
     procedure formclose(sender: tobject; var closeaction: tcloseaction);
     procedure formatcbchange(sender: tobject);
 
+
     procedure leftupbtnclick(sender: tobject);
     procedure leftdownbtnclick(sender: tobject);
+    procedure leftediteditingdone(sender: tobject);
+    procedure rightediteditingdone(sender: tobject);
     procedure rightupbtnclick(sender: tobject);
     procedure rightdownbtnclick(sender: tobject);
     procedure penupbtnclick(sender: tobject);
@@ -227,6 +230,16 @@ end;
 procedure tmainform.leftdownbtnclick(sender: tobject);
 begin
   leftupbtnclick(leftdownbtn);
+end;
+
+procedure tmainform.leftediteditingdone(sender: tobject);
+begin
+  rightedit.text := leftedit.text;
+end;
+
+procedure tmainform.rightediteditingdone(sender: tobject);
+begin
+  leftedit.text:= rightedit.text;
 end;
 
 procedure tmainform.rightupbtnclick(sender: tobject);
