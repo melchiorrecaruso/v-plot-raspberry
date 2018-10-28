@@ -40,6 +40,9 @@ implementation
 uses
   math, sysutils, vpwave;
 
+const
+  min_len = 0.15/2;
+
 // toolpath routines
 
 function interpolate_line(const p0, p1: tvppoint): tvppath;
@@ -48,7 +51,7 @@ var
   i, len: longint;
        p: tvppoint;
 begin
-  len := max(1, round(distance_between_two_points(p0, p1) / 0.15));
+  len := max(1, round(distance_between_two_points(p0, p1) / min_len));
    dx := (p1.x - p0.x) / len;
    dy := (p1.y - p0.y) / len;
 
@@ -77,7 +80,7 @@ begin
   start.y := +0.0;
   sweep   := 2 * pi;
 
-  len := max(1, round(abs(sweep) * entity.radius / 0.15));
+  len := max(1, round(abs(sweep) * entity.radius / min_len));
 
   result := tvppath.create;
   for i := 0 to len do
@@ -104,7 +107,7 @@ begin
   start   := rotate_point(start, degtorad(entity.startangle));
   sweep   := degtorad(entity.endangle - entity.startangle);
 
-  len := max(1, round(abs(sweep) * entity.radius / 0.15));
+  len := max(1, round(abs(sweep) * entity.radius / min_len));
 
   result := tvppath.create;
   for i := 0 to len do
@@ -140,7 +143,7 @@ begin
         p1.x := t2dsegment(segment).x;
         p1.y := t2dsegment(segment).y;
 
-        len := max(1, round(distance_between_two_points(p0, p1) / 0.15));
+        len := max(1, round(distance_between_two_points(p0, p1) / min_len));
         dx := (p1.x - p0.x) / len;
         dy := (p1.y - p0.y) / len;
 
