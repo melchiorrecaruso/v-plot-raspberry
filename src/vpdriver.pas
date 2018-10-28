@@ -150,7 +150,7 @@ begin
   // setup wiringpi library
   wiringpisetup;
   // setup pca9685 library
-  pca9685setup(PCA9685_PIN_BASE,               PCA9685_ADDRESS, motz_freq);
+  pca9685setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, motz_freq);
   // init step mode
   pinmode(motx_mod0, OUTPUT);
   pinmode(motx_mod1, OUTPUT);
@@ -170,7 +170,6 @@ begin
   digitalwrite(mot1_step, LOW);
   {$endif}
   setmode(1);
-  setpen(true);
   setpen(false);
 end;
 
@@ -339,7 +338,6 @@ begin
       delaymicroseconds(fdelayz);
       {$endif}
     end;
-
   end else
   begin
     cnt0 := setting.srvdef0 - setting.srvcount * motz_inc;
@@ -354,8 +352,8 @@ begin
       delaymicroseconds(fdelayz);
       {$endif}
     end;
-
   end;
+
 end;
 
 procedure tvpdriver.setcount0(value: longint);
