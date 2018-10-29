@@ -140,10 +140,10 @@ begin
   inherited create;
   fcount0  := 0;
   fcount1  := 0;
-  fdelaym  := 1000;
-  fdelayz  := 30000;
+  fdelaym  := setting.delaym;
+  fdelayz  := setting.delayz;
   fenabled := false;
-  fmode    := 0;
+  fmode    := setting.mode;
   fpen     := true;
   fzoff    := false;
   {$ifdef cpuarm}
@@ -275,6 +275,7 @@ begin
 
       for i := 0 to 18 do
       begin
+
         if (vplotmatrix[ddm0, i] = 1) then
         begin
           digitalwrite(mot0_step, HIGH);
@@ -290,6 +291,7 @@ begin
           digitalwrite(mot1_step,  LOW);
           delaymicroseconds(fdelaym);
         end;
+
       end;
       dec(dm0, ddm0);
       dec(dm1, ddm1);
@@ -324,6 +326,10 @@ begin
   if fpen  = value then exit;
 
   fpen := value;
+  {$ifdef cpuarm}
+  if fpen then
+    delaymicroseconds(setting.srvcount*fdelayz);
+  {$endif}
   if clockwise(fpen) then
   begin
     cnt0 := setting.srvdef0;
