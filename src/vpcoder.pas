@@ -32,6 +32,8 @@ uses
   function interpolate_circle(const entity: tvcircle ): tvppath;
   function interpolate_circlearc(const entity: tvcirculararc): tvppath;
   function interpolate_path(const entity: tpath): tvppath;
+  function interpolate_text(const entity: tvtext): tvppath;
+
 
   procedure vec2paths(vec: tvvectorialdocument; paths: tvppaths);
 
@@ -48,7 +50,7 @@ var
   i, len: longint;
        p: tvppoint;
 begin
-  len := max(1, round(distance_between_two_points(p0, p1) / (1.2/setting.mode)));
+  len := max(1, round(distance_between_two_points(p0, p1)/(1.2/setting.mode)));
    dx := (p1.x - p0.x) / len;
    dy := (p1.y - p0.y) / len;
 
@@ -77,7 +79,7 @@ begin
   start.y := +0.0;
   sweep   := 2 * pi;
 
-  len := max(1, round(abs(sweep) * entity.radius / (1.2/setting.mode)));
+  len := max(1, round(abs(sweep) * entity.radius/(1.2/setting.mode)));
 
   result := tvppath.create;
   for i := 0 to len do
@@ -104,7 +106,7 @@ begin
   start   := rotate_point(start, degtorad(entity.startangle));
   sweep   := degtorad(entity.endangle - entity.startangle);
 
-  len := max(1, round(abs(sweep) * entity.radius / (1.2/setting.mode)));
+  len := max(1, round(abs(sweep)*entity.radius/(1.2/setting.mode)));
 
   result := tvppath.create;
   for i := 0 to len do
@@ -140,7 +142,7 @@ begin
         p1.x := t2dsegment(segment).x;
         p1.y := t2dsegment(segment).y;
 
-        len := max(1, round(distance_between_two_points(p0, p1) / (1.2/setting.mode)));
+        len := max(1, round(distance_between_two_points(p0, p1)/(1.2/setting.mode)));
         dx := (p1.x - p0.x) / len;
         dy := (p1.y - p0.y) / len;
 
@@ -157,6 +159,11 @@ begin
         writeln(segment.segmenttype);
     end;
   end;
+end;
+
+function interpolate_text(const entity: tvtext): tvppath;
+begin
+  result := tvppath.create;
 end;
 
 procedure vec2paths(vec: tvvectorialdocument; paths: tvppaths);
@@ -185,10 +192,15 @@ begin
       begin
         path := interpolate_path(tpath(entity))
       end else
+      if entity is tvtext then
+      begin
+        path := interpolate_text(tvtext(entity))
+      end else
       begin
         if enabledebug then
           writeln(entity.classname);
       end;
+
       if assigned(path) then
         paths.add(path);
     end;

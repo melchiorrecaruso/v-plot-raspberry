@@ -140,8 +140,8 @@ begin
   inherited create;
   fcount0  := 0;
   fcount1  := 0;
-  fdelaym  := setting.delaym;
-  fdelayz  := setting.delayz;
+  fdelaym  := trunc(setting.delaym/setting.mode);
+  fdelayz  :=       setting.delayz;
   fenabled := false;
   fmode    := setting.mode;
   fpen     := true;

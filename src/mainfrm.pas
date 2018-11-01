@@ -178,8 +178,8 @@ begin
   // create plotter driver
   driver         := tvpdriver.create;
   driver.mode    := setting.mode;
-  driver.delaym  := setting.delaym;
-  driver.delayz  := setting.delayz;
+  driver.delaym  := trunc(setting.delaym/setting.mode);
+  driver.delayz  :=       setting.delayz;
   driver.pen     := false;
   // create preview and empty paths
   bitmap := tbitmap.create;
@@ -348,7 +348,7 @@ procedure tmainform.openbtnclick(sender: tobject);
 var
   vec: tvvectorialdocument;
 begin
-  opendialog.filter := 'dxf files (*.dxf)|*.dxf';
+  //opendialog.filter := 'dxf files (*.dxf)|*.dxf';
   if opendialog.execute then
   begin
     lock2(false);
