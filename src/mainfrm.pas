@@ -27,7 +27,7 @@ interface
 
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls, comctrls,
-  buttons, menus, spin, vpcommon, vpcoder, vpsetting, vpdriver, fpvectorial;
+  buttons, menus, spin, vppaths, vpsetting, vpdriver, fpvectorial;
 
 type
   { tmainform }

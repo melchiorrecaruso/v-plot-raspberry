@@ -27,7 +27,7 @@ interface
 
 uses
   classes, {$ifdef cpuarm} pca9685, wiringpi, {$endif} sysutils,
-  vpcommon, vpmath, vpsetting, vpwave;
+  vppaths, vpmath, vpsetting, vpwave;
 
 type
   tvpdriver = class
@@ -417,14 +417,14 @@ begin
   c2  := circle_by_center_and_radius(p, l0);
   if intersection_of_two_circles(c0, c2, s00, sxx) = 0 then
     raise exception.create('intersection_of_two_circles [c0c2]');
-  l0  := l0 + get_line_angle(line_by_two_points(s00, t00))*setting.radius;
+  l0  := l0 + get_angle(line_by_two_points(s00, t00))*setting.radius;
   //find tangent point t01
   l1  := sqrt(sqr(distance_between_two_points(t01, p))-sqr(setting.radius));
   c1  := circle_by_center_and_radius(t01, setting.radius);
   c2  := circle_by_center_and_radius(p, l1);
   if intersection_of_two_circles(c1, c2, s01, sxx) = 0 then
     raise exception.create('intersection_of_two_circles [c1c2]');
-  l1  := l1 + (pi-get_line_angle(line_by_two_points(s01, t01)))*setting.radius;
+  l1  := l1 + (pi-get_angle(line_by_two_points(s01, t01)))*setting.radius;
   // calculate steps
   m0 := round(setting.mode*(l0/setting.ratio));
   m1 := round(setting.mode*(l1/setting.ratio));
@@ -513,7 +513,6 @@ begin
             synchronize(ontick);
         end;
         while not enabled do sleep(250);
-
       end;
       fprogress := (100*i) div fpaths.count;
     end;

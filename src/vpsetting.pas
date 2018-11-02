@@ -1,5 +1,5 @@
 {
-  Description: vPlot layout.
+  Description: vPlot setting class.
 
   Copyright (C) 2017-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
@@ -26,7 +26,7 @@ unit vpsetting;
 interface
 
 uses
-  vpcommon, vpmath, vpwave;
+  vpmath, vpwave;
 
 type
   tvpsetting = class
@@ -211,6 +211,8 @@ begin
     writeln(format(' MACHINE::WEIGHT = %12.5f', [fweight  ]));
   end;
 end;
+
+
 
 end.
 

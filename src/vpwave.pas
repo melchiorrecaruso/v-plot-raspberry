@@ -1,4 +1,3 @@
-
 {
   Description: vPlot wave class.
 
@@ -27,7 +26,7 @@ unit vpwave;
 interface
 
 uses
-  classes, sysutils, vpcommon, vpmath;
+  classes, sysutils, vpmath;
 
 type
   tdegres = 0..10;
@@ -55,7 +54,6 @@ type
   end;
 
   function polyeval(const apoly: tpolynome; x: double): double;
-
 
 var
   wave: twave = nil;

@@ -1,5 +1,5 @@
 {
-  Description: vPlot common unit.
+  Description: vPlot math unit.
 
   Copyright (C) 2017-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
@@ -26,7 +26,7 @@ unit vpmath;
 interface
 
 uses
-  classes, sysutils;
+  classes, sysutils, math;
 
 type
   tvppoint = packed record
@@ -49,7 +49,6 @@ type
   end;
   pvpcircle = ^tvpcircle;
 
-
 function translate_point(const p, cc: tvppoint): tvppoint;
 function line_by_two_points(const p0, p1: tvppoint): tvpline;
 function rotate_point(const p: tvppoint; const alpha: double): tvppoint;
@@ -57,16 +56,14 @@ function distance_between_two_points(const p0, p1: tvppoint): double;
 function intersection_of_two_lines(const l0, l1: tvpline): tvppoint;
 function circle_by_three_points(const p0, p1, p2: tvppoint): tvpcircle;
 function circle_by_center_and_radius(const cc: tvppoint; radius: double): tvpcircle;
-
 function intersection_of_two_circles(const c0, c1: tvpcircle; var p1, p2: tvppoint): longint;
 
-function get_line_angle(const line: tvpline): double;
+function get_angle(const line: tvpline): double;
 
+var
+  enabledebug: boolean = false;
 
 implementation
-
-uses
-  math;
 
 function translate_point(const p, cc: tvppoint): tvppoint;
 begin
@@ -173,7 +170,7 @@ begin
       result := 0;
 end;
 
-function get_line_angle(const line: tvpline): double;
+function get_angle(const line: tvpline): double;
 begin
   if line.b = 0 then
   begin
@@ -184,6 +181,33 @@ begin
   end else
     result := arctan2(line.a, -line.b);
 end;
+
+// init unit
+
+procedure initializedebug;
+begin
+  if paramcount = 1 then
+  begin
+    enabledebug := (paramstr(1) =  '-debug') or
+                   (paramstr(1) = '--debug');
+    if enabledebug then
+      writeln('VPLOTTER::START-DEBUGGER');
+  end;
+end;
+
+procedure finalizedebug;
+begin
+  if enabledebug then
+    writeln('VPLOTTER::END-DEBUGGER');
+end;
+
+initialization
+
+  initializedebug;
+
+finalization
+
+  finalizedebug;
 
 end.
 

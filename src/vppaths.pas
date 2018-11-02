@@ -1,5 +1,5 @@
 {
-  Description: vPlot common unit.
+  Description: vPlot paths class.
 
   Copyright (C) 2017-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
@@ -19,14 +19,14 @@
   MA 02111-1307, USA.
 }
 
-unit vpcommon;
+unit vppaths;
 
 {$mode objfpc}
 
 interface
 
 uses
-  classes, sysutils, vpmath;
+  classes, fpvectorial, vpmath, vpsetting;
 
 type
   tvpposition = class(tobject)
@@ -40,7 +40,6 @@ type
     property b: boolean read fb write fb;
     property x: double  read fx;
     property y: double  read fy;
-
   end;
 
   tvppath = class(tobject)
@@ -67,8 +66,6 @@ type
   tvppaths = class(tobject)
   private
     flist:   tlist;
-    fheight: double;
-    fwidth:  double;
     function getcount:  longint;
     function get(index: longint): tvppath;
   public
@@ -80,29 +77,147 @@ type
     procedure   createtoolpath;
     procedure   zerocenter;
   public
-    property height:               double  read fheight;
-    property width:                double  read fwidth;
-    property count:                longint read getcount;
     property item[index: longint]: tvppath read get;
+    property count: longint read getcount;
   end;
 
-var
-  enabledebug: boolean = false;
+  procedure vec2paths(vec: tvvectorialdocument; paths: tvppaths);
 
 implementation
 
 uses
-  math;
+  math, sysutils;
 
 const
   smallest = 0.05;
+
+// internal toolpath routines
+
+function interpolate_line(const p0, p1: tvppoint): tvppath;
+var
+  dx, dy: double;
+  i, len: longint;
+       p: tvppoint;
+begin
+  len := max(1, round(distance_between_two_points(p0, p1)/(1.2/setting.mode)));
+   dx := (p1.x - p0.x) / len;
+   dy := (p1.y - p0.y) / len;
+
+  result := tvppath.create;
+  for i := 0 to len do
+  begin
+    p.x := i * dx;
+    p.y := i * dy;
+    p   := translate_point(p0, p);
+    result.add(p);
+  end;
+end;
+
+function interpolate_circle(const entity: tvcircle): tvppath;
+var
+      i: longint;
+    len: longint;
+     cc: tvppoint;
+      p: tvppoint;
+  start: tvppoint;
+  sweep: double;
+begin
+  cc.x    := entity.x;
+  cc.y    := entity.y;
+  start.x := entity.radius;
+  start.y := +0.0;
+  sweep   := 2 * pi;
+
+  len := max(1, round(abs(sweep) * entity.radius/(1.2/setting.mode)));
+
+  result := tvppath.create;
+  for i := 0 to len do
+  begin
+    p := rotate_point(start, (i * (sweep / len)));
+    p := translate_point(cc, p);
+    result.insert(0, p);
+  end;
+end;
+
+function interpolate_circlearc(const entity: tvcirculararc): tvppath;
+var
+      i: longint;
+    len: longint;
+     cc: tvppoint;
+      p: tvppoint;
+  start: tvppoint;
+  sweep: double;
+begin
+  cc.x    := entity.x;
+  cc.y    := entity.y;
+  start.x := entity.radius;
+  start.y := +0.0;
+  start   := rotate_point(start, degtorad(entity.startangle));
+  sweep   := degtorad(entity.endangle - entity.startangle);
+
+  len := max(1, round(abs(sweep)*entity.radius/(1.2/setting.mode)));
+
+  result := tvppath.create;
+  for i := 0 to len do
+  begin
+    p := rotate_point(start, (i * (sweep / len)));
+    p := translate_point(cc, p);
+    result.insert(0, p);
+  end;
+end;
+
+function interpolate_path(const entity: tpath): tvppath;
+var
+   dx, dy: double;
+     i, j: longint;
+      len: longint;
+        p: tvppoint;
+   p0, p1: tvppoint;
+  segment: tpathsegment;
+begin
+  result := tvppath.create;
+  entity.prepareforsequentialreading;
+  for i := 0 to entity.len - 1 do
+  begin
+    segment := tpathsegment(entity.next);
+    case segment.segmenttype of
+      stmoveto:
+      begin
+        p0.x := t2dsegment(segment).x;
+        p0.y := t2dsegment(segment).y;
+      end;
+      st2dlinewithpen, st2dline, st3dline:
+      begin
+        p1.x := t2dsegment(segment).x;
+        p1.y := t2dsegment(segment).y;
+
+        len := max(1, round(distance_between_two_points(p0, p1)/(1.2/setting.mode)));
+        dx := (p1.x - p0.x) / len;
+        dy := (p1.y - p0.y) / len;
+
+        for j := 0 to len do
+        begin
+          p.x := j * dx;
+          p.y := j * dy;
+          p   := translate_point(p0, p);
+          result.add(p);
+        end;
+        p0 := p1;
+      end;
+      else
+        writeln(segment.segmenttype);
+    end;
+  end;
+end;
+
+// internal commont routines
 
 function distance_between_two_position(p0, p1: tvpposition): double;
 begin
   result := sqrt(sqr(p1.x - p0.x) + sqr(p1.y - p0.y));
 end;
 
-function compareposition(pos0, pos1: tvpposition): boolean;
+function compare_position(pos0, pos1: tvpposition): boolean;
 begin
   result := abs(pos1.x - pos0.x) < smallest;
   if result then
@@ -111,23 +226,23 @@ begin
   end;
 end;
 
-function comparepath(path0, path1: pointer): longint;
+function compare_path(path0, path1: pointer): longint;
 begin
   result := round(tvppath(path1).getlen - tvppath(path0).getlen);
 end;
 
-function walkback(pos0: tvpposition; list: tlist): longint;
+function walk_back(pos0: tvpposition; list: tlist): longint;
 var
   i: longint;
 begin
   result := -1;
   for i := 0 to list.count - 1 do
-    if compareposition(pos0, tvppath(list[i]).getlast) then
+    if compare_position(pos0, tvppath(list[i]).getlast) then
     begin
       result := i;
       exit;
     end else
-    if compareposition(pos0, tvppath(list[i]).getfirst) then
+    if compare_position(pos0, tvppath(list[i]).getfirst) then
     begin
       tvppath(list[i]).invert;
       result := i;
@@ -135,18 +250,18 @@ begin
     end;
 end;
 
-function walknext(pos0: tvpposition; list: tlist): longint;
+function walk_next(pos0: tvpposition; list: tlist): longint;
 var
   i: longint;
 begin
   result := -1;
   for i := 0 to list.count - 1 do
-    if compareposition(pos0, tvppath(list[i]).getfirst) then
+    if compare_position(pos0, tvppath(list[i]).getfirst) then
     begin
       result := i;
       exit;
     end else
-    if compareposition(pos0, tvppath(list[i]).getlast) then
+    if compare_position(pos0, tvppath(list[i]).getlast) then
     begin
       tvppath(list[i]).invert;
       result := i;
@@ -154,7 +269,7 @@ begin
     end;
 end;
 
-function walknear(path: tvppath; list: tlist): longint;
+function walk_near(path: tvppath; list: tlist): longint;
 var
      i: longint;
   curr: double;
@@ -192,12 +307,12 @@ begin
   end;
 end;
 
-function isclosed(path: tvppath): boolean;
+function is_closed(path: tvppath): boolean;
 begin
   result := false;
   if path.count > 1 then
   begin
-    result := compareposition(path.getfirst, path.getlast);
+    result := compare_position(path.getfirst, path.getlast);
   end;
 end;
 
@@ -303,9 +418,7 @@ end;
 constructor tvppaths.create;
 begin
   inherited create;
-  flist   := tlist.create;
-  fheight := 0;
-  fwidth  := 0;
+  flist := tlist.create;
 end;
 
 destructor tvppaths.destroy;
@@ -327,29 +440,8 @@ begin
 end;
 
 procedure tvppaths.add(path: tvppath);
-//var
-//  i: longint;
-//  j: longint;
-//  k: longint;
 begin
-// DELETE OVERLAP POINT
-//for i := path.count - 1 downto 0 do
-//  for j := flist.count - 1 downto 0 do
-//  begin
-//    k := tvppath(flist[j]).find(path.item[i]);
-//    if k <> - 1 then
-//    begin
-//      path.delete(i);
-//      break;
-//    end;
-//  end;
-//if path.getlen = 0 then
-//begin
-//  path.destroy;
-//  path := nil;
-
-  if assigned(path) then
-    flist.add(path)
+  flist.add(path)
 end;
 
 procedure tvppaths.zerocenter;
@@ -393,8 +485,6 @@ begin
       pos.fy := pos.fy + offsety;
     end;
   end;
-  fheight := ymax - ymin;
-  fwidth  := xmax - xmin;
 end;
 
 procedure tvppaths.createtoolpath;
@@ -415,14 +505,14 @@ begin
   path := nil;
   while list1.count > 0 do
   begin
-    index := walknear(path, list1);
+    index := walk_near(path, list1);
     path  := tvppath(list1[index]);
     list1.delete(index);
     list2.add(path);
-    if not isclosed(tvppath(flist[i])) then
+    if not is_closed(tvppath(flist[i])) then
     begin
       repeat
-        index := walkback(path.getfirst, list1);
+        index := walk_back(path.getfirst, list1);
         if index <> -1 then
         begin
           path := tvppath(list1[index]);
@@ -433,7 +523,7 @@ begin
 
       path := tvppath(list2.last);
       repeat
-        index := walknext(path.getlast, list1);
+        index := walk_next(path.getlast, list1);
         if index <> -1 then
         begin
           path := tvppath(list1[index]);
@@ -466,31 +556,46 @@ begin
   result := tvppath(flist[index]);
 end;
 
-// init unit
-procedure initializedebug;
+// vectorial2paths
+
+procedure vec2paths(vec: tvvectorialdocument; paths: tvppaths);
+var
+    i, j: longint;
+  entity: tventity;
+    page: tvpage;
+    path: tvppath;
 begin
-  if paramcount = 1 then
+  for i := 0 to vec.getpagecount - 1 do
   begin
-    enabledebug := (paramstr(1) =  '-debug') or
-                   (paramstr(1) = '--debug');
-    if enabledebug then
-      writeln('VPLOTTER::START-DEBUGGER');
+    page := vec.getpageasvectorial(i);
+    for j := 0 to page.getentitiescount - 1 do
+    begin
+      path   := nil;
+      entity := page.getentity(j);
+      if entity is tvcircle then
+      begin
+        path := interpolate_circle(tvcircle(entity));
+      end else
+      if entity is tvcirculararc then
+      begin
+        path := interpolate_circlearc(tvcirculararc(entity));
+      end else
+      if entity is tpath then
+      begin
+        path := interpolate_path(tpath(entity));
+      end else
+      begin
+        if enabledebug then
+          writeln(entity.classname);
+      end;
+
+      if assigned(path) then
+        paths.add(path);
+    end;
   end;
+  paths.createtoolpath;
+  paths.zerocenter;
 end;
-
-procedure finalizedebug;
-begin
-  if enabledebug then
-    writeln('VPLOTTER::END-DEBUGGER');
-end;
-
-initialization
-
-  initializedebug;
-
-finalization
-
-  finalizedebug;
 
 end.
 
