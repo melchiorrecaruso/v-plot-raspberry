@@ -77,10 +77,8 @@ type
     property weight:    double    read fweight;
  end;
 
-
 var
   setting: tvpsetting = nil;
-
 
 implementation
 
@@ -211,8 +209,6 @@ begin
     writeln(format(' MACHINE::WEIGHT = %12.5f', [fweight  ]));
   end;
 end;
-
-
 
 end.
 

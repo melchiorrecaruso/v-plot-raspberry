@@ -1,4 +1,5 @@
-(* Pascal wrapper unit for Gordon Henderson wiringPi library.
+(*
+ * Pascal wrapper unit for Gordon Henderson wiringPi library.
  * The source can be found at https://http://wiringpi.com
  *
  * wiringpi.pas: version 0.1 by Melchiorre Caruso

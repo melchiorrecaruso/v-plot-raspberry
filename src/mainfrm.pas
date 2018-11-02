@@ -70,36 +70,33 @@ type
     widthl: tlabel;
     widthse: tspinedit;
 
-    procedure formcreate(sender: tobject);
-    procedure formdestroy(sender: tobject);
-    procedure formclose(sender: tobject; var closeaction: tcloseaction);
+    procedure formcreate    (sender: tobject);
+    procedure formdestroy   (sender: tobject);
+    procedure formclose     (sender: tobject; var closeaction: tcloseaction);
     procedure formatcbchange(sender: tobject);
 
-
-    procedure leftupbtnclick(sender: tobject);
-    procedure leftdownbtnclick(sender: tobject);
-    procedure leftediteditingdone(sender: tobject);
+    procedure leftupbtnclick      (sender: tobject);
+    procedure leftdownbtnclick    (sender: tobject);
+    procedure leftediteditingdone (sender: tobject);
     procedure rightediteditingdone(sender: tobject);
-    procedure rightupbtnclick(sender: tobject);
-    procedure rightdownbtnclick(sender: tobject);
-    procedure penupbtnclick(sender: tobject);
-    procedure pendownbtnclick(sender: tobject);
-    procedure gohomebtnclick(sender: tobject);
+    procedure rightupbtnclick     (sender: tobject);
+    procedure rightdownbtnclick   (sender: tobject);
+    procedure penupbtnclick       (sender: tobject);
+    procedure pendownbtnclick     (sender: tobject);
+    procedure gohomebtnclick      (sender: tobject);
 
-    procedure heightseeditingdone(sender: tobject);
-    procedure widthseeditingdone(sender: tobject);
+    procedure heightseeditingdone  (sender: tobject);
+    procedure widthseeditingdone   (sender: tobject);
     procedure verticalcbeditingdone(sender: tobject);
 
-    procedure openbtnclick(sender: tobject);
-    procedure reloadmiclick(sender: tobject);
-    procedure clearmiclick(sender: tobject);
-
-    procedure startmiclick(sender: tobject);
-    procedure stopmiclick(sender: tobject);
-    procedure killmiclick(sender: tobject);
-
-    procedure layoutmiclick(sender: tobject);
-    procedure aboutmiclick(sender: tobject);
+    procedure openbtnclick         (sender: tobject);
+    procedure reloadmiclick        (sender: tobject);
+    procedure clearmiclick         (sender: tobject);
+    procedure startmiclick         (sender: tobject);
+    procedure stopmiclick          (sender: tobject);
+    procedure killmiclick          (sender: tobject);
+    procedure layoutmiclick        (sender: tobject);
+    procedure aboutmiclick         (sender: tobject);
 
     procedure imagemouseup  (sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
     procedure imagemousedown(sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
@@ -111,9 +108,6 @@ type
  mouseisdown: boolean;
           px: longint;
           py: longint;
-
-    procedure onloadstart;
-    procedure onloadend;
     // ---
     procedure onplotterstart;
     procedure onplotterstop;
@@ -123,20 +117,8 @@ type
     procedure lock2(value: boolean);
   end;
 
-  tloader = class(tthread)
-  private
-    fonloadstart: tthreadmethod;
-    fonloadend:   tthreadmethod;
-  protected
-    procedure execute; override;
-  public
-    constructor create;
-    destructor destroy; override;
-  end;
-
 var
   mainform: tmainform;
-  loader:   tloader;
 
 implementation
 
@@ -144,25 +126,6 @@ implementation
 
 uses
   math, sysutils, dxfvectorialreader, aboutfrm, vpmath, vpwave;
-
-// LOADER THREAD
-
-constructor tloader.create;
-begin
-  freeonterminate := true;
-  inherited create(true);
-end;
-
-destructor tloader.destroy;
-begin
-  inherited destroy;
-end;
-
-procedure tloader.execute;
-begin
-  synchronize(fonloadstart);
-  synchronize(fonloadend);
-end;
 
 // FORM EVENTS
 
@@ -363,18 +326,31 @@ begin
     except
     end;
     freeandnil(vec);
-    // ---
-    lock2(true);
     reloadmiclick(nil);
   end;
 end;
 
 procedure tmainform.reloadmiclick(sender: tobject);
+var
+  i, j: longint;
+  path: tvppath;
+   pos: tvpposition;
 begin
-  loader              := tloader.create;
-  loader.fonloadstart := @onloadstart;
-  loader.fonloadend   := @onloadend;
-  loader.start;
+  lock2(false);
+  // updtare preview ...
+  for i := 0 to paths.count - 1 do
+  begin
+    path := paths.item[i];
+    for j := 0 to path.count - 1 do
+    begin
+      pos := path.item[j];
+      bitmap.canvas.pixels[
+        trunc(( widthse.value div 2) + pos.x + offsetxse.value + 1),
+        trunc((heightse.value div 2) - pos.y - offsetyse.value + 1)] := clblack;
+    end;
+  end;
+  image.canvas.draw(0, 0, bitmap);
+  lock2(true);
 end;
 
 procedure tmainform.clearmiclick(sender: tobject);
@@ -619,34 +595,7 @@ begin
   application  .processmessages;
 end;
 
-// LOADER/PLOTTER THREAD EVENTS
-
-procedure tmainform.onloadstart;
-begin
-  lock2(false);
-end;
-
-procedure tmainform.onloadend;
-var
-  i, j: longint;
-  path: tvppath;
-   pos: tvpposition;
-begin
-  // updtare preview ...
-  for i := 0 to paths.count - 1 do
-  begin
-    path := paths.item[i];
-    for j := 0 to path.count - 1 do
-    begin
-      pos := path.item[j];
-      bitmap.canvas.pixels[
-        trunc(( widthse.value div 2) + pos.x + offsetxse.value + 1),
-        trunc((heightse.value div 2) - pos.y - offsetyse.value + 1)] := clblack;
-    end;
-  end;
-  image.canvas.draw(0, 0, bitmap);
-  lock2(true);
-end;
+// PLOTTER THREAD EVENTS
 
 procedure tmainform.onplotterstart;
 begin
