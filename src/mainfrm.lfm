@@ -1,11 +1,11 @@
 object mainform: Tmainform
-  Left = 290
-  Height = 566
-  Top = 119
+  Left = 309
+  Height = 565
+  Top = 158
   Width = 921
   Anchors = []
   Caption = 'vPlotter'
-  ClientHeight = 566
+  ClientHeight = 565
   ClientWidth = 921
   Color = clForm
   OnClose = FormClose
@@ -21,12 +21,12 @@ object mainform: Tmainform
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 302
-    Height = 566
+    Height = 565
     Top = 0
     Width = 619
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelOuter = bvNone
-    ClientHeight = 566
+    ClientHeight = 565
     ClientWidth = 619
     Color = clWhite
     ParentColor = False
@@ -39,7 +39,7 @@ object mainform: Tmainform
       AnchorSideBottom.Control = imagepanel
       AnchorSideBottom.Side = asrBottom
       Left = 0
-      Height = 566
+      Height = 565
       Top = 0
       Width = 619
       Anchors = [akTop, akLeft, akRight, akBottom]
@@ -48,6 +48,7 @@ object mainform: Tmainform
       OnMouseDown = imageMouseDown
       OnMouseMove = imageMouseMove
       OnMouseUp = imageMouseUp
+      PopupMenu = imagemenu
       Proportional = True
       Stretch = True
       StretchOutEnabled = False
@@ -912,7 +913,7 @@ object mainform: Tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 8
     Height = 26
-    Top = 536
+    Top = 535
     Width = 286
     Anchors = [akLeft, akRight, akBottom]
     BorderSpacing.Left = 4
@@ -924,6 +925,11 @@ object mainform: Tmainform
   end
   object opendialog: TOpenDialog
     left = 696
+    top = 360
+  end
+  object imagemenu: TPopupMenu
+    OnPopup = imagemenuPopup
+    left = 600
     top = 360
   end
 end

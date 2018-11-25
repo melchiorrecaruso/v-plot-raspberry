@@ -244,6 +244,7 @@ end;
 procedure tvpdriver.move(acount0, acount1: longint);
 {$ifdef cpuarm}
 var
+   c0,   c1: boolean;
           i: longint;
   dm0, ddm0: longint;
   dm1, ddm1: longint;
@@ -275,23 +276,20 @@ begin
 
       for i := 0 to 18 do
       begin
+        c0 := vplotmatrix[ddm0, i] = 1;
+        c1 := vplotmatrix[ddm1, i] = 1;
 
-        if (vplotmatrix[ddm0, i] = 1) then
-        begin
-          digitalwrite(mot0_step, HIGH);
-          delaymicroseconds(fdelaym);
-          digitalwrite(mot0_step,  LOW);
-          delaymicroseconds(fdelaym);
-        end;
+        if c0 then digitalwrite(mot0_step, HIGH);
+        if c1 then digitalwrite(mot1_step, HIGH);
 
-        if (vplotmatrix[ddm1, i] = 1) then
-        begin
-          digitalwrite(mot1_step, HIGH);
-          delaymicroseconds(fdelaym);
-          digitalwrite(mot1_step,  LOW);
-          delaymicroseconds(fdelaym);
-        end;
+        if c0 or
+           c1 then delaymicroseconds(fdelaym);
 
+        if c0 then digitalwrite(mot0_step,  LOW);
+        if c1 then digitalwrite(mot1_step,  LOW);
+
+        if c0 or
+           c1 then delaymicroseconds(fdelaym);
       end;
       dec(dm0, ddm0);
       dec(dm1, ddm1);
@@ -327,8 +325,7 @@ begin
 
   fpen := value;
   {$ifdef cpuarm}
-  if fpen then
-    delaymicroseconds(setting.srvcount*fdelayz);
+  if fpen then delaymicroseconds($F*fdelayz);
   {$endif}
   if clockwise(fpen) then
   begin
@@ -403,8 +400,8 @@ end;
 
 procedure optimize(const p: tvppoint; var m0, m1: longint);
 var
-   c0,  c1,  c2: tvpcircle;
-       f01, fxx: tvpline;
+   c0,  c1,  c2: tvpcircleimp;
+       f01, fxx: tvplineimp;
         l0,  l1: double;
   s00, s01, sxx: tvppoint;
   t00, t01, txx: tvppoint;
@@ -454,13 +451,13 @@ end;
 
 procedure tvpdriverthread.execute;
 var
-     i: longint;
-     j: longint;
-    m0: longint;
-    m1: longint;
-  path: tvppath;
-   pos: tvpposition;
-     p: tvppoint;
+  i, j, k: longint;
+       m0: longint = 0;
+       m1: longint = 0;
+     path: tvppath;
+   entity: tvpentity;
+    point: tvppoint;
+    list1: tfplist;
 begin
   if assigned(onstart) then
     synchronize(fonstart);
@@ -475,48 +472,49 @@ begin
     writeln(format('DRIVER.THREAD::MID-Y  = %12.5f', [fmidy   ]));
   end;
 
-  fprogress := 0;
+  list1 := tfplist.create;
   for i := 0 to fpaths.count - 1 do
   begin
-    path := fpaths.item[i];
-    for j := 0 to path.count - 1 do
-    begin
-      pos   := path.item[j];
-      p.x   := pos.x + foffsetx;
-      p.y   := pos.y + foffsety;
-      p     := wave.update(p);
-      pos.b := (abs(p.x) <= (fmaxdx)) and
-               (abs(p.y) <= (fmaxdy));
-    end;
-    fprogress := (100*i) div fpaths.count;
+    path := fpaths.items[i];
+    if path.enabled then
+      for j := 0 to path.count - 1 do
+      begin
+        entity := path.items[j];
+        for k := 0 to entity.count - 1 do
+        begin
+          point   := entity.items[k]^;
+          point.x := point.x + foffsetx;
+          point.y := point.y + foffsety;
+          point   := wave.update(point);
+
+          if (abs(point.x) <= (fmaxdx)) and
+             (abs(point.y) <= (fmaxdy)) then
+            list1.add(entity.items[k]);
+        end;
+      end;
   end;
 
   fprogress := 0;
-  for i := 0 to fpaths.count - 1 do
+  for i := 0 to list1.count - 1 do
   begin
-    path := fpaths.item[i];
-    for j := 0 to path.count - 1 do
+    point := pvppoint(list1[i])^;
+    if not terminated then
     begin
-      if not terminated then
-      begin
-        pos := path.item[j];
-        if pos.b then
-        begin
-          p.x := pos.x + foffsetx;
-          p.y := pos.y + foffsety;
-          p   := wave.update(p);
-          p.x := p.x + fmidx;
-          p.y := p.y + fmidy;
-          optimize(p, m0, m1);
-          driver.move(m0, m1);
-          if assigned(ontick) then
-            synchronize(ontick);
-        end;
-        while not enabled do sleep(250);
-      end;
-      fprogress := (100*i) div fpaths.count;
+      point.x := point.x + foffsetx;
+      point.y := point.y + foffsety;
+      point   := wave.update(point);
+      point.x := point.x + fmidx;
+      point.y := point.y + fmidy;
+      optimize(point, m0, m1);
+      driver.move(m0, m1);
+      if assigned(ontick) then
+        synchronize(ontick);
+
+      while not enabled do sleep(250);
     end;
+    fprogress := (100*i) div fpaths.count;
   end;
+  list1.destroy;
 
   if assigned(fonstop) then
     synchronize(fonstop);

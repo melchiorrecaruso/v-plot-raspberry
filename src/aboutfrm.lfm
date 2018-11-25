@@ -1,7 +1,7 @@
 object aboutform: Taboutform
-  Left = 536
+  Left = 458
   Height = 320
-  Top = 187
+  Top = 181
   Width = 400
   BorderStyle = bsDialog
   Caption = 'About ...'
@@ -190,7 +190,7 @@ object aboutform: Taboutform
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 12
-    Caption = 'Build 20181103'
+    Caption = 'Build 20181125'
     Layout = tlCenter
     ParentColor = False
   end

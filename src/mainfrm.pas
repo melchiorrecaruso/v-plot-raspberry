@@ -27,7 +27,7 @@ interface
 
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls, comctrls,
-  buttons, menus, spin, vppaths, vpsetting, vpdriver, fpvectorial;
+  buttons, menus, spin, vppaths, vpsetting, vpdriver;
 
 type
   { tmainform }
@@ -35,6 +35,7 @@ type
   tmainform = class(tform)
     aboutbtn: tbitbtn;
     layoutbtn: tbitbtn;
+    imagemenu: TPopupMenu;
     progressbar: TProgressBar;
     rightedit: tspinedit;
     startbtn: tbitbtn;
@@ -74,16 +75,19 @@ type
     procedure formdestroy   (sender: tobject);
     procedure formclose     (sender: tobject; var closeaction: tcloseaction);
     procedure formatcbchange(sender: tobject);
+    procedure imagemenuPopup(Sender: TObject);
 
     procedure leftupbtnclick      (sender: tobject);
     procedure leftdownbtnclick    (sender: tobject);
     procedure leftediteditingdone (sender: tobject);
+    procedure pathsclbClickCheck(Sender: TObject);
     procedure rightediteditingdone(sender: tobject);
     procedure rightupbtnclick     (sender: tobject);
     procedure rightdownbtnclick   (sender: tobject);
     procedure penupbtnclick       (sender: tobject);
     procedure pendownbtnclick     (sender: tobject);
     procedure gohomebtnclick      (sender: tobject);
+
 
     procedure heightseeditingdone  (sender: tobject);
     procedure widthseeditingdone   (sender: tobject);
@@ -101,6 +105,7 @@ type
     procedure imagemouseup  (sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
     procedure imagemousedown(sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
     procedure imagemousemove(sender: tobject; shift: tshiftstate; x, y: integer);
+    procedure imagemenuclick(sender: tobject);
 
   private
       bitmap: tbitmap;
@@ -125,7 +130,7 @@ implementation
 {$R *.lfm}
 
 uses
-  math, sysutils, dxfvectorialreader, aboutfrm, vpmath, vpwave;
+  math, sysutils, vpdxfreader, aboutfrm, vpmath, vpwave;
 
 // FORM EVENTS
 
@@ -148,7 +153,7 @@ begin
   bitmap := tbitmap.create;
    paths := tvppaths.create;
   // update preview
-  formatcbchange (nil);
+  formatcbchange(nil);
   // show toolbars
   manualdrivinggb.enabled := true;
   pagesizegb     .enabled := true;
@@ -305,49 +310,86 @@ begin
   mouseisdown := false;
 end;
 
+procedure tmainform.imagemenuclick(sender: tobject);
+var
+  i: longint;
+begin
+  if sender is tmenuitem then
+  begin
+    tmenuitem(sender).checked := not tmenuitem(sender).checked;
+    for i := 0 to paths.count - 1 do
+    begin
+      paths.items[i].enabled := imagemenu.items[i].checked;
+    end;
+  end;
+end;
+
+procedure tmainform.imagemenupopup(sender: tobject);
+var
+     i: longint;
+  item: tmenuitem;
+begin
+  imagemenu.items.clear;
+  if not assigned(driverthread) then
+    for i := 0 to paths.count - 1 do
+    begin
+      item := tmenuitem.create(imagemenu);
+      item.caption := paths.itemname[i];
+      item.checked := paths.items[i].enabled;
+      item.onclick := @imagemenuclick;
+      imagemenu.items.add(item);
+    end;
+end;
+
 // LOAD EVENTS
 
 procedure tmainform.openbtnclick(sender: tobject);
-var
-  vec: tvvectorialdocument;
 begin
   //opendialog.filter := 'dxf files (*.dxf)|*.dxf';
   if opendialog.execute then
   begin
     lock2(false);
     paths.clear;
+
     caption := 'vPlotter - ' + opendialog.filename;
-    // ---
-    vec := tvvectorialdocument.create;
     try
-      vec.readfromfile(opendialog.filename,
-        vec.getformatfromextension(opendialog.filename));
-      vec2paths(vec, paths);
+      dxf2paths(opendialog.filename, paths);
     except
+      paths.clear;
     end;
-    freeandnil(vec);
     reloadmiclick(nil);
   end;
 end;
 
 procedure tmainform.reloadmiclick(sender: tobject);
 var
-  i, j: longint;
-  path: tvppath;
-   pos: tvpposition;
+  i, j, k: longint;
+     path: tvppath;
+   entity: tvpentity;
+    point: tvppoint;
 begin
   lock2(false);
   // updtare preview ...
   for i := 0 to paths.count - 1 do
   begin
-    path := paths.item[i];
-    for j := 0 to path.count - 1 do
-    begin
-      pos := path.item[j];
-      bitmap.canvas.pixels[
-        trunc(( widthse.value div 2) + pos.x + offsetxse.value + 1),
-        trunc((heightse.value div 2) - pos.y - offsetyse.value + 1)] := clblack;
-    end;
+    path := paths.items[i];
+    if path.enabled then
+      for j := 0 to path.count - 1 do
+      begin
+        entity := path.items[j];
+        for k := 0 to entity.count - 1 do
+        begin
+          //sleep(2);
+          //image.canvas.draw(0, 0, bitmap);
+          //image.invalidate;
+          //application.processmessages;
+
+          point := entity.items[k]^;
+          bitmap.canvas.pixels[
+          trunc(( widthse.value div 2) + point.x + offsetxse.value + 1),
+          trunc((heightse.value div 2) - point.y - offsetyse.value + 1)] := clblack;
+        end;
+      end;
   end;
   image.canvas.draw(0, 0, bitmap);
   lock2(true);
@@ -387,6 +429,12 @@ begin
   image.stretch           := false;
   // ---
   lock2(true);
+end;
+
+procedure tmainform.pathsclbclickcheck(sender: tobject);
+begin
+  clearmiclick(sender);
+  reloadmiclick(sender);
 end;
 
 // PLOT EVENTS

@@ -24,7 +24,7 @@ program vplot;
 
 uses
   {$ifdef unix} cthreads, {$endif} interfaces, forms, mainfrm,
-  fpvectorialpkg, vpsetting, vppaths, aboutfrm, vpmath, vpwave;
+  vpsetting, vppaths, aboutfrm, vpmath, vpwave, vpdxfreader;
 
   {$R *.res}
 

@@ -26,304 +26,285 @@ unit vppaths;
 interface
 
 uses
-  classes, fpvectorial, vpmath, vpsetting;
+  classes, vpmath, vpsetting;
 
 type
-  tvpposition = class(tobject)
+  tvpentity = class(tobject)
   private
-    fb: boolean;
-    fx: double;
-    fy: double;
+    flist:   tfplist;
+    function getcount: longint;
+    function get(index: longint): pvppoint;
   public
-    constructor create(p: tvppoint);
-  published
-    property b: boolean read fb write fb;
-    property x: double  read fx;
-    property y: double  read fy;
+    constructor create;
+    destructor destroy; override;
+    procedure add(p: pvppoint);
+    procedure delete(index: longint);
+    procedure clear;
+    procedure invert;
+    function first: pvppoint;
+    function last: pvppoint;
+  public
+    property items[index: longint]: pvppoint read get;
+    property count: longint read getcount;
   end;
 
   tvppath = class(tobject)
   private
-    flist:   tlist;
-    function getfirst: tvpposition;
-    function getlast:  tvpposition;
+    flist: tfplist;
+    fenabled: boolean;
     function getcount: longint;
-    function get(index: longint): tvpposition;
+    function get(index: longint): tvpentity;
   public
     constructor create;
-    destructor  destroy; override;
-    procedure   add(const p: tvppoint);
-    procedure   insert(index: longint; const p: tvppoint);
-    procedure   delete(index: longint);
-    procedure   clear;
-    procedure   invert;
-    function    getlen: double;
+    destructor destroy; override;
+    procedure add(entity: tvpentity);
+    procedure delete(index: longint);
+    procedure clear;
+    procedure reorder;
   public
-    property item[index: longint]: tvpposition read get;
+    property enabled: boolean read fenabled write fenabled;
+    property items[index: longint]: tvpentity read get;
     property count: longint read getcount;
   end;
 
   tvppaths = class(tobject)
   private
-    flist:   tlist;
+    flist: tfplist;
+    fpathnames: tstringlist;
     function getcount:  longint;
     function get(index: longint): tvppath;
+    function getname(index: longint): string;
   public
     constructor create;
-    destructor  destroy; override;
-    procedure   add(path: tvppath);
-    procedure   delete(index: longint);
-    procedure   clear;
-    procedure   createtoolpath;
-    procedure   zerocenter;
+    destructor destroy; override;
+    procedure addline     (entity: pvpline;      const pathname: string);
+    procedure addcircle   (entity: pvpcircle;    const pathname: string);
+    procedure addcirclearc(entity: pvpcirclearc; const pathname: string);
+    procedure addellipse  (entity: pvpellipse;   const pathname: string);
+    procedure delete(index: longint);
+    procedure clear;
+    procedure createtoolpath;
+    procedure zerocenter;
   public
-    property item[index: longint]: tvppath read get;
+    property items[index: longint]: tvppath read get;
+    property itemname[index: longint]: string  read getname;
     property count: longint read getcount;
   end;
 
-  procedure vec2paths(vec: tvvectorialdocument; paths: tvppaths);
+  procedure dxf2paths(const filename: string; apaths: tvppaths);
 
 implementation
 
 uses
-  math, sysutils;
-
-const
-  smallest = 0.05;
+  math, sysutils, vpdxfreader;
 
 // internal toolpath routines
 
-function interpolate_line(const p0, p1: tvppoint): tvppath;
+function interpolate_line(entity: pvpline): tvpentity;
 var
   dx, dy: double;
-  i, len: longint;
+   i,  j: longint;
        p: tvppoint;
 begin
-  len := max(1, round(distance_between_two_points(p0, p1)/(1.2/setting.mode)));
-   dx := (p1.x - p0.x) / len;
-   dy := (p1.y - p0.y) / len;
+    j := max(1, round(len_segment(entity)/(1.2/setting.mode)));
+   dx := (entity^.p1.x - entity^.p0.x)/j;
+   dy := (entity^.p1.y - entity^.p0.y)/j;
 
-  result := tvppath.create;
-  for i := 0 to len do
+  result := tvpentity.create;
+  for i := 0 to j do
   begin
     p.x := i * dx;
     p.y := i * dy;
-    p   := translate_point(p0, p);
-    result.add(p);
+    p   := translate_point(entity^.p0, p);
+    result.add(@p);
   end;
 end;
 
-function interpolate_circle(const entity: tvcircle): tvppath;
+function interpolate_circle(entity: pvpcircle): tvpentity;
 var
-      i: longint;
-    len: longint;
-     cc: tvppoint;
+   i, j: longint;
       p: tvppoint;
   start: tvppoint;
   sweep: double;
 begin
-  cc.x    := entity.x;
-  cc.y    := entity.y;
-  start.x := entity.radius;
-  start.y := +0.0;
+  start.x := entity^.radius;
+  start.y := 0.0;
   sweep   := 2 * pi;
 
-  len := max(1, round(abs(sweep) * entity.radius/(1.2/setting.mode)));
+  j := max(1, round((abs(sweep)*entity^.radius)/(1.2/setting.mode)));
 
-  result := tvppath.create;
-  for i := 0 to len do
+  result := tvpentity.create;
+  for i := 0 to j do
   begin
-    p := rotate_point(start, (i * (sweep / len)));
-    p := translate_point(cc, p);
-    result.insert(0, p);
+    p := rotate_point(start, (i * (sweep / j)));
+    p := translate_point(entity^.center, p);
+    result.add(@p);
   end;
 end;
 
-function interpolate_circlearc(const entity: tvcirculararc): tvppath;
+function interpolate_circlearc(entity: pvpcirclearc): tvpentity;
 var
-      i: longint;
-    len: longint;
-     cc: tvppoint;
+   i, j: longint;
       p: tvppoint;
   start: tvppoint;
   sweep: double;
 begin
-  cc.x    := entity.x;
-  cc.y    := entity.y;
-  start.x := entity.radius;
-  start.y := +0.0;
-  start   := rotate_point(start, degtorad(entity.startangle));
-  sweep   := degtorad(entity.endangle - entity.startangle);
+  start.x := entity^.radius;
+  start.y := 0.0;
+  start   := rotate_point(start, degtorad(entity^.startangle));
+  sweep   := degtorad(entity^.endangle - entity^.startangle);
 
-  len := max(1, round(abs(sweep)*entity.radius/(1.2/setting.mode)));
+  j := max(1, round(abs(sweep)*entity^.radius/(1.2/setting.mode)));
 
-  result := tvppath.create;
-  for i := 0 to len do
+  result := tvpentity.create;
+  for i := 0 to j do
   begin
-    p := rotate_point(start, (i * (sweep / len)));
-    p := translate_point(cc, p);
-    result.insert(0, p);
+    p := rotate_point(start, (i * (sweep / j)));
+    p := translate_point(entity^.center, p);
+    result.add(@p);
   end;
 end;
 
-function interpolate_path(const entity: tpath): tvppath;
-var
-   dx, dy: double;
-     i, j: longint;
-      len: longint;
-        p: tvppoint;
-   p0, p1: tvppoint;
-  segment: tpathsegment;
+function interpolate_elipse(entity: pvpellipse): tvpentity;
 begin
-  result := tvppath.create;
-  entity.prepareforsequentialreading;
-  for i := 0 to entity.len - 1 do
-  begin
-    segment := tpathsegment(entity.next);
-    case segment.segmenttype of
-      stmoveto:
-      begin
-        p0.x := t2dsegment(segment).x;
-        p0.y := t2dsegment(segment).y;
-      end;
-      st2dlinewithpen, st2dline, st3dline:
-      begin
-        p1.x := t2dsegment(segment).x;
-        p1.y := t2dsegment(segment).y;
-
-        len := max(1, round(distance_between_two_points(p0, p1)/(1.2/setting.mode)));
-        dx := (p1.x - p0.x) / len;
-        dy := (p1.y - p0.y) / len;
-
-        for j := 0 to len do
-        begin
-          p.x := j * dx;
-          p.y := j * dy;
-          p   := translate_point(p0, p);
-          result.add(p);
-        end;
-        p0 := p1;
-      end;
-      else
-        writeln(segment.segmenttype);
-    end;
-  end;
+  // ...
 end;
 
 // internal commont routines
 
-function distance_between_two_position(p0, p1: tvpposition): double;
+function distance_between_two_position(p0, p1: pvppoint): double;
 begin
-  result := sqrt(sqr(p1.x - p0.x) + sqr(p1.y - p0.y));
+  result := sqrt(sqr(p1^.x - p0^.x) + sqr(p1^.y - p0^.y));
 end;
 
-function compare_position(pos0, pos1: tvpposition): boolean;
+function compare_position(p0, p1: pvppoint): boolean;
 begin
-  result := abs(pos1.x - pos0.x) < smallest;
-  if result then
-  begin
-    result := abs(pos1.y - pos0.y) < smallest;
-  end;
+  result := distance_between_two_position(p0, p1) < 0.001;
 end;
 
-function compare_path(path0, path1: pointer): longint;
-begin
-  result := round(tvppath(path1).getlen - tvppath(path0).getlen);
-end;
-
-function walk_back(pos0: tvpposition; list: tlist): longint;
+function get_next(p0: pvppoint; list: tfplist): longint;
 var
   i: longint;
 begin
   result := -1;
   for i := 0 to list.count - 1 do
-    if compare_position(pos0, tvppath(list[i]).getlast) then
+    if compare_position(p0, tvpentity(list[i]).first) or
+       compare_position(p0, tvpentity(list[i]).last ) then
     begin
-      result := i;
-      exit;
-    end else
-    if compare_position(pos0, tvppath(list[i]).getfirst) then
-    begin
-      tvppath(list[i]).invert;
       result := i;
       exit;
     end;
 end;
 
-function walk_next(pos0: tvpposition; list: tlist): longint;
-var
-  i: longint;
-begin
-  result := -1;
-  for i := 0 to list.count - 1 do
-    if compare_position(pos0, tvppath(list[i]).getfirst) then
-    begin
-      result := i;
-      exit;
-    end else
-    if compare_position(pos0, tvppath(list[i]).getlast) then
-    begin
-      tvppath(list[i]).invert;
-      result := i;
-      exit;
-    end;
-end;
-
-function walk_near(path: tvppath; list: tlist): longint;
+function get_near(p0: pvppoint; list: tfplist): longint;
 var
      i: longint;
-  curr: double;
-  best: double;
+  len1: double = $FFFFFFF;
+  len2: double = $FFFFFFF;
 begin
   result := 0;
-  if path <> nil then
+  for i := 0 to list.count - 1 do
   begin
-    best := distance_between_two_position(
-      path.getlast, tvppath(list[0]).getfirst);
 
-    for i := 1 to list.count - 1 do
+    len2 := distance_between_two_position(p0, tvpentity(list[i]).first);
+    if len1 > len2 then
     begin
-      curr := distance_between_two_position(
-        path.getlast, tvppath(list[i]).getfirst);
-
-      if curr < best then
-      begin
-        best   := curr;
-        result := i;
-      end else
-      begin
-        curr := distance_between_two_position(
-          path.getlast, tvppath(list[i]).getlast);
-
-        if curr < best then
-        begin
-          best   := curr;
-          result := i;
-
-          tvppath(list[i]).invert;
-        end;
-      end;
+      len1 := len2;
+      result := i;
     end;
+
+    len2 := distance_between_two_position(p0, tvpentity(list[i]).last);
+    if len1 > len2 then
+    begin
+      tvpentity(list[i]).invert;
+      len1 := len2;
+      result := i;
+    end;
+
   end;
 end;
 
-function is_closed(path: tvppath): boolean;
+function is_closed(entity: tvpentity): boolean;
 begin
-  result := false;
-  if path.count > 1 then
+  result := true;
+  if entity.count > 1 then
   begin
-    result := compare_position(path.getfirst, path.getlast);
+    result := compare_position(entity.get(0), entity.get(entity.count-1));
   end;
 end;
 
-// tvpposition
+// tvpentity
 
-constructor tvpposition.create(p: tvppoint);
+constructor tvpentity.create;
 begin
   inherited create;
-  fb := true;
-  fx := p.x;
-  fy := p.y;
+  flist := tfplist.create;
+end;
+
+destructor tvpentity.destroy;
+begin
+  clear;
+  flist.destroy;
+  inherited destroy;
+end;
+
+procedure tvpentity.delete(index: longint);
+begin
+  dispose(pvppoint(flist[index]));
+  flist.delete(index);
+end;
+
+procedure tvpentity.clear;
+var
+  i: longint;
+begin
+  for i := 0 to flist.count - 1 do
+  begin
+    dispose(pvppoint(flist[i]));
+  end;
+  flist.clear;
+end;
+
+procedure tvpentity.add(p: pvppoint);
+var
+  point: pvppoint;
+begin
+  new(point);
+  point^.x := p^.x;
+  point^.y := p^.y;
+  point^.z := p^.z;
+  flist.add(point);
+end;
+
+procedure tvpentity.invert;
+var
+    i: longint;
+  tmp: tlist;
+begin
+  tmp := tlist.create;
+  for i := flist.count - 1 downto 0 do tmp.add(flist[i]);
+  for i := flist.count - 1 downto 0 do flist[i] := tmp[i];
+  tmp.destroy;
+end;
+
+function tvpentity.first: pvppoint;
+begin
+  result := pvppoint(flist[0]);
+end;
+
+function tvpentity.last: pvppoint;
+begin
+  result := pvppoint(flist[flist.count-1]);
+end;
+
+function tvpentity.get(index: longint): pvppoint;
+begin
+   result := pvppoint(flist[index]);
+end;
+
+function tvpentity.getcount: longint;
+begin
+  result := flist.count;
 end;
 
 // tvppath
@@ -331,7 +312,8 @@ end;
 constructor tvppath.create;
 begin
   inherited create;
-  flist := tlist.create;
+  flist    := tfplist.create;
+  fenabled := true;
 end;
 
 destructor tvppath.destroy;
@@ -343,64 +325,100 @@ end;
 
 procedure tvppath.delete(index: longint);
 begin
-  tvpposition(flist[index]).destroy;
+  tvpentity(flist[index]).destroy;
   flist.delete(index);
 end;
 
 procedure tvppath.clear;
-begin
-  while flist.count > 0 do delete(0);
-end;
-
-procedure tvppath.add(const p: tvppoint);
-begin
-  flist.add(tvpposition.create(p));
-end;
-
-procedure tvppath.insert(index: longint; const p: tvppoint);
-begin
-  flist.insert(index, tvpposition.create(p));
-end;
-
-procedure tvppath.invert;
-var
-      i: longint;
-  alist: tlist;
-begin
-  alist := tlist.create;
-  for i := flist.count - 1 downto 0 do alist.add(flist[i]);
-  for i := flist.count - 1 downto 0 do flist[i] := alist[i];
-  alist.destroy;
-end;
-
-function tvppath.getlen: double;
 var
   i: longint;
 begin
-  result := 0;
-  for i := 1 to flist.count - 1 do
+  for i := 0 to flist.count - 1 do
   begin
-    result := result +
-      distance_between_two_position(
-        tvpposition(flist[i    ]),
-        tvpposition(flist[i - 1]));
+    tvpentity(flist[i]).destroy;
   end;
+  flist.clear;
 end;
 
-function tvppath.getfirst: tvpposition;
+procedure tvppath.reorder;
+var
+       i: longint;
+  entity: tvpentity;
+   point: pvppoint = nil;
+   list1: tfplist;
+   list2: tfplist;
 begin
-  if flist.count > 0 then
-    result := tvpposition(flist.first)
-  else
-    result := nil;
+  list1 := tfplist.create;
+  list2 := tfplist.create;
+
+  // move all path to list1
+  while flist.count > 0 do
+  begin
+    list1.add(flist[0]);
+    flist.delete(0);
+  end;
+
+  // create toolpath
+  while list1.count > 0 do
+  begin
+    if point = nil then
+      i := 0
+    else
+      i := get_near(point, list1);
+
+    list2.add(list1[i]);
+    list1.delete(i);
+
+    if not is_closed(tvpentity(list2[0])) then
+    begin
+      entity := tvpentity(list2[0]);
+      repeat
+        i := get_next(entity.last, list1);
+        if i <> -1 then
+        begin
+          if compare_position(entity.last,
+            tvpentity(list1[i]).last) then
+            tvpentity(list1[i]).invert;
+
+          entity := tvpentity(list1[i]);
+          list2.add(entity);
+          list1.delete(i);
+        end;
+      until i = -1;
+
+      entity := tvpentity(list2[0]);
+      repeat
+        i := get_next(entity.first, list1);
+        if i <> -1 then
+        begin
+          if compare_position(entity.first,
+            tvpentity(list1[i]).first) then
+            tvpentity(list1[i]).invert;
+
+          entity := tvpentity(list1[i]);
+          list2.insert(0, entity);
+          list1.delete(i);
+        end;
+      until i = -1;
+    end;
+
+    // move toolpath
+    point := tvpentity(list2[list2.count-1]).last;
+    while list2.count > 0 do
+    begin
+      flist.add(tvppath(list2[0]));
+      list2.delete(0);
+    end;
+
+  end;
+  list2.destroy;
+  list1.destroy;
 end;
 
-function tvppath.getlast: tvpposition;
+
+procedure tvppath.add(entity: tvpentity);
 begin
-  if flist.count > 0 then
-    result := tvpposition(flist.last)
-  else
-    result := nil;
+  flist.add(entity);
 end;
 
 function tvppath.getcount: longint;
@@ -408,9 +426,9 @@ begin
   result := flist.count;
 end;
 
-function tvppath.get(index: longint): tvpposition;
+function tvppath.get(index: longint): tvpentity;
 begin
-  result := tvpposition(flist[index]);
+  result := tvpentity(flist[index]);
 end;
 
 // tvppaths
@@ -418,13 +436,15 @@ end;
 constructor tvppaths.create;
 begin
   inherited create;
-  flist := tlist.create;
+  flist      := tfplist.create;
+  fpathnames := tstringlist.create;
 end;
 
 destructor tvppaths.destroy;
 begin
   clear;
   flist.destroy;
+  fpathnames.destroy;
   inherited destroy;
 end;
 
@@ -432,29 +452,80 @@ procedure tvppaths.delete(index: longint);
 begin
   tvppath(flist[index]).destroy;
   flist.delete(index);
+  fpathnames.delete(index);
 end;
 
 procedure tvppaths.clear;
+var
+  i: longint;
 begin
-  while flist.count > 0 do delete(0);
+  for i := 0 to flist.count - 1 do
+  begin
+    tvppath(flist[i]).destroy;
+  end;
+  flist.clear;
+  fpathnames.clear;
 end;
 
-procedure tvppaths.add(path: tvppath);
+procedure tvppaths.addline(entity: pvpline; const pathname: string);
+var
+  i: longint;
 begin
-  flist.add(path)
+  i := fpathnames.indexof(pathname);
+  if i = -1 then
+  begin
+    i :=
+      flist     .add(tvppath.create);
+      fpathnames.add(pathname);
+  end;
+  tvppath(flist[i]).add(interpolate_line(entity));
+end;
+
+procedure tvppaths.addcircle(entity: pvpcircle; const pathname: string);
+var
+  i: longint;
+begin
+  i := fpathnames.indexof(pathname);
+  if i = -1 then
+  begin
+    i :=
+      flist .add(tvppath.create);
+      fpathnames.add(pathname);
+  end;
+  tvppath(flist[i]).add(interpolate_circle(entity));
+end;
+
+procedure tvppaths.addcirclearc(entity: pvpcirclearc; const pathname: string);
+var
+  i: longint;
+begin
+  i := fpathnames.indexof(pathname);
+  if i = -1 then
+  begin
+    i :=
+      flist .add(tvppath.create);
+      fpathnames.add(pathname);
+  end;
+  tvppath(flist[i]).add(interpolate_circlearc(entity));
+end;
+
+procedure tvppaths.addellipse(entity: pvpellipse; const pathname: string);
+begin
+  // ...
 end;
 
 procedure tvppaths.zerocenter;
 var
-     i, j: longint;
+  i, j, k: longint;
      xmin: double;
      xmax: double;
      ymin: double;
      ymax: double;
   offsetx: double;
   offsety: double;
+   entity: tvpentity;
      path: tvppath;
-      pos: tvpposition;
+    point: pvppoint;
 begin
   xmin  := + maxint;
   xmax  := - maxint;
@@ -465,11 +536,15 @@ begin
     path := tvppath(flist[i]);
     for j := 0 to path.count - 1 do
     begin
-        pos := path.item[j];
-       xmin := min(xmin, pos.x);
-       xmax := max(xmax, pos.x);
-       ymin := min(ymin, pos.y);
-       ymax := max(ymax, pos.y);
+      entity := path.items[j];
+      for k := 0 to entity.count - 1 do
+      begin
+        point := entity.items[k];
+         xmin := min(xmin, point^.x);
+         xmax := max(xmax, point^.x);
+         ymin := min(ymin, point^.y);
+         ymax := max(ymax, point^.y);
+      end;
     end;
   end;
   offsetx := - (xmin + xmax) / 2;
@@ -480,70 +555,23 @@ begin
     path := tvppath(flist[i]);
     for j := 0 to path.count - 1 do
     begin
-      pos    := path.item[j];
-      pos.fx := pos.fx + offsetx;
-      pos.fy := pos.fy + offsety;
+      entity := path.items[j];
+      for k := 0 to entity.count - 1 do
+      begin
+        point    := entity.items[k];
+        point^.x := point^.x + offsetx;
+        point^.y := point^.y + offsety;
+      end;
     end;
   end;
 end;
 
 procedure tvppaths.createtoolpath;
 var
-      i: longint;
-  index: longint;
-  list1: tlist;
-  list2: tlist;
-  list3: tlist;
-   path: tvppath;
+  i: longint;
 begin
-  list1 := tlist.create;
-  list2 := tlist.create;
-  list3 := tlist.create;
   for i := 0 to flist.count - 1 do
-    list1.add(flist[i]);
-  // create toolpath
-  path := nil;
-  while list1.count > 0 do
-  begin
-    index := walk_near(path, list1);
-    path  := tvppath(list1[index]);
-    list1.delete(index);
-    list2.add(path);
-    if not is_closed(tvppath(flist[i])) then
-    begin
-      repeat
-        index := walk_back(path.getfirst, list1);
-        if index <> -1 then
-        begin
-          path := tvppath(list1[index]);
-          list1.delete(index);
-          list2.insert(0, path);
-        end;
-      until index = -1;
-
-      path := tvppath(list2.last);
-      repeat
-        index := walk_next(path.getlast, list1);
-        if index <> -1 then
-        begin
-          path := tvppath(list1[index]);
-          list1.delete(index);
-          list2.add(path);
-        end;
-      until index = -1;
-    end;
-    // move toolpath
-    for i := 0 to list2.count - 1 do
-      list3.add(list2[i]);
-    list2.clear;
-  end;
-
-  for i := 0 to flist.count - 1 do
-    flist[i] := list3[i];
-
-  list3.destroy;
-  list2.destroy;
-  list1.destroy;
+    get(i).reorder;
 end;
 
 function tvppaths.getcount: longint;
@@ -556,45 +584,22 @@ begin
   result := tvppath(flist[index]);
 end;
 
-// vectorial2paths
-
-procedure vec2paths(vec: tvvectorialdocument; paths: tvppaths);
-var
-    i, j: longint;
-  entity: tventity;
-    page: tvpage;
-    path: tvppath;
+function tvppaths.getname(index: longint): string;
 begin
-  for i := 0 to vec.getpagecount - 1 do
-  begin
-    page := vec.getpageasvectorial(i);
-    for j := 0 to page.getentitiescount - 1 do
-    begin
-      path   := nil;
-      entity := page.getentity(j);
-      if entity is tvcircle then
-      begin
-        path := interpolate_circle(tvcircle(entity));
-      end else
-      if entity is tvcirculararc then
-      begin
-        path := interpolate_circlearc(tvcirculararc(entity));
-      end else
-      if entity is tpath then
-      begin
-        path := interpolate_path(tpath(entity));
-      end else
-      begin
-        if enabledebug then
-          writeln(entity.classname);
-      end;
+  result := fpathnames[index];
+end;
 
-      if assigned(path) then
-        paths.add(path);
-    end;
-  end;
-  paths.createtoolpath;
-  paths.zerocenter;
+// dxf2paths
+
+procedure dxf2paths(const filename: string; apaths: tvppaths);
+var
+  reader: tvdxfreader;
+begin
+  reader := tvdxfreader.create;
+  reader.readfromstrings(filename, apaths);
+  reader.destroy;
+  apaths.zerocenter;
+  apaths.createtoolpath;
 end;
 
 end.
