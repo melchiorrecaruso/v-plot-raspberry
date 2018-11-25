@@ -24,11 +24,7 @@
 
 unit vpdxfreader;
 
-{$mode objfpc}{$H+}
-
-{.$define FPVECTORIALDEBUG}
-{.$define FPVECTORIALDEBUG_POLYLINE}
-{.$define FPVECTORIALDEBUG_LINE}
+{$mode objfpc}
 
 interface
 
@@ -36,24 +32,6 @@ uses
   classes, fpimage, sysutils, vppaths, vpmath;
 
 type
-  tdxftokens = class(tfplist)
-  public
-    destructor destroy; override;
-    procedure clear;
-  end;
-
-  tdxftoken = class(tobject)
-  public
-    groupcode:  integer;
-    strvalue:   string;
-    floatvalue: double;
-    intvalue:   integer;
-    childs:     tdxftokens;
-  public
-    constructor create;
-    destructor destroy; override;
-  end;
-
   tpolylineelement = record
     x: double;
     y: double;
@@ -71,9 +49,31 @@ type
     y: double;
   end;
 
+  { tdxftokens }
+
+  tdxftokens = class(tfplist)
+  public
+    destructor destroy; override;
+    procedure clear;
+  end;
+
+  { tdxftoken }
+
+  tdxftoken = class(tobject)
+  public
+    groupcode:  integer;
+    strvalue:   string;
+    floatvalue: double;
+    intvalue:   integer;
+    childs:     tdxftokens;
+  public
+    constructor create;
+    destructor destroy; override;
+  end;
+
   { tdxftokenizer }
 
-  tdxftokenizer = class
+  tdxftokenizer = class(tobject)
   public
     tokens: tdxftokens;
     constructor create;
@@ -175,12 +175,11 @@ end;
 
 procedure tdxftokens.clear;
 var
-  j: integer;
+  i: longint;
 begin
-  for j := count-1 downto 0 do
+  for i := 0 to count - 1 do
   begin
-    tobject(items[j]).destroy;
-    delete(j);
+    tobject(items[i]).destroy;
   end;
   inherited clear;
 end;
@@ -404,14 +403,18 @@ end;
 
 procedure tvdxfreader.readheader(atokens: tdxftokens; apaths: tvppaths);
 var
-  i, j: integer;
+      i, j: integer;
   curtoken: tdxftoken;
   curfield: pvppoint;
+  S: string;
 begin
   i := 0;
   while i < atokens.count do
   begin
     curtoken := tdxftoken(atokens.items[i]);
+
+    s:= curtoken.strvalue;
+
     if curtoken.strvalue = '$ANGBASE' then
     begin
       curtoken := tdxftoken(atokens.items[i+1]);
@@ -460,7 +463,7 @@ begin
       //if we are forcing an encoding, don't use the value from the header
       //if adoc.forcedencodingonread = '' then
       //begin
-      //  curtoken := tdxftoken(atokens.items[i+1]);
+      curtoken := tdxftoken(atokens.items[i+1]);
         //if curtoken.strvalue = 'ANSI_1252' then
         //  encoding := 'CP1252';
       //end;
@@ -1186,18 +1189,14 @@ begin
   tokenizer.readfromstrings(astrings);
   for i := 0 to tokenizer.tokens.count - 1 do
   begin
-    writeln(i);
-    writeln(tokenizer.tokens.count);
-    writeln(tdxftoken(tokenizer.tokens.items[i]).strvalue);
-
     curtoken := tdxftoken(tokenizer.tokens.items[i]);
     if (curtoken.childs       = nil) or
        (curtoken.childs.count = 0  ) then continue;
     curtokenfirstchild := tdxftoken(curtoken.childs.items[0]);
 
-    if curtokenfirstchild.strvalue = 'HEADER'   then readheader  (curtoken.childs, apaths) else
-    if curtokenfirstchild.strvalue = 'TABLES'   then readtables  (curtoken.childs, apaths) else
-    if curtokenfirstchild.strvalue = 'BLOCKS'   then readblocks  (curtoken.childs, apaths) else
+  //if curtokenfirstchild.strvalue = 'HEADER'   then readheader  (curtoken.childs, apaths) else
+  //if curtokenfirstchild.strvalue = 'TABLES'   then readtables  (curtoken.childs, apaths) else
+  //if curtokenfirstchild.strvalue = 'BLOCKS'   then readblocks  (curtoken.childs, apaths) else
     if curtokenfirstchild.strvalue = 'ENTITIES' then readentities(curtoken.childs, apaths);
   end;
 end;
