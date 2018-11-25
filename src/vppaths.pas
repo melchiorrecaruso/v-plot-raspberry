@@ -91,7 +91,7 @@ type
     property count: longint read getcount;
   end;
 
-  procedure dxf2paths(const filename: string; apaths: tvppaths);
+  procedure dxf2paths(const afilename: string; apaths: tvppaths);
 
 implementation
 
@@ -591,12 +591,12 @@ end;
 
 // dxf2paths
 
-procedure dxf2paths(const filename: string; apaths: tvppaths);
+procedure dxf2paths(const afilename: string; apaths: tvppaths);
 var
   reader: tvdxfreader;
 begin
   reader := tvdxfreader.create;
-  reader.readfromstrings(filename, apaths);
+  reader.readfromfile(afilename, apaths);
   reader.destroy;
   apaths.zerocenter;
   apaths.createtoolpath;
