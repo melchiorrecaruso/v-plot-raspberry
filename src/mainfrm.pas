@@ -386,8 +386,8 @@ begin
 
           point := entity.items[k]^;
           bitmap.canvas.pixels[
-          trunc(( widthse.value div 2) + point.x + offsetxse.value + 1),
-          trunc((heightse.value div 2) - point.y - offsetyse.value + 1)] := clblack;
+            trunc(( widthse.value div 2) + point.x + offsetxse.value + 1),
+            trunc((heightse.value div 2) - point.y - offsetyse.value + 1)] := clblack;
         end;
       end;
   end;
@@ -451,8 +451,8 @@ begin
     driverthread         := tvpdriverthread.create(paths);
     driverthread.midx    := setting.layout08.x;
     driverthread.midy    := setting.layout08.y+heightse.value/2;
-    driverthread.maxdx   := widthse.value/2;
-    driverthread.maxdy   := heightse.value/2;
+    driverthread.maxdx   := widthse .value/2 + 2;
+    driverthread.maxdy   := heightse.value/2 + 2;
     driverthread.offsetx := offsetxse.value;
     driverthread.offsety := offsetyse.value;
     driverthread.onstart := @onplotterstart;
@@ -655,6 +655,7 @@ end;
 
 procedure tmainform.onplotterstop;
 begin
+  image.canvas.draw(0, 0, bitmap);
   driverthread := nil;
   penupbtnclick(nil);
 
@@ -665,7 +666,27 @@ end;
 
 procedure tmainform.onplottertick;
 begin
-  progressbar.position := driverthread.progress;
+  bitmap.canvas.pixels[
+    trunc(( widthse.value div 2) + driverdetails.point.x + offsetxse.value + 1),
+    trunc((heightse.value div 2) - driverdetails.point.y - offsetyse.value + 1)] := clred;
+
+  if driverdetails.load0 > 2100 then
+  begin
+    showmessage('warning load0 ' + inttostr(driverdetails.load0));
+    image.canvas.draw(0, 0, bitmap);
+  end;
+
+  if driverdetails.load1 > 2100 then
+  begin
+    showmessage('warning load1 ' + inttostr(driverdetails.load1));
+    image.canvas.draw(0, 0, bitmap);
+  end;
+
+  if (driverdetails.tick mod 1000) = 0 then
+  begin
+    progressbar.position := driverthread.progress;
+    image.canvas.draw(0, 0, bitmap);
+  end;
   application.processmessages;
 end;
 

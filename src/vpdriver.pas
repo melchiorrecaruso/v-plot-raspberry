@@ -30,6 +30,17 @@ uses
   vppaths, vpmath, vpsetting, vpwave;
 
 type
+  tvpdriverdetails = packed record
+    point:  tvppoint;
+    len0:   double;
+    len1:   double;
+    load0:  longint;
+    load1:  longint;
+    count0: double;
+    count1: double;
+    tick:   longint;
+  end;
+
   tvpdriver = class
   private
     fcount0:  longint;
@@ -97,8 +108,9 @@ type
   procedure optimize(const p: tvppoint; var m0, m1: longint);
 
 var
-  driver:       tvpdriver       = nil;
-  driverthread: tvpdriverthread = nil;
+  driver:        tvpdriver       = nil;
+  driverthread:  tvpdriverthread = nil;
+  driverdetails: tvpdriverdetails;
 
 implementation
 
@@ -398,7 +410,7 @@ begin
   inherited destroy;
 end;
 
-procedure optimize(const p: tvppoint; var m0, m1: longint);
+procedure optimize(const p: tvppoint; var m0, m1: longint); inline;
 var
    c0,  c1,  c2: tvpcircleimp;
        f01, fxx: tvplineimp;
@@ -425,8 +437,14 @@ begin
   // calculate steps
   m0 := round(setting.mode*(l0/setting.ratio));
   m1 := round(setting.mode*(l1/setting.ratio));
+  // load details
+  driverdetails.count0  := m0;
+  driverdetails.count1  := m1;
+  driverdetails.len0    := l0;
+  driverdetails.len1    := l1;
+  inc(driverdetails.tick);
 
-  if enabledebug then
+  //if enabledebug then
   begin
     txx.x := s00.x;
     txx.y := p.y;
@@ -435,17 +453,12 @@ begin
     fxx := line_by_two_points(s00, txx);
     txx := intersection_of_two_lines(f01, fxx);
 
-    writeln(format('OPTIMIZE::P.X    = %12.5f  P.Y   = %12.5f', [p.x, p.y]));
-    writeln(format('OPTIMIZE::LEN0   = %12.5f  LEN1  = %12.5f', [l0, l1]));
-    writeln(format('OPTIMIZE::CNT0   = %12.5u  CNT1  = %12.5u', [m0, m1]));
-
-    writeln(format('OPTIMIZE::F0     = %12.5u  F1    = %12.5u', [
-      trunc(setting.weight/
-        distance_between_two_points(s00, txx)*
-        distance_between_two_points(s00, p)),
-      trunc(setting.weight/
-        distance_between_two_points(s00, txx)*
-        distance_between_two_points(txx, p))]));
+    driverdetails.load0   := trunc(setting.weight/
+      distance_between_two_points(s00, txx)*
+      distance_between_two_points(s00, p));
+    driverdetails.load1   :=trunc(setting.weight/
+      distance_between_two_points(s00, txx)*
+      distance_between_two_points(txx, p));
   end;
 end;
 
@@ -459,6 +472,16 @@ var
     point: tvppoint;
     list1: tfplist;
 begin
+  driverdetails.point.x := 0;
+  driverdetails.point.y := 0;
+  driverdetails.len0    := 0;
+  driverdetails.len1    := 0;
+  driverdetails.load0   := 0;
+  driverdetails.load1   := 0;
+  driverdetails.count0  := 0;
+  driverdetails.count1  := 0;
+  driverdetails.tick    := 0;
+
   if assigned(onstart) then
     synchronize(fonstart);
 
@@ -500,6 +523,9 @@ begin
     point := pvppoint(list1[i])^;
     if not terminated then
     begin
+      driverdetails.point := point;
+
+
       point.x := point.x + foffsetx;
       point.y := point.y + foffsety;
       point   := wave.update(point);
