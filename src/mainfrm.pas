@@ -1,7 +1,7 @@
 {
   Description: vPlot main form.
 
-  Copyright (C) 2017-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
+  Copyright (C) 2017-2019 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
   This source is free software; you can redistribute it and/or modify it under
   the terms of the GNU General Public License as published by the Free
@@ -27,13 +27,14 @@ interface
 
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls, comctrls,
-  buttons, menus, spin, vppaths, vpsetting, vpdriver;
+  buttons, menus, spin, vppaths, vpsetting, vpdriver, BCSVGViewer, BGRABitmap, BCTypes, BGraBitmapTypes;
 
 type
   { tmainform }
 
   tmainform = class(tform)
     aboutbtn: tbitbtn;
+    SVGViewer: TBCSVGViewer;
     layoutbtn: tbitbtn;
     imagemenu: TPopupMenu;
     progressbar: TProgressBar;
@@ -90,6 +91,7 @@ type
 
 
     procedure heightseeditingdone  (sender: tobject);
+    procedure SVGViewerRedraw(Sender: TObject; Bitmap: TBGRABitmap);
     procedure widthseeditingdone   (sender: tobject);
     procedure verticalcbeditingdone(sender: tobject);
 
@@ -130,7 +132,7 @@ implementation
 {$R *.lfm}
 
 uses
-  math, sysutils, vpdxfreader, aboutfrm, vpmath, vpwave;
+  math, sysutils, aboutfrm, vpmath, vpwave;
 
 // FORM EVENTS
 
@@ -349,14 +351,17 @@ begin
   if opendialog.execute then
   begin
     lock2(false);
-    paths.clear;
-
     caption := 'vPlotter - ' + opendialog.filename;
-    try
-      dxf2paths(opendialog.filename, paths);
-    except
+    //try
       paths.clear;
-    end;
+      svgviewer.loadfromfile(opendialog.filename);
+
+    //svg2paths(opendialog.filename, paths);
+    //vec2paths(opendialog.filename, paths);
+    //dxf2paths(opendialog.filename, paths);
+    //except
+      //paths.clear;
+    //end;
     reloadmiclick(nil);
   end;
 end;
@@ -379,11 +384,6 @@ begin
         entity := path.items[j];
         for k := 0 to entity.count - 1 do
         begin
-          //sleep(2);
-          //image.canvas.draw(0, 0, bitmap);
-          //image.invalidate;
-          //application.processmessages;
-
           point := entity.items[k]^;
           bitmap.canvas.pixels[
             trunc(( widthse.value div 2) + point.x + offsetxse.value + 1),
@@ -541,6 +541,20 @@ begin
   formatcbchange(nil);
 end;
 
+procedure tmainform.SVGViewerRedraw(Sender: TObject; Bitmap: TBGRABitmap);
+var
+  i: longint;
+  points: arrayoftpointf;
+begin
+  points := bitmap.canvas2d.currentpath;
+  for i := 0 to length(points) - 2 do
+  begin
+    writeln('index =', i, ' p.x=', points[i].x:2:2);
+    writeln('index =', i, ' p.x=', points[i].y:2:2);
+  end;
+  setlength(points, 0);
+end;
+
 procedure tmainform.widthseeditingdone(sender: tobject);
 begin
   formatcbchange(nil);
@@ -670,23 +684,9 @@ begin
     trunc(( widthse.value div 2) + driverdetails.point.x + offsetxse.value + 1),
     trunc((heightse.value div 2) - driverdetails.point.y - offsetyse.value + 1)] := clred;
 
-  if driverdetails.load0 > 2100 then
-  begin
-    showmessage('warning load0 ' + inttostr(driverdetails.load0));
-    image.canvas.draw(0, 0, bitmap);
-  end;
-
-  if driverdetails.load1 > 2100 then
-  begin
-    showmessage('warning load1 ' + inttostr(driverdetails.load1));
-    image.canvas.draw(0, 0, bitmap);
-  end;
-
   if (driverdetails.tick mod 1000) = 0 then
-  begin
     progressbar.position := driverthread.progress;
-    image.canvas.draw(0, 0, bitmap);
-  end;
+
   application.processmessages;
 end;
 

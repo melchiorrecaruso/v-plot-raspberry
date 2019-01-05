@@ -26,7 +26,8 @@ unit vppaths;
 interface
 
 uses
-  classes, vpmath, vpsetting;
+  classes, vpmath, vpsetting, bgrabitmap, bgrasvg, bgrasvgshapes, bgrasvgtype,
+  bgrabitmaptypes, bgratransform, bgrapath, bgravectorize, bcsvgviewer;
 
 type
   tvpentity = class(tobject)
@@ -85,18 +86,33 @@ type
     procedure clear;
     procedure createtoolpath;
     procedure zerocenter;
+    procedure mirror_x;
+    procedure mirror_y;
+    procedure rotate(const alpha: double);
   public
     property items[index: longint]: tvppath read get;
     property itemname[index: longint]: string  read getname;
     property count: longint read getcount;
   end;
 
-  procedure dxf2paths(const afilename: string; apaths: tvppaths);
+
+  TPather = class(TBCSVGViewer)
+
+
+  public
+
+
+
+  end;
+
+  //procedure dxf2paths(const afilename: string; apaths: tvppaths);
+  //procedure vec2paths(const afilename: string; apaths: tvppaths);
+  procedure svg2paths(const afilename: string; apaths: tvppaths);
 
 implementation
 
 uses
-  math, sysutils, vpdxfreader;
+  math, sysutils;
 
 // internal toolpath routines
 
@@ -415,7 +431,6 @@ begin
   list1.destroy;
 end;
 
-
 procedure tvppath.add(entity: tvpentity);
 begin
   flist.add(entity);
@@ -566,6 +581,72 @@ begin
   end;
 end;
 
+procedure tvppaths.mirror_x;
+var
+  i, j, k: longint;
+   entity: tvpentity;
+     path: tvppath;
+    point: pvppoint;
+begin
+  for i := 0 to flist.count - 1 do
+  begin
+    path := tvppath(flist[i]);
+    for j := 0 to path.count - 1 do
+    begin
+      entity := path.items[j];
+      for k := 0 to entity.count - 1 do
+      begin
+         point    := entity.items[k];
+         point^.y := -point^.y;
+      end;
+    end;
+  end;
+end;
+
+procedure tvppaths.mirror_y;
+var
+  i, j, k: longint;
+   entity: tvpentity;
+     path: tvppath;
+    point: pvppoint;
+begin
+  for i := 0 to flist.count - 1 do
+  begin
+    path := tvppath(flist[i]);
+    for j := 0 to path.count - 1 do
+    begin
+      entity := path.items[j];
+      for k := 0 to entity.count - 1 do
+      begin
+         point    := entity.items[k];
+         point^.x := -point^.x;
+      end;
+    end;
+  end;
+end;
+
+procedure tvppaths.rotate(const alpha: double);
+var
+  i, j, k: longint;
+   entity: tvpentity;
+     path: tvppath;
+    point: pvppoint;
+begin
+  for i := 0 to flist.count - 1 do
+  begin
+    path := tvppath(flist[i]);
+    for j := 0 to path.count - 1 do
+    begin
+      entity := path.items[j];
+      for k := 0 to entity.count - 1 do
+      begin
+         point  := entity.items[k];
+         point^ := rotate_point(point^, alpha);
+      end;
+    end;
+  end;
+end;
+
 procedure tvppaths.createtoolpath;
 var
   i: longint;
@@ -590,7 +671,7 @@ begin
 end;
 
 // dxf2paths
-
+(*
 procedure dxf2paths(const afilename: string; apaths: tvppaths);
 var
   reader: tvdxfreader;
@@ -600,6 +681,169 @@ begin
   reader.destroy;
   apaths.zerocenter;
   apaths.createtoolpath;
+end;
+
+// vectorial2paths
+
+procedure entity2paths(entity: tventity; apaths: tvppaths);
+var
+          i: longint;
+     circle: tvpcircle;
+  circlearc: tvpcirclearc;
+       line: tvpline;
+    segment: tpathsegment;
+begin
+  if entity is tvcircle then
+  begin
+    circle.center.x := tvcircle(entity).x;
+    circle.center.y := tvcircle(entity).y;
+    circle.radius   := tvcircle(entity).radius;
+    apaths.addcircle(@circle, '0');
+  end else
+  if entity is tvcirculararc then
+  begin
+    circlearc.center.x   := tvcirculararc(entity).x;
+    circlearc.center.y   := tvcirculararc(entity).y;
+    circlearc.radius     := tvcirculararc(entity).radius;
+    circlearc.startangle := tvcirculararc(entity).startangle;
+    circlearc.endangle   := tvcirculararc(entity).endangle;
+    apaths.addcirclearc(@circlearc, '0');
+  end else
+  if entity is tpath then
+  begin
+    tpath(entity).prepareforsequentialreading;
+    for i := 0 to tpath(entity).len - 1 do
+    begin
+      segment := tpathsegment(tpath(entity).next);
+      case segment.segmenttype of
+        stmoveto:
+        begin
+          line.p0.x := t2dsegment(segment).x;
+          line.p0.y := t2dsegment(segment).y;
+        end;
+        st2dlinewithpen, st2dline, st3dline:
+        begin
+          line.p1.x := t2dsegment(segment).x;
+          line.p1.y := t2dsegment(segment).y;
+          apaths.addline(@line, '0');
+          line.p0 := line.p1;
+        end;
+        else
+          writeln(segment.segmenttype);
+      end;
+    end;
+  end else
+  if entity is tvlayer then
+  begin
+    for i := 0 to tvlayer(entity).getentitiescount -1 do
+    begin
+      entity2paths(tvlayer(entity).getentity(i), apaths);
+    end;
+  end else
+  begin
+    if enabledebug then
+      writeln(entity.classname);
+  end;
+end;
+
+procedure vec2paths(const afilename: string; apaths: tvppaths);
+var
+  i, j: longint;
+  page: tvpage;
+   vec: tvvectorialdocument;
+begin
+  vec := tvvectorialdocument.create;
+  vec.readfromfile(afilename);
+  for i := 0 to vec.getpagecount - 1 do
+  begin
+    page := vec.getpageasvectorial(i);
+    for j := 0 to page.getentitiescount - 1 do
+      entity2paths(page.getentity(j), apaths);
+  end;
+  vec.destroy;
+
+  apaths.createtoolpath;
+  apaths.mirror_x;
+  apaths.zerocenter;
+end;
+*)
+// svg2paths
+
+procedure element2paths(element: tsvgelement; apaths: tvppaths);
+var
+     bmp: tbgrabitmap;
+       i: longint;
+    line: tvpline;
+  points: arrayoftpointf;
+begin
+  bmp := tbgrabitmap.create;
+  bmp.canvas2d.fontrenderer := tbgravectorizedfontrenderer.create;
+  if (element is tsvgline      ) or
+     (element is tsvgrectangle ) or
+     (element is tsvgcircle    ) or
+     (element is tsvgellipse   ) or
+     (element is tsvgpath      ) or
+     (element is tsvgtext      ) or
+     (element is tsvgpolypoints) then
+  begin
+
+
+    if (element is tsvgtext      ) then
+      tsvgtext(element).draw(bmp.canvas2d, cumillimeter)
+    else
+      element.draw(bmp.canvas2d, cumillimeter);
+
+
+
+    points := bmp.canvas2d.currentpath;
+    try
+      for i := 0 to length(points) - 2 do
+      begin
+        line.p0.x := points[i].x;
+        line.p0.y := points[i].y;
+        line.p1.x := points[i+1].x;
+        line.p1.y := points[i+1].y;
+
+        if distance_between_two_position(@line.p0, @line.p1) < 2000  then
+          apaths.addline(@line, element.id);
+      end;
+    except
+    end;
+    setlength(points, 0);
+  end else
+  if element is tsvggroup then
+  begin
+    with tsvggroup(element).content do
+    begin
+      for i := 0 to elementcount - 1 do
+        element2paths(element[i], apaths);
+    end;
+  end else
+  if enabledebug then
+  begin
+    writeln(element.classname);
+  end;
+
+  bmp.destroy;
+end;
+
+procedure svg2paths(const afilename: string; apaths: tvppaths);
+var
+    i: longint;
+  svg: tbgrasvg;
+  bmp: tbgrabitmap;
+    p: arrayoftpointf;
+begin
+  svg := tbgrasvg.create(afilename);
+  for i := 0 to svg.content.elementcount - 1 do
+  begin
+    element2paths(svg.content.element[i], apaths);
+  end;
+  svg.destroy;
+
+  apaths.mirror_x;
+  apaths.createtoolpath;
+  apaths.zerocenter;
 end;
 
 end.

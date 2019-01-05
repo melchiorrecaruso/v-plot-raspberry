@@ -72,13 +72,10 @@ type
 
   pvpellipse = ^tvpellipse;
   tvpellipse = packed record
-    center:    tvppoint;
-    majoraxisendx:  double;
-    majoraxisendy:  double;
-    majoraxisendz:  double;
-    minoraxisratio: double;
-    startparam:     double;
-    endparam:       double;
+    center:   tvppoint;
+    radiusx:  double;
+    radiusy:  double;
+      angle:  double;
   end;
 
 function translate_point(const p, cc: tvppoint): tvppoint;

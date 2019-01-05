@@ -24,13 +24,13 @@ program vplot;
 
 uses
   {$ifdef unix} cthreads, {$endif} interfaces, forms, mainfrm,
-  vpsetting, vppaths, aboutfrm, vpmath, vpwave, vpdxfreader;
+  vpsetting, vppaths, aboutfrm, vpmath, vpwave;
 
   {$R *.res}
 
 begin
   requirederivedformresource := true;
-  Application.Title:='VPlot Driver';
+  application.title:='VPlot Driver';
   application.initialize;
   application.createform(tmainform, mainform);
   application.run;
