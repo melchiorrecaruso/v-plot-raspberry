@@ -772,7 +772,7 @@ end;
 procedure element2paths(element: tsvgelement; apaths: tvppaths);
 var
      bmp: tbgrabitmap;
-       i: longint;
+    i, j: longint;
     line: tvpline;
   points: arrayoftpointf;
 begin
@@ -786,28 +786,35 @@ begin
      (element is tsvgtext      ) or
      (element is tsvgpolypoints) then
   begin
-
-
-    if (element is tsvgtext      ) then
-      tsvgtext(element).draw(bmp.canvas2d, cumillimeter)
-    else
-      element.draw(bmp.canvas2d, cumillimeter);
-
-
-
+    element.draw(bmp.canvas2d, cumillimeter);
     points := bmp.canvas2d.currentpath;
-    try
-      for i := 0 to length(points) - 2 do
-      begin
-        line.p0.x := points[i].x;
-        line.p0.y := points[i].y;
-        line.p1.x := points[i+1].x;
-        line.p1.y := points[i+1].y;
 
-        if distance_between_two_position(@line.p0, @line.p1) < 2000  then
-          apaths.addline(@line, element.id);
+    i := 0;
+    while i < length(points) do
+    begin
+      writeln('index** =', i, ' p.x=', points[i].x:2:2);
+      writeln('index** =', i, ' p.x=', points[i].y:2:2);
+      if (points[i].x < 0) or
+         (points[i].y < 0) then
+      begin
+        points[i].x := -1;
+        points[i].y := -1;
       end;
-    except
+      inc(i);
+    end;
+
+    for i := 0 to length(points) - 2 do
+    begin
+      line.p0.x := points[i].x;
+      line.p0.y := points[i].y;
+      line.p1.x := points[i+1].x;
+      line.p1.y := points[i+1].y;
+
+      if (line.p0.x > 0) and
+         (line.p0.y > 0) and
+         (line.p1.x > 0) and
+         (line.p1.y > 0) then
+        apaths.addline(@line, element.id);
     end;
     setlength(points, 0);
   end else
@@ -831,8 +838,6 @@ procedure svg2paths(const afilename: string; apaths: tvppaths);
 var
     i: longint;
   svg: tbgrasvg;
-  bmp: tbgrabitmap;
-    p: arrayoftpointf;
 begin
   svg := tbgrasvg.create(afilename);
   for i := 0 to svg.content.elementcount - 1 do

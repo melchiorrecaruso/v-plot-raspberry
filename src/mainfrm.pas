@@ -91,7 +91,6 @@ type
 
 
     procedure heightseeditingdone  (sender: tobject);
-    procedure SVGViewerRedraw(Sender: TObject; Bitmap: TBGRABitmap);
     procedure widthseeditingdone   (sender: tobject);
     procedure verticalcbeditingdone(sender: tobject);
 
@@ -356,7 +355,7 @@ begin
       paths.clear;
       svgviewer.loadfromfile(opendialog.filename);
 
-    //svg2paths(opendialog.filename, paths);
+      svg2paths(opendialog.filename, paths);
     //vec2paths(opendialog.filename, paths);
     //dxf2paths(opendialog.filename, paths);
     //except
@@ -541,20 +540,6 @@ begin
   formatcbchange(nil);
 end;
 
-procedure tmainform.SVGViewerRedraw(Sender: TObject; Bitmap: TBGRABitmap);
-var
-  i: longint;
-  points: arrayoftpointf;
-begin
-  points := bitmap.canvas2d.currentpath;
-  for i := 0 to length(points) - 2 do
-  begin
-    writeln('index =', i, ' p.x=', points[i].x:2:2);
-    writeln('index =', i, ' p.x=', points[i].y:2:2);
-  end;
-  setlength(points, 0);
-end;
-
 procedure tmainform.widthseeditingdone(sender: tobject);
 begin
   formatcbchange(nil);
@@ -686,6 +671,14 @@ begin
 
   if (driverdetails.tick mod 1000) = 0 then
     progressbar.position := driverthread.progress;
+
+  if (driverdetails.tick mod 50) = 0 then
+  begin
+    image.canvas.draw(0, 0, bitmap);
+
+    sleep(50);
+  end;
+
 
   application.processmessages;
 end;
