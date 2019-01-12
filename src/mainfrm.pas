@@ -27,14 +27,14 @@ interface
 
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls, comctrls,
-  buttons, menus, spin, vppaths, vpsetting, vpdriver, BCSVGViewer, BGRABitmap, BCTypes, BGraBitmapTypes;
+  buttons, menus, spin, vppaths, vpsetting, vpdriver, BCSVGViewer,
+  BGRAGraphicControl, BGRABitmap, BGRABitmapTypes, BCTypes;
 
 type
   { tmainform }
 
   tmainform = class(tform)
     aboutbtn: tbitbtn;
-    SVGViewer: TBCSVGViewer;
     layoutbtn: tbitbtn;
     imagemenu: TPopupMenu;
     progressbar: TProgressBar;
@@ -109,7 +109,8 @@ type
     procedure imagemenuclick(sender: tobject);
 
   private
-      bitmap: tbitmap;
+          ar: tlist;
+         bit: tbgrabitmap;
        paths: tvppaths;
  mouseisdown: boolean;
           px: longint;
@@ -151,8 +152,8 @@ begin
   driver.delayz  :=       setting.delayz;
   driver.pen     := false;
   // create preview and empty paths
-  bitmap := tbitmap.create;
-   paths := tvppaths.create;
+    bit := tbgrabitmap.create;
+  paths := tvppaths.create;
   // update preview
   formatcbchange(nil);
   // show toolbars
@@ -174,7 +175,7 @@ begin
   gohomebtnclick(nil);
   wave.destroy;
   paths.destroy;
-  bitmap.destroy;
+  bit.destroy;
   driver.destroy;
   setting.destroy;
 end;
@@ -350,17 +351,11 @@ begin
   if opendialog.execute then
   begin
     lock2(false);
-    caption := 'vPlotter - ' + opendialog.filename;
-    //try
-      paths.clear;
-      svgviewer.loadfromfile(opendialog.filename);
+    paths.clear;
 
-      svg2paths(opendialog.filename, paths);
-    //vec2paths(opendialog.filename, paths);
-    //dxf2paths(opendialog.filename, paths);
-    //except
-      //paths.clear;
-    //end;
+    caption := 'vPlotter - ' + opendialog.filename;
+  //bcsvgviewer1.loadfromfile(opendialog.filename);
+    svg2paths(opendialog.filename, paths);
     reloadmiclick(nil);
   end;
 end;
@@ -370,7 +365,8 @@ var
   i, j, k: longint;
      path: tvppath;
    entity: tvpentity;
-    point: tvppoint;
+    point1: tvppoint;
+    point2: tvppoint;
 begin
   lock2(false);
   // updtare preview ...
@@ -381,16 +377,26 @@ begin
       for j := 0 to path.count - 1 do
       begin
         entity := path.items[j];
-        for k := 0 to entity.count - 1 do
+        for k := 0 to entity.count - 2 do
         begin
-          point := entity.items[k]^;
-          bitmap.canvas.pixels[
-            trunc(( widthse.value div 2) + point.x + offsetxse.value + 1),
-            trunc((heightse.value div 2) - point.y - offsetyse.value + 1)] := clblack;
+
+          (*
+          point1   := entity.items[k]^;
+          point1.x := ( widthse.value div 2) + point1.x + offsetxse.value + 1;
+          point1.y := (heightse.value div 2) - point1.y - offsetyse.value + 1;
+
+          point2   := entity.items[k+1]^;
+          point2.x := ( widthse.value div 2) + point2.x + offsetxse.value + 1;
+          point2.y := (heightse.value div 2) - point2.y - offsetyse.value + 1;
+
+          bit.drawlineantialias(
+            point1.x, point1.y,
+            point2.x, point2.y, bgra(0, 0, 0), 0.5);
+          *)
         end;
       end;
   end;
-  image.canvas.draw(0, 0, bitmap);
+  bit.draw(image.canvas, 0, 0, true);
   lock2(true);
 end;
 
@@ -398,13 +404,13 @@ procedure tmainform.clearmiclick(sender: tobject);
 begin
   lock2(false);
   // ---
-  bitmap.canvas.pen  .color := clltgray;
-  bitmap.canvas.brush.color := clltgray;
-  bitmap.canvas.brush.style := bssolid;
-  bitmap.setsize(
+  bit.canvas.pen  .color := clltgray;
+  bit.canvas.brush.color := clltgray;
+  bit.canvas.brush.style := bssolid;
+  bit.setsize(
      widthse.value + 2,
     heightse.value + 2);
-  bitmap.canvas.fillrect(0, 0,
+  bit.canvas.fillrect(0, 0,
      widthse.value + 2,
     heightse.value + 2);
   // ---
@@ -647,14 +653,12 @@ end;
 procedure tmainform.onplotterstart;
 begin
   lock1(false);
-
   progressbar.visible:= true;
   application.processmessages;
 end;
 
 procedure tmainform.onplotterstop;
 begin
-  image.canvas.draw(0, 0, bitmap);
   driverthread := nil;
   penupbtnclick(nil);
 
@@ -665,21 +669,10 @@ end;
 
 procedure tmainform.onplottertick;
 begin
-  bitmap.canvas.pixels[
-    trunc(( widthse.value div 2) + driverdetails.point.x + offsetxse.value + 1),
-    trunc((heightse.value div 2) - driverdetails.point.y - offsetyse.value + 1)] := clred;
-
   if (driverdetails.tick mod 1000) = 0 then
-    progressbar.position := driverthread.progress;
-
-  if (driverdetails.tick mod 50) = 0 then
   begin
-    image.canvas.draw(0, 0, bitmap);
-
-    sleep(50);
+    progressbar.position := driverthread.progress;
   end;
-
-
   application.processmessages;
 end;
 

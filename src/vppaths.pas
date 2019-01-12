@@ -27,7 +27,7 @@ interface
 
 uses
   classes, vpmath, vpsetting, bgrabitmap, bgrasvg, bgrasvgshapes, bgrasvgtype,
-  bgrabitmaptypes, bgratransform, bgrapath, bgravectorize, bcsvgviewer;
+  bgrabitmaptypes, bgratransform, bgrapath, bgravectorize, bcsvgviewer, bgracanvas2d;
 
 type
   tvpentity = class(tobject)
@@ -772,7 +772,7 @@ end;
 procedure element2paths(element: tsvgelement; apaths: tvppaths);
 var
      bmp: tbgrabitmap;
-    i, j: longint;
+       i: longint;
     line: tvpline;
   points: arrayoftpointf;
 begin
@@ -786,51 +786,28 @@ begin
      (element is tsvgtext      ) or
      (element is tsvgpolypoints) then
   begin
-    element.draw(bmp.canvas2d, cumillimeter);
+    element.draw(bmp.canvas2d, cucustom);
     points := bmp.canvas2d.currentpath;
-
-    i := 0;
-    while i < length(points) do
-    begin
-      writeln('index** =', i, ' p.x=', points[i].x:2:2);
-      writeln('index** =', i, ' p.x=', points[i].y:2:2);
-      if (points[i].x < 0) or
-         (points[i].y < 0) then
-      begin
-        points[i].x := -1;
-        points[i].y := -1;
-      end;
-      inc(i);
-    end;
-
     for i := 0 to length(points) - 2 do
-    begin
-      line.p0.x := points[i].x;
-      line.p0.y := points[i].y;
-      line.p1.x := points[i+1].x;
-      line.p1.y := points[i+1].y;
-
-      if (line.p0.x > 0) and
-         (line.p0.y > 0) and
-         (line.p1.x > 0) and
-         (line.p1.y > 0) then
+      if (not isemptypointf(points[i  ])) and
+         (not isemptypointf(points[i+1])) then
+      begin
+        line.p0.x := points[i].x;
+        line.p0.y := points[i].y;
+        line.p1.x := points[i+1].x;
+        line.p1.y := points[i+1].y;
         apaths.addline(@line, element.id);
-    end;
+      end;
     setlength(points, 0);
   end else
-  if element is tsvggroup then
+  if (element is tsvggroup ) then
   begin
     with tsvggroup(element).content do
-    begin
       for i := 0 to elementcount - 1 do
         element2paths(element[i], apaths);
-    end;
   end else
   if enabledebug then
-  begin
     writeln(element.classname);
-  end;
-
   bmp.destroy;
 end;
 
@@ -841,12 +818,10 @@ var
 begin
   svg := tbgrasvg.create(afilename);
   for i := 0 to svg.content.elementcount - 1 do
-  begin
     element2paths(svg.content.element[i], apaths);
-  end;
   svg.destroy;
 
-  apaths.mirror_x;
+  //apaths.mirror_x;
   apaths.createtoolpath;
   apaths.zerocenter;
 end;

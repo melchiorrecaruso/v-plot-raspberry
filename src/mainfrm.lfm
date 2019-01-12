@@ -1,8 +1,9 @@
 object mainform: Tmainform
-  Left = 301
+  Left = 298
   Height = 565
-  Top = 114
+  Top = 153
   Width = 921
+  ActiveControl = leftupbtn
   Anchors = []
   Caption = 'vPlotter'
   ClientHeight = 565
@@ -52,15 +53,6 @@ object mainform: Tmainform
       Proportional = True
       Stretch = True
       StretchOutEnabled = False
-    end
-    object SVGViewer: TBCSVGViewer
-      Left = 8
-      Height = 194
-      Top = 6
-      Width = 227
-      Color = clYellow
-      ColorOpacity = 128
-      Caption = 'SVGViewer'
     end
   end
   object manualdrivinggb: TGroupBox
