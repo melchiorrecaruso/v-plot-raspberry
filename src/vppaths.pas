@@ -26,8 +26,7 @@ unit vppaths;
 interface
 
 uses
-  classes, vpmath, vpsetting, bgrabitmap, bgrasvg, bgrasvgshapes, bgrasvgtype,
-  bgrabitmaptypes, bgratransform, bgrapath, bgravectorize, bcsvgviewer, bgracanvas2d;
+  classes, vpmath, vpsetting;
 
 type
   tvpentity = class(tobject)
@@ -95,24 +94,14 @@ type
     property count: longint read getcount;
   end;
 
-
-  TPather = class(TBCSVGViewer)
-
-
-  public
-
-
-
-  end;
-
-  //procedure dxf2paths(const afilename: string; apaths: tvppaths);
-  //procedure vec2paths(const afilename: string; apaths: tvppaths);
+  procedure dxf2paths(const afilename: string; apaths: tvppaths);
   procedure svg2paths(const afilename: string; apaths: tvppaths);
 
 implementation
 
 uses
-  math, sysutils;
+  math, sysutils, bgrabitmap, bgrasvg, bgrasvgshapes, bgrasvgtype,
+  bgrabitmaptypes, bgravectorize, bgracanvas2d, vpdxfreader;
 
 // internal toolpath routines
 
@@ -671,7 +660,7 @@ begin
 end;
 
 // dxf2paths
-(*
+
 procedure dxf2paths(const afilename: string; apaths: tvppaths);
 var
   reader: tvdxfreader;
@@ -683,90 +672,6 @@ begin
   apaths.createtoolpath;
 end;
 
-// vectorial2paths
-
-procedure entity2paths(entity: tventity; apaths: tvppaths);
-var
-          i: longint;
-     circle: tvpcircle;
-  circlearc: tvpcirclearc;
-       line: tvpline;
-    segment: tpathsegment;
-begin
-  if entity is tvcircle then
-  begin
-    circle.center.x := tvcircle(entity).x;
-    circle.center.y := tvcircle(entity).y;
-    circle.radius   := tvcircle(entity).radius;
-    apaths.addcircle(@circle, '0');
-  end else
-  if entity is tvcirculararc then
-  begin
-    circlearc.center.x   := tvcirculararc(entity).x;
-    circlearc.center.y   := tvcirculararc(entity).y;
-    circlearc.radius     := tvcirculararc(entity).radius;
-    circlearc.startangle := tvcirculararc(entity).startangle;
-    circlearc.endangle   := tvcirculararc(entity).endangle;
-    apaths.addcirclearc(@circlearc, '0');
-  end else
-  if entity is tpath then
-  begin
-    tpath(entity).prepareforsequentialreading;
-    for i := 0 to tpath(entity).len - 1 do
-    begin
-      segment := tpathsegment(tpath(entity).next);
-      case segment.segmenttype of
-        stmoveto:
-        begin
-          line.p0.x := t2dsegment(segment).x;
-          line.p0.y := t2dsegment(segment).y;
-        end;
-        st2dlinewithpen, st2dline, st3dline:
-        begin
-          line.p1.x := t2dsegment(segment).x;
-          line.p1.y := t2dsegment(segment).y;
-          apaths.addline(@line, '0');
-          line.p0 := line.p1;
-        end;
-        else
-          writeln(segment.segmenttype);
-      end;
-    end;
-  end else
-  if entity is tvlayer then
-  begin
-    for i := 0 to tvlayer(entity).getentitiescount -1 do
-    begin
-      entity2paths(tvlayer(entity).getentity(i), apaths);
-    end;
-  end else
-  begin
-    if enabledebug then
-      writeln(entity.classname);
-  end;
-end;
-
-procedure vec2paths(const afilename: string; apaths: tvppaths);
-var
-  i, j: longint;
-  page: tvpage;
-   vec: tvvectorialdocument;
-begin
-  vec := tvvectorialdocument.create;
-  vec.readfromfile(afilename);
-  for i := 0 to vec.getpagecount - 1 do
-  begin
-    page := vec.getpageasvectorial(i);
-    for j := 0 to page.getentitiescount - 1 do
-      entity2paths(page.getentity(j), apaths);
-  end;
-  vec.destroy;
-
-  apaths.createtoolpath;
-  apaths.mirror_x;
-  apaths.zerocenter;
-end;
-*)
 // svg2paths
 
 procedure element2paths(element: tsvgelement; apaths: tvppaths);
@@ -821,7 +726,7 @@ begin
     element2paths(svg.content.element[i], apaths);
   svg.destroy;
 
-  //apaths.mirror_x;
+  apaths.mirror_x;
   apaths.createtoolpath;
   apaths.zerocenter;
 end;
