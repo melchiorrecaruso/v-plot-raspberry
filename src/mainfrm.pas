@@ -347,15 +347,17 @@ end;
 
 procedure tmainform.openbtnclick(sender: tobject);
 begin
-  //opendialog.filter := 'dxf files (*.dxf)|*.dxf';
+  opendialog.filter := 'dxf files (*.dxf)|*.dxf|svg files (*.svg)|*.svg';
   if opendialog.execute then
   begin
+    caption := 'vPlotter - ' + opendialog.filename;
+
     lock2(false);
     paths.clear;
-
-    caption := 'vPlotter - ' + opendialog.filename;
-  //bcsvgviewer1.loadfromfile(opendialog.filename);
-    svg2paths(opendialog.filename, paths);
+    if lowercase(extractfileext(opendialog.filename)) = '.dxf' then
+      dxf2paths(opendialog.filename, paths)
+    else
+      svg2paths(opendialog.filename, paths);
     reloadmiclick(nil);
   end;
 end;
@@ -379,8 +381,6 @@ begin
         entity := path.items[j];
         for k := 0 to entity.count - 2 do
         begin
-
-          (*
           point1   := entity.items[k]^;
           point1.x := ( widthse.value div 2) + point1.x + offsetxse.value + 1;
           point1.y := (heightse.value div 2) - point1.y - offsetyse.value + 1;
@@ -392,7 +392,6 @@ begin
           bit.drawlineantialias(
             point1.x, point1.y,
             point2.x, point2.y, bgra(0, 0, 0), 0.5);
-          *)
         end;
       end;
   end;

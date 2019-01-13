@@ -746,12 +746,12 @@ begin
   lellipse.center.x       := 0.0;
   lellipse.center.y       := 0.0;
   lellipse.center.z       := 0.0;
-  lellipse.majoraxisendx  := 0.0;
-  lellipse.majoraxisendy  := 0.0;
-  lellipse.majoraxisendz  := 0.0;
-  lellipse.minoraxisratio := 0.0;
-  lellipse.startparam     := 0.0;
-  lellipse.endparam       := 0.0;
+//lellipse.majoraxisendx  := 0.0;
+//lellipse.majoraxisendy  := 0.0;
+//lellipse.majoraxisendz  := 0.0;
+//lellipse.minoraxisratio := 0.0;
+//lellipse.startparam     := 0.0;
+//lellipse.endparam       := 0.0;
   llayer                  :=  '';
 
   for i := 0 to atokens.count - 1 do
@@ -768,12 +768,12 @@ begin
       10: lellipse.center.x       := curtoken.floatvalue;
       20: lellipse.center.y       := curtoken.floatvalue;
       30: lellipse.center.z       := curtoken.floatvalue;
-      11: lellipse.majoraxisendx  := curtoken.floatvalue;
-      21: lellipse.majoraxisendy  := curtoken.floatvalue;
-      31: lellipse.majoraxisendz  := curtoken.floatvalue;
-      40: lellipse.minoraxisratio := curtoken.floatvalue;
-      41: lellipse.startparam     := curtoken.floatvalue;
-      42: lellipse.endparam       := curtoken.floatvalue;
+    //11: lellipse.majoraxisendx  := curtoken.floatvalue;
+    //21: lellipse.majoraxisendy  := curtoken.floatvalue;
+    //31: lellipse.majoraxisendz  := curtoken.floatvalue;
+    //40: lellipse.minoraxisratio := curtoken.floatvalue;
+    //41: lellipse.startparam     := curtoken.floatvalue;
+    //42: lellipse.endparam       := curtoken.floatvalue;
     end;
   end;
 
