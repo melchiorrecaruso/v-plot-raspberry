@@ -27,8 +27,7 @@ interface
 
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls, comctrls,
-  buttons, menus, spin, vppaths, vpsetting, vpdriver, BCSVGViewer,
-  BGRAGraphicControl, BGRABitmap, BGRABitmapTypes, BCTypes;
+  buttons, menus, spin, vppaths, vpsetting, vpdriver, bgrabitmap, bgrabitmaptypes;
 
 type
   { tmainform }
@@ -132,7 +131,7 @@ implementation
 {$R *.lfm}
 
 uses
-  math, sysutils, aboutfrm, vpmath, vpwave;
+  math, sysutils, aboutfrm, vpmath, vpwave, sketchyimage;
 
 // FORM EVENTS
 
@@ -147,7 +146,6 @@ begin
   setting.load(changefileext(paramstr(0), '.ini'));
   // create plotter driver
   driver         := tvpdriver.create;
-  driver.mode    := setting.mode;
   driver.delaym  := trunc(setting.delaym/setting.mode);
   driver.delayz  :=       setting.delayz;
   driver.pen     := false;
@@ -347,7 +345,7 @@ end;
 
 procedure tmainform.openbtnclick(sender: tobject);
 begin
-  opendialog.filter := 'dxf files (*.dxf)|*.dxf|svg files (*.svg)|*.svg';
+  //opendialog.filter := 'dxf files (*.dxf)|*.dxf|svg files (*.svg)|*.svg';
   if opendialog.execute then
   begin
     caption := 'vPlotter - ' + opendialog.filename;
@@ -355,9 +353,13 @@ begin
     lock2(false);
     paths.clear;
     if lowercase(extractfileext(opendialog.filename)) = '.dxf' then
-      dxf2paths(opendialog.filename, paths)
-    else
+      dxf2paths(opendialog.filename, paths);
+
+    if lowercase(extractfileext(opendialog.filename)) = '.svg' then
       svg2paths(opendialog.filename, paths);
+
+    decodePNG(opendialog.filename, 50, 1, 1, 50);
+
     reloadmiclick(nil);
   end;
 end;
@@ -498,7 +500,6 @@ begin
   setting.clear;
   setting.load(changefileext(paramstr(0), '.ini'));
   // update plotter driver
-  driver.mode   := setting.mode;
   driver.delaym := setting.delaym;
   driver.delayz := setting.delayz;
 

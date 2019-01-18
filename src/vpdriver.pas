@@ -48,12 +48,10 @@ type
     fdelaym:  longint;
     fdelayz:  longint;
     fenabled: boolean;
-    fmode:    longint;
     fpen:     boolean;
     fzoff:    boolean;
     procedure setcount0(value: longint);
     procedure setcount1(value: longint);
-    procedure setmode  (value: longint);
     procedure setpen   (value: boolean);
     procedure setzoff  (value: boolean);
   public
@@ -67,7 +65,6 @@ type
     property delaym:  longint read fdelaym  write fdelaym;
     property delayz:  longint read fdelayz  write fdelayz;
     property enabled: boolean read fenabled write fenabled;
-    property mode:    longint read fmode    write setmode;
     property pen:     boolean read fpen     write setpen;
     property zoff:    boolean read fzoff    write setzoff;
   end;
@@ -129,10 +126,6 @@ const
   mot1_step     = P29;
   mot1_dir      = P31;
 
-  motx_mod0     = P15;
-  motx_mod1     = P13;
-  motx_mod2     = P11;
-
   vplotmatrix : array [0..10, 0..18] of longint = (
     (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),  //  0
     (0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),  //  1
@@ -155,7 +148,6 @@ begin
   fdelaym  := trunc(setting.delaym/setting.mode);
   fdelayz  :=       setting.delayz;
   fenabled := false;
-  fmode    := setting.mode;
   fpen     := true;
   fzoff    := false;
   {$ifdef cpuarm}
@@ -181,7 +173,6 @@ begin
   digitalwrite(mot1_dir,  LOW);
   digitalwrite(mot1_step, LOW);
   {$endif}
-  setmode(1);
   setpen(false);
 end;
 
@@ -194,63 +185,6 @@ procedure  tvpdriver.init(acount0, acount1: longint);
 begin
   fcount0 := acount0;
   fcount1 := acount1;
-end;
-
-procedure tvpdriver.setmode(value: longint);
-begin
-  if value <> fmode then
-  begin
-    {$ifdef cpuarm}
-    if value = 1 then
-    begin
-      digitalwrite(motx_mod0,  LOW);
-      digitalwrite(motx_mod1,  LOW);
-      digitalwrite(motx_mod2,  LOW);
-      fmode := value;
-    end else
-    if value = 2 then
-    begin
-      digitalwrite(motx_mod0, HIGH);
-      digitalwrite(motx_mod1,  LOW);
-      digitalwrite(motx_mod2,  LOW);
-      fmode := value;
-    end else
-    if value = 4 then
-    begin
-      digitalwrite(motx_mod0,  LOW);
-      digitalwrite(motx_mod1, HIGH);
-      digitalwrite(motx_mod2,  LOW);
-      fmode := value;
-    end else
-    if value = 8 then
-    begin
-      digitalwrite(motx_mod0, HIGH);
-      digitalwrite(motx_mod1, HIGH);
-      digitalwrite(motx_mod2,  LOW);
-      fmode := value;
-    end else
-    if value = 16 then
-    begin
-      digitalwrite(motx_mod0,  LOW);
-      digitalwrite(motx_mod1,  LOW);
-      digitalwrite(motx_mod2, HIGH);
-      fmode := value;
-    end else
-    if value = 32 then
-    begin
-      digitalwrite(motx_mod0, HIGH);
-      digitalwrite(motx_mod1,  LOW);
-      digitalwrite(motx_mod2, HIGH);
-      fmode := value;
-    end else
-    begin
-      digitalwrite(motx_mod0,  LOW);
-      digitalwrite(motx_mod1,  LOW);
-      digitalwrite(motx_mod2,  LOW);
-      fmode := 1;
-    end;
-    {$endif}
-  end;
 end;
 
 procedure tvpdriver.move(acount0, acount1: longint);

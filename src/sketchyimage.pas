@@ -1,19 +1,52 @@
+{
+  Description: vPlot sketch class.
 
+  Copyright (C) 2017-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
+
+  This source is free software; you can redistribute it and/or modify it under
+  the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 2 of the License, or (at your option)
+  any later version.
+
+  This code is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+  details.
+
+  A copy of the GNU General Public License is available on the World Wide Web
+  at <http://www.gnu.org/copyleft/gpl.html>. You can also obtain it by writing
+  to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+  MA 02111-1307, USA.
+}
 
 unit sketchyimage;
 
+{$mode objfpc}
 
 interface
 
 uses
-  classes, graphics, fpimage, fpvectorial;
+  classes, graphics, bgrabitmap, bgrasvg, fpimage, vpmath;
+
+
+  procedure decodePNG(const filename: string; maxlinelength: longint; nibsize: single; linesize: longint; maxlinelen: longint);
+
+
+implementation
+
+uses
+  math, sysutils;
+
 
 type
-  tsketchyimage = class(tobject) 
-    count:          longint;
+  tlinedarknessmode = (linedarknessmodeavg, linedarknessmodeclear);
+
+type
+  tsketchyimage = class(tobject)
+    retaincount:    longint;
     stype:          shortstring;
-    data_in:        tbitmap;
-    data_out:       tbitmap;
+    fdata_in:       array of array of longint;
+    fdata_out:      array of array of longint;
     scalefactor:    double;
     xcorrection:    double;
     ycorrection:    double;
@@ -27,10 +60,23 @@ type
     fheight:        longword;
     fwidth:         longword;
     fnibsize:       longint;
+  protected
+    function darknesshelperforline(
+      const x1, y1, x2, y2: single; mode: tlinedarknessmode): single;
+
+    function kernelvaluebyxy(x, y: longint; clear: boolean; kernelsize: longint): longint;
+
+    function avgdarknessforline  (x1, y1, x2, y2: single): single;
+    function cleardarknessforline(x1, y1, x2, y2: single): single;
+    function bestpointofndestinationsfromxy2(x, y, radius: single): tvppoint;
+
   public
     constructor create(const filename: rawbytestring);
     destructor destroy; override;
     function getdarkpixel: tpoint;
+
+    procedure save(const filename: rawbytestring);
+    procedure savestate(const filename: rawbytestring);
 
   published
 
@@ -41,7 +87,7 @@ type
 
 
 
-    property nibsize: longint  read fnibsize;
+    property nibsize: longint  read fnibsize write fnibsize;
 
     property height:  longword read fheight;
     property width:   longword read fwidth;
@@ -49,24 +95,18 @@ type
 
   end;
 
-
-implementation
-
-type
-  linedarknessmode = (linedarknessmodeavg, linedarknessmodeclear);
-
 var
   gcounter: longint = 0;
 
 
 constructor tsketchyimage.create(const filename: rawbytestring);
 var
-  i, j:  longint;
-  color: tfpcolor;
-  image: tportablenetworkgraphic;
+  x, y:   longint;
+  pixval: longint;
+  image:  tbgrabitmap;
 begin
   inherited create;
-  count           := 1;
+  retaincount     := 1;
   stype           := 'sketchyimage';
   scalefactor     := 1.0;
   xcorrection     := 0.0;
@@ -76,274 +116,349 @@ begin
 
   fbrightness_in  := 0;
   fbrightness_out := 0;
-  fbrightness_avg := 0.0;
+  fbrightness_avg := 255;
   fnibsize        := 1;
 
-  image := tportablenetworkgraphic.create;
+  image  := tbgrabitmap.create;
   try
     image.loadfromfile(filename);
   except;
-
   end;
-  fheight  := image.height;
-  fwidth   := image.width;
+  fheight := image.height;
+  fwidth  := image.width;
 
-  data_in  := tbitmap.create;
-  data_in.setsize(width, height);
-
-  data_out := tbitmap.create;
-  data_out.setsize(width, height);
-
-  for i := 0 to width - 1 do
-    for j := 0 to height -1 do
+  setlength(fdata_in,  fwidth, fheight);
+  setlength(fdata_out, fwidth, fheight);
+  for y := 0 to fheight - 1 do
+    for x := 0 to fwidth - 1 do
     begin
-      color := image.canvas.colors[i, j];
-      data_in .canvas.colors[i, j] := color;
-      inc(fbrightness_in, color.alpha);
-
-      color.alpha := 255;
-      data_out.canvas.colors[i, j] := color;
+      pixval := image.canvas.colors[x, y].alpha;
+      inc(fbrightness_in, pixval);
+      fdata_out[x, y] := 255;
+      fdata_in [x, y] := pixval;
     end;
   fbrightness_out := fwidth*fheight*255;
   fbrightness_avg := fbrightness_in/(fwidth*fheight);
-
-  freemem(image);
-end;
-
-
-function tsketchyimage.getdarkpixel: tpoint;
-var
-  i, j:  longword;
-  alpha: longword;
-  color: tfpcolor;
-begin
-  alpha    := 255;
-  result.x := 0;
-  result.y := 0;
-
-  for i := 0 to fwidth -1 do
-    for j := 0 to fheight -1 do
-    begin
-      color := data_in.canvas.colors[i, j];
-      if color.alpha < alpha then
-      begin
-        alpha    := color.alpha;
-        result.x := i;
-        result.y := j;
-      end;
-    end;
+  image.destroy;
 end;
 
 destructor tsketchyimage.destroy;
 begin
-  data_in.destroy;
-  data_out.destroy;
+  setlength(fdata_in,  0, 0);
+  setlength(fdata_out, 0, 0);
   inherited destroy;
 end;
 
-//
-// helper method called by :
-// 1) sketchyimage_avgdarknessforline returns the average darkness for pixels under a line
-// 2) sketchyimage_cleardarknessforline clears the darkness for pixels under the line, returns 0
-//
-float SketchyImage_darknessHelperForLine(SketchyImage *obj, float x1, float y1, float x2, float y2,LineDarknessMode mode){
+function tsketchyimage.getdarkpixel: tpoint;
+var
+  x, y:    longint;
+  darkest: longint;
+  pixval:  longint;
+begin
+  darkest  := 255;
+  result.x := 0;
+  result.y := 0;
 
-    int kernelSize = obj->nibsize;
-    if(kernelSize%2 == 0){
-        kernelSize = kernelSize - 1;
-    }
+  for y := 0 to fheight -1 do
+    for x := 0 to fwidth - 1 do
+    begin
+      pixval := fdata_in[x, y];
+      if pixval < darkest then
+      begin
+        darkest  := pixval;
+        result.x := x;
+        result.y := y;
+      end;
+    end;
+end;
 
-    int xpol = (x1-x2) < 0;
-    int ypol = (y1-y2) < 0;
-    if(xpol == 0){
-        xpol = -1;
-    }
-    if(ypol == 0){
-        ypol = -1;
-    }
+function tsketchyimage.darknesshelperforline(
+  const x1, y1, x2, y2: single; mode: tlinedarknessmode): single;
+var
 
-    float xd = fabs(x1-x2);
-    float yd = fabs(y1-y2);
-    float slope = (x1-x2)/(y1-y2);
-    float totaldarkness = 0;
-    float avg;
-    if(xd > yd){
-        int i;
-        int cx = (int)x1;
-        int cy = (int)y1;
-        for(i=0;i<xd;i++){
-            if(mode == lineDarknessModeAvg){
-                int darkness = SketchyImage_kernelValueByXY(obj,(int)floor(cx),(int)floor(cy),false,kernelSize);
-                totaldarkness = totaldarkness + darkness;
-            }else{
-                SketchyImage_kernelValueByXY(obj,cx,cy,true,kernelSize);
-            }
-            cx += xpol;
-            cy = y1 + i/slope * xpol;
-        }
-        avg = totaldarkness/xd; 
-    }else{
-        int i;
-        int cx = (int)x1;
-        int cy = (int)y1;
-        for(i=0;i<yd;i++){
-            if(mode == lineDarknessModeAvg){
-                int darkness = SketchyImage_kernelValueByXY(obj,cx,cy,false,kernelSize);
-                totaldarkness = totaldarkness + darkness;
-            }else{
-                SketchyImage_kernelValueByXY(obj,cx,cy,true,kernelSize);
-            }
-            cy += ypol;
-            cx = x1 + i*slope * ypol;
-        }
-        avg = totaldarkness/yd; 
-    }
-    return avg;
-}
+  i: longint;
 
-float SketchyImage_avgDarknessForLine(SketchyImage *obj, float x1, float y1, float x2, float y2){
-    float avg = SketchyImage_darknessHelperForLine(obj,x1,y1,x2,y2,lineDarknessModeAvg);
-    return avg;
-}
+  cx: longint;
+  cy: longint;
 
-void SketchyImage_clearDarknessForLine(SketchyImage *obj, float x1, float y1, float x2, float y2){
-    SketchyImage_darknessHelperForLine(obj,x1,y1,x2,y2,lineDarknessModeClear);
-}
+  kernelsize: longint;
 
-Point *SketchyImage_bestPointOfNDestinationsFromXY2(SketchyImage *obj, int radius, int x, int y){
-
-    x = x * obj->scaleFactor;
-    y = y * obj->scaleFactor;
-
-    float degree_to_radian_fact = 0.0174532925;
-    int n = 360; //full circle scan
-    int i;
-    float best = 9999.0;
-    int bestX = 0;
-    int bestY = 0;
-    gCounter ++;
-    for(i=gCounter; i<n+gCounter; i+=3){
-
-        int rx = cos(i*degree_to_radian_fact) * radius + x;
-        int ry = sin(i*degree_to_radian_fact) * radius + y;
-
-        if(rx < obj->width-1 && ry < obj->height-1 && rx > 0 && ry > 0){
-            float avg = SketchyImage_avgDarknessForLine(obj,x,y,rx,ry);
-            if(avg < best){
-                best = avg;
-                bestX = rx;
-                bestY = ry;
-                // if(avg < 100){
-                //     break;
-                // }
-            }
-        }
-
-    }
-    SketchyImage_clearDarknessForLine(obj,x,y,bestX,bestY);
-    bestX = bestX/obj->scaleFactor;
-    bestY = bestY/obj->scaleFactor;
-    return Point_alloc((float)bestX,(float)bestY);
-
-}
-
-int pix(SketchyImage *obj,int pixelindex){
-    if(pixelindex < (obj->width * obj->height)){
-        return pixelindex;
-    }
-    return 0;
-}
-
-int SketchyImage_getPixel(SketchyImage *obj,int x, int y){
-    if (y < 0 || y > obj->height-1 || x < 0 || x > obj->width-1){
-        return 255;
-    }
-    int index = y * obj->width + x;
-    return obj->imageData[pix(obj,index)];
-}
-
-int SketchyImage_kernelValueByXY(SketchyImage *obj,int x, int y, bool clear,int kernelSize){
-    
-    //the image data contains a 6 byte header
-    //these are the threshold levels
-    //this used to be fixed (36 spacing)
-    //int levels[6] = {217, 180, 144, 108, 72, 36};
-    if (x > obj->width-1 || y > obj->height-1 || x < 0 || y < 0){
-        //out of bounds
-        return -1;
-    }
-    int w = obj->width;
-    int pixelindex = y*w + x;
-
-    int pixelValue = obj->imageData[pixelindex];
-    if(kernelSize > 1){
-        int i;
-        int limit = (kernelSize - 1) / 2.0;
-        for(i=0;i<limit;i++){
-            pixelValue += obj->imageData[pix(obj,pixelindex+1+i)];
-            pixelValue += obj->imageData[pix(obj,pixelindex+obj->width+(i*obj->width))];
-            pixelValue += obj->imageData[pix(obj,pixelindex-obj->width-(i*obj->width))];
-            pixelValue += obj->imageData[pix(obj,pixelindex-1-i)];
-        }
-    }
-
-    if(clear){
-        int index;
-        if(kernelSize > 1){
-            int i;
-            int limit = (kernelSize - 1) / 2.0;
-            for(i=0;i<limit;i++){
-
-                index = pix(obj,pixelindex+1+i);
-                obj->brightness += (255-obj->imageData[index]);
-                obj->imageData[index] = 255;
-                obj->outputBrightness -= obj->outputImageData[index];
-                obj->outputImageData[index] = 0;
-
-                index = pix(obj,pixelindex+obj->width+(i*obj->width));
-                obj->brightness += (255-obj->imageData[index]);
-                obj->imageData[index] = 255;
-                obj->outputBrightness -= obj->outputImageData[index];
-                obj->outputImageData[index] = 0;
-
-                index = pix(obj,pixelindex-obj->width-(i*obj->width));
-                obj->brightness += (255-obj->imageData[index]);
-                obj->imageData[index] = 255;
-                obj->outputBrightness -= obj->outputImageData[index];
-                obj->outputImageData[index] = 0;
-
-                index = pix(obj,pixelindex-1-i);
-                obj->brightness += (255-obj->imageData[index]);
-                obj->imageData[index] = 255;
-                obj->outputBrightness -= obj->outputImageData[index];
-                obj->outputImageData[index] = 0;
-
-            }
-        }
-        index = pixelindex;
-        obj->brightness += (255-obj->imageData[index]);
-        obj->imageData[index] = 255;
-        obj->outputBrightness -= obj->outputImageData[index];
-        obj->outputImageData[index] = 0;
-    }
-
-    return pixelValue;
-}
-
-void SketchyImage_saveStateAsPNG(SketchyImage *obj,const char *name){
-    unsigned char *imd = obj->imageData;
-    unsigned error = lodepng_encode_file(name, imd,obj->width, obj->height,LCT_GREY,8);
-    if(error) printf("error %u: %s\n", error, lodepng_error_text(error));
-}
-
-void SketchyImage_saveAsPNG(SketchyImage *obj,const char *name){
-    unsigned char *imdo = obj->outputImageData;
-    unsigned erroro = lodepng_encode_file(name, imdo,obj->width, obj->height,LCT_GREY,8);
-    if(erroro) printf("error %u: %s\n", erroro, lodepng_error_text(erroro)); 
-}
+  xpol: longint;
+  ypol: longint;
 
 
+  xd:    single;
+  yd:    single;
+  slope: single;
+  totdarkness: single;
+
+  darkness: longint;
+begin
+
+  kernelsize := nibsize;
+  if (kernelsize mod 2) = 0 then
+    kernelsize := kernelsize - 1;
+
+  xpol := longint((x1-x2)<0);
+  ypol := longint((y1-y2)<0);
+
+  if (xpol = 0) then xpol := -1;
+  if (ypol = 0) then ypol := -1;
+
+  xd := abs(x1-x2);
+  yd := abs(y1-y2);
+  slope := (x1-x2)/(y1-y2);
+  totdarkness := 0;
+
+  if (xd > yd) then
+  begin
+    i  := 0;
+    cx := round(x1);
+    cy := round(y1);
+    while i < xd do
+    begin
+      if mode = linedarknessmodeavg then
+      begin
+        darkness := kernelvaluebyxy(trunc(cx), trunc(cy), false, kernelsize);
+        totdarkness := totdarkness + darkness;
+      end else
+        kernelvaluebyxy(cx, cy, true, kernelsize);
+
+      cx := cx + xpol;
+      cy := round(y1 + i/slope*xpol);
+      inc(i);
+    end;
+    result := totdarkness/xd;
+  end else
+  begin
+    i  := 0;
+    cx := round(x1);
+    cy := round(y1);
+    while i < yd do
+    begin
+      if mode = linedarknessmodeavg then
+      begin
+        darkness := kernelvaluebyxy(cx, cy, false, kernelsize);
+        totdarkness := totdarkness + darkness;
+      end else
+        kernelvaluebyxy(cx, cy, true, kernelsize);
+
+      cy := cy + ypol;
+      cx := trunc(x1 + i*slope*ypol);
+      inc(i);
+    end;
+    result := totdarkness/yd;
+  end;
+end;
+
+function tsketchyimage.avgdarknessforline(x1, y1, x2, y2: single): single;
+begin
+  result := darknesshelperforline(x1, y1, x2, y2, linedarknessmodeavg);
+end;
+
+function tsketchyimage.cleardarknessforline(x1, y1, x2, y2: single): single;
+begin
+  result := darknesshelperforline(x1, y1, x2, y2, linedarknessmodeclear);
+end;
+
+function tsketchyimage.bestpointofndestinationsfromxy2(x, y, radius: single): tvppoint;
+var
+  i: longint;
+  best:  single;
+  bestx: single;
+  besty: single;
+
+  rx:  single;
+  ry:  single;
+  avg: single;
+
+begin
+  x := x * scalefactor;
+  y := y * scalefactor;
+
+  best  := 9999.0;
+  bestx := 0;
+  besty := 0;
+  inc(gcounter);
+
+  i := gcounter;
+  while i < 360 + gcounter do
+  begin
+    rx := x + cos(degtorad(i)) * radius;
+    ry := y + sin(degtorad(i)) * radius;
+
+    if (rx < width -1) and (rx > 0) and
+       (ry < height-1) and (ry > 0) then
+    begin
+      avg := avgdarknessforline(x, y, rx, ry);
+      if (avg < best) then
+      begin
+        best  := avg;
+        bestX := rx;
+        bestY := ry;
+      //if (avg < 100) then
+      //  break;
+      end;
+    end;
+    inc(i, 3);
+  end;
+
+  cleardarknessforline(x, y, bestx, besty);
+  result.x := bestx/scalefactor;
+  result.y := besty/scalefactor;
+end;
+
+function tsketchyimage.kernelvaluebyxy(x, y: longint; clear: boolean; kernelsize: longint): longint;
+var
+  xt: longint;
+  yt: longint;
+
+  i: longint;
+  limit: longint;
+begin
+  result := -1;
+  if (x > width -1) or
+     (y > height-1) or
+     (x < 0)        or
+     (y < 0)        then exit;
+
+  result := fdata_in[x, y];
+  if (kernelsize > 1) then
+  begin
+    limit := (kernelsize - 1) div 2;
+    for i := 0 to limit - 1 do
+    begin
+      inc(result, fdata_in[min(x+1+i, fwidth), y]);
+      inc(result, fdata_in[max(x-1-i,      0), y]);
+      inc(result, fdata_in[x, min(y+1+i, fheight)]);
+      inc(result, fdata_in[x, max(y-1-i,       0)]);
+    end;
+  end;
+
+   if clear then
+   begin
+     if (kernelsize > 1) then
+     begin
+       limit := (kernelsize - 1) div 2;
+       for i := 0 to limit - 1 do
+       begin
+         xt := min(x+1+i, fwidth);
+         inc(fbrightness_in, 255 - fdata_in [xt, y]);
+         dec(fbrightness_out,      fdata_out[xt, y]);
+         fdata_in [xt, y] := 255;
+         fdata_out[xt, y] := 0;
+
+         xt := max(x-1-i, 0);
+         inc(fbrightness_in, 255 - fdata_in [xt, y]);
+         dec(fbrightness_out,      fdata_out[xt, y]);
+         fdata_in [xt, y] := 255;
+         fdata_out[xt, y] := 0;
+
+         yt := min(y+1+i, fheight);
+         inc(fbrightness_in, 255 - fdata_in [x, yt]);
+         dec(fbrightness_out,      fdata_out[x, yt]);
+         fdata_in [x, yt] := 255;
+         fdata_out[x, yt] := 0;
+
+         yt := max(y-1-i, 0);
+         inc(fbrightness_in, 255 - fdata_in [x, yt]);
+         dec(fbrightness_out,      fdata_out[x, yt]);
+         fdata_in [x, yt] := 255;
+         fdata_out[x, yt] := 0;
+       end
+     end;
+
+     inc(fbrightness_in, 255 - fdata_in [x, y]);
+     dec(fbrightness_out,      fdata_out[x, y]);
+     fdata_in [x, y] := 255;
+     fdata_out[x, y] := 0;
+   end;
+end;
+
+procedure tsketchyimage.savestate(const filename: rawbytestring);
+var
+  x, y:  longint;
+  image: tbgrabitmap;
+  color: tfpcolor;
+begin
+  image := tbgrabitmap.create(fwidth, fheight);
+  for y := 0 to fheight - 1 do
+    for x := 0 to fwidth - 1 do
+    begin
+      color       := image.canvas.colors[x, y];
+      color.alpha := fdata_in[x, y];
+      image.canvas.colors[x, y] := color;
+    end;
+  image.savetofile(filename);
+  image.destroy;
+end;
+
+procedure tsketchyimage.save(const filename: rawbytestring);
+var
+  x, y:  longint;
+  image: tbgrabitmap;
+  color: tfpcolor;
+begin
+  image := tbgrabitmap.create(fwidth, fheight);
+  for y := 0 to fheight - 1 do
+    for x := 0 to fwidth - 1 do
+    begin
+      color       := image.canvas.colors[x, y];
+      color.alpha := fdata_out[x, y];
+      image.canvas.colors[x, y] := color;
+    end;
+  image.savetofile(filename);
+  image.destroy;
+end;
+
+procedure decodePNG(const filename: string; maxlinelength: longint; nibsize: single; linesize: longint; maxlinelen: longint);
+var
+  x: single;
+  y: single;
+  r: longint;
+  p: tvppoint;
+
+  sketchy: tsketchyimage;
+  avg: single;
+  threshold : longint;
+  brightness_out: longint;
+  darkestpixel: tpoint;
+
+  svg: tbgrasvg;
+
+begin
+  randomize;
+  sketchy := tsketchyimage.create(filename);
+  sketchy.nibsize := linesize;
+
+  avg       := sketchy.brightness_avg;
+  threshold := sketchy.brightness_in;
+
+  if (avg < 128) then
+    threshold := round(threshold * (128.0/avg));
+
+  brightness_out := sketchy.brightness_out;
+  darkestpixel   := sketchy.getdarkpixel;
+
+  writeln('decodePNG - calc');
+
+  x := darkestpixel.x;
+  y := darkestpixel.y;
+  svg := tbgrasvg.create(sketchy.width, sketchy.height, cumillimeter);
+  while brightness_out > threshold do
+  begin
+    r := 10 + random(maxlinelen - 10);
+    p := sketchy.bestpointofndestinationsfromxy2(r,x,y);
+    svg.content.appendline(x, y, p.x, p.y);
+    brightness_out := sketchy.brightness_out;
+    writeln('brightness =', brightness_out);
+
+    x := p.x;
+    y := p.y;
+  end;
+  svg.savetofile(changefileext(filename, '.svg'));
+  sketchy.destroy;
+end;
 
 
-
-#endif
+end.

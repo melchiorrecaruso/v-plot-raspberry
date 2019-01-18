@@ -31,9 +31,9 @@ uses
 type
   pvppoint = ^tvppoint;
   tvppoint = packed record
-    x: double;
-    y: double;
-    z: double;
+    x: single;
+    y: single;
+    z: single;
   end;
 
   pvpline = ^tvpline;
@@ -44,52 +44,52 @@ type
 
   pvplineimp = ^tvplineimp;
   tvplineimp = packed record
-    a: double;
-    b: double;
-    c: double;
+    a: single;
+    b: single;
+    c: single;
   end;
 
   pvpcircle = ^tvpcircle;
   tvpcircle = packed record
     center: tvppoint;
-    radius: double;
+    radius: single;
   end;
 
   pvpcircleimp = ^tvpcircleimp;
   tvpcircleimp = packed record
-    a: double;
-    b: double;
-    c: double;
+    a: single;
+    b: single;
+    c: single;
   end;
 
   pvpcirclearc = ^tvpcirclearc;
   tvpcirclearc = packed record
     center:     tvppoint;
-    startangle: double;
-    endangle:   double;
-    radius:     double;
+    startangle: single;
+    endangle:   single;
+    radius:     single;
   end;
 
   pvpellipse = ^tvpellipse;
   tvpellipse = packed record
     center:   tvppoint;
-    radiusx:  double;
-    radiusy:  double;
-      angle:  double;
+    radiusx:  single;
+    radiusy:  single;
+      angle:  single;
   end;
 
 function translate_point(const p, cc: tvppoint): tvppoint;
 function line_by_two_points(const p0, p1: tvppoint): tvplineimp;
-function rotate_point(const p: tvppoint; const alpha: double): tvppoint;
-function distance_between_two_points(const p0, p1: tvppoint): double;
+function rotate_point(const p: tvppoint; const alpha: single): tvppoint;
+function distance_between_two_points(const p0, p1: tvppoint): single;
 function intersection_of_two_lines(const l0, l1: tvplineimp): tvppoint;
 function circle_by_three_points(const p0, p1, p2: tvppoint): tvpcircleimp;
 function circle_by_center_and_radius(const cc: tvppoint; radius: double): tvpcircleimp;
 function intersection_of_two_circles(const c0, c1: tvpcircleimp; var p1, p2: tvppoint): longint;
 
-function len_segment(segment: pvpline): double;
+function len_segment(segment: pvpline): single;
 
-function get_angle(const line: tvplineimp): double;
+function get_angle(const line: tvplineimp): single;
 
 var
   enabledebug: boolean = false;
@@ -109,7 +109,7 @@ begin
   result.c := (p1.x - p0.x) * p0.y -(p1.y - p0.y) * p0.x;
 end;
 
-function rotate_point(const p: tvppoint; const alpha: double): tvppoint;
+function rotate_point(const p: tvppoint; const alpha: single): tvppoint;
 var
   sinus, cosinus: double;
 begin
@@ -118,7 +118,7 @@ begin
   result.y := p.x *   sinus + p.y * cosinus;
 end;
 
-function distance_between_two_points(const p0, p1: tvppoint): double;
+function distance_between_two_points(const p0, p1: tvppoint): single;
 begin
   result := sqrt(sqr(p1.x - p0.x) + sqr(p1.y - p0.y));
 end;
@@ -201,7 +201,7 @@ begin
       result := 0;
 end;
 
-function get_angle(const line: tvplineimp): double;
+function get_angle(const line: tvplineimp): single;
 begin
   if line.b = 0 then
   begin
@@ -213,7 +213,7 @@ begin
     result := arctan2(line.a, -line.b);
 end;
 
-function len_segment(segment: pvpline): double;
+function len_segment(segment: pvpline): single;
 begin
   result := distance_between_two_points(segment^.p0, segment^.p1);
 end;

@@ -26,7 +26,7 @@ unit vppaths;
 interface
 
 uses
-  classes, vpmath, vpsetting;
+  classes, vpmath, vpsetting, sketchyimage;
 
 type
   tvpentity = class(tobject)
