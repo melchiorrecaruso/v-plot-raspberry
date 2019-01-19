@@ -121,6 +121,7 @@ const
   motz_freq     = 50;
 
 {$ifdef cpuarm}
+  mot_en        = P37;
   mot0_step     = P38;
   mot0_dir      = P40;
   mot1_step     = P29;
@@ -155,13 +156,9 @@ begin
   wiringpisetup;
   // setup pca9685 library
   pca9685setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, motz_freq);
-  // init step mode
-  pinmode(motx_mod0, OUTPUT);
-  pinmode(motx_mod1, OUTPUT);
-  pinmode(motx_mod2, OUTPUT);
-  digitalwrite(motx_mod0, LOW);
-  digitalwrite(motx_mod1, LOW);
-  digitalwrite(motx_mod2, LOW);
+  // enable motors
+  pinmode(mot_en,      OUTPUT);
+  digitalwrite(mot_en,    LOW);
   // init step motor0
   pinmode(mot0_dir,    OUTPUT);
   pinmode(mot0_step,   OUTPUT);
