@@ -162,7 +162,7 @@ begin
   pca9685setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, motz_freq);
   // enable motors
   pinmode(mot_en,      OUTPUT);
-  digitalwrite(mot_en,   HIGH);
+  digitalwrite(mot_en,    LOW);
   // init step motor0
   pinmode(mot0_dir,    OUTPUT);
   pinmode(mot0_step,   OUTPUT);
@@ -174,12 +174,13 @@ begin
   digitalwrite(mot1_dir,  LOW);
   digitalwrite(mot1_step, LOW);
   {$endif}
-  setxyoff(true);
+  setxyoff(false);
   setpen(false);
 end;
 
 destructor tvpdriver.destroy;
 begin
+  setxyoff(true);
   inherited destroy;
 end;
 
@@ -194,39 +195,39 @@ procedure tvpdriver.move(acount0, acount1: longint);
 var
    c0,   c1: boolean;
           i: longint;
-  dm0, ddm0: longint;
-  dm1, ddm1: longint;
+  dmx, ddmx: longint;
+  dmy, ddmy: longint;
 {$endif}
 begin
   {$ifdef cpuarm}
   if fxyoff  then exit;
   if enabled then
   begin
-    dm0 := acount0 - fcountx;
-    if dm0 > 0 then
+    dmx := acount0 - fcountx;
+    if dmx < 0 then
       digitalwrite(mot0_dir,  LOW)
     else
       digitalwrite(mot0_dir, HIGH);
 
-    dm1 := acount1 - fcounty;
-    if dm1 > 0 then
+    dmy := acount1 - fcounty;
+    if dmy < 0 then
       digitalwrite(mot1_dir, HIGH)
     else
       digitalwrite(mot1_dir,  LOW);
 
-    dm0 := abs(dm0);
-    dm1 := abs(dm1);
-    setpen(max(dm0, dm1) <= 10);
+    dmx := abs(dmx);
+    dmy := abs(dmy);
+    setpen(max(dmx, dmy) <= 10);
 
-    while (dm0 > 0) or (dm1 > 0) do
+    while (dmx > 0) or (dmy > 0) do
     begin
-      ddm0 := min(10, dm0);
-      ddm1 := min(10, dm1);
+      ddmx := min(10, dmx);
+      ddmy := min(10, dmy);
 
       for i := 0 to 18 do
       begin
-        c0 := vplotmatrix[ddm0, i] = 1;
-        c1 := vplotmatrix[ddm1, i] = 1;
+        c0 := vplotmatrix[ddmx, i] = 1;
+        c1 := vplotmatrix[ddmy, i] = 1;
 
         if c0 then digitalwrite(mot0_step, HIGH);
         if c1 then digitalwrite(mot1_step, HIGH);
@@ -240,8 +241,8 @@ begin
         if c0 or
            c1 then delaymicroseconds(fdelaym);
       end;
-      dec(dm0, ddm0);
-      dec(dm1, ddm1);
+      dec(dmx, ddmx);
+      dec(dmy, ddmy);
     end;
   end;
   {$endif}
