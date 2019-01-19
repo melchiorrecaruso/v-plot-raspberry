@@ -45,8 +45,8 @@ type
   tsketchyimage = class(tobject)
     retaincount:    longint;
     stype:          shortstring;
-    fdata_in:       array of array of longint;
-    fdata_out:      array of array of longint;
+    fdata_in:       array of array of byte;
+    fdata_out:      array of array of byte;
     scalefactor:    double;
     xcorrection:    double;
     ycorrection:    double;
@@ -132,14 +132,20 @@ begin
   for y := 0 to fheight - 1 do
     for x := 0 to fwidth - 1 do
     begin
-      pixval := image.canvas.colors[x, y].alpha;
+      pixval := byte(image.canvas.colors[x, y].green);
       inc(fbrightness_in, pixval);
       fdata_out[x, y] := 255;
       fdata_in [x, y] := pixval;
     end;
   fbrightness_out := fwidth*fheight*255;
   fbrightness_avg := fbrightness_in/(fwidth*fheight);
+
+  writeln('brightness_in  ', fbrightness_in);
+  writeln('brightness_avg ', fbrightness_avg);
+  writeln('brightness_out ', fbrightness_out);
+
   image.destroy;
+  halt;
 end;
 
 destructor tsketchyimage.destroy;
@@ -386,7 +392,7 @@ begin
     for x := 0 to fwidth - 1 do
     begin
       color       := image.canvas.colors[x, y];
-      color.alpha := fdata_in[x, y];
+      color.green := fdata_in[x, y];
       image.canvas.colors[x, y] := color;
     end;
   image.savetofile(filename);
@@ -458,6 +464,8 @@ begin
   end;
   svg.savetofile(changefileext(filename, '.svg'));
   sketchy.destroy;
+
+  writeln('decodePNG - end');
 end;
 
 

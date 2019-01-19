@@ -43,30 +43,33 @@ type
 
   tvpdriver = class
   private
-    fcount0:  longint;
-    fcount1:  longint;
+    fcountx:  longint;
+    fcounty:  longint;
     fdelaym:  longint;
     fdelayz:  longint;
     fenabled: boolean;
     fpen:     boolean;
     fzoff:    boolean;
+    fxyoff:   boolean;
     procedure setcount0(value: longint);
     procedure setcount1(value: longint);
     procedure setpen   (value: boolean);
     procedure setzoff  (value: boolean);
+    procedure setxyoff (value: boolean);
   public
     constructor create;
     destructor  destroy; override;
     procedure   init(acount0, acount1: longint);
     procedure   move(acount0, acount1: longint);
   published
-    property count0:  longint read fcount0  write setcount0;
-    property count1:  longint read fcount1  write setcount1;
+    property count0:  longint read fcountx  write setcount0;
+    property count1:  longint read fcounty  write setcount1;
     property delaym:  longint read fdelaym  write fdelaym;
     property delayz:  longint read fdelayz  write fdelayz;
     property enabled: boolean read fenabled write fenabled;
     property pen:     boolean read fpen     write setpen;
     property zoff:    boolean read fzoff    write setzoff;
+    property xyoff:   boolean read fxyoff   write setxyoff;
   end;
 
   tvpdriverthread = class(tthread)
@@ -88,6 +91,7 @@ type
   public
     constructor create(paths: tvppaths);
     destructor  destroy; override;
+
   public
     property enabled:  boolean       read fenabled  write fenabled;
     property maxdx:    double        read fmaxdx    write fmaxdx;
@@ -144,8 +148,8 @@ const
 constructor tvpdriver.create;
 begin
   inherited create;
-  fcount0  := 0;
-  fcount1  := 0;
+  fcountx  := 0;
+  fcounty  := 0;
   fdelaym  := trunc(setting.delaym/setting.mode);
   fdelayz  :=       setting.delayz;
   fenabled := false;
@@ -158,7 +162,7 @@ begin
   pca9685setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, motz_freq);
   // enable motors
   pinmode(mot_en,      OUTPUT);
-  digitalwrite(mot_en,    LOW);
+  digitalwrite(mot_en,   HIGH);
   // init step motor0
   pinmode(mot0_dir,    OUTPUT);
   pinmode(mot0_step,   OUTPUT);
@@ -170,6 +174,7 @@ begin
   digitalwrite(mot1_dir,  LOW);
   digitalwrite(mot1_step, LOW);
   {$endif}
+  setxyoff(true);
   setpen(false);
 end;
 
@@ -180,8 +185,8 @@ end;
 
 procedure  tvpdriver.init(acount0, acount1: longint);
 begin
-  fcount0 := acount0;
-  fcount1 := acount1;
+  fcountx := acount0;
+  fcounty := acount1;
 end;
 
 procedure tvpdriver.move(acount0, acount1: longint);
@@ -194,6 +199,7 @@ var
 {$endif}
 begin
   {$ifdef cpuarm}
+  if fxyoff  then exit;
   if enabled then
   begin
     dm0 := acount0 - fcount0;
@@ -239,12 +245,12 @@ begin
     end;
   end;
   {$endif}
-  fcount0 := acount0;
-  fcount1 := acount1;
+  fcountx := acount0;
+  fcounty := acount1;
   if enabledebug then
   begin
-    writeln(format('  DRIVER::CNT.0  = %12.5u', [fcount0]));
-    writeln(format('  DRIVER::CNT.1  = %12.5u', [fcount1]));
+    writeln(format('  DRIVER::CNT.0  = %12.5u', [fcountx]));
+    writeln(format('  DRIVER::CNT.1  = %12.5u', [fcounty]));
   end;
 end;
 
@@ -304,17 +310,28 @@ end;
 
 procedure tvpdriver.setcount0(value: longint);
 begin
-  move(value, fcount1);
+  move(value, fcounty);
 end;
 
 procedure tvpdriver.setcount1(value: longint);
 begin
-  move(fcount0, value);
+  move(fcountx, value);
 end;
 
 procedure tvpdriver.setzoff(value: boolean);
 begin
   fzoff := value;
+end;
+
+procedure tvpdriver.setxyoff(value: boolean);
+begin
+  {$ifdef cpuarm}
+  fxyoff := value;
+  if fxyoff then
+    digitalwrite(mot_en, HIGH)
+  else
+    digitalwrite(mot_en,  LOW);
+  {$endif}
 end;
 
 // tvpdriverthread
