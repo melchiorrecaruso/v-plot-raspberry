@@ -1,7 +1,7 @@
 {
   Description: vPlot driver library.
 
-  Copyright (C) 2017-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
+  Copyright (C) 2017-2019 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
   This source is free software; you can redistribute it and/or modify it under
   the terms of the GNU General Public License as published by the Free
@@ -32,12 +32,12 @@ uses
 type
   tvpdriverdetails = packed record
     point:  tvppoint;
-    len0:   double;
-    len1:   double;
-    load0:  longint;
-    load1:  longint;
-    count0: double;
-    count1: double;
+    lenx:   double;
+    leny:   double;
+    loadx:  longint;
+    loady:  longint;
+    countx: double;
+    county: double;
     tick:   longint;
   end;
 
@@ -51,8 +51,8 @@ type
     fpen:     boolean;
     fzoff:    boolean;
     fxyoff:   boolean;
-    procedure setcount0(value: longint);
-    procedure setcount1(value: longint);
+    procedure setcountx(value: longint);
+    procedure setcounty(value: longint);
     procedure setpen   (value: boolean);
     procedure setzoff  (value: boolean);
     procedure setxyoff (value: boolean);
@@ -62,8 +62,8 @@ type
     procedure   init(acount0, acount1: longint);
     procedure   move(acount0, acount1: longint);
   published
-    property count0:  longint read fcountx  write setcount0;
-    property count1:  longint read fcounty  write setcount1;
+    property count0:  longint read fcountx  write setcountx;
+    property count1:  longint read fcounty  write setcounty;
     property delaym:  longint read fdelaym  write fdelaym;
     property delayz:  longint read fdelayz  write fdelayz;
     property enabled: boolean read fenabled write fenabled;
@@ -202,13 +202,13 @@ begin
   if fxyoff  then exit;
   if enabled then
   begin
-    dm0 := acount0 - fcount0;
+    dm0 := acount0 - fcountx;
     if dm0 > 0 then
       digitalwrite(mot0_dir,  LOW)
     else
       digitalwrite(mot0_dir, HIGH);
 
-    dm1 := acount1 - fcount1;
+    dm1 := acount1 - fcounty;
     if dm1 > 0 then
       digitalwrite(mot1_dir, HIGH)
     else
@@ -308,12 +308,12 @@ begin
 
 end;
 
-procedure tvpdriver.setcount0(value: longint);
+procedure tvpdriver.setcountx(value: longint);
 begin
   move(value, fcounty);
 end;
 
-procedure tvpdriver.setcount1(value: longint);
+procedure tvpdriver.setcounty(value: longint);
 begin
   move(fcountx, value);
 end;
@@ -386,10 +386,10 @@ begin
   m0 := round(setting.mode*(l0/setting.ratio));
   m1 := round(setting.mode*(l1/setting.ratio));
   // load details
-  driverdetails.count0  := m0;
-  driverdetails.count1  := m1;
-  driverdetails.len0    := l0;
-  driverdetails.len1    := l1;
+  driverdetails.countx  := m0;
+  driverdetails.county  := m1;
+  driverdetails.lenx    := l0;
+  driverdetails.leny    := l1;
   inc(driverdetails.tick);
 
   //if enabledebug then
@@ -401,10 +401,10 @@ begin
     fxx := line_by_two_points(s00, txx);
     txx := intersection_of_two_lines(f01, fxx);
 
-    driverdetails.load0   := trunc(setting.weight/
+    driverdetails.loadx   := trunc(setting.weight/
       distance_between_two_points(s00, txx)*
       distance_between_two_points(s00, p));
-    driverdetails.load1   :=trunc(setting.weight/
+    driverdetails.loady   :=trunc(setting.weight/
       distance_between_two_points(s00, txx)*
       distance_between_two_points(txx, p));
   end;
@@ -422,12 +422,12 @@ var
 begin
   driverdetails.point.x := 0;
   driverdetails.point.y := 0;
-  driverdetails.len0    := 0;
-  driverdetails.len1    := 0;
-  driverdetails.load0   := 0;
-  driverdetails.load1   := 0;
-  driverdetails.count0  := 0;
-  driverdetails.count1  := 0;
+  driverdetails.lenx    := 0;
+  driverdetails.leny    := 0;
+  driverdetails.loadx   := 0;
+  driverdetails.loady   := 0;
+  driverdetails.countx  := 0;
+  driverdetails.county  := 0;
   driverdetails.tick    := 0;
 
   if assigned(onstart) then

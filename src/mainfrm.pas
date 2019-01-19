@@ -358,8 +358,7 @@ begin
     if lowercase(extractfileext(opendialog.filename)) = '.svg' then
       svg2paths(opendialog.filename, paths);
 
-    decodePNG(opendialog.filename, 50, 1, 1, 50);
-
+    //decodePNG(opendialog.filename, 50, 1, 1, 50);
     reloadmiclick(nil);
   end;
 end;
