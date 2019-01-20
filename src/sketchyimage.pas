@@ -61,6 +61,10 @@ type
     fwidth:         longword;
     fnibsize:       longint;
   protected
+    function px(x: longint): longint;
+    function py(y: longint): longint;
+
+
     function darknesshelperforline(
       const x1, y1, x2, y2: single; mode: tlinedarknessmode): single;
 
@@ -138,14 +142,13 @@ begin
       fdata_in [x, y] := pixval;
     end;
   fbrightness_out := fwidth*fheight*255;
-  fbrightness_avg := fbrightness_in/(fwidth*fheight);
+  fbrightness_avg := fbrightness_in div (fwidth*fheight);
 
   writeln('brightness_in  ', fbrightness_in);
   writeln('brightness_avg ', fbrightness_avg);
   writeln('brightness_out ', fbrightness_out);
 
   image.destroy;
-  halt;
 end;
 
 destructor tsketchyimage.destroy;
@@ -293,15 +296,15 @@ begin
     rx := x + cos(degtorad(i)) * radius;
     ry := y + sin(degtorad(i)) * radius;
 
-    if (rx < width -1) and (rx > 0) and
-       (ry < height-1) and (ry > 0) then
+    if (rx < fwidth -1) and (rx > 0) and
+       (ry < fheight-1) and (ry > 0) then
     begin
       avg := avgdarknessforline(x, y, rx, ry);
       if (avg < best) then
       begin
         best  := avg;
-        bestX := rx;
-        bestY := ry;
+        bestx := rx;
+        besty := ry;
       //if (avg < 100) then
       //  break;
       end;
@@ -314,6 +317,22 @@ begin
   result.y := besty/scalefactor;
 end;
 
+function tsketchyimage.px(x: longint): longint;
+begin
+  if x < fwidth then
+    result := x
+  else
+    result := 0;
+end;
+
+function tsketchyimage.py(y: longint): longint;
+begin
+  if y < fheight then
+    result := y
+  else
+    result := 0;
+end;
+
 function tsketchyimage.kernelvaluebyxy(x, y: longint; clear: boolean; kernelsize: longint): longint;
 var
   xt: longint;
@@ -323,8 +342,8 @@ var
   limit: longint;
 begin
   result := -1;
-  if (x > width -1) or
-     (y > height-1) or
+  if (x > fwidth -1) or
+     (y > fheight-1) or
      (x < 0)        or
      (y < 0)        then exit;
 
@@ -334,10 +353,10 @@ begin
     limit := (kernelsize - 1) div 2;
     for i := 0 to limit - 1 do
     begin
-      inc(result, fdata_in[min(x+1+i, fwidth), y]);
-      inc(result, fdata_in[max(x-1-i,      0), y]);
-      inc(result, fdata_in[x, min(y+1+i, fheight)]);
-      inc(result, fdata_in[x, max(y-1-i,       0)]);
+      inc(result, fdata_in[px(x+1+i), y]);
+      inc(result, fdata_in[px(x-1-i), y]);
+      inc(result, fdata_in[x, py(y+1+i)]);
+      inc(result, fdata_in[x, py(y-1-i)]);
     end;
   end;
 
@@ -348,25 +367,25 @@ begin
        limit := (kernelsize - 1) div 2;
        for i := 0 to limit - 1 do
        begin
-         xt := min(x+1+i, fwidth);
+         xt := px(x+1+i);
          inc(fbrightness_in, 255 - fdata_in [xt, y]);
          dec(fbrightness_out,      fdata_out[xt, y]);
          fdata_in [xt, y] := 255;
          fdata_out[xt, y] := 0;
 
-         xt := max(x-1-i, 0);
+         xt := px(x-1-i);
          inc(fbrightness_in, 255 - fdata_in [xt, y]);
          dec(fbrightness_out,      fdata_out[xt, y]);
          fdata_in [xt, y] := 255;
          fdata_out[xt, y] := 0;
 
-         yt := min(y+1+i, fheight);
+         yt := py(y+1+i);
          inc(fbrightness_in, 255 - fdata_in [x, yt]);
          dec(fbrightness_out,      fdata_out[x, yt]);
          fdata_in [x, yt] := 255;
          fdata_out[x, yt] := 0;
 
-         yt := max(y-1-i, 0);
+         yt := py(y-1-i);
          inc(fbrightness_in, 255 - fdata_in [x, yt]);
          dec(fbrightness_out,      fdata_out[x, yt]);
          fdata_in [x, yt] := 255;
@@ -446,11 +465,13 @@ begin
   brightness_out := sketchy.brightness_out;
   darkestpixel   := sketchy.getdarkpixel;
 
-  writeln('decodePNG - calc');
-
   x := darkestpixel.x;
   y := darkestpixel.y;
-  svg := tbgrasvg.create(sketchy.width, sketchy.height, cumillimeter);
+
+  writeln('darkestpixel.x ', darkestpixel.x);
+  writeln('darkestpixel.y ', darkestpixel.y);
+
+  svg := tbgrasvg.create(sketchy.width, sketchy.height, cupixel);
   while brightness_out > threshold do
   begin
     r := 10 + random(maxlinelen - 10);
@@ -462,6 +483,7 @@ begin
     x := p.x;
     y := p.y;
   end;
+  sketchy.savestate(changefileext(filename, '.bmp'));
   svg.savetofile(changefileext(filename, '.svg'));
   sketchy.destroy;
 
