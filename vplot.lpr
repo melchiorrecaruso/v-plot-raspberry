@@ -23,8 +23,8 @@ program vplot;
 {$mode objfpc}
 
 uses
-  {$ifdef unix} cthreads, {$endif} interfaces, forms, mainfrm,
-  vpsetting, vppaths, aboutfrm, vpmath, vpwave;
+  {$ifdef unix} cthreads, {$endif} interfaces, forms, mainfrm, vpsetting, vppaths,
+  aboutfrm, vpmath, vpwave, calibrationfrm, scalefrm, offsetfrm;
 
   {$R *.res}
 
@@ -32,7 +32,7 @@ begin
   requirederivedformresource := true;
   Application.Title:='VPlot Driver';
   application.initialize;
-  application.createform(tmainform, mainform);
+  Application.CreateForm(Tmainform, mainform);
   application.run;
 end.
 
