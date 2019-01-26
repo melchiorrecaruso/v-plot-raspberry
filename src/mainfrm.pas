@@ -27,100 +27,172 @@ interface
 
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls, comctrls,
-  buttons, menus, spin, vppaths, vpsetting, vpdriver, bgrabitmap, bgrabitmaptypes;
+  buttons, menus, spin, vppaths, vpsetting, vpdriver, bgrabitmap,
+  bgrabitmaptypes, bgravirtualscreen, bgratransform, bgragradientscanner, bctypes, bgracanvas2d, types;
 
 type
   { tmainform }
 
   tmainform = class(tform)
-    aboutbtn: tbitbtn;
-    layoutbtn: tbitbtn;
-    imagemenu: TPopupMenu;
-    progressbar: TProgressBar;
-    rightedit: tspinedit;
-    startbtn: tbitbtn;
-    stopbtn: tbitbtn;
-    killbtn: tbitbtn;
-    controlgb: tgroupbox;
-    loadbtn: tbitbtn;
-    clearbtn: tbitbtn;
-    reloadbtn: tbitbtn;
-    leftdownbtn: tbitbtn;
-    formatcb: tcombobox;
-    formatl: tlabel;
-    gohomebtn: tbitbtn;
-    loadgb: tgroupbox;
-    heightl: tlabel;
-    heightse: tspinedit;
-    image: timage;
-    label1: tlabel;
-    label2: tlabel;
-    rightdownbtn: tbitbtn;
-    imagepanel: tpanel;
-    manualdrivinggb: tgroupbox;
-    leftedit: tspinedit;
-    offsetxse: tspinedit;
-    offsetyse: tspinedit;
-    pagesizegb: tgroupbox;
-    pendownbtn: tbitbtn;
-    penupbtn: tbitbtn;
-    rightupbtn: tbitbtn;
+    divideselpm: TMenuItem;
+    selattachedpm: TMenuItem;
+    selbylayerpm: TMenuItem;
+    hidebylayerpm: TMenuItem;
+    mergesel: TMenuItem;
+    n2pm: TMenuItem;
+    invertselpm: TMenuItem;
+    deselallpm: TMenuItem;
+    deselbylayerpm: TMenuItem;
+    hideselpm: TMenuItem;
+    showallpm: TMenuItem;
+    showbylayerpm: TMenuItem;
+    inverthiddenpm: TMenuItem;
+    hideallpm: TMenuItem;
+    selallpm: TMenuItem;
+    popup: TPopupMenu;
+    screen: TBGRAVirtualScreen;
+    mainmenu: TMainMenu;
+    Edit: TMenuItem;
+    calibrationmi: TMenuItem;
+    layoutmi: TMenuItem;
+    a0mi: TMenuItem;
+    a1mi: TMenuItem;
+    a2mi: TMenuItem;
+    a3mi: TMenuItem;
+    a4mi: TMenuItem;
+    a5mi: TMenuItem;
+    horizontalmi: TMenuItem;
+    MenuItem1: TMenuItem;
+    N8: TMenuItem;
+    verticalmi: TMenuItem;
+    N7: TMenuItem;
+    rotate90mi: TMenuItem;
+    rotate180mi: TMenuItem;
+    rotate270mi: TMenuItem;
+    mirrorxmi: TMenuItem;
+    mirrorymi: TMenuItem;
+    N6: TMenuItem;
+    killmi: TMenuItem;
+    N5: TMenuItem;
+    savedialog: TSaveDialog;
+    stopmi: TMenuItem;
+    startmi: TMenuItem;
+    aboutmi: TMenuItem;
+    createtoolpathmi: TMenuItem;
+    N4: TMenuItem;
+    mirrormi: TMenuItem;
+    scalemi: TMenuItem;
+    offsetmi: TMenuItem;
+    pagesizemi: TMenuItem;
+    N3: TMenuItem;
+    mirotate: TMenuItem;
+    clearmi: TMenuItem;
+    exitmi: TMenuItem;
+    loadmi: TMenuItem;
+    savemi: TMenuItem;
+    importmi: TMenuItem;
+    N2: TMenuItem;
+    N1: TMenuItem;
+    mihelp: TMenuItem;
+    miprint: TMenuItem;
+    mifile: TMenuItem;
+    progressbar: tprogressbar;
     opendialog: topendialog;
-    leftupbtn: tbitbtn;
-    verticalcb: tcheckbox;
-    widthl: tlabel;
-    widthse: tspinedit;
-
-    procedure formcreate    (sender: tobject);
-    procedure formdestroy   (sender: tobject);
-    procedure formclose     (sender: tobject; var closeaction: tcloseaction);
-    procedure formatcbchange(sender: tobject);
-    procedure imagemenuPopup(Sender: TObject);
-
-    procedure leftupbtnclick      (sender: tobject);
-    procedure leftdownbtnclick    (sender: tobject);
-    procedure leftediteditingdone (sender: tobject);
-    procedure pathsclbClickCheck(Sender: TObject);
-    procedure rightediteditingdone(sender: tobject);
-    procedure rightupbtnclick     (sender: tobject);
-    procedure rightdownbtnclick   (sender: tobject);
-    procedure penupbtnclick       (sender: tobject);
-    procedure pendownbtnclick     (sender: tobject);
-    procedure gohomebtnclick      (sender: tobject);
 
 
-    procedure heightseeditingdone  (sender: tobject);
-    procedure widthseeditingdone   (sender: tobject);
-    procedure verticalcbeditingdone(sender: tobject);
 
-    procedure openbtnclick         (sender: tobject);
-    procedure reloadmiclick        (sender: tobject);
-    procedure clearmiclick         (sender: tobject);
+    procedure clearmiClick(Sender: TObject);
+    procedure divideselpmClick(Sender: TObject);
+    procedure formcreate (sender: tobject);
+    procedure formdestroy(sender: tobject);
+    procedure formclose  (sender: tobject; var closeaction: tcloseaction);
+    procedure hideallpmClick(Sender: TObject);
+    procedure hidebylayerpmClick(Sender: TObject);
+    procedure hideselpmClick(Sender: TObject);
+    procedure inverthiddenpmClick(Sender: TObject);
+    procedure invertselpmClick(Sender: TObject);
+    procedure mergeselClick(Sender: TObject);
+    procedure selattachedpmClick(Sender: TObject);
+    procedure selbylayerpmClick(Sender: TObject);
+    // MAIN MENU::FILE
+    procedure loadmiclick  (sender: tobject);
+    procedure selallpmClick(Sender: TObject);
+    procedure savemiclick  (sender: tobject);
+
+    procedure importmiclick(sender: tobject);
+    procedure exitmiclick  (sender: tobject);
+    // MAIN MENU::EDIT
+    procedure rotate180miclick (sender: tobject);
+    procedure rotate270miclick (sender: tobject);
+    procedure rotate90miclick  (sender: tobject);
+    procedure mirrorxmiclick   (sender: tobject);
+    procedure mirrorymiclick   (sender: tobject);
+    procedure scalemiclick     (sender: tobject);
+    procedure offsetmiclick    (sender: tobject);
+    procedure a0miclick        (sender: tobject);
+    procedure horizontalmiclick(sender: tobject);
+    procedure layoutmiclick    (sender: tobject);
+
+    procedure screenMouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+    procedure screenRedraw(Sender: TObject; Bitmap: TBGRABitmap);
+    procedure showallpmClick(Sender: TObject);
+    procedure showbylayerpmClick(Sender: TObject);
+    // MAIN-MENU::PRINTER
     procedure startmiclick         (sender: tobject);
     procedure stopmiclick          (sender: tobject);
     procedure killmiclick          (sender: tobject);
-    procedure layoutmiclick        (sender: tobject);
-    procedure aboutmiclick         (sender: tobject);
+    procedure calibrationmiclick   (sender: tobject);
+
+    procedure createtoolpathmiclick(sender: tobject);
+    // MAIN-FORM::HELP
+    procedure aboutmiclick(sender: tobject);
+
+
+
+    procedure deselallpmClick(Sender: TObject);
+
+
+
+
+
+
+
+
+
 
     procedure imagemouseup  (sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
     procedure imagemousedown(sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
     procedure imagemousemove(sender: tobject; shift: tshiftstate; x, y: integer);
-    procedure imagemenuclick(sender: tobject);
+    procedure trackbarChange(Sender: TObject);
 
   private
-          ar: tlist;
+
+
+
          bit: tbgrabitmap;
        paths: tvppaths;
  mouseisdown: boolean;
           px: longint;
           py: longint;
+
+   pagewidth: longint;
+  pageheight: longint;
+        zoom: single;
+
+       movex: longint;
+       movey: longint;
+        lock: boolean;
+
     // ---
     procedure onplotterstart;
     procedure onplotterstop;
     procedure onplottertick;
-    // ---
+  public
     procedure lock1(value: boolean);
     procedure lock2(value: boolean);
+
+    procedure updatevirtualscreen;
   end;
 
 var
@@ -131,14 +203,15 @@ implementation
 {$R *.lfm}
 
 uses
-  math, sysutils, aboutfrm, vpmath, vpwave, sketchyimage;
+  math, sysutils, aboutfrm, calibrationfrm, offsetfrm,
+  scalefrm, vpmath, vpwave, sketchyimage;
 
 // FORM EVENTS
 
 procedure tmainform.formcreate(sender: tobject);
 var
-  m0: longint = 0;
-  m1: longint = 0;
+  m0: longint;
+  m1: longint;
 begin
   progressbar.visible := false;
   // load setting
@@ -153,14 +226,12 @@ begin
     bit := tbgrabitmap.create;
   paths := tvppaths.create;
   // update preview
-  formatcbchange(nil);
-  // show toolbars
-  manualdrivinggb.enabled := true;
-  pagesizegb     .enabled := true;
+  a0miclick(a3mi);
   // init wave
-  wave := twave.create(setting.wavemaxdx,
-                       setting.wavemaxdy,
-                       setting.wave);
+  wave := twave.create(
+    setting.wavemaxdx,
+    setting.wavemaxdy,
+    setting.wave);
   wave.enabled := false;
   wave.test;
   // initialize driver
@@ -169,8 +240,13 @@ begin
 end;
 
 procedure tmainform.formdestroy(sender: tobject);
+var
+  f: tcalibrationform;
 begin
-  gohomebtnclick(nil);
+  f := tcalibrationform.create(nil);
+  f.gohomebtnclick(sender);
+  f.destroy;
+
   wave.destroy;
   paths.destroy;
   bit.destroy;
@@ -188,164 +264,105 @@ begin
     closeaction := cafree;
 end;
 
-// CALIBRATION EVENTS
+// MAIN-MENU::FILE
 
-procedure tmainform.rightdownbtnclick(sender: tobject);
+procedure tmainform.loadmiclick(sender: tobject);
 begin
-  leftupbtnclick(rightdownbtn);
-end;
-
-procedure tmainform.leftdownbtnclick(sender: tobject);
-begin
-  leftupbtnclick(leftdownbtn);
-end;
-
-procedure tmainform.leftediteditingdone(sender: tobject);
-begin
-  rightedit.text := leftedit.text;
-end;
-
-procedure tmainform.rightediteditingdone(sender: tobject);
-begin
-  leftedit.text:= rightedit.text;
-end;
-
-procedure tmainform.rightupbtnclick(sender: tobject);
-begin
-  leftupbtnclick(rightupbtn);
-end;
-
-procedure tmainform.leftupbtnclick(sender: tobject);
-var
-  m0: longint = 0;
-  m1: longint = 0;
-begin
-  lock2(false);
-  driver.enabled := true;
-  driver.zoff    := false;
-  driver.pen     := false;
-  driver.zoff    := true;
-
-  if sender = leftupbtn    then driver.count0 := driver.count0 - leftedit .value;
-  if sender = leftdownbtn  then driver.count0 := driver.count0 + leftedit .value;
-  if sender = rightupbtn   then driver.count1 := driver.count1 - rightedit.value;
-  if sender = rightdownbtn then driver.count1 := driver.count1 + rightedit.value;
-
-  optimize(setting.layout09, m0, m1);
-  driver.init(m0, m1);
-  lock2(true);
-end;
-
-procedure tmainform.pendownbtnclick(Sender: TObject);
-begin
-  lock2(false);
-  driver.enabled := true;
-  driver.zoff    := false;
-  driver.pen     := true;
-  lock2(true);
-end;
-
-procedure tmainform.penupbtnclick(sender: tobject);
-begin
-  lock2(false);
-  driver.enabled := true;
-  driver.zoff    := false;
-  driver.pen     := false;
-  lock2(true);
-end;
-
-procedure tmainform.gohomebtnclick(sender: tobject);
-var
-  m0: longint = 0;
-  m1: longint = 0;
-begin
-  lock2(false);
-  driver.enabled := true;
-  driver.zoff    := false;
-  driver.pen     := false;
-  driver.zoff    := true;
-
-  optimize(setting.layout09, m0, m1);
-  driver.move(m0, m1);
-  lock2(true);
-end;
-
-// PREVIEW EVENTS
-
-procedure tmainform.imagemousedown(sender: tobject;
-  button: tmousebutton; shift: tshiftstate; x, y: integer);
-begin
-  if button = mbleft then
+  opendialog.filter := 'vplot files (*.vplot)|*.vplot';
+  if opendialog.execute then
   begin
-    mouseisdown := true;
-    px := x;
-    py := y;
+    caption := 'vPlotter - ' + opendialog.filename;
+
+    lock2(false);
+    paths.clear;
+    paths.load(opendialog.filename);
+    updatevirtualscreen;
   end;
 end;
 
-procedure tmainform.imagemousemove(sender: tobject;
-  shift: tshiftstate; x, y: integer);
-var
-  nleft: longint;
-  ntop:  longint;
+procedure tmainform.savemiclick(sender: tobject);
 begin
-  if mouseisdown then
+  savedialog.filter := 'vplot files (*.vplot)|*.vplot';
+  if savedialog.execute then
   begin
-    nleft := image.left + (x - px);
-    ntop  := image.top  + (y - py);
+    caption := 'vPlotter - ' + changefileext(savedialog.filename, '.vplot');
 
-    if nleft                >  width - 150 then nleft :=  width - 150;
-    if ntop                 > height - 150 then ntop  := height - 150;
-    if nleft + image. width <          150 then nleft :=          150 - image.width;
-    if ntop  + image.height <          150 then ntop  :=          150 - image.height;
-
-    image.left := nleft;
-    image.top  := ntop;
+    paths.save(changefileext(savedialog.filename, '.vplot'));
   end;
 end;
 
-procedure tmainform.imagemouseup(sender: tobject;
-  button: tmousebutton; shift: tshiftstate; x, y: integer);
+procedure tmainform.clearmiclick(sender: tobject);
 begin
-  mouseisdown := false;
+  paths.clear;
+  updatevirtualscreen;
 end;
 
-procedure tmainform.imagemenuclick(sender: tobject);
+procedure tmainform.updatevirtualscreen;
 var
-  i: longint;
+    i, j: longint;
+    path: tvppath;
+  point1: tvppoint;
+  point2: tvppoint;
 begin
-  if sender is tmenuitem then
+  lock2(false);
+  //screen.canvas.pen  .color := clwhite;
+  //screen.canvas.brush.color := clwhite;
+  //screen.canvas.brush.style := bssolid;
+  // ---
+  //screen.width  := round(pagewidth *zoom);
+  //screen.height := round(pageheight*zoom);
+  //screen.canvas.fillrect(0, 0, screen.width, screen.height);
+  // ---
+  //screen.align            := alnone;
+  //screen.anchors          := [aktop, akleft, akright, akbottom];
+  //screen.anchors          := [];
+  // ---
+  bit.canvas.pen  .color := clwhite;
+  bit.canvas.brush.color := clwhite;
+  bit.canvas.brush.style := bssolid;
+  bit.setsize(round(pagewidth *zoom),
+              round(pageheight*zoom));
+  // ---
+  bit.fillrect(0, 0, bit.width,   bit.height,   bgra(100, 100, 100), dmset);
+  bit.fillrect(1, 1, bit.width-1, bit.height-1, bgra(255, 255, 255), dmset);
+  // updtare preview ...
+  for i := 0 to paths.count -1 do
   begin
-    tmenuitem(sender).checked := not tmenuitem(sender).checked;
-    for i := 0 to paths.count - 1 do
+    path := paths.items[i];
+    if (path.enabled) and (path.count > 1) then
     begin
-      paths.items[i].enabled := imagemenu.items[i].checked;
+      point1   := path.items[0]^;
+      point1.x := (bit.width  div 2) + point1.x*zoom;
+      point1.y := (bit.height div 2) - point1.y*zoom;
+      for j := 1 to path.count -1 do
+      begin
+        point2   := path.items[j]^;
+        point2.x := (bit.width  div 2) + point2.x*zoom;
+        point2.y := (bit.height div 2) - point2.y*zoom;
+        if path.hidden = false then
+        begin
+          if path.selected then
+            bit.drawline(
+              round(point1.x), round(point1.y),
+              round(point2.x), round(point2.y),
+              bgra(57, 255, 20), true, dmset)
+          else
+            bit.drawline(
+              round(point1.x), round(point1.y),
+              round(point2.x), round(point2.y),
+              bgra(  0,  0,  0), true, dmset);
+        end;
+        point1 := point2;
+      end;
     end;
   end;
+  screen.redrawbitmap;
+  lock2(true);
 end;
 
-procedure tmainform.imagemenupopup(sender: tobject);
-var
-     i: longint;
-  item: tmenuitem;
+procedure tmainform.importmiclick(sender: tobject);
 begin
-  imagemenu.items.clear;
-  if not assigned(driverthread) then
-    for i := 0 to paths.count - 1 do
-    begin
-      item := tmenuitem.create(imagemenu);
-      item.caption := paths.itemname[i];
-      item.checked := paths.items[i].enabled;
-      item.onclick := @imagemenuclick;
-      imagemenu.items.add(item);
-    end;
-end;
-
-// LOAD EVENTS
-
-procedure tmainform.openbtnclick(sender: tobject);
-begin
-  //opendialog.filter := 'dxf files (*.dxf)|*.dxf|svg files (*.svg)|*.svg';
+  opendialog.filter := 'Supported files (*.svg, *.dxf)|*.svg; *.dxf';
   if opendialog.execute then
   begin
     caption := 'vPlotter - ' + opendialog.filename;
@@ -357,92 +374,142 @@ begin
 
     if lowercase(extractfileext(opendialog.filename)) = '.svg' then
       svg2paths(opendialog.filename, paths);
-
     //decodePNG(opendialog.filename, 100, 1, 1, 100);
-    reloadmiclick(nil);
+    paths.createtoolpath;
+    updatevirtualscreen;
   end;
 end;
 
-procedure tmainform.reloadmiclick(sender: tobject);
+procedure tmainform.exitmiclick(sender: tobject);
+begin
+  close;
+end;
+
+// MAIN-MENU::EDIT
+
+procedure tmainform.rotate90miclick(sender: tobject);
+begin
+  paths.rotate(degtorad(90));
+  updatevirtualscreen;
+end;
+
+procedure tmainform.rotate180miclick(sender: tobject);
+begin
+  paths.rotate(degtorad(180));
+  updatevirtualscreen;
+end;
+
+procedure tmainform.rotate270miclick(sender: tobject);
+begin
+  paths.rotate(degtorad(270));
+  updatevirtualscreen;
+end;
+
+procedure tmainform.mirrorxmiclick(sender: tobject);
+begin
+  paths.mirror(true);
+  updatevirtualscreen;
+end;
+
+procedure tmainform.mirrorymiclick(sender: tobject);
+begin
+  paths.mirror(false);
+  updatevirtualscreen;
+end;
+
+procedure tmainform.scalemiclick(sender: tobject);
 var
-  i, j, k: longint;
-     path: tvppath;
-   entity: tvpentity;
-    point1: tvppoint;
-    point2: tvppoint;
+  f: tscaleform;
 begin
-  lock2(false);
-  // updtare preview ...
-  for i := 0 to paths.count - 1 do
+  f := tscaleform.create(nil);
+  if f.showmodal = mrok then
   begin
-    path := paths.items[i];
-    if path.enabled then
-      for j := 0 to path.count - 1 do
-      begin
-        entity := path.items[j];
-        for k := 0 to entity.count - 2 do
-        begin
-          point1   := entity.items[k]^;
-          point1.x := ( widthse.value div 2) + point1.x + offsetxse.value + 1;
-          point1.y := (heightse.value div 2) - point1.y - offsetyse.value + 1;
-
-          point2   := entity.items[k+1]^;
-          point2.x := ( widthse.value div 2) + point2.x + offsetxse.value + 1;
-          point2.y := (heightse.value div 2) - point2.y - offsetyse.value + 1;
-
-          bit.drawlineantialias(
-            point1.x, point1.y,
-            point2.x, point2.y, bgra(0, 0, 0), 0.5);
-        end;
-      end;
+    paths.scale(f.factoredit.value);
   end;
-  bit.draw(image.canvas, 0, 0, true);
-  lock2(true);
+  f.destroy;
+  updatevirtualscreen;
 end;
 
-procedure tmainform.clearmiclick(sender: tobject);
+procedure tmainform.offsetmiclick(sender: tobject);
+var
+  f: toffsetform;
 begin
-  lock2(false);
-  // ---
-  bit.canvas.pen  .color := clltgray;
-  bit.canvas.brush.color := clltgray;
-  bit.canvas.brush.style := bssolid;
-  bit.setsize(
-     widthse.value + 2,
-    heightse.value + 2);
-  bit.canvas.fillrect(0, 0,
-     widthse.value + 2,
-    heightse.value + 2);
-  // ---
-  image.canvas.pen  .color := clltgray;
-  image.canvas.brush.color := clltgray;
-  image.canvas.brush.style := bssolid;
-  image.picture.bitmap.setsize(
-     widthse.value + 2,
-    heightse.value + 2);
-  image.canvas.fillrect(0, 0,
-     widthse.value + 2,
-    heightse.value + 2);
-  // ---
-  image.align             := alnone;
-  image.anchors           := [aktop, akleft, akright, akbottom];
-  image.anchors           := [];
-  image.center            := true;
-  image.proportional      := false;
-  image.stretchinenabled  := false;
-  image.stretchoutenabled := false;
-  image.stretch           := false;
-  // ---
-  lock2(true);
+  f := toffsetform.create(nil);
+  if f.showmodal = mrok then
+  begin
+    paths.offset(
+      f.offsetxse.value,
+      f.offsetyse.value);
+  end;
+  f.destroy;
+  updatevirtualscreen;
 end;
 
-procedure tmainform.pathsclbclickcheck(sender: tobject);
+procedure tmainform.a0miclick(sender: tobject);
+var
+  amin: longint = 297;
+  amax: longint = 420;
 begin
-  clearmiclick(sender);
-  reloadmiclick(sender);
+  a0mi.checked := (sender = a0mi);
+  a1mi.checked := (sender = a1mi);
+  a2mi.checked := (sender = a2mi);
+  a3mi.checked := (sender = a3mi);
+  a4mi.checked := (sender = a4mi);
+  a5mi.checked := (sender = a5mi);
+
+  if a0mi.checked then begin amin :=  841; amax := 1189; end else
+  if a1mi.checked then begin amin :=  594; amax :=  841; end else
+  if a2mi.checked then begin amin :=  420; amax :=  594; end else
+  if a3mi.checked then begin amin :=  297; amax :=  420; end else
+  if a4mi.checked then begin amin :=  210; amax :=  297; end else
+  if a5mi.checked then begin amin :=  148; amax :=  210; end;
+
+  if verticalmi.checked then
+  begin
+    pageheight := amax;
+    pagewidth  := amin;
+  end else
+  begin
+    pageheight := amin;
+    pagewidth  := amax;
+  end;
+
+  zoom  := 1.0;
+  movex := (screen.width  - pagewidth ) div 2;
+  movey := (screen.height - pageheight) div 2;
+  updatevirtualscreen;
 end;
 
-// PLOT EVENTS
+procedure tmainform.horizontalmiclick(sender: tobject);
+var
+  amin: longint;
+  amax: longint;
+begin
+  verticalmi  .checked := sender = verticalmi;
+  horizontalmi.checked := sender = horizontalmi;
+
+  amax := max(pagewidth, pageheight);
+  amin := min(pagewidth, pageheight);
+  if verticalmi.checked then
+  begin
+    pageheight := amax;
+    pagewidth  := amin;
+  end else
+  begin
+    pageheight := amin;
+    pagewidth  := amax;
+  end;
+  updatevirtualscreen;
+end;
+
+procedure tmainform.createtoolpathmiclick(sender: tobject);
+begin
+  paths.selectall(false);
+  paths.createtoolpath;
+  updatevirtualscreen;
+end;
+
+// MAIN MENU::PRINT
 
 procedure tmainform.startmiclick(sender: tobject);
 begin
@@ -455,11 +522,9 @@ begin
   begin
     driverthread         := tvpdriverthread.create(paths);
     driverthread.midx    := setting.layout08.x;
-    driverthread.midy    := setting.layout08.y+heightse.value/2;
-    driverthread.maxdx   := widthse .value/2 + 2;
-    driverthread.maxdy   := heightse.value/2 + 2;
-    driverthread.offsetx := offsetxse.value;
-    driverthread.offsety := offsetyse.value;
+    driverthread.midy    := setting.layout08.y+pageheight/2;
+    driverthread.maxdx   := pagewidth /2 + 2;
+    driverthread.maxdy   := pageheight/2 + 2;
     driverthread.onstart := @onplotterstart;
     driverthread.onstop  := @onplotterstop;
     driverthread.ontick  := @onplottertick;
@@ -487,14 +552,24 @@ begin
   end;
 end;
 
-// SETTING EVENTS
-
-procedure tmainform.layoutmiclick(Sender: TObject);
+procedure tmainform.calibrationmiclick(sender: tobject);
 var
+  f: tcalibrationform;
+begin
+  f := tcalibrationform.create(nil);
+  f.showmodal;
+  f.destroy;
+end;
+
+procedure tmainform.layoutmiclick(sender: tobject);
+var
+   f: tcalibrationform;
   m0: longint = 0;
   m1: longint = 0;
 begin
-  gohomebtnclick(nil);
+  f := tcalibrationform.create(nil);
+  f.gohomebtnclick(sender);
+  f.destroy;
   // load configuration
   setting.clear;
   setting.load(changefileext(paramstr(0), '.ini'));
@@ -506,7 +581,7 @@ begin
   driver.init(m0, m1);
 end;
 
-// INFO EVENTS
+// MAIN-MENU::HELP
 
 procedure tmainform.aboutmiclick(sender: tobject);
 var
@@ -517,70 +592,220 @@ begin
   about.destroy;
 end;
 
-// PAGE SIZE EVENTS
+// POPUP-MENU
 
-procedure tmainform.formatcbchange(sender: tobject);
+procedure tmainform.selallpmclick(sender: tobject);
 begin
-  verticalcb.enabled := true;
-  heightse  .enabled := false;
-  widthse   .enabled := false;
-  case formatcb.itemindex of
-    0: begin heightse.value := 841; widthse .value := 1189; end;
-    1: begin heightse.value := 594; widthse .value :=  841; end;
-    2: begin heightse.value := 420; widthse .value :=  594; end;
-    3: begin heightse.value := 297; widthse .value :=  420; end;
-    4: begin heightse.value := 210; widthse .value :=  297; end;
-    5: begin heightse.value := 148; widthse .value :=  210; end;
-  else begin
-         verticalcb.enabled := false;
-         heightse  .enabled := true;
-         widthse   .enabled := true;
-       end;
-  end;
-  verticalcbeditingdone(formatcb);
+  paths.selectall(true);
+  updatevirtualscreen;
 end;
 
-procedure tmainform.heightseeditingdone(sender: tobject);
-begin
-  formatcbchange(nil);
-end;
-
-procedure tmainform.widthseeditingdone(sender: tobject);
-begin
-  formatcbchange(nil);
-end;
-
-procedure tmainform.verticalcbeditingdone(sender: tobject);
+procedure tmainform.selbylayerpmclick(sender: tobject);
 var
-  amin: longint;
-  amax: longint;
+     i: longint;
+  path: tvppath;
 begin
-  if verticalcb.enabled then
+  for i := 0 to paths.count -1 do
   begin
-    amin := min(heightse.value, widthse.value);
-    amax := max(heightse.value, widthse.value);
-    if verticalcb.checked then
+    path := paths.items[i];
+    if path.selected then
+      paths.selectlayer(path.layer);
+  end;
+  updatevirtualscreen;
+end;
+
+procedure tmainform.invertselpmclick(sender: tobject);
+begin
+  paths.invertselected;
+  updatevirtualscreen;
+end;
+
+procedure tmainform.deselallpmclick(sender: tobject);
+begin
+  paths.selectall(false);
+  updatevirtualscreen;
+end;
+
+procedure tmainform.showallpmclick(sender: tobject);
+begin
+  paths.showall(true);
+  updatevirtualscreen;
+end;
+
+procedure tmainform.showbylayerpmclick(sender: tobject);
+var
+     i: longint;
+  path: tvppath;
+begin
+  for i := 0 to paths.count -1 do
+  begin
+    path := paths.items[i];
+    if path.selected then
+      paths.showlayer(path.layer);
+  end;
+  updatevirtualscreen;
+end;
+
+procedure tmainform.inverthiddenpmclick(sender: tobject);
+begin
+  paths.inverthidden;
+  paths.selectall(false);
+  updatevirtualscreen;
+end;
+
+procedure tmainform.hideallpmclick(sender: tobject);
+begin
+  paths.showall(false);
+  paths.selectall(false);
+  updatevirtualscreen;
+end;
+
+procedure tmainform.hidebylayerpmclick(sender: tobject);
+var
+     i: longint;
+  path: tvppath;
+begin
+  for i := 0 to paths.count -1 do
+  begin
+    path := paths.items[i];
+    if path.selected then
+      paths.hidelayer(path.layer);
+  end;
+  paths.selectall(false);
+  updatevirtualscreen;
+end;
+
+procedure tmainform.hideselpmclick(sender: tobject);
+var
+     i: longint;
+  path: tvppath;
+begin
+  for i := 0 to paths.count -1 do
+  begin
+    path := paths.items[i];
+    if path.selected then
+      path.hidden := true;
+  end;
+  paths.selectall(false);
+  updatevirtualscreen;
+end;
+
+procedure tmainform.mergeselclick(sender: tobject);
+begin
+  paths.mergeselected;
+  updatevirtualscreen;
+end;
+
+procedure tmainform.selattachedpmclick(sender: tobject);
+begin
+  paths.selectattached;
+  updatevirtualscreen;
+end;
+
+procedure tmainform.divideselpmclick(sender: tobject);
+begin
+  paths.unmergeselected;
+  updatevirtualscreen;
+end;
+
+// PREVIEW EVENTS
+
+procedure tmainform.imagemousedown(sender: tobject;
+  button: tmousebutton; shift: tshiftstate; x, y: integer);
+var
+   i, j: longint;
+   path: tvppath;
+  point: tvppoint;
+begin
+  popup.autopopup:= true;
+  // search path ...
+  for i := 0 to paths.count -1 do
+  begin
+    path := paths.items[i];
+    for j := 0 to path.count -1 do
     begin
-      heightse.value := amax;
-      widthse .value := amin;
-    end else
-    begin
-      heightse.value := amin;
-      widthse .value := amax;
+      point   := path.items[j]^;
+      point.x := (bit.width  div 2) + point.x*zoom;
+      point.y := (bit.height div 2) - point.y*zoom;
+
+      if (abs(point.x + movex - x) < 3) and
+         (abs(point.y + movey - y) < 3) then
+        if path.hidden = false then
+        begin
+          if not (ssctrl in shift) then
+          begin
+            paths.selectall(false);
+          end;
+
+          path.selected   := button = mbleft;
+          popup.autopopup := false;
+        end;
     end;
   end;
-  (*
-  if (heightse.value > (2*setting.waveymax)) or
-     (widthse .value > (2*setting.wavexmax)) then
-  begin
-    messagedlg('vPlotter Error', 'Selected page size is bigger than work area !', mterror, [mbok], 0);
 
-    formatcb.itemindex := formatcb.items.count - 2;
-    formatcbchange (nil);
+  if popup.autopopup = false then
+  begin
+    updatevirtualscreen;
+  end else
+    if button = mbleft then
+    begin
+      mouseisdown := true;
+      px := x - movex;
+      py := y - movey;
+    end;
+end;
+
+procedure tmainform.imagemousemove(sender: tobject;
+  shift: tshiftstate; x, y: integer);
+begin
+  if mouseisdown then
+  begin
+    movex := x - px;
+    movey := y - py;
+    screen.redrawbitmap;
   end;
-  *)
-  clearmiclick(verticalcb);
-  reloadmiclick(verticalcb);
+end;
+
+procedure tmainform.trackbarchange(sender: tobject);
+begin
+  updatevirtualscreen;
+end;
+
+procedure tmainform.imagemouseup(sender: tobject;
+  button: tmousebutton; shift: tshiftstate; x, y: integer);
+begin
+  mouseisdown := false;
+end;
+
+procedure tmainform.screenmousewheel(sender: tobject; shift: tshiftstate;
+  wheeldelta: integer; mousepos: tpoint; var handled: boolean);
+var
+  value: single;
+begin
+  if lock = false then
+  begin
+    lock := true;
+    if wheeldelta > 0 then
+      value := max(min(zoom*1.5, 25.0), 0.5)
+    else
+      value := max(min(zoom/1.5, 25.0), 0.5);
+
+    if value <> zoom then
+    begin
+      zoom  := value;
+      movex := movex + round((bit.width  -(pagewidth *zoom))*(mousepos.x-movex)/bit.width );
+      movey := movey + round((bit.height -(pageheight*zoom))*(mousepos.y-movey)/bit.height);
+      updatevirtualscreen;
+    end;
+    lock := false;
+  end;
+end;
+
+// LOAD EVENTS
+
+procedure tmainform.screenredraw(sender: tobject; bitmap: tbgrabitmap);
+begin
+  bitmap.putimage(movex, movey, bit, dmset);
 end;
 
 // LOCK/UNLOCK EVENTS
@@ -588,62 +813,62 @@ end;
 procedure tmainform.lock1(value: boolean);
 begin
   // main menu
-  loadbtn      .enabled := value;
-  reloadbtn    .enabled := value;
-  clearbtn     .enabled := value;
-  startbtn     .enabled := true;
-  stopbtn      .enabled := true;
-  killbtn      .enabled := true;
-  layoutbtn    .enabled := value;
-  aboutbtn     .enabled := value;
+  loadmi      .enabled := value;
+//reloadbtn    .enabled := value;
+  clearmi      .enabled := value;
+  startmi      .enabled := true;
+  stopmi       .enabled := true;
+  killmi       .enabled := true;
+  layoutmi     .enabled := value;
+  aboutmi      .enabled := value;
   // calibration
-  leftupbtn    .enabled := value;
-  leftdownbtn  .enabled := value;
-  leftedit     .enabled := value;
-  rightupbtn   .enabled := value;
-  rightdownbtn .enabled := value;
-  rightedit    .enabled := value;
-  penupbtn     .enabled := value;
-  pendownbtn   .enabled := value;
-  gohomebtn    .enabled := value;
+  // leftupbtn    .enabled := value;
+  // leftdownbtn  .enabled := value;
+  // leftedit     .enabled := value;
+  // rightupbtn   .enabled := value;
+  // rightdownbtn .enabled := value;
+  // rightedit    .enabled := value;
+  // penupbtn     .enabled := value;
+  // pendownbtn   .enabled := value;
+  // gohomebtn    .enabled := value;
   // page format
-  formatcb     .enabled := value;
-  heightse     .enabled := value;
-  widthse      .enabled := value;
-  offsetxse    .enabled := value;
-  offsetyse    .enabled := value;
-  verticalcb   .enabled := value;
+  // formatcb     .enabled := value;
+  // heightse     .enabled := value;
+  // widthse      .enabled := value;
+  // offsetxse    .enabled := value;
+  // offsetyse    .enabled := value;
+  // verticalcb   .enabled := value;
   application  .processmessages;
 end;
 
 procedure tmainform.lock2(value: boolean);
 begin
   // main menu
-  loadbtn      .enabled := value;
-  reloadbtn    .enabled := value;
-  clearbtn     .enabled := value;
-  startbtn     .enabled := value;
-  stopbtn      .enabled := value;
-  killbtn      .enabled := value;
-  layoutbtn    .enabled := value;
-  aboutbtn     .enabled := value;
+  loadmi      .enabled := value;
+  // reloadbtn    .enabled := value;
+  clearmi      .enabled := value;
+  startmi      .enabled := value;
+  stopmi       .enabled := value;
+  killmi       .enabled := value;
+  layoutmi     .enabled := value;
+  aboutmi      .enabled := value;
   // calibration
-  leftupbtn    .enabled := value;
-  leftdownbtn  .enabled := value;
-  leftedit     .enabled := value;
-  rightupbtn   .enabled := value;
-  rightdownbtn .enabled := value;
-  rightedit    .enabled := value;
-  penupbtn     .enabled := value;
-  pendownbtn   .enabled := value;
-  gohomebtn    .enabled := value;
+  // leftupbtn    .enabled := value;
+  // leftdownbtn  .enabled := value;
+  // leftedit     .enabled := value;
+  // rightupbtn   .enabled := value;
+  // rightdownbtn .enabled := value;
+  // rightedit    .enabled := value;
+  // penupbtn     .enabled := value;
+  // pendownbtn   .enabled := value;
+  // gohomebtn    .enabled := value;
   // page format
-  formatcb     .enabled := value;
-  heightse     .enabled := value;
-  widthse      .enabled := value;
-  offsetxse    .enabled := value;
-  offsetyse    .enabled := value;
-  verticalcb   .enabled := value;
+  // formatcb     .enabled := value;
+  // heightse     .enabled := value;
+  // widthse      .enabled := value;
+  // offsetxse    .enabled := value;
+  // offsetyse    .enabled := value;
+  // verticalcb   .enabled := value;
   application  .processmessages;
 end;
 
@@ -658,8 +883,10 @@ end;
 
 procedure tmainform.onplotterstop;
 begin
-  driverthread := nil;
-  penupbtnclick(nil);
+  driverthread   := nil;
+  driver.enabled := true;
+  driver.zoff    := false;
+  driver.pen     := false;
 
   lock1(true);
   progressbar.visible:= false;
@@ -668,10 +895,6 @@ end;
 
 procedure tmainform.onplottertick;
 begin
-  if (driverdetails.tick mod 1000) = 0 then
-  begin
-    progressbar.position := driverthread.progress;
-  end;
   application.processmessages;
 end;
 

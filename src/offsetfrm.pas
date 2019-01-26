@@ -1,7 +1,7 @@
 {
-  Description: vPlot about form.
+  Description: vPlot offset form.
 
-  Copyright (C) 2017-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
+  Copyright (C) 2017-2019 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
   This source is free software; you can redistribute it and/or modify it under
   the terms of the GNU General Public License as published by the Free
@@ -19,37 +19,37 @@
   MA 02111-1307, USA.
 }
 
-unit aboutfrm;
+unit offsetfrm;
 
 {$mode objfpc}
 
 interface
 
 uses
-  classes, sysutils, fileutil, lresources, forms, controls,
-  graphics, dialogs, extctrls, stdctrls;
+  classes, sysutils, forms, controls, graphics, dialogs, buttons, stdctrls,
+  spin, extctrls;
 
 type
-  { taboutform }
 
-  taboutform = class(tform)
-    aboutcopyrigth: tlabel;
-    aboutdescription: tlabel;
-    aboutimage: timage;
-    aboutlicense: tlabel;
-    aboutlink: tlabel;
-    aboutname: tlabel;
-    aboutversion: tlabel;
+  { toffsetform }
+
+  toffsetform = class(tform)
+    bevel1: tbevel;
+    okbtn: tbitbtn;
+    label1: tlabel;
+    label2: tlabel;
+    offsetxse: tspinedit;
+    offsetyse: tspinedit;
   private
   public
   end;
 
 var
-  aboutform: taboutform;
+  offsetform: toffsetform;
 
 implementation
 
-{$r *.lfm}
+{$R *.lfm}
 
 end.
 

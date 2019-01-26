@@ -1,5 +1,5 @@
 {
-  Description: vPlot about form.
+  Description: vPlot scale form.
 
   Copyright (C) 2017-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
@@ -19,37 +19,32 @@
   MA 02111-1307, USA.
 }
 
-unit aboutfrm;
+unit scalefrm;
 
 {$mode objfpc}
 
 interface
 
 uses
-  classes, sysutils, fileutil, lresources, forms, controls,
-  graphics, dialogs, extctrls, stdctrls;
+  classes, sysutils, forms, controls, graphics, dialogs, buttons,
+  spin, stdctrls, extctrls;
 
 type
-  { taboutform }
 
-  taboutform = class(tform)
-    aboutcopyrigth: tlabel;
-    aboutdescription: tlabel;
-    aboutimage: timage;
-    aboutlicense: tlabel;
-    aboutlink: tlabel;
-    aboutname: tlabel;
-    aboutversion: tlabel;
+  { tscaleform }
+
+  tscaleform = class(tform)
+    bevel: tbevel;
+    okbtn: tbitbtn;
+    factoredit: tfloatspinedit;
+    factorlabel: tlabel;
   private
   public
   end;
 
-var
-  aboutform: taboutform;
-
 implementation
 
-{$r *.lfm}
+{$R *.lfm}
 
 end.
 

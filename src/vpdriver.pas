@@ -30,17 +30,6 @@ uses
   vppaths, vpmath, vpsetting, vpwave;
 
 type
-  tvpdriverdetails = packed record
-    point:  tvppoint;
-    lenx:   double;
-    leny:   double;
-    loadx:  longint;
-    loady:  longint;
-    countx: double;
-    county: double;
-    tick:   longint;
-  end;
-
   tvpdriver = class
   private
     fcountx:  longint;
@@ -98,20 +87,17 @@ type
     property maxdy:    double        read fmaxdy    write fmaxdy;
     property midx:     double        read fmidx     write fmidx;
     property midy:     double        read fmidy     write fmidy;
-    property offsetx:  double        read foffsetx  write foffsetx;
-    property offsety:  double        read foffsety  write foffsety;
     property onstart:  tthreadmethod read fonstart  write fonstart;
     property onstop:   tthreadmethod read fonstop   write fonstop;
     property ontick:   tthreadmethod read fontick   write fontick;
     property progress: longint       read fprogress;
   end;
 
-  procedure optimize(const p: tvppoint; var m0, m1: longint);
+  procedure optimize(const p: tvppoint; out m0, m1: longint);
 
 var
   driver:        tvpdriver       = nil;
   driverthread:  tvpdriverthread = nil;
-  driverdetails: tvpdriverdetails;
 
 implementation
 
@@ -359,13 +345,12 @@ begin
   inherited destroy;
 end;
 
-procedure optimize(const p: tvppoint; var m0, m1: longint); inline;
+procedure optimize(const p: tvppoint; out m0, m1: longint); inline;
 var
    c0,  c1,  c2: tvpcircleimp;
-       f01, fxx: tvplineimp;
         l0,  l1: double;
   s00, s01, sxx: tvppoint;
-  t00, t01, txx: tvppoint;
+       t00, t01: tvppoint;
 begin
   t00 := setting.layout00;
   t01 := setting.layout01;
@@ -386,51 +371,17 @@ begin
   // calculate steps
   m0 := round(setting.mode*(l0/setting.ratio));
   m1 := round(setting.mode*(l1/setting.ratio));
-  // load details
-  driverdetails.countx  := m0;
-  driverdetails.county  := m1;
-  driverdetails.lenx    := l0;
-  driverdetails.leny    := l1;
-  inc(driverdetails.tick);
-
-  //if enabledebug then
-  begin
-    txx.x := s00.x;
-    txx.y := p.y;
-
-    f01 := line_by_two_points(s01, p);
-    fxx := line_by_two_points(s00, txx);
-    txx := intersection_of_two_lines(f01, fxx);
-
-    driverdetails.loadx   := trunc(setting.weight/
-      distance_between_two_points(s00, txx)*
-      distance_between_two_points(s00, p));
-    driverdetails.loady   :=trunc(setting.weight/
-      distance_between_two_points(s00, txx)*
-      distance_between_two_points(txx, p));
-  end;
 end;
 
 procedure tvpdriverthread.execute;
 var
-  i, j, k: longint;
-       m0: longint = 0;
-       m1: longint = 0;
-     path: tvppath;
-   entity: tvpentity;
-    point: tvppoint;
-    list1: tfplist;
+   i, j: longint;
+     m0: longint = 0;
+     m1: longint = 0;
+   path: tvppath;
+  point: tvppoint;
+   list: tfplist;
 begin
-  driverdetails.point.x := 0;
-  driverdetails.point.y := 0;
-  driverdetails.lenx    := 0;
-  driverdetails.leny    := 0;
-  driverdetails.loadx   := 0;
-  driverdetails.loady   := 0;
-  driverdetails.countx  := 0;
-  driverdetails.county  := 0;
-  driverdetails.tick    := 0;
-
   if assigned(onstart) then
     synchronize(fonstart);
 
@@ -444,43 +395,37 @@ begin
     writeln(format('DRIVER.THREAD::MID-Y  = %12.5f', [fmidy   ]));
   end;
 
-  list1 := tfplist.create;
-  for i := 0 to fpaths.count - 1 do
+  list := tfplist.create;
+  for i := 0 to fpaths.count -1 do
   begin
     path := fpaths.items[i];
     if path.enabled then
-      for j := 0 to path.count - 1 do
+      for j := 0 to path.count -1 do
       begin
-        entity := path.items[j];
-        for k := 0 to entity.count - 1 do
-        begin
-          point   := entity.items[k]^;
-          point.x := point.x + foffsetx;
-          point.y := point.y + foffsety;
-          point   := wave.update(point);
+        point   := path.items[j]^;
+        point.x := point.x + foffsetx;
+        point.y := point.y + foffsety;
+        point   := wave.update(point);
 
-          if (abs(point.x) <= (fmaxdx)) and
-             (abs(point.y) <= (fmaxdy)) then
-            list1.add(entity.items[k]);
-        end;
+        if (abs(point.x) <= (fmaxdx)) and
+           (abs(point.y) <= (fmaxdy)) then
+          list.add(path.items[j]);
       end;
   end;
 
   fprogress := 0;
-  for i := 0 to list1.count - 1 do
+  for i := 0 to list.count -1 do
   begin
-    point := pvppoint(list1[i])^;
+    point := pvppoint(list[i])^;
     if not terminated then
     begin
-      driverdetails.point := point;
-
-
       point.x := point.x + foffsetx;
       point.y := point.y + foffsety;
       point   := wave.update(point);
       point.x := point.x + fmidx;
       point.y := point.y + fmidy;
       optimize(point, m0, m1);
+
       driver.move(m0, m1);
       if assigned(ontick) then
         synchronize(ontick);
@@ -489,7 +434,7 @@ begin
     end;
     fprogress := (100*i) div fpaths.count;
   end;
-  list1.destroy;
+  list.destroy;
 
   if assigned(fonstop) then
     synchronize(fonstop);

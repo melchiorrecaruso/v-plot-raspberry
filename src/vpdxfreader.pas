@@ -652,7 +652,7 @@ begin
     end;
   end;
 
-  apaths.addline(@lline, llayer);
+  apaths.addline(@lline);
 end;
 
 procedure tvdxfreader.readentities_circlearc(atokens: tdxftokens; apaths: tvppaths);
@@ -697,7 +697,7 @@ begin
   if larc.endangle < larc.startangle then
     larc.endangle := larc.endangle + 360;
 
-  apaths.addcirclearc(@larc, llayer);
+  apaths.addcirclearc(@larc);
 end;
 
 procedure tvdxfreader.readentities_circle(atokens: tdxftokens; apaths: tvppaths);
@@ -732,7 +732,7 @@ begin
     end;
   end;
 
-  apaths.addcircle(@lcircle, llayer);
+  apaths.addcircle(@lcircle);
 end;
 
 procedure tvdxfreader.readentities_ellipse(atokens: tdxftokens; apaths: tvppaths);
@@ -777,7 +777,7 @@ begin
     end;
   end;
 
-  apaths.addellipse(@lellipse, llayer);
+  apaths.addellipse(@lellipse);
 end;
 
 {.$define FPVECTORIALDEBUG_LWPOLYLINE}
