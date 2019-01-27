@@ -877,6 +877,7 @@ end;
 
 procedure tmainform.onplottertick;
 begin
+  progressbar.position := driverthread.progress;
   application.processmessages;
 end;
 

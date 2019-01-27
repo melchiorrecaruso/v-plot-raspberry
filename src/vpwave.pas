@@ -171,10 +171,12 @@ begin
 
     result.x := p.x + polyeval(lx, p.y);
     result.y := p.y + polyeval(ly, p.x);
+    result.z := p.z;
   end else
   begin
     result.x := p.x;
     result.y := p.y;
+    result.z := p.z;
   end;
 end;
 

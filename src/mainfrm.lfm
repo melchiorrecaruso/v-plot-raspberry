@@ -1,11 +1,11 @@
 object mainform: Tmainform
-  Left = 369
+  Left = 348
   Height = 448
-  Top = 159
+  Top = 161
   Width = 699
   Anchors = []
   Caption = 'vPlotter'
-  ClientHeight = 426
+  ClientHeight = 424
   ClientWidth = 699
   Menu = mainmenu
   OnClose = FormClose
@@ -20,7 +20,7 @@ object mainform: Tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 26
-    Top = 400
+    Top = 398
     Width = 699
     Anchors = [akLeft, akRight, akBottom]
     Smooth = True
@@ -29,12 +29,13 @@ object mainform: Tmainform
   end
   object screen: TBGRAVirtualScreen
     Left = 0
-    Height = 426
+    Height = 424
     Top = 0
     Width = 699
     OnRedraw = screenRedraw
     Align = alClient
     Alignment = taLeftJustify
+    Color = clWhite
     ParentColor = False
     PopupMenu = popup
     TabOrder = 1

@@ -99,21 +99,16 @@ var
 
 implementation
 
-uses
-  math;
-
 const
-  motz_hi       = 2.50;
-  motz_lo       = 0.00;
-  motz_inc      = 0.02;
-  motz_freq     = 50;
+  motz_inc  = 0.02;
+  motz_freq = 50;
 
 {$ifdef cpuarm}
-  mot_en        = P37;
-  mot0_step     = P38;
-  mot0_dir      = P40;
-  mot1_step     = P29;
-  mot1_dir      = P31;
+  mot_en    = P37;
+  mot0_step = P38;
+  mot0_dir  = P40;
+  mot1_step = P29;
+  mot1_dir  = P31;
 {$endif}
 
 constructor tvpdriver.create;
@@ -146,7 +141,7 @@ begin
   digitalwrite(mot1_step, LOW);
   {$endif}
   setxyoff(false);
-  setpen(false);
+  setpen  (false);
 end;
 
 destructor tvpdriver.destroy;
@@ -207,8 +202,8 @@ begin
   fcounty := acount1;
   if enabledebug then
   begin
-    writeln(format('  DRIVER::CNT.0  = %12.5u', [fcountx]));
-    writeln(format('  DRIVER::CNT.1  = %12.5u', [fcounty]));
+    //writeln(format('  DRIVER::CNT.0  = %12.5u', [fcountx]));
+    //writeln(format('  DRIVER::CNT.1  = %12.5u', [fcounty]));
   end;
 end;
 
@@ -263,7 +258,10 @@ begin
       {$endif}
     end;
   end;
-
+  if enabledebug then
+  begin
+    writeln(format('  DRIVER::PEN    = %12.5u', [longword(fpen)]));
+  end;
 end;
 
 procedure tvpdriver.setcountx(value: longint);
@@ -380,13 +378,13 @@ begin
 
   if list.count > 0 then
   begin
-    path.items[0]^.z := 0;
+    pvppoint(list[0])^.z := 0.0;
     for i := 1 to list.count -1 do
       if distance_between_two_points(
-        path.items[i]^, path.items[i-1]^) < 0.2 then
-        path.items[i]^.z := -1
+        pvppoint(list[i])^, pvppoint(list[i-1])^) < 0.2 then
+        pvppoint(list[i])^.z := 1.0
       else
-        path.items[i]^.z := +1;
+        pvppoint(list[i])^.z := 0.0;
   end;
 
   fprogress := 0;
@@ -400,7 +398,7 @@ begin
       point.y := point.y + fmidy;
       optimize(point, m0, m1);
 
-      driver.pen := point.z < 0;
+      driver.pen := point.z = 1.0;
       driver.move(m0, m1);
       if assigned(ontick) then
         synchronize(ontick);

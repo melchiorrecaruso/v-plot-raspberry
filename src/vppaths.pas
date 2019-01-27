@@ -311,7 +311,7 @@ begin
       pvppoint(flist[i])^,
       pvppoint(flist[j])^) < minlen then
     begin
-      flist.delete(j);
+      delete(j);
       inc(k);
     end;
     inc(i);
@@ -924,10 +924,10 @@ begin
       end;
     setlength(points, 0);
   end else
-  if (element is tsvggroup ) then
+  if (element is tsvggroup) then
   begin
     with tsvggroup(element).content do
-      for i := 0 to elementcount - 1 do
+      for i := 0 to elementcount -1 do
         element2paths(element[i], apaths);
   end else
   if enabledebug then
