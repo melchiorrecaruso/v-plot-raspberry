@@ -1,13 +1,12 @@
 object mainform: Tmainform
   Left = 369
   Height = 448
-  Top = 157
+  Top = 159
   Width = 699
   Anchors = []
   Caption = 'vPlotter'
   ClientHeight = 426
   ClientWidth = 699
-  Color = clForm
   Menu = mainmenu
   OnClose = FormClose
   OnCreate = FormCreate
@@ -36,7 +35,6 @@ object mainform: Tmainform
     OnRedraw = screenRedraw
     Align = alClient
     Alignment = taLeftJustify
-    Color = clWhite
     ParentColor = False
     PopupMenu = popup
     TabOrder = 1
@@ -51,6 +49,7 @@ object mainform: Tmainform
     top = 24
   end
   object mainmenu: TMainMenu
+    OwnerDraw = True
     left = 32
     top = 24
     object mifile: TMenuItem
@@ -201,8 +200,9 @@ object mainform: Tmainform
         Caption = 'Calibration ...'
         OnClick = calibrationmiClick
       end
-      object MenuItem1: TMenuItem
+      object movetohomemi: TMenuItem
         Caption = 'Move to Home'
+        OnClick = movetohomemiClick
       end
       object N8: TMenuItem
         Caption = '-'

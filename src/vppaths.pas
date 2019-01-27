@@ -45,6 +45,7 @@ type
     destructor destroy; override;
     procedure add(p: pvppoint);
     procedure clear;
+    procedure clean;
     procedure delete(index: longint);
     procedure invert;
   public
@@ -73,6 +74,7 @@ type
     procedure addpath(entity: tvppath);
     procedure delete(index: longint);
     procedure clear;
+    procedure clean;
     procedure createtoolpath;
     procedure zerocenter;
     procedure mirror(xaxis: boolean);
@@ -110,6 +112,9 @@ uses
   math, sysutils, bgrabitmap, bgrasvg, bgrasvgshapes, bgrasvgtype,
   bgrabitmaptypes, bgravectorize, bgracanvas2d, vpdxfreader;
 
+const
+  minlen = 0.15;
+
 // internal toolpath routines
 
 function interpolate_line(entity: pvpline): tvppath;
@@ -118,7 +123,7 @@ var
    i,  j: longint;
        p: tvppoint;
 begin
-    j := max(1, round(len_segment(entity)/(1.2/setting.mode)));
+    j := max(1, round(len_segment(entity)/minlen));
    dx := (entity^.p1.x - entity^.p0.x)/j;
    dy := (entity^.p1.y - entity^.p0.y)/j;
 
@@ -143,7 +148,7 @@ begin
   start.y := 0.0;
   sweep   := 2 * pi;
 
-  j := max(1, round((abs(sweep)*entity^.radius)/(1.2/setting.mode)));
+  j := max(1, round((abs(sweep)*entity^.radius)/minlen));
 
   result := tvppath.create;
   for i := 0 to j do
@@ -166,7 +171,7 @@ begin
   start   := rotate_point(start, degtorad(entity^.startangle));
   sweep   := degtorad(entity^.endangle - entity^.startangle);
 
-  j := max(1, round(abs(sweep)*entity^.radius/(1.2/setting.mode)));
+  j := max(1, round(abs(sweep)*entity^.radius/minlen));
 
   result := tvppath.create;
   for i := 0 to j do
@@ -291,6 +296,31 @@ begin
   flist.clear;
 end;
 
+procedure tvppath.clean;
+var
+  i, j: longint;
+     k: longint;
+begin
+  i := 0;
+  j := 3;
+  k := 0;
+  while (i < flist.count) and
+        (j < flist.count) do
+  begin
+    if distance_between_two_points(
+      pvppoint(flist[i])^,
+      pvppoint(flist[j])^) < minlen then
+    begin
+      flist.delete(j);
+      inc(k);
+    end;
+    inc(i);
+    inc(j);
+  end;
+  if k > 0 then
+    writeln('deleted', k);
+end;
+
 procedure tvppath.add(p: pvppoint);
 var
   point: pvppoint;
@@ -361,6 +391,14 @@ begin
   for i := 0 to flist.count - 1 do
     tvppath(flist[i]).destroy;
   flist.clear;
+end;
+
+procedure tvppaths.clean;
+var
+  i: longint;
+begin
+  for i := 0 to flist.count - 1 do
+    tvppath(flist[i]).clean;
 end;
 
 procedure tvppaths.addline(entity: pvpline);
@@ -848,6 +886,8 @@ begin
   reader := tvdxfreader.create;
   reader.readfromfile(afilename, apaths);
   reader.destroy;
+
+  apaths.clean;
   apaths.zerocenter;
 end;
 
@@ -872,12 +912,12 @@ begin
   begin
     element.draw(bmp.canvas2d, cucustom);
     points := bmp.canvas2d.currentpath;
-    for i := 0 to length(points) - 2 do
+    for i := 0 to length(points) -2 do
       if (not isemptypointf(points[i  ])) and
          (not isemptypointf(points[i+1])) then
       begin
-        line.p0.x := points[i].x;
-        line.p0.y := points[i].y;
+        line.p0.x := points[i  ].x;
+        line.p0.y := points[i  ].y;
         line.p1.x := points[i+1].x;
         line.p1.y := points[i+1].y;
         apaths.addline(@line);
@@ -902,9 +942,12 @@ var
 begin
   svg := tbgrasvg.create(afilename);
   for i := 0 to svg.content.elementcount - 1 do
+  begin
     element2paths(svg.content.element[i], apaths);
+  end;
   svg.destroy;
 
+  apaths.clean;
   apaths.mirror(true);
   apaths.zerocenter;
 end;

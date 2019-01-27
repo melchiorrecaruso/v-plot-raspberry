@@ -27,8 +27,9 @@ interface
 
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls, comctrls,
-  buttons, menus, spin, vppaths, vpsetting, vpdriver, bgrabitmap,
-  bgrabitmaptypes, bgravirtualscreen, bgratransform, bgragradientscanner, bctypes, bgracanvas2d, types;
+  buttons, menus, spin, vppaths, vpsetting, vpdriver, bgrabitmap,  types,
+  bgrabitmaptypes, bgravirtualscreen, bgratransform, bgragradientscanner,
+  bctypes, bgracanvas2d;
 
 type
   { tmainform }
@@ -62,7 +63,7 @@ type
     a4mi: TMenuItem;
     a5mi: TMenuItem;
     horizontalmi: TMenuItem;
-    MenuItem1: TMenuItem;
+    movetohomemi: TMenuItem;
     N8: TMenuItem;
     verticalmi: TMenuItem;
     N7: TMenuItem;
@@ -99,73 +100,58 @@ type
     progressbar: tprogressbar;
     opendialog: topendialog;
 
-
-
-    procedure clearmiClick(Sender: TObject);
-    procedure divideselpmClick(Sender: TObject);
-    procedure formcreate (sender: tobject);
-    procedure formdestroy(sender: tobject);
-    procedure formclose  (sender: tobject; var closeaction: tcloseaction);
-    procedure hideallpmClick(Sender: TObject);
-    procedure hidebylayerpmClick(Sender: TObject);
-    procedure hideselpmClick(Sender: TObject);
-    procedure inverthiddenpmClick(Sender: TObject);
-    procedure invertselpmClick(Sender: TObject);
-    procedure mergeselClick(Sender: TObject);
-    procedure selattachedpmClick(Sender: TObject);
-    procedure selbylayerpmClick(Sender: TObject);
+    procedure formcreate           (sender: tobject);
+    procedure formdestroy          (sender: tobject);
+    procedure formclose            (sender: tobject; var closeaction: tcloseaction);
     // MAIN MENU::FILE
-    procedure loadmiclick  (sender: tobject);
-    procedure selallpmClick(Sender: TObject);
-    procedure savemiclick  (sender: tobject);
-
-    procedure importmiclick(sender: tobject);
-    procedure exitmiclick  (sender: tobject);
+    procedure loadmiclick          (sender: tobject);
+    procedure savemiclick          (sender: tobject);
+    procedure clearmiclick         (sender: tobject);
+    procedure importmiclick        (sender: tobject);
+    procedure exitmiclick          (sender: tobject);
     // MAIN MENU::EDIT
-    procedure rotate180miclick (sender: tobject);
-    procedure rotate270miclick (sender: tobject);
-    procedure rotate90miclick  (sender: tobject);
-    procedure mirrorxmiclick   (sender: tobject);
-    procedure mirrorymiclick   (sender: tobject);
-    procedure scalemiclick     (sender: tobject);
-    procedure offsetmiclick    (sender: tobject);
-    procedure a0miclick        (sender: tobject);
-    procedure horizontalmiclick(sender: tobject);
-    procedure layoutmiclick    (sender: tobject);
-
-    procedure screenMouseWheel(Sender: TObject; Shift: TShiftState;
-      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
-    procedure screenRedraw(Sender: TObject; Bitmap: TBGRABitmap);
-    procedure showallpmClick(Sender: TObject);
-    procedure showbylayerpmClick(Sender: TObject);
+    procedure rotate180miclick     (sender: tobject);
+    procedure rotate270miclick     (sender: tobject);
+    procedure rotate90miclick      (sender: tobject);
+    procedure mirrorxmiclick       (sender: tobject);
+    procedure mirrorymiclick       (sender: tobject);
+    procedure scalemiclick         (sender: tobject);
+    procedure offsetmiclick        (sender: tobject);
+    procedure a0miclick            (sender: tobject);
+    procedure horizontalmiclick    (sender: tobject);
+    procedure layoutmiclick        (sender: tobject);
     // MAIN-MENU::PRINTER
     procedure startmiclick         (sender: tobject);
     procedure stopmiclick          (sender: tobject);
     procedure killmiclick          (sender: tobject);
     procedure calibrationmiclick   (sender: tobject);
-
+    procedure movetohomemiclick    (sender: tobject);
     procedure createtoolpathmiclick(sender: tobject);
     // MAIN-FORM::HELP
-    procedure aboutmiclick(sender: tobject);
+    procedure aboutmiclick         (sender: tobject);
+    // POPUP-MENU
+    procedure selallpmclick        (sender: tobject);
 
+    procedure deselallpmclick      (sender: tobject);
+    procedure divideselpmclick     (sender: tobject);
 
-
-    procedure deselallpmClick(Sender: TObject);
-
-
-
-
-
-
-
-
-
-
-    procedure imagemouseup  (sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
-    procedure imagemousedown(sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
-    procedure imagemousemove(sender: tobject; shift: tshiftstate; x, y: integer);
-    procedure trackbarChange(Sender: TObject);
-
+    procedure hideallpmclick       (sender: tobject);
+    procedure hidebylayerpmclick   (sender: tobject);
+    procedure hideselpmclick       (sender: tobject);
+    procedure inverthiddenpmclick  (sender: tobject);
+    procedure invertselpmclick     (sender: tobject);
+    procedure mergeselclick        (sender: tobject);
+    procedure selattachedpmclick   (sender: tobject);
+    procedure selbylayerpmclick    (sender: tobject);
+    procedure showallpmclick       (sender: tobject);
+    procedure showbylayerpmclick   (sender: tobject);
+    // virtual screen events
+    procedure screenredraw    (sender: tobject; bitmap: tbgrabitmap);
+    procedure imagemouseup    (sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
+    procedure imagemousedown  (sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
+    procedure imagemousemove  (sender: tobject; shift: tshiftstate; x, y: integer);
+    procedure screenmousewheel(sender: tobject; shift: tshiftstate;
+      wheeldelta: integer; mousepos: tpoint; var handled: boolean);
   private
 
 
@@ -191,7 +177,6 @@ type
   public
     procedure lock1(value: boolean);
     procedure lock2(value: boolean);
-
     procedure updatevirtualscreen;
   end;
 
@@ -220,12 +205,12 @@ begin
   // create plotter driver
   driver         := tvpdriver.create;
   driver.delaym  := trunc(setting.delaym/setting.mode);
-  driver.delayz  :=       setting.delayz;
+  driver.delayz  := setting.delayz;
   driver.pen     := false;
   // create preview and empty paths
     bit := tbgrabitmap.create;
   paths := tvppaths.create;
-  // update preview
+  // update virtual screen
   a0miclick(a3mi);
   // init wave
   wave := twave.create(
@@ -240,13 +225,8 @@ begin
 end;
 
 procedure tmainform.formdestroy(sender: tobject);
-var
-  f: tcalibrationform;
 begin
-  f := tcalibrationform.create(nil);
-  f.gohomebtnclick(sender);
-  f.destroy;
-
+  movetohomemiclick(sender);
   wave.destroy;
   paths.destroy;
   bit.destroy;
@@ -299,30 +279,25 @@ end;
 
 procedure tmainform.updatevirtualscreen;
 var
-    i, j: longint;
-    path: tvppath;
-  point1: tvppoint;
-  point2: tvppoint;
+ i, j: longint;
+ path: tvppath;
+   p1: tvppoint;
+   p2: tvppoint;
+    a: array of tpointf;
 begin
   lock2(false);
-  //screen.canvas.pen  .color := clwhite;
-  //screen.canvas.brush.color := clwhite;
-  //screen.canvas.brush.style := bssolid;
+  //
+
+  bit.canvas.pen.color := clred;
+  bit.canvas.pen.joinstyle:=pjsround;
+  bit.canvas.pen.width := 5;
+  bit.canvas.pen.style:=psdash;
+
+
+
   // ---
-  //screen.width  := round(pagewidth *zoom);
-  //screen.height := round(pageheight*zoom);
-  //screen.canvas.fillrect(0, 0, screen.width, screen.height);
-  // ---
-  //screen.align            := alnone;
-  //screen.anchors          := [aktop, akleft, akright, akbottom];
-  //screen.anchors          := [];
-  // ---
-  bit.canvas.pen  .color := clwhite;
-  bit.canvas.brush.color := clwhite;
-  bit.canvas.brush.style := bssolid;
   bit.setsize(round(pagewidth *zoom),
               round(pageheight*zoom));
-  // ---
   bit.fillrect(0, 0, bit.width,   bit.height,   bgra(100, 100, 100), dmset);
   bit.fillrect(1, 1, bit.width-1, bit.height-1, bgra(255, 255, 255), dmset);
   // updtare preview ...
@@ -331,28 +306,28 @@ begin
     path := paths.items[i];
     if (path.enabled) and (path.count > 1) then
     begin
-      point1   := path.items[0]^;
-      point1.x := (bit.width  div 2) + point1.x*zoom;
-      point1.y := (bit.height div 2) - point1.y*zoom;
+      p1    := path.items[0]^;
+      p1.x  := (bit.width  div 2) + p1.x*zoom;
+      p1.y  := (bit.height div 2) - p1.y*zoom;
       for j := 1 to path.count -1 do
       begin
-        point2   := path.items[j]^;
-        point2.x := (bit.width  div 2) + point2.x*zoom;
-        point2.y := (bit.height div 2) - point2.y*zoom;
+        p2   := path.items[j]^;
+        p2.x := (bit.width  div 2) + p2.x*zoom;
+        p2.y := (bit.height div 2) - p2.y*zoom;
         if path.hidden = false then
         begin
           if path.selected then
             bit.drawline(
-              round(point1.x), round(point1.y),
-              round(point2.x), round(point2.y),
+              round(p1.x), round(p1.y),
+              round(p2.x), round(p2.y),
               bgra(57, 255, 20), true, dmset)
           else
             bit.drawline(
-              round(point1.x), round(point1.y),
-              round(point2.x), round(point2.y),
+              round(p1.x), round(p1.y),
+              round(p2.x), round(p2.y),
               bgra(  0,  0,  0), true, dmset);
         end;
-        point1 := point2;
+        p1 := p2;
       end;
     end;
   end;
@@ -561,15 +536,27 @@ begin
   f.destroy;
 end;
 
+procedure tmainform.movetohomemiclick(sender: tobject);
+var
+  m0: longint = 0;
+  m1: longint = 0;
+begin
+  driver.enabled := true;
+  driver.zoff    := false;
+  driver.pen     := false;
+  driver.zoff    := true;
+
+  optimize(setting.layout09, m0, m1);
+  driver.move(m0, m1);
+end;
+
 procedure tmainform.layoutmiclick(sender: tobject);
 var
    f: tcalibrationform;
   m0: longint = 0;
   m1: longint = 0;
 begin
-  f := tcalibrationform.create(nil);
-  f.gohomebtnclick(sender);
-  f.destroy;
+  movetohomemiclick(sender);
   // load configuration
   setting.clear;
   setting.load(changefileext(paramstr(0), '.ini'));
@@ -764,11 +751,6 @@ begin
     movey := y - py;
     screen.redrawbitmap;
   end;
-end;
-
-procedure tmainform.trackbarchange(sender: tobject);
-begin
-  updatevirtualscreen;
 end;
 
 procedure tmainform.imagemouseup(sender: tobject;

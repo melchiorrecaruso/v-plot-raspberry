@@ -34,7 +34,6 @@ type
   { tcalibrationform }
 
   tcalibrationform = class(tform)
-    gohomebtn: tbitbtn;
     pendownbtn: tbitbtn;
     penupbtn: tbitbtn;
     leftdownbtn: tbitbtn;
@@ -43,7 +42,6 @@ type
     rightdownbtn: tbitbtn;
     rightedit: tspinedit;
     rightupbtn: tbitbtn;
-    procedure gohomebtnClick(Sender: TObject);
     procedure leftdownbtnclick (sender: tobject);
     procedure leftupbtnclick   (sender: tobject);
     procedure pendownbtnclick  (sender: tobject);
@@ -73,6 +71,7 @@ var
   m0: longint = 0;
   m1: longint = 0;
 begin
+  lock;
   driver.enabled := true;
   driver.zoff    := false;
   driver.pen     := false;
@@ -85,6 +84,7 @@ begin
 
   optimize(setting.layout09, m0, m1);
   driver.init(m0, m1);
+  unlock;
 end;
 
 procedure tcalibrationform.leftdownbtnclick(sender: tobject);
@@ -114,20 +114,6 @@ begin
   driver.enabled := true;
   driver.zoff    := false;
   driver.pen     := false;
-end;
-
-procedure tcalibrationform.gohomebtnclick(sender: tobject);
-var
-  m0: longint = 0;
-  m1: longint = 0;
-begin
-  driver.enabled := true;
-  driver.zoff    := false;
-  driver.pen     := false;
-  driver.zoff    := true;
-
-  optimize(setting.layout09, m0, m1);
-  driver.move(m0, m1);
 end;
 
 procedure tcalibrationform.lock;

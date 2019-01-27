@@ -1,7 +1,7 @@
 object calibrationform: Tcalibrationform
-  Left = 656
+  Left = 633
   Height = 130
-  Top = 430
+  Top = 300
   Width = 300
   BorderStyle = bsDialog
   Caption = 'Calibration'
@@ -229,23 +229,6 @@ object calibrationform: Tcalibrationform
     OnClick = penupbtnClick
     TabOrder = 3
   end
-  object gohomebtn: TBitBtn
-    AnchorSideLeft.Control = penupbtn
-    AnchorSideTop.Control = leftedit
-    AnchorSideRight.Control = penupbtn
-    AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = leftedit
-    AnchorSideBottom.Side = asrBottom
-    Left = 108
-    Height = 30
-    Top = 48
-    Width = 85
-    Anchors = [akTop, akLeft, akRight, akBottom]
-    Caption = 'Go Home'
-    Color = clSkyBlue
-    OnClick = gohomebtnClick
-    TabOrder = 4
-  end
   object pendownbtn: TBitBtn
     AnchorSideLeft.Control = penupbtn
     AnchorSideTop.Control = leftdownbtn
@@ -260,7 +243,7 @@ object calibrationform: Tcalibrationform
     Anchors = [akTop, akRight, akBottom]
     Caption = 'Pen Down'
     OnClick = pendownbtnClick
-    TabOrder = 5
+    TabOrder = 4
   end
   object rightupbtn: TBitBtn
     AnchorSideLeft.Control = penupbtn
@@ -353,7 +336,7 @@ object calibrationform: Tcalibrationform
       0000000000000000000000000000000000000000000000000000
     }
     OnClick = rightupbtnClick
-    TabOrder = 6
+    TabOrder = 5
   end
   object rightedit: TSpinEdit
     AnchorSideLeft.Control = rightupbtn
@@ -370,7 +353,7 @@ object calibrationform: Tcalibrationform
     Anchors = [akTop, akLeft, akRight, akBottom]
     AutoSize = False
     MaxValue = 1000000
-    TabOrder = 7
+    TabOrder = 6
   end
   object rightdownbtn: TBitBtn
     AnchorSideLeft.Control = rightupbtn
@@ -463,6 +446,6 @@ object calibrationform: Tcalibrationform
       0000000000000000000000000000000000000000000000000000
     }
     OnClick = rightdownbtnClick
-    TabOrder = 8
+    TabOrder = 7
   end
 end

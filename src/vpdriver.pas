@@ -110,13 +110,14 @@ const
   motz_inc      = 0.02;
   motz_freq     = 50;
 
+
 {$ifdef cpuarm}
   mot_en        = P37;
   mot0_step     = P38;
   mot0_dir      = P40;
   mot1_step     = P29;
   mot1_dir      = P31;
-
+  (*
   vplotmatrix : array [0..10, 0..18] of longint = (
     (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),  //  0
     (0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),  //  1
@@ -129,7 +130,9 @@ const
     (1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1),  //  8
     (0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0),  //  9
     (1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1)); // 10
+  *)
 {$endif}
+
 
 constructor tvpdriver.create;
 begin
@@ -205,6 +208,7 @@ begin
     dmy := abs(dmy);
     setpen(max(dmx, dmy) <= 10);
 
+    (*
     while (dmx > 0) or (dmy > 0) do
     begin
       ddmx := min(10, dmx);
@@ -230,6 +234,34 @@ begin
       dec(dmx, ddmx);
       dec(dmy, ddmy);
     end;
+    *)
+
+    while (dmx > 0) or (dmy > 0) do
+    begin
+      ddmx := min(10, dmx);
+      ddmy := min(10, dmy);
+
+      for i := 0 to 18 do
+      begin
+        c0 := vplotmatrix[ddmx, i] = 1;
+        c1 := vplotmatrix[ddmy, i] = 1;
+
+        if c0 then digitalwrite(mot0_step, HIGH);
+        if c1 then digitalwrite(mot1_step, HIGH);
+
+        if c0 or
+           c1 then delaymicroseconds(fdelaym);
+
+        if c0 then digitalwrite(mot0_step,  LOW);
+        if c1 then digitalwrite(mot1_step,  LOW);
+
+        if c0 or
+           c1 then delaymicroseconds(fdelaym);
+      end;
+      dec(dmx, ddmx);
+      dec(dmy, ddmy);
+    end;
+
   end;
   {$endif}
   fcountx := acount0;
