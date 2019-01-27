@@ -68,8 +68,6 @@ type
     fmaxdy:    double;
     fmidx:     double;
     fmidy:     double;
-    foffsetx:  double;
-    foffsety:  double;
     fonstart:  tthreadmethod;
     fonstop:   tthreadmethod;
     fontick:   tthreadmethod;
@@ -110,29 +108,13 @@ const
   motz_inc      = 0.02;
   motz_freq     = 50;
 
-
 {$ifdef cpuarm}
   mot_en        = P37;
   mot0_step     = P38;
   mot0_dir      = P40;
   mot1_step     = P29;
   mot1_dir      = P31;
-  (*
-  vplotmatrix : array [0..10, 0..18] of longint = (
-    (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),  //  0
-    (0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),  //  1
-    (0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0),  //  2
-    (0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0),  //  3
-    (1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1),  //  4
-    (1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1),  //  5
-    (0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0),  //  6
-    (1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1),  //  7
-    (1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1),  //  8
-    (0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0),  //  9
-    (1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1)); // 10
-  *)
 {$endif}
-
 
 constructor tvpdriver.create;
 begin
@@ -182,10 +164,8 @@ end;
 procedure tvpdriver.move(acount0, acount1: longint);
 {$ifdef cpuarm}
 var
-   c0,   c1: boolean;
-          i: longint;
-  dmx, ddmx: longint;
-  dmy, ddmy: longint;
+  dmx: longint;
+  dmy: longint;
 {$endif}
 begin
   {$ifdef cpuarm}
@@ -206,62 +186,21 @@ begin
 
     dmx := abs(dmx);
     dmy := abs(dmy);
-    setpen(max(dmx, dmy) <= 10);
-
-    (*
     while (dmx > 0) or (dmy > 0) do
     begin
-      ddmx := min(10, dmx);
-      ddmy := min(10, dmy);
+      if dmx > 0 then digitalwrite(mot0_step, HIGH);
+      if dmy > 0 then digitalwrite(mot1_step, HIGH);
 
-      for i := 0 to 18 do
-      begin
-        c0 := vplotmatrix[ddmx, i] = 1;
-        c1 := vplotmatrix[ddmy, i] = 1;
+      delaymicroseconds(fdelaym);
 
-        if c0 then digitalwrite(mot0_step, HIGH);
-        if c1 then digitalwrite(mot1_step, HIGH);
+      if dmx > 0 then digitalwrite(mot0_step,  LOW);
+      if dmy > 0 then digitalwrite(mot1_step,  LOW);
 
-        if c0 or
-           c1 then delaymicroseconds(fdelaym);
+      delaymicroseconds(fdelaym);
 
-        if c0 then digitalwrite(mot0_step,  LOW);
-        if c1 then digitalwrite(mot1_step,  LOW);
-
-        if c0 or
-           c1 then delaymicroseconds(fdelaym);
-      end;
-      dec(dmx, ddmx);
-      dec(dmy, ddmy);
+      if dmx > 0 then dec(dmx);
+      if dmy > 0 then dec(dmy);
     end;
-    *)
-
-    while (dmx > 0) or (dmy > 0) do
-    begin
-      ddmx := min(10, dmx);
-      ddmy := min(10, dmy);
-
-      for i := 0 to 18 do
-      begin
-        c0 := vplotmatrix[ddmx, i] = 1;
-        c1 := vplotmatrix[ddmy, i] = 1;
-
-        if c0 then digitalwrite(mot0_step, HIGH);
-        if c1 then digitalwrite(mot1_step, HIGH);
-
-        if c0 or
-           c1 then delaymicroseconds(fdelaym);
-
-        if c0 then digitalwrite(mot0_step,  LOW);
-        if c1 then digitalwrite(mot1_step,  LOW);
-
-        if c0 or
-           c1 then delaymicroseconds(fdelaym);
-      end;
-      dec(dmx, ddmx);
-      dec(dmy, ddmy);
-    end;
-
   end;
   {$endif}
   fcountx := acount0;
@@ -288,8 +227,8 @@ var
  end;
 
 begin
-  if fzoff = true  then exit;
   if fpen  = value then exit;
+  if fzoff = true  then exit;
 
   fpen := value;
   {$ifdef cpuarm}
@@ -362,8 +301,6 @@ begin
   fmaxdy    := 0;
   fmidx     := 0;
   fmidy     := 0;
-  foffsetx  := 0;
-  foffsety  := 0;
   fpaths    := paths;
   fprogress := 0;
 
@@ -419,12 +356,10 @@ begin
 
   if enabledebug then
   begin
-    writeln(format('DRIVER.THREAD::OFF-X  = %12.5f', [foffsetx]));
-    writeln(format('DRIVER.THREAD::OFF-Y  = %12.5f', [foffsety]));
-    writeln(format('DRIVER.THREAD::MAX-DX = %12.5f', [fmaxdx  ]));
-    writeln(format('DRIVER.THREAD::MAX-DY = %12.5f', [fmaxdy  ]));
-    writeln(format('DRIVER.THREAD::MID-X  = %12.5f', [fmidx   ]));
-    writeln(format('DRIVER.THREAD::MID-Y  = %12.5f', [fmidy   ]));
+    writeln(format('DRIVER.THREAD::MAX-DX = %12.5f', [fmaxdx]));
+    writeln(format('DRIVER.THREAD::MAX-DY = %12.5f', [fmaxdy]));
+    writeln(format('DRIVER.THREAD::MID-X  = %12.5f', [fmidx ]));
+    writeln(format('DRIVER.THREAD::MID-Y  = %12.5f', [fmidy ]));
   end;
 
   list := tfplist.create;
@@ -434,15 +369,24 @@ begin
     if path.enabled then
       for j := 0 to path.count -1 do
       begin
-        point   := path.items[j]^;
-        point.x := point.x + foffsetx;
-        point.y := point.y + foffsety;
-        point   := wave.update(point);
+        point:= path.items[j]^;
+        point:= wave.update(point);
 
         if (abs(point.x) <= (fmaxdx)) and
            (abs(point.y) <= (fmaxdy)) then
           list.add(path.items[j]);
       end;
+  end;
+
+  if list.count > 0 then
+  begin
+    path.items[0]^.z := 0;
+    for i := 1 to list.count -1 do
+      if distance_between_two_points(
+        path.items[i]^, path.items[i-1]^) < 0.2 then
+        path.items[i]^.z := -1
+      else
+        path.items[i]^.z := +1;
   end;
 
   fprogress := 0;
@@ -451,20 +395,19 @@ begin
     point := pvppoint(list[i])^;
     if not terminated then
     begin
-      point.x := point.x + foffsetx;
-      point.y := point.y + foffsety;
       point   := wave.update(point);
       point.x := point.x + fmidx;
       point.y := point.y + fmidy;
       optimize(point, m0, m1);
 
+      driver.pen := point.z < 0;
       driver.move(m0, m1);
       if assigned(ontick) then
         synchronize(ontick);
 
       while not enabled do sleep(250);
     end;
-    fprogress := (100*i) div fpaths.count;
+    fprogress := (100*i) div list.count;
   end;
   list.destroy;
 
