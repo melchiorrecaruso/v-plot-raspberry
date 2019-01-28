@@ -138,9 +138,7 @@ begin
   fwave[6].x  := 0;  fwave[6].y  := 0;
   fwave[7].x  := 0;  fwave[7].y  := 0;
   fwave[8].x  := 0;  fwave[8].y  := 0;
-
-  fwavexmax   := 0;
-  fwaveymax   := 0;
+  fwavexmax   := 0;  fwaveymax   := 0;
 
   fxmin       := 0;  fymin       := 0;  fzmin       := 0;
   fxmax       := 0;  fymax       := 0;  fzmax       := 0;
@@ -234,25 +232,25 @@ begin
     writeln(format('    WAVE::XMAX   = %12.5f', [fwavexmax]));
     writeln(format('    WAVE::YMAX   = %12.5f', [fwaveymax]));
 
-    writeln(format('  X-AXIS::MIN    = %12.5f', [fxmin    ]));
-    writeln(format('  X-AXIS::MAX    = %12.5f', [fxmax    ]));
-    writeln(format('  X-AXIS::INC    = %12.5f', [fxinc    ]));
+    writeln(format('  X-AXIS::MIN    = %12.5u', [fxmin    ]));
+    writeln(format('  X-AXIS::MAX    = %12.5u', [fxmax    ]));
+    writeln(format('  X-AXIS::INC    = %12.5u', [fxinc    ]));
     writeln(format('  X-AXIS::DELAY  = %12.5u', [fxdelay  ]));
     writeln(format('  X-AXIS::DIR    = %12.5u', [fxdir    ]));
     writeln(format('  X-AXIS::RADIUS = %12.5f', [fxradius ]));
     writeln(format('  X-AXIS::RATIO  = %12.5f', [fxratio  ]));
 
-    writeln(format('  Y-AXIS::MIN    = %12.5f', [fymin    ]));
-    writeln(format('  Y-AXIS::MAX    = %12.5f', [fymax    ]));
-    writeln(format('  Y-AXIS::INC    = %12.5f', [fyinc    ]));
+    writeln(format('  Y-AXIS::MIN    = %12.5u', [fymin    ]));
+    writeln(format('  Y-AXIS::MAX    = %12.5u', [fymax    ]));
+    writeln(format('  Y-AXIS::INC    = %12.5u', [fyinc    ]));
     writeln(format('  Y-AXIS::DELAY  = %12.5u', [fydelay  ]));
     writeln(format('  Y-AXIS::DIR    = %12.5u', [fydir    ]));
     writeln(format('  Y-AXIS::RADIUS = %12.5f', [fyradius ]));
     writeln(format('  Y-AXIS::RATIO  = %12.5f', [fyratio  ]));
 
-    writeln(format('  Z-AXIS::MIN    = %12.5f', [fzmin    ]));
-    writeln(format('  Z-AXIS::MAX    = %12.5f', [fzmax    ]));
-    writeln(format('  Z-AXIS::INC    = %12.5f', [fzinc    ]));
+    writeln(format('  Z-AXIS::MIN    = %12.5u', [fzmin    ]));
+    writeln(format('  Z-AXIS::MAX    = %12.5u', [fzmax    ]));
+    writeln(format('  Z-AXIS::INC    = %12.5u', [fzinc    ]));
     writeln(format('  Z-AXIS::DELAY  = %12.5u', [fzdelay  ]));
     writeln(format('  Z-AXIS::DIR    = %12.5u', [fzdir    ]));
     writeln(format('  Z-AXIS::RADIUS = %12.5f', [fzradius ]));

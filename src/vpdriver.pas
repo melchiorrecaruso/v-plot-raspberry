@@ -32,18 +32,18 @@ uses
 type
   tvpdriver = class
   private
-    fxcount:   longint;
-    fycount:   longint;
-    fzcount:   longint;
-    fxdelay:   longint;
-    fydelay:   longint;
-    fzdelay:   longint;
-    fxoff:     boolean;
-    fyoff:     boolean;
-    fzoff:     boolean;
-    procedure  setxcount(value: longint);
-    procedure  setycount(value: longint);
-    procedure  setzcount(value: longint);
+    fxcount:  longint;
+    fycount:  longint;
+    fzcount:  longint;
+    fxdelay:  longint;
+    fydelay:  longint;
+    fzdelay:  longint;
+    fxoff:    boolean;
+    fyoff:    boolean;
+    fzoff:    boolean;
+    procedure setxcount(value: longint);
+    procedure setycount(value: longint);
+    procedure setzcount(value: longint);
   public
     constructor create;
     destructor  destroy; override;
@@ -162,13 +162,13 @@ var
 {$endif}
 begin
   {$ifdef cpuarm}
-  dx := acountx - fcountx;
+  dx := axcount - fxcount;
   if dx < 0 then
     digitalwrite(motx_dir,  LOW)
   else
     digitalwrite(motx_dir, HIGH);
 
-  dy := acounty - fcounty;
+  dy := aycount - fycount;
   if dy < 0 then
     digitalwrite(moty_dir, HIGH)
   else
@@ -220,7 +220,7 @@ begin
   begin
     inc(fzcount, setting.zinc);
     {$ifdef cpuarm}
-    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fzcount, motz_freq));
+    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fzcount/100, motz_freq));
     delaymicroseconds(fzdelay);
     {$endif}
   end;
@@ -229,7 +229,7 @@ begin
   begin
     dec(fzcount, setting.zinc);
     {$ifdef cpuarm}
-    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fzcount, motz_freq));
+    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fzcount/100, motz_freq));
     delaymicroseconds(fzdelay);
     {$endif}
   end;
