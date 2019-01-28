@@ -1,48 +1,58 @@
 object mainform: Tmainform
   Left = 348
   Height = 448
-  Top = 161
-  Width = 699
+  Top = 163
+  Width = 806
   Anchors = []
   Caption = 'vPlotter'
-  ClientHeight = 424
-  ClientWidth = 699
+  ClientHeight = 426
+  ClientWidth = 806
   Menu = mainmenu
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   LCLVersion = '2.1.0.0'
-  object progressbar: TProgressBar
-    AnchorSideLeft.Control = Owner
-    AnchorSideRight.Control = Owner
-    AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = Owner
-    AnchorSideBottom.Side = asrBottom
-    Left = 0
-    Height = 26
-    Top = 398
-    Width = 699
-    Anchors = [akLeft, akRight, akBottom]
-    Smooth = True
-    Step = 1
-    TabOrder = 0
-  end
   object screen: TBGRAVirtualScreen
     Left = 0
-    Height = 424
-    Top = 0
-    Width = 699
+    Height = 404
+    Top = 2
+    Width = 806
     OnRedraw = screenRedraw
     Align = alClient
     Alignment = taLeftJustify
-    Color = clWhite
+    BorderSpacing.Top = 2
+    ClientHeight = 404
+    ClientWidth = 806
+    Color = clForm
     ParentColor = False
     PopupMenu = popup
-    TabOrder = 1
+    TabOrder = 0
     OnMouseDown = imageMouseDown
     OnMouseMove = imageMouseMove
     OnMouseUp = imageMouseUp
     OnMouseWheel = screenMouseWheel
+    object Bevel1: TBevel
+      Left = 0
+      Height = 2
+      Top = 0
+      Width = 806
+      Align = alTop
+    end
+  end
+  object statusbar: TStatusBar
+    Left = 0
+    Height = 20
+    Top = 406
+    Width = 806
+    Panels = <    
+      item
+        Width = 50
+      end    
+      item
+        Width = 50
+      end>
+    SimplePanel = False
+    SizeGrip = False
   end
   object opendialog: TOpenDialog
     Options = [ofPathMustExist, ofFileMustExist, ofEnableSizing, ofViewDetail]
@@ -228,7 +238,7 @@ object mainform: Tmainform
   end
   object popup: TPopupMenu
     AutoPopup = False
-    left = 256
+    left = 240
     top = 24
     object selallpm: TMenuItem
       Caption = 'Select All'

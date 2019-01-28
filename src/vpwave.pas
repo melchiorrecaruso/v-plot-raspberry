@@ -81,13 +81,13 @@ end;
 
 constructor twave.create(xmax, ymax: double; const mesh: twavemesh);
 var
-   a, aa: tvector3_double;
-   b, bb: tvector3_double;
-   c, cc: tvector3_double;
-  dy: tvector3_double;
-  dx: tvector3_double;
-   y: tmatrix3_double;
-   x: tmatrix3_double;
+  a, aa: tvector3_double;
+  b, bb: tvector3_double;
+  c, cc: tvector3_double;
+     dy: tvector3_double;
+     dx: tvector3_double;
+      y: tmatrix3_double;
+      x: tmatrix3_double;
 begin
   inherited create;
   xmax := abs(xmax);

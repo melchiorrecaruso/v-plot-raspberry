@@ -35,6 +35,7 @@ type
   { tmainform }
 
   tmainform = class(tform)
+    Bevel1: TBevel;
     divideselpm: TMenuItem;
     selattachedpm: TMenuItem;
     selbylayerpm: TMenuItem;
@@ -65,6 +66,7 @@ type
     horizontalmi: TMenuItem;
     movetohomemi: TMenuItem;
     N8: TMenuItem;
+    statusbar: TStatusBar;
     verticalmi: TMenuItem;
     N7: TMenuItem;
     rotate90mi: TMenuItem;
@@ -97,7 +99,6 @@ type
     mihelp: TMenuItem;
     miprint: TMenuItem;
     mifile: TMenuItem;
-    progressbar: tprogressbar;
     opendialog: topendialog;
 
     procedure formcreate           (sender: tobject);
@@ -153,9 +154,6 @@ type
     procedure screenmousewheel(sender: tobject; shift: tshiftstate;
       wheeldelta: integer; mousepos: tpoint; var handled: boolean);
   private
-
-
-
          bit: tbgrabitmap;
        paths: tvppaths;
  mouseisdown: boolean;
@@ -195,18 +193,17 @@ uses
 
 procedure tmainform.formcreate(sender: tobject);
 var
-  m0: longint;
-  m1: longint;
+  mx: longint;
+  my: longint;
 begin
-  progressbar.visible := false;
   // load setting
   setting := tvpsetting.create;
   setting.load(changefileext(paramstr(0), '.ini'));
   // create plotter driver
   driver         := tvpdriver.create;
-  driver.delaym  := trunc(setting.delaym/setting.mode);
-  driver.delayz  := setting.delayz;
-  driver.pen     := false;
+  driver.xdelay  := setting.xdelay;
+  driver.ydelay  := setting.ydelay;
+  driver.zdelay  := setting.zdelay;
   // create preview and empty paths
     bit := tbgrabitmap.create;
   paths := tvppaths.create;
@@ -214,19 +211,20 @@ begin
   a0miclick(a3mi);
   // init wave
   wave := twave.create(
-    setting.wavemaxdx,
-    setting.wavemaxdy,
+    setting.wavexmax,
+    setting.waveymax,
     setting.wave);
   wave.enabled := false;
   wave.test;
   // initialize driver
-  optimize(setting.layout09, m0, m1);
-  driver.init(m0, m1);
+  optimize(setting.layout09, mx, my);
+  driver.init(mx, my);
 end;
 
 procedure tmainform.formdestroy(sender: tobject);
 begin
   movetohomemiclick(sender);
+  // ---
   wave.destroy;
   paths.destroy;
   bit.destroy;
@@ -267,7 +265,9 @@ begin
   begin
     caption := 'vPlotter - ' + changefileext(savedialog.filename, '.vplot');
 
+    lock2(false);
     paths.save(changefileext(savedialog.filename, '.vplot'));
+    lock2(true);
   end;
 end;
 
@@ -286,15 +286,6 @@ var
     a: array of tpointf;
 begin
   lock2(false);
-  //
-
-  bit.canvas.pen.color := clred;
-  bit.canvas.pen.joinstyle:=pjsround;
-  bit.canvas.pen.width := 5;
-  bit.canvas.pen.style:=psdash;
-
-
-
   // ---
   bit.setsize(round(pagewidth *zoom),
               round(pageheight*zoom));
@@ -488,18 +479,19 @@ end;
 
 procedure tmainform.startmiclick(sender: tobject);
 begin
-  driver.enabled := true;
-  driver.zoff    := false;
+  driver.xoff := false;
+  driver.yoff := false;
+  driver.zoff := false;
   if assigned(driverthread) then
   begin
     driverthread.enabled := true;
   end else
   begin
     driverthread         := tvpdriverthread.create(paths);
-    driverthread.midx    := setting.layout08.x;
-    driverthread.midy    := setting.layout08.y+pageheight/2;
-    driverthread.maxdx   := pagewidth /2 + 2;
-    driverthread.maxdy   := pageheight/2 + 2;
+    driverthread.xcenter := setting.layout08.x;
+    driverthread.ycenter := setting.layout08.y+pageheight/2;
+    driverthread.xmax    := pagewidth /2 + 2;
+    driverthread.ymax    := pageheight/2 + 2;
     driverthread.onstart := @onplotterstart;
     driverthread.onstop  := @onplotterstop;
     driverthread.ontick  := @onplottertick;
@@ -513,16 +505,16 @@ begin
   begin
     driverthread.enabled := false;
   end;
-  driver.enabled := true;
-  driver.zoff    := false;
-  driver.pen     := false;
+  driver.zcount := setting.zmax;
+  driver.xoff   := true;
+  driver.yoff   := true;
+  driver.zoff   := true;
 end;
 
 procedure tmainform.killmiclick(sender: tobject);
 begin
   if assigned(driverthread) then
   begin
-    driverthread.enabled := true;
     driverthread.terminate;
   end;
 end;
@@ -538,34 +530,34 @@ end;
 
 procedure tmainform.movetohomemiclick(sender: tobject);
 var
-  m0: longint = 0;
-  m1: longint = 0;
+  mx: longint = 0;
+  my: longint = 0;
 begin
-  driver.enabled := true;
-  driver.zoff    := false;
-  driver.pen     := false;
-  driver.zoff    := true;
+  driver.zcount := setting.zmax;
+  driver.xoff   := false;
+  driver.yoff   := false;
+  driver.zoff   := false;
 
-  optimize(setting.layout09, m0, m1);
-  driver.move(m0, m1);
+  optimize(setting.layout09, mx, my);
+  driver.move(mx, my);
 end;
 
 procedure tmainform.layoutmiclick(sender: tobject);
 var
-   f: tcalibrationform;
-  m0: longint = 0;
-  m1: longint = 0;
+  mx: longint = 0;
+  my: longint = 0;
 begin
   movetohomemiclick(sender);
   // load configuration
   setting.clear;
   setting.load(changefileext(paramstr(0), '.ini'));
   // update plotter driver
-  driver.delaym := setting.delaym;
-  driver.delayz := setting.delayz;
+  driver.xdelay := setting.xdelay;
+  driver.ydelay := setting.ydelay;
+  driver.zdelay := setting.zdelay;
 
-  optimize(setting.layout09, m0, m1);
-  driver.init(m0, m1);
+  optimize(setting.layout09, mx, my);
+  driver.init(mx, my);
 end;
 
 // MAIN-MENU::HELP
@@ -723,7 +715,6 @@ begin
           begin
             paths.selectall(false);
           end;
-
           path.selected   := button = mbleft;
           popup.autopopup := false;
         end;
@@ -859,25 +850,25 @@ end;
 procedure tmainform.onplotterstart;
 begin
   lock1(false);
-  progressbar.visible:= true;
   application.processmessages;
 end;
 
 procedure tmainform.onplotterstop;
 begin
   driverthread   := nil;
-  driver.enabled := true;
+  driver.xoff    := false;
+  driver.yoff    := false;
   driver.zoff    := false;
-  driver.pen     := false;
+  driver.zcount  := setting.zmax;
 
   lock1(true);
-  progressbar.visible:= false;
   application.processmessages;
 end;
 
 procedure tmainform.onplottertick;
 begin
-  progressbar.position := driverthread.progress;
+
+
   application.processmessages;
 end;
 

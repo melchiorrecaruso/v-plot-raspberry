@@ -31,50 +31,76 @@ uses
 type
   tvpsetting = class
   private
-    flayout00:  tvppoint;
-    flayout01:  tvppoint;
-    flayout08:  tvppoint;
-    flayout09:  tvppoint;
+    flayout00: tvppoint;
+    flayout01: tvppoint;
+    flayout08: tvppoint;
+    flayout09: tvppoint;
 
-    fwave:      twavemesh;
-    fwavemaxdx: double;
-    fwavemaxdy: double;
+    fwave:     twavemesh;
+    fwavexmax: single;
+    fwaveymax: single;
 
-    fmode:      longint;
-    fratio:     double;
-    fradius:    double;
-    fdelaym:    longint;
-    fdelayz:    longint;
-    fsrvcount:  longint;
-    fsrvdef0:   double;
-    fsrvdef1:   double;
-    fsrvdir:    longint;
-    fweight:    double;
+    fxmin:     longint;
+    fxmax:     longint;
+    fxinc:     longint;
+    fxdelay:   longint;
+    fxdir:     longint;
+    fxradius:  single;
+    fxratio:   single;
+
+    fymin:     longint;
+    fymax:     longint;
+    fyinc:     longint;
+    fydelay:   longint;
+    fydir:     longint;
+    fyradius:  single;
+    fyratio:   single;
+
+    fzmin:     longint;
+    fzmax:     longint;
+    fzinc:     longint;
+    fzdelay:   longint;
+    fzdir:     longint;
+    fzradius:  single;
+    fzratio:   single;
  public
     constructor create;
-    destructor destroy; override;
-    procedure load(const filename: rawbytestring);
-    procedure clear;
+    destructor  destroy; override;
+    procedure   load(const filename: rawbytestring);
+    procedure   clear;
  public
-    property layout00:  tvppoint  read flayout00;
-    property layout01:  tvppoint  read flayout01;
-    property layout08:  tvppoint  read flayout08;
-    property layout09:  tvppoint  read flayout09;
+    property layout00: tvppoint  read flayout00;
+    property layout01: tvppoint  read flayout01;
+    property layout08: tvppoint  read flayout08;
+    property layout09: tvppoint  read flayout09;
 
-    property wave:      twavemesh read fwave;
-    property wavemaxdx: double    read fwavemaxdx;
-    property wavemaxdy: double    read fwavemaxdy;
+    property wave:     twavemesh read fwave;
+    property wavexmax: single    read fwavexmax;
+    property waveymax: single    read fwaveymax;
 
-    property mode:      longint   read fmode;
-    property ratio:     double    read fratio;
-    property radius:    double    read fradius;
-    property delaym:    longint   read fdelaym;
-    property delayz:    longint   read fdelayz;
-    property srvcount:  longint   read fsrvcount;
-    property srvdef0:   double    read fsrvdef0;
-    property srvdef1:   double    read fsrvdef1;
-    property srvdir:    longint   read fsrvdir;
-    property weight:    double    read fweight;
+    property xmin:     longint   read fxmin;
+    property xmax:     longint   read fxmax;
+    property xinc:     longint   read fxinc;
+    property xdelay:   longint   read fxdelay;
+    property xdir:     longint   read fxdir;
+    property xradius:  single    read fxradius;
+    property xratio:   single    read fxratio;
+
+    property ymin:     longint   read fymin;
+    property ymax:     longint   read fymax;
+    property yinc:     longint   read fyinc;
+    property ydelay:   longint   read fydelay;
+    property ydir:     longint   read fydir;
+    property yradius:  single    read fyradius;
+    property yratio:   single    read fyratio;
+
+    property zmin:     longint   read fzmin;
+    property zmax:     longint   read fzmax;
+    property zinc:     longint   read fzinc;
+    property zdelay:   longint   read fzdelay;
+    property zdir:     longint   read fzdir;
+    property zradius:  single    read fzradius;
+    property zratio:   single    read fzratio;
  end;
 
 var
@@ -112,19 +138,17 @@ begin
   fwave[6].x  := 0;  fwave[6].y  := 0;
   fwave[7].x  := 0;  fwave[7].y  := 0;
   fwave[8].x  := 0;  fwave[8].y  := 0;
-  fwavemaxdx  := 0;
-  fwavemaxdy  := 0;
 
-  fmode       := 0;
-  fratio      := 0;
-  fradius     := 0;
-  fdelaym     := 0;
-  fdelayz     := 0;
-  fsrvcount   := 0;
-  fsrvdef0    := 0;
-  fsrvdef1    := 0;
-  fsrvdir     := 0;
-  fweight     := 0;
+  fwavexmax   := 0;
+  fwaveymax   := 0;
+
+  fxmin       := 0;  fymin       := 0;  fzmin       := 0;
+  fxmax       := 0;  fymax       := 0;  fzmax       := 0;
+  fxinc       := 0;  fyinc       := 0;  fzinc       := 0;
+  fxdelay     := 0;  fydelay     := 0;  fzdelay     := 0;
+  fxdir       := 0;  fydir       := 0;  fzdir       := 0;
+  fxradius    := 0;  fyradius    := 0;  fzradius    := 0;
+  fxratio     := 0;  fyratio     := 0;  fzratio     := 0;
 end;
 
 procedure tvpsetting.load(const filename: rawbytestring);
@@ -134,14 +158,14 @@ begin
   ini := tinifile.create(filename);
   ini.formatsettings.decimalseparator := '.';
   try
-    flayout00.x := ini.readfloat  ('Layout',  '00.X',   0);
-    flayout00.y := ini.readfloat  ('Layout',  '00.Y',   0);
-    flayout01.x := ini.readfloat  ('Layout',  '01.X',   0);
-    flayout01.y := ini.readfloat  ('Layout',  '01.Y',   0);
-    flayout08.x := ini.readfloat  ('Layout',  '08.X',   0);
-    flayout08.y := ini.readfloat  ('Layout',  '08.Y',   0);
-    flayout09.x := ini.readfloat  ('Layout',  '09.X',   0);
-    flayout09.y := ini.readfloat  ('Layout',  '09.Y',   0);
+    flayout00.x  := ini.readfloat ('Layout',  '00.X',  0);
+    flayout00.y  := ini.readfloat ('Layout',  '00.Y',  0);
+    flayout01.x  := ini.readfloat ('Layout',  '01.X',  0);
+    flayout01.y  := ini.readfloat ('Layout',  '01.Y',  0);
+    flayout08.x  := ini.readfloat ('Layout',  '08.X',  0);
+    flayout08.y  := ini.readfloat ('Layout',  '08.Y',  0);
+    flayout09.x  := ini.readfloat ('Layout',  '09.X',  0);
+    flayout09.y  := ini.readfloat ('Layout',  '09.Y',  0);
 
     fwave[0].x  := ini.readfloat  ('Wave',    '00.X',   0);
     fwave[0].y  := ini.readfloat  ('Wave',    '00.Y',   0);
@@ -161,19 +185,32 @@ begin
     fwave[7].y  := ini.readfloat  ('Wave',    '07.Y',   0);
     fwave[8].x  := ini.readfloat  ('Wave',    '08.X',   0);
     fwave[8].y  := ini.readfloat  ('Wave',    '08.Y',   0);
-    fwavemaxdx  := ini.readfloat  ('Wave',    'MAXDX',  0);
-    fwavemaxdy  := ini.readfloat  ('Wave',    'MAXDY',  0);
+    fwavexmax   := ini.readfloat  ('Wave',    'XMAX',   0);
+    fwaveymax   := ini.readfloat  ('Wave',    'YMAX',   0);
 
-    fmode       := ini.readinteger('Stepper', 'MODE',   0);
-    fratio      := ini.readfloat  ('Stepper', 'RATIO',  0);
-    fradius     := ini.readfloat  ('Stepper', 'RADIUS', 0);
-    fdelaym     := ini.readinteger('Stepper', 'DELAY',  0);
-    fdelayz     := ini.readinteger('Servo',   'DELAY',  0);
-    fsrvdef0    := ini.readfloat  ('Servo',   'DEF0',   0);
-    fsrvdef1    := ini.readfloat  ('Servo',   'DEF1',   0);
-    fsrvdir     := ini.readinteger('Servo',   'DIR',    0);
-    fsrvcount   := ini.readinteger('Servo',   'COUNT',  0);
-    fweight     := ini.readfloat  ('Machine', 'WEIGHT', 0);
+    fxmin       := ini.readinteger('X-AXIS',  'MIN',    0);
+    fxmax       := ini.readinteger('X-AXIS',  'MAX',    0);
+    fxinc       := ini.readinteger('X-AXIS',  'INC',    0);
+    fxdelay     := ini.readinteger('X-AXIS',  'DELAY',  0);
+    fxdir       := ini.readinteger('X-AXIS',  'DIR',    0);
+    fxradius    := ini.readfloat  ('X-AXIS',  'RADIUS', 0);
+    fxratio     := ini.readfloat  ('X-AXIS',  'RATIO',  0);
+
+    fymin       := ini.readinteger('Y-AXIS',  'MIN',    0);
+    fymax       := ini.readinteger('Y-AXIS',  'MAX',    0);
+    fyinc       := ini.readinteger('Y-AXIS',  'INC',    0);
+    fydelay     := ini.readinteger('Y-AXIS',  'DELAY',  0);
+    fydir       := ini.readinteger('Y-AXIS',  'DIR',    0);
+    fyradius    := ini.readfloat  ('Y-AXIS',  'RADIUS', 0);
+    fyratio     := ini.readfloat  ('Y-AXIS',  'RATIO',  0);
+
+    fzmin       := ini.readinteger('Z-AXIS',  'MIN',    0);
+    fzmax       := ini.readinteger('Z-AXIS',  'MAX',    0);
+    fzinc       := ini.readinteger('Z-AXIS',  'INC',    0);
+    fzdelay     := ini.readinteger('Z-AXIS',  'DELAY',  0);
+    fzdir       := ini.readinteger('Z-AXIS',  'DIR',    0);
+    fzradius    := ini.readfloat  ('Z-AXIS',  'RADIUS', 0);
+    fzratio     := ini.readfloat  ('Z-AXIS',  'RATIO',  0);
   finally
     ini.destroy;
   end;
@@ -194,19 +231,32 @@ begin
     writeln(format('    WAVE::06.X   = %12.5f  06.Y = %12.5f', [ fwave[6].x,  fwave[6].y]));
     writeln(format('    WAVE::07.X   = %12.5f  07.Y = %12.5f', [ fwave[7].x,  fwave[7].y]));
     writeln(format('    WAVE::08.X   = %12.5f  08.Y = %12.5f', [ fwave[8].x,  fwave[8].y]));
-    writeln(format('    WAVE::MAXDX  = %12.5f', [fwavemaxdx]));
-    writeln(format('    WAVE::MAXDY  = %12.5f', [fwavemaxdy]));
+    writeln(format('    WAVE::XMAX   = %12.5f', [fwavexmax]));
+    writeln(format('    WAVE::YMAX   = %12.5f', [fwaveymax]));
 
-    writeln(format(' STEPPER::MODE   = %12.5u', [fmode    ]));
-    writeln(format(' STEPPER::RATIO  = %12.5f', [fratio   ]));
-    writeln(format(' STEPPER::RADIUS = %12.5f', [fradius  ]));
-    writeln(format(' STEPPER::DELAY  = %12.5u', [fdelaym  ]));
-    writeln(format('   SERVO::DELAY  = %12.5u', [fdelayz  ]));
-    writeln(format('   SERVO::DEF0   = %12.5f', [fsrvdef0 ]));
-    writeln(format('   SERVO::DEF1   = %12.5f', [fsrvdef1 ]));
-    writeln(format('   SERVO::DIR    = %12.5u', [fsrvdir  ]));
-    writeln(format('   SERVO::COUNT  = %12.5u', [fsrvcount]));
-    writeln(format(' MACHINE::WEIGHT = %12.5f', [fweight  ]));
+    writeln(format('  X-AXIS::MIN    = %12.5f', [fxmin    ]));
+    writeln(format('  X-AXIS::MAX    = %12.5f', [fxmax    ]));
+    writeln(format('  X-AXIS::INC    = %12.5f', [fxinc    ]));
+    writeln(format('  X-AXIS::DELAY  = %12.5u', [fxdelay  ]));
+    writeln(format('  X-AXIS::DIR    = %12.5u', [fxdir    ]));
+    writeln(format('  X-AXIS::RADIUS = %12.5f', [fxradius ]));
+    writeln(format('  X-AXIS::RATIO  = %12.5f', [fxratio  ]));
+
+    writeln(format('  Y-AXIS::MIN    = %12.5f', [fymin    ]));
+    writeln(format('  Y-AXIS::MAX    = %12.5f', [fymax    ]));
+    writeln(format('  Y-AXIS::INC    = %12.5f', [fyinc    ]));
+    writeln(format('  Y-AXIS::DELAY  = %12.5u', [fydelay  ]));
+    writeln(format('  Y-AXIS::DIR    = %12.5u', [fydir    ]));
+    writeln(format('  Y-AXIS::RADIUS = %12.5f', [fyradius ]));
+    writeln(format('  Y-AXIS::RATIO  = %12.5f', [fyratio  ]));
+
+    writeln(format('  Z-AXIS::MIN    = %12.5f', [fzmin    ]));
+    writeln(format('  Z-AXIS::MAX    = %12.5f', [fzmax    ]));
+    writeln(format('  Z-AXIS::INC    = %12.5f', [fzinc    ]));
+    writeln(format('  Z-AXIS::DELAY  = %12.5u', [fzdelay  ]));
+    writeln(format('  Z-AXIS::DIR    = %12.5u', [fzdir    ]));
+    writeln(format('  Z-AXIS::RADIUS = %12.5f', [fzradius ]));
+    writeln(format('  Z-AXIS::RATIO  = %12.5f', [fzratio  ]));
   end;
 end;
 

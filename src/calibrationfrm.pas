@@ -68,22 +68,22 @@ uses
 
 procedure tcalibrationform.leftupbtnclick(sender: tobject);
 var
-  m0: longint = 0;
-  m1: longint = 0;
+  mx: longint = 0;
+  my: longint = 0;
 begin
   lock;
-  driver.enabled := true;
-  driver.zoff    := false;
-  driver.pen     := false;
-  driver.zoff    := true;
+  driver.xoff   := false;
+  driver.yoff   := false;
+  driver.zoff   := false;
+  driver.zcount := setting.zmax;
 
-  if sender = leftupbtn    then driver.count0 := driver.count0 - leftedit .value;
-  if sender = leftdownbtn  then driver.count0 := driver.count0 + leftedit .value;
-  if sender = rightupbtn   then driver.count1 := driver.count1 - rightedit.value;
-  if sender = rightdownbtn then driver.count1 := driver.count1 + rightedit.value;
+  if sender = leftupbtn    then driver.xcount := driver.xcount - leftedit .value;
+  if sender = leftdownbtn  then driver.xcount := driver.xcount + leftedit .value;
+  if sender = rightupbtn   then driver.ycount := driver.ycount - rightedit.value;
+  if sender = rightdownbtn then driver.ycount := driver.ycount + rightedit.value;
 
-  optimize(setting.layout09, m0, m1);
-  driver.init(m0, m1);
+  optimize(setting.layout09, mx, my);
+  driver.init(mx, my);
   unlock;
 end;
 
@@ -104,16 +104,12 @@ end;
 
 procedure tcalibrationform.pendownbtnclick(sender: tobject);
 begin
-  driver.enabled := true;
-  driver.zoff    := false;
-  driver.pen     := true;
+  driver.zcount := setting.zmin;
 end;
 
 procedure tcalibrationform.penupbtnclick(sender: tobject);
 begin
-  driver.enabled := true;
-  driver.zoff    := false;
-  driver.pen     := false;
+  driver.zcount := setting.zmax;
 end;
 
 procedure tcalibrationform.lock;
