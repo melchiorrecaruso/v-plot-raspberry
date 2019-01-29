@@ -217,8 +217,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="833"/>
-        <CursorPos X="3" Y="872"/>
+        <TopLine Value="203"/>
+        <CursorPos X="3" Y="263"/>
         <FoldState Value=" T3pB048124Be"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -324,8 +324,8 @@
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="19"/>
-        <CursorPos X="15" Y="35"/>
+        <TopLine Value="331"/>
+        <CursorPos Y="340"/>
         <FoldState Value=" T3n60Q7"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -1505,7 +1505,7 @@
         <UsageCount Value="10"/>
       </Unit216>
     </Units>
-    <JumpHistory Count="24" HistoryIndex="23">
+    <JumpHistory Count="25" HistoryIndex="24">
       <Position1>
         <Filename Value="src/vpdriver.pas"/>
         <Caret Line="166" Column="16"/>
@@ -1602,6 +1602,10 @@
         <Filename Value="src/vpdriver.pas"/>
         <Caret Line="223" Column="53" TopLine="205"/>
       </Position24>
+      <Position25>
+        <Filename Value="src/mainfrm.pas"/>
+        <Caret Line="857" Column="33" TopLine="782"/>
+      </Position25>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

@@ -326,6 +326,7 @@ begin
       end;
   end;
 
+  fprogress := 0;
   if list.count > 0 then
   begin
     pvppoint(list[0])^.z := setting.zmax;
@@ -335,27 +336,26 @@ begin
         pvppoint(list[i])^.z := setting.zmin
       else
         pvppoint(list[i])^.z := setting.zmax;
-  end;
 
-  fprogress := 0;
-  for i := 0 to list.count -1 do
-  begin
-    point := pvppoint(list[i])^;
-    if not terminated then
+    for i := 0 to list.count -1 do
     begin
-      point   := wave.update(point);
-      point.x := point.x + fxcenter;
-      point.y := point.y + fycenter;
+      point := pvppoint(list[i])^;
+      if not terminated then
+      begin
+        point   := wave.update(point);
+        point.x := point.x + fxcenter;
+        point.y := point.y + fycenter;
 
-      driver.zcount := trunc(point.z);
-      optimize(point, mx, my);
-      driver.move(mx, my);
-      if assigned(ontick) then
-        synchronize(ontick);
+        driver.zcount := trunc(point.z);
+        optimize(point, mx, my);
+        driver.move(mx, my);
+        if assigned(ontick) then
+          synchronize(ontick);
 
-      while not enabled do sleep(250);
+        while not enabled do sleep(250);
+      end;
+      fprogress := (100*i) div list.count;
     end;
-    fprogress := (100*i) div list.count;
   end;
   list.destroy;
 
