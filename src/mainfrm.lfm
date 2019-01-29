@@ -1,11 +1,11 @@
 object mainform: Tmainform
-  Left = 348
+  Left = 328
   Height = 448
-  Top = 163
+  Top = 602
   Width = 806
   Anchors = []
   Caption = 'vPlotter'
-  ClientHeight = 426
+  ClientHeight = 424
   ClientWidth = 806
   Menu = mainmenu
   OnClose = FormClose
@@ -14,14 +14,14 @@ object mainform: Tmainform
   LCLVersion = '2.1.0.0'
   object screen: TBGRAVirtualScreen
     Left = 0
-    Height = 404
+    Height = 402
     Top = 2
     Width = 806
     OnRedraw = screenRedraw
     Align = alClient
     Alignment = taLeftJustify
     BorderSpacing.Top = 2
-    ClientHeight = 404
+    ClientHeight = 402
     ClientWidth = 806
     Color = clForm
     ParentColor = False
@@ -42,7 +42,7 @@ object mainform: Tmainform
   object statusbar: TStatusBar
     Left = 0
     Height = 20
-    Top = 406
+    Top = 404
     Width = 806
     Panels = <    
       item
@@ -63,7 +63,7 @@ object mainform: Tmainform
     OwnerDraw = True
     left = 32
     top = 24
-    object mifile: TMenuItem
+    object filemi: TMenuItem
       Caption = 'File'
       object loadmi: TMenuItem
         Caption = 'Load ...'
@@ -77,14 +77,14 @@ object mainform: Tmainform
         Caption = 'Clear'
         OnClick = clearmiClick
       end
-      object N1: TMenuItem
+      object n1: TMenuItem
         Caption = '-'
       end
       object importmi: TMenuItem
         Caption = 'Import ...'
         OnClick = importmiClick
       end
-      object N2: TMenuItem
+      object n2: TMenuItem
         Caption = '-'
       end
       object exitmi: TMenuItem
@@ -92,9 +92,9 @@ object mainform: Tmainform
         OnClick = exitmiClick
       end
     end
-    object Edit: TMenuItem
+    object editmi: TMenuItem
       Caption = 'Edit'
-      object mirotate: TMenuItem
+      object rotatemi: TMenuItem
         Caption = 'Rotate'
         object rotate90mi: TMenuItem
           Caption = '90°'
@@ -128,7 +128,7 @@ object mainform: Tmainform
         Caption = 'OffSet ...'
         OnClick = offsetmiClick
       end
-      object N3: TMenuItem
+      object n3: TMenuItem
         Caption = '-'
       end
       object pagesizemi: TMenuItem
@@ -179,15 +179,15 @@ object mainform: Tmainform
           OnClick = horizontalmiClick
         end
       end
-      object N4: TMenuItem
+      object n4: TMenuItem
         Caption = '-'
       end
-      object createtoolpathmi: TMenuItem
+      object toolpathmi: TMenuItem
         Caption = 'Optimize ToolPath'
-        OnClick = createtoolpathmiClick
+        OnClick = toolpathmiClick
       end
     end
-    object miprint: TMenuItem
+    object miprinter: TMenuItem
       Caption = 'Printer'
       object startmi: TMenuItem
         Caption = 'Start'
@@ -197,14 +197,14 @@ object mainform: Tmainform
         Caption = 'Stop'
         OnClick = stopmiclick
       end
-      object N5: TMenuItem
+      object n5: TMenuItem
         Caption = '-'
       end
       object killmi: TMenuItem
         Caption = 'Kill'
         OnClick = killmiclick
       end
-      object N6: TMenuItem
+      object n6: TMenuItem
         Caption = '-'
       end
       object calibrationmi: TMenuItem
@@ -215,7 +215,7 @@ object mainform: Tmainform
         Caption = 'Move to Home'
         OnClick = movetohomemiClick
       end
-      object N8: TMenuItem
+      object n8: TMenuItem
         Caption = '-'
       end
       object layoutmi: TMenuItem
@@ -223,7 +223,7 @@ object mainform: Tmainform
         OnClick = layoutmiClick
       end
     end
-    object mihelp: TMenuItem
+    object helpmi: TMenuItem
       Caption = 'Help'
       object aboutmi: TMenuItem
         Caption = 'About ...'

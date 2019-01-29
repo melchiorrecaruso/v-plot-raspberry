@@ -163,16 +163,34 @@ var
 begin
   {$ifdef cpuarm}
   dx := axcount - fxcount;
-  if dx < 0 then
-    digitalwrite(motx_dir,  LOW)
-  else
-    digitalwrite(motx_dir, HIGH);
+  if setting.xdir = 0 then
+  begin
+    if dx < 0 then
+      digitalwrite(motx_dir,  LOW)
+    else
+      digitalwrite(motx_dir, HIGH);
+  end else
+  begin
+    if dx < 0 then
+      digitalwrite(motx_dir, HIGH)
+    else
+      digitalwrite(motx_dir,  LOW);
+  end;
 
   dy := aycount - fycount;
-  if dy < 0 then
-    digitalwrite(moty_dir, HIGH)
-  else
-    digitalwrite(moty_dir,  LOW);
+  if setting.ydir = 0 then
+  begin;
+    if dy < 0 then
+      digitalwrite(moty_dir,  LOW)
+    else
+      digitalwrite(moty_dir, HIGH);
+  end else
+  begin
+    if dy < 0 then
+      digitalwrite(moty_dir, HIGH)
+    else
+      digitalwrite(moty_dir,  LOW);
+  end;
 
   dx := abs(dx);
   dy := abs(dy);
@@ -216,23 +234,31 @@ procedure tvpdriver.setzcount(value: longint);
 begin
   if fzoff then exit;
 
-  while fzcount < value do
+  if fzcount > value then
   begin
-    inc(fzcount, setting.zinc);
-    {$ifdef cpuarm}
-    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fzcount/100, motz_freq));
-    delaymicroseconds(fzdelay);
-    {$endif}
-  end;
+    if setting.zdir = 0 then delaymicroseconds($f*fzdelay);
+    while fzcount > value do
+    begin
+      dec(fzcount, setting.zinc);
+      {$ifdef cpuarm}
+      pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fzcount/100, motz_freq));
+      delaymicroseconds(fzdelay);
+      {$endif}
+    end;
+  end else
+    if fzcount < value then
+    begin
+      if setting.zdir = 1 then delaymicroseconds($f*fzdelay);
+      while fzcount < value do
+      begin
+        inc(fzcount, setting.zinc);
+        {$ifdef cpuarm}
+        pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fzcount/100, motz_freq));
+        delaymicroseconds(fzdelay);
+        {$endif}
+      end;
+    end;
 
-  while fzcount > value do
-  begin
-    dec(fzcount, setting.zinc);
-    {$ifdef cpuarm}
-    pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fzcount/100, motz_freq));
-    delaymicroseconds(fzdelay);
-    {$endif}
-  end;
   fzcount := value;
   if enabledebug then
   begin

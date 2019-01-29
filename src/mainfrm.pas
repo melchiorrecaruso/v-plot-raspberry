@@ -28,8 +28,7 @@ interface
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls, comctrls,
   buttons, menus, spin, vppaths, vpsetting, vpdriver, bgrabitmap,  types,
-  bgrabitmaptypes, bgravirtualscreen, bgratransform, bgragradientscanner,
-  bctypes, bgracanvas2d;
+  bgrabitmaptypes, bgravirtualscreen, bgragradientscanner;
 
 type
   { tmainform }
@@ -54,7 +53,7 @@ type
     popup: TPopupMenu;
     screen: TBGRAVirtualScreen;
     mainmenu: TMainMenu;
-    Edit: TMenuItem;
+    editmi: TMenuItem;
     calibrationmi: TMenuItem;
     layoutmi: TMenuItem;
     a0mi: TMenuItem;
@@ -65,7 +64,7 @@ type
     a5mi: TMenuItem;
     horizontalmi: TMenuItem;
     movetohomemi: TMenuItem;
-    N8: TMenuItem;
+    n8: TMenuItem;
     statusbar: TStatusBar;
     verticalmi: TMenuItem;
     N7: TMenuItem;
@@ -74,31 +73,31 @@ type
     rotate270mi: TMenuItem;
     mirrorxmi: TMenuItem;
     mirrorymi: TMenuItem;
-    N6: TMenuItem;
+    n6: TMenuItem;
     killmi: TMenuItem;
-    N5: TMenuItem;
+    n5: TMenuItem;
     savedialog: TSaveDialog;
     stopmi: TMenuItem;
     startmi: TMenuItem;
     aboutmi: TMenuItem;
-    createtoolpathmi: TMenuItem;
-    N4: TMenuItem;
+    toolpathmi: TMenuItem;
+    n4: TMenuItem;
     mirrormi: TMenuItem;
     scalemi: TMenuItem;
     offsetmi: TMenuItem;
     pagesizemi: TMenuItem;
-    N3: TMenuItem;
-    mirotate: TMenuItem;
+    n3: TMenuItem;
+    rotatemi: TMenuItem;
     clearmi: TMenuItem;
     exitmi: TMenuItem;
     loadmi: TMenuItem;
     savemi: TMenuItem;
     importmi: TMenuItem;
-    N2: TMenuItem;
-    N1: TMenuItem;
-    mihelp: TMenuItem;
-    miprint: TMenuItem;
-    mifile: TMenuItem;
+    n2: TMenuItem;
+    n1: TMenuItem;
+    helpmi: TMenuItem;
+    miprinter: TMenuItem;
+    filemi: TMenuItem;
     opendialog: topendialog;
 
     procedure formcreate           (sender: tobject);
@@ -110,7 +109,7 @@ type
     procedure clearmiclick         (sender: tobject);
     procedure importmiclick        (sender: tobject);
     procedure exitmiclick          (sender: tobject);
-    // MAIN MENU::EDIT
+    // MAIN MENU::editmi
     procedure rotate180miclick     (sender: tobject);
     procedure rotate270miclick     (sender: tobject);
     procedure rotate90miclick      (sender: tobject);
@@ -127,7 +126,7 @@ type
     procedure killmiclick          (sender: tobject);
     procedure calibrationmiclick   (sender: tobject);
     procedure movetohomemiclick    (sender: tobject);
-    procedure createtoolpathmiclick(sender: tobject);
+    procedure toolpathmiClick(sender: tobject);
     // MAIN-FORM::HELP
     procedure aboutmiclick         (sender: tobject);
     // POPUP-MENU
@@ -175,7 +174,7 @@ type
   public
     procedure lock1(value: boolean);
     procedure lock2(value: boolean);
-    procedure updatevirtualscreen;
+    procedure updatescreen;
   end;
 
 var
@@ -254,7 +253,8 @@ begin
     lock2(false);
     paths.clear;
     paths.load(opendialog.filename);
-    updatevirtualscreen;
+    updatescreen;
+    lock2(true);
   end;
 end;
 
@@ -267,17 +267,22 @@ begin
 
     lock2(false);
     paths.save(changefileext(savedialog.filename, '.vplot'));
+    updatescreen;
     lock2(true);
   end;
 end;
 
 procedure tmainform.clearmiclick(sender: tobject);
 begin
+  caption := 'vPlotter';
+
+  lock2(false);
   paths.clear;
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
-procedure tmainform.updatevirtualscreen;
+procedure tmainform.updatescreen;
 var
  i, j: longint;
  path: tvppath;
@@ -285,8 +290,6 @@ var
    p2: tvppoint;
     a: array of tpointf;
 begin
-  lock2(false);
-  // ---
   bit.setsize(round(pagewidth *zoom),
               round(pageheight*zoom));
   bit.fillrect(0, 0, bit.width,   bit.height,   bgra(100, 100, 100), dmset);
@@ -323,7 +326,6 @@ begin
     end;
   end;
   screen.redrawbitmap;
-  lock2(true);
 end;
 
 procedure tmainform.importmiclick(sender: tobject);
@@ -336,13 +338,15 @@ begin
     lock2(false);
     paths.clear;
     if lowercase(extractfileext(opendialog.filename)) = '.dxf' then
-      dxf2paths(opendialog.filename, paths);
+      dxf2paths(opendialog.filename, paths)
+    else
+      if lowercase(extractfileext(opendialog.filename)) = '.svg' then
+        svg2paths(opendialog.filename, paths);
 
-    if lowercase(extractfileext(opendialog.filename)) = '.svg' then
-      svg2paths(opendialog.filename, paths);
     //decodePNG(opendialog.filename, 100, 1, 1, 100);
     paths.createtoolpath;
-    updatevirtualscreen;
+    updatescreen;
+    lock2(true);
   end;
 end;
 
@@ -351,36 +355,46 @@ begin
   close;
 end;
 
-// MAIN-MENU::EDIT
+// MAIN-MENU::editmi
 
 procedure tmainform.rotate90miclick(sender: tobject);
 begin
+  lock2(false);
   paths.rotate(degtorad(90));
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.rotate180miclick(sender: tobject);
 begin
+  lock2(false);
   paths.rotate(degtorad(180));
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.rotate270miclick(sender: tobject);
 begin
+  lock2(false);
   paths.rotate(degtorad(270));
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.mirrorxmiclick(sender: tobject);
 begin
+  lock2(false);
   paths.mirror(true);
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.mirrorymiclick(sender: tobject);
 begin
+  lock2(false);
   paths.mirror(false);
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.scalemiclick(sender: tobject);
@@ -393,7 +407,10 @@ begin
     paths.scale(f.factoredit.value);
   end;
   f.destroy;
-  updatevirtualscreen;
+
+  lock2(false);
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.offsetmiclick(sender: tobject);
@@ -408,7 +425,10 @@ begin
       f.offsetyse.value);
   end;
   f.destroy;
-  updatevirtualscreen;
+
+  lock2(false);
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.a0miclick(sender: tobject);
@@ -443,7 +463,10 @@ begin
   zoom  := 1.0;
   movex := (screen.width  - pagewidth ) div 2;
   movey := (screen.height - pageheight) div 2;
-  updatevirtualscreen;
+
+  lock2(false);
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.horizontalmiclick(sender: tobject);
@@ -465,14 +488,19 @@ begin
     pageheight := amin;
     pagewidth  := amax;
   end;
-  updatevirtualscreen;
+
+  lock2(false);
+  updatescreen;
+  lock2(true);
 end;
 
-procedure tmainform.createtoolpathmiclick(sender: tobject);
+procedure tmainform.toolpathmiclick(sender: tobject);
 begin
+  lock2(false);
   paths.selectall(false);
   paths.createtoolpath;
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 // MAIN MENU::PRINT
@@ -516,6 +544,7 @@ begin
   if assigned(driverthread) then
   begin
     driverthread.terminate;
+    driverthread.enabled := true;
   end;
 end;
 
@@ -575,8 +604,10 @@ end;
 
 procedure tmainform.selallpmclick(sender: tobject);
 begin
+  lock2(false);
   paths.selectall(true);
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.selbylayerpmclick(sender: tobject);
@@ -584,31 +615,39 @@ var
      i: longint;
   path: tvppath;
 begin
+  lock2(false);
   for i := 0 to paths.count -1 do
   begin
     path := paths.items[i];
     if path.selected then
       paths.selectlayer(path.layer);
   end;
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.invertselpmclick(sender: tobject);
 begin
+  lock2(false);
   paths.invertselected;
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.deselallpmclick(sender: tobject);
 begin
+  lock2(false);
   paths.selectall(false);
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.showallpmclick(sender: tobject);
 begin
+  lock2(false);
   paths.showall(true);
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.showbylayerpmclick(sender: tobject);
@@ -616,27 +655,33 @@ var
      i: longint;
   path: tvppath;
 begin
+  lock2(false);
   for i := 0 to paths.count -1 do
   begin
     path := paths.items[i];
     if path.selected then
       paths.showlayer(path.layer);
   end;
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.inverthiddenpmclick(sender: tobject);
 begin
+  lock2(false);
   paths.inverthidden;
   paths.selectall(false);
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.hideallpmclick(sender: tobject);
 begin
+  lock2(false);
   paths.showall(false);
   paths.selectall(false);
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.hidebylayerpmclick(sender: tobject);
@@ -644,6 +689,7 @@ var
      i: longint;
   path: tvppath;
 begin
+  lock2(false);
   for i := 0 to paths.count -1 do
   begin
     path := paths.items[i];
@@ -651,7 +697,8 @@ begin
       paths.hidelayer(path.layer);
   end;
   paths.selectall(false);
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.hideselpmclick(sender: tobject);
@@ -659,6 +706,7 @@ var
      i: longint;
   path: tvppath;
 begin
+  lock2(false);
   for i := 0 to paths.count -1 do
   begin
     path := paths.items[i];
@@ -666,25 +714,32 @@ begin
       path.hidden := true;
   end;
   paths.selectall(false);
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.mergeselclick(sender: tobject);
 begin
+  lock2(false);
   paths.mergeselected;
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.selattachedpmclick(sender: tobject);
 begin
+  lock2(false);
   paths.selectattached;
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 procedure tmainform.divideselpmclick(sender: tobject);
 begin
+  lock2(false);
   paths.unmergeselected;
-  updatevirtualscreen;
+  updatescreen;
+  lock2(true);
 end;
 
 // PREVIEW EVENTS
@@ -723,7 +778,7 @@ begin
 
   if popup.autopopup = false then
   begin
-    updatevirtualscreen;
+    updatescreen;
   end else
     if button = mbleft then
     begin
@@ -768,7 +823,7 @@ begin
       zoom  := value;
       movex := movex + round((bit.width  -(pagewidth *zoom))*(mousepos.x-movex)/bit.width );
       movey := movey + round((bit.height -(pageheight*zoom))*(mousepos.y-movey)/bit.height);
-      updatevirtualscreen;
+      updatescreen;
     end;
     lock := false;
   end;
@@ -785,63 +840,63 @@ end;
 
 procedure tmainform.lock1(value: boolean);
 begin
-  // main menu
-  loadmi      .enabled := value;
-//reloadbtn    .enabled := value;
+  // main menu::file
+  loadmi       .enabled := value;
+  savemi       .enabled := value;
   clearmi      .enabled := value;
+  importmi     .enabled := value;
+  // main menu::editmi
+  rotatemi     .enabled := value;
+  mirrormi     .enabled := value;
+  scalemi      .enabled := value;
+  offsetmi     .enabled := value;
+  pagesizemi   .enabled := value;
+  toolpathmi   .enabled := value;
+  // main menu::printer
   startmi      .enabled := true;
   stopmi       .enabled := true;
   killmi       .enabled := true;
+  calibrationmi.enabled := value;
+  movetohomemi .enabled := value;
   layoutmi     .enabled := value;
+  // main menu::help
   aboutmi      .enabled := value;
-  // calibration
-  // leftupbtn    .enabled := value;
-  // leftdownbtn  .enabled := value;
-  // leftedit     .enabled := value;
-  // rightupbtn   .enabled := value;
-  // rightdownbtn .enabled := value;
-  // rightedit    .enabled := value;
-  // penupbtn     .enabled := value;
-  // pendownbtn   .enabled := value;
-  // gohomebtn    .enabled := value;
-  // page format
-  // formatcb     .enabled := value;
-  // heightse     .enabled := value;
-  // widthse      .enabled := value;
-  // offsetxse    .enabled := value;
-  // offsetyse    .enabled := value;
-  // verticalcb   .enabled := value;
+  // popup menu
+  if value then
+    screen.popupmenu := nil
+  else
+    screen.popupmenu := popup;
   application  .processmessages;
 end;
 
 procedure tmainform.lock2(value: boolean);
 begin
-  // main menu
-  loadmi      .enabled := value;
-  // reloadbtn    .enabled := value;
+  // main menu::file
+  loadmi       .enabled := value;
+  savemi       .enabled := value;
   clearmi      .enabled := value;
+  importmi     .enabled := value;
+  // main menu::editmi
+  rotatemi     .enabled := value;
+  mirrormi     .enabled := value;
+  scalemi      .enabled := value;
+  offsetmi     .enabled := value;
+  pagesizemi   .enabled := value;
+  toolpathmi   .enabled := value;
+  // main menu::printer
   startmi      .enabled := value;
   stopmi       .enabled := value;
   killmi       .enabled := value;
+  calibrationmi.enabled := value;
+  movetohomemi .enabled := value;
   layoutmi     .enabled := value;
+  // main menu::help
   aboutmi      .enabled := value;
-  // calibration
-  // leftupbtn    .enabled := value;
-  // leftdownbtn  .enabled := value;
-  // leftedit     .enabled := value;
-  // rightupbtn   .enabled := value;
-  // rightdownbtn .enabled := value;
-  // rightedit    .enabled := value;
-  // penupbtn     .enabled := value;
-  // pendownbtn   .enabled := value;
-  // gohomebtn    .enabled := value;
-  // page format
-  // formatcb     .enabled := value;
-  // heightse     .enabled := value;
-  // widthse      .enabled := value;
-  // offsetxse    .enabled := value;
-  // offsetyse    .enabled := value;
-  // verticalcb   .enabled := value;
+  // popup menu
+  if value then
+    screen.popupmenu := nil
+  else
+    screen.popupmenu := popup;
   application  .processmessages;
 end;
 
@@ -855,11 +910,11 @@ end;
 
 procedure tmainform.onplotterstop;
 begin
-  driverthread   := nil;
-  driver.xoff    := false;
-  driver.yoff    := false;
-  driver.zoff    := false;
-  driver.zcount  := setting.zmax;
+  driverthread  := nil;
+  driver.xoff   := false;
+  driver.yoff   := false;
+  driver.zoff   := false;
+  driver.zcount := setting.zmax;
 
   lock1(true);
   application.processmessages;
@@ -867,7 +922,6 @@ end;
 
 procedure tmainform.onplottertick;
 begin
-
 
   application.processmessages;
 end;

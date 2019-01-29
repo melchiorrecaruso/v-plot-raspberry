@@ -1,6 +1,6 @@
 { Description: vPlotter application.
 
-  Copyright (C) 2017-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
+  Copyright (C) 2017-2019 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
   This source is free software; you can redistribute it and/or modify it under
   the terms of the GNU General Public License as published by the Free
@@ -30,9 +30,9 @@ uses
 
 begin
   requirederivedformresource := true;
-  Application.Title:='VPlot Driver';
+  application.title := 'VPlot Driver';
   application.initialize;
-  Application.CreateForm(Tmainform, mainform);
+  application.createform(tmainform, mainform);
   application.run;
 end.
 

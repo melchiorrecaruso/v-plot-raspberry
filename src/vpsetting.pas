@@ -152,6 +152,7 @@ end;
 procedure tvpsetting.load(const filename: rawbytestring);
 var
   ini: tinifile;
+    x: longint;
 begin
   ini := tinifile.create(filename);
   ini.formatsettings.decimalseparator := '.';
