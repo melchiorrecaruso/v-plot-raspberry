@@ -154,13 +154,14 @@ type
       wheeldelta: integer; mousepos: tpoint; var handled: boolean);
   private
          bit: tbgrabitmap;
-       paths: tvppaths;
+
  mouseisdown: boolean;
           px: longint;
           py: longint;
 
    pagewidth: longint;
   pageheight: longint;
+       paths: tvppaths;
         zoom: single;
 
        movex: longint;
@@ -168,17 +169,24 @@ type
         lock: boolean;
 
     // ---
+    procedure lockinternal1(value: boolean);
+    procedure lockinternal2(value: boolean);
     procedure onplotterstart;
     procedure onplotterstop;
     procedure onplottertick;
   public
-    procedure lock1(value: boolean);
-    procedure lock2(value: boolean);
+    procedure lock1;
+    procedure lock2;
+    procedure unlock1;
+    procedure unlock2;
+
     procedure updatescreen;
   end;
 
+
 var
   mainform: tmainform;
+
 
 implementation
 
@@ -250,11 +258,11 @@ begin
   begin
     caption := 'vPlotter - ' + opendialog.filename;
 
-    lock2(false);
+    lock2;
     paths.clear;
     paths.load(opendialog.filename);
     updatescreen;
-    lock2(true);
+    unlock2;
   end;
 end;
 
@@ -265,10 +273,10 @@ begin
   begin
     caption := 'vPlotter - ' + changefileext(savedialog.filename, '.vplot');
 
-    lock2(false);
+    lock2;
     paths.save(changefileext(savedialog.filename, '.vplot'));
     updatescreen;
-    lock2(true);
+    unlock2;
   end;
 end;
 
@@ -276,10 +284,10 @@ procedure tmainform.clearmiclick(sender: tobject);
 begin
   caption := 'vPlotter';
 
-  lock2(false);
+  lock2;
   paths.clear;
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.updatescreen;
@@ -335,7 +343,7 @@ begin
   begin
     caption := 'vPlotter - ' + opendialog.filename;
 
-    lock2(false);
+    lock2;
     paths.clear;
     if lowercase(extractfileext(opendialog.filename)) = '.dxf' then
       dxf2paths(opendialog.filename, paths)
@@ -346,7 +354,7 @@ begin
     //decodePNG(opendialog.filename, 100, 1, 1, 100);
     paths.createtoolpath;
     updatescreen;
-    lock2(true);
+    unlock2;
   end;
 end;
 
@@ -359,42 +367,42 @@ end;
 
 procedure tmainform.rotate90miclick(sender: tobject);
 begin
-  lock2(false);
+  lock2;
   paths.rotate(degtorad(90));
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.rotate180miclick(sender: tobject);
 begin
-  lock2(false);
+  lock2;
   paths.rotate(degtorad(180));
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.rotate270miclick(sender: tobject);
 begin
-  lock2(false);
+  lock2;
   paths.rotate(degtorad(270));
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.mirrorxmiclick(sender: tobject);
 begin
-  lock2(false);
+  lock2;
   paths.mirror(true);
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.mirrorymiclick(sender: tobject);
 begin
-  lock2(false);
+  lock2;
   paths.mirror(false);
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.scalemiclick(sender: tobject);
@@ -408,9 +416,9 @@ begin
   end;
   f.destroy;
 
-  lock2(false);
+  lock2;
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.offsetmiclick(sender: tobject);
@@ -426,9 +434,9 @@ begin
   end;
   f.destroy;
 
-  lock2(false);
+  lock2;
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.a0miclick(sender: tobject);
@@ -464,9 +472,9 @@ begin
   movex := (screen.width  - pagewidth ) div 2;
   movey := (screen.height - pageheight) div 2;
 
-  lock2(false);
+  lock2;
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.horizontalmiclick(sender: tobject);
@@ -489,18 +497,18 @@ begin
     pagewidth  := amax;
   end;
 
-  lock2(false);
+  lock2;
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.toolpathmiclick(sender: tobject);
 begin
-  lock2(false);
+  lock2;
   paths.selectall(false);
   paths.createtoolpath;
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 // MAIN MENU::PRINT
@@ -604,10 +612,10 @@ end;
 
 procedure tmainform.selallpmclick(sender: tobject);
 begin
-  lock2(false);
+  lock2;
   paths.selectall(true);
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.selbylayerpmclick(sender: tobject);
@@ -615,7 +623,7 @@ var
      i: longint;
   path: tvppath;
 begin
-  lock2(false);
+  lock2;
   for i := 0 to paths.count -1 do
   begin
     path := paths.items[i];
@@ -623,31 +631,31 @@ begin
       paths.selectlayer(path.layer);
   end;
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.invertselpmclick(sender: tobject);
 begin
-  lock2(false);
+  lock2;
   paths.invertselected;
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.deselallpmclick(sender: tobject);
 begin
-  lock2(false);
+  lock2;
   paths.selectall(false);
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.showallpmclick(sender: tobject);
 begin
-  lock2(false);
+  lock2;
   paths.showall(true);
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.showbylayerpmclick(sender: tobject);
@@ -655,7 +663,7 @@ var
      i: longint;
   path: tvppath;
 begin
-  lock2(false);
+  lock2;
   for i := 0 to paths.count -1 do
   begin
     path := paths.items[i];
@@ -663,25 +671,25 @@ begin
       paths.showlayer(path.layer);
   end;
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.inverthiddenpmclick(sender: tobject);
 begin
-  lock2(false);
+  lock2;
   paths.inverthidden;
   paths.selectall(false);
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.hideallpmclick(sender: tobject);
 begin
-  lock2(false);
+  lock2;
   paths.showall(false);
   paths.selectall(false);
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.hidebylayerpmclick(sender: tobject);
@@ -689,7 +697,7 @@ var
      i: longint;
   path: tvppath;
 begin
-  lock2(false);
+  lock2;
   for i := 0 to paths.count -1 do
   begin
     path := paths.items[i];
@@ -698,7 +706,7 @@ begin
   end;
   paths.selectall(false);
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.hideselpmclick(sender: tobject);
@@ -706,7 +714,7 @@ var
      i: longint;
   path: tvppath;
 begin
-  lock2(false);
+  lock2;
   for i := 0 to paths.count -1 do
   begin
     path := paths.items[i];
@@ -715,31 +723,31 @@ begin
   end;
   paths.selectall(false);
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.mergeselclick(sender: tobject);
 begin
-  lock2(false);
+  lock2;
   paths.mergeselected;
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.selattachedpmclick(sender: tobject);
 begin
-  lock2(false);
+  lock2;
   paths.selectattached;
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 procedure tmainform.divideselpmclick(sender: tobject);
 begin
-  lock2(false);
+  lock2;
   paths.unmergeselected;
   updatescreen;
-  lock2(true);
+  unlock2;
 end;
 
 // PREVIEW EVENTS
@@ -838,7 +846,7 @@ end;
 
 // LOCK/UNLOCK EVENTS
 
-procedure tmainform.lock1(value: boolean);
+procedure tmainform.lockinternal1(value: boolean);
 begin
   // main menu::file
   loadmi       .enabled := value;
@@ -869,7 +877,17 @@ begin
   application  .processmessages;
 end;
 
-procedure tmainform.lock2(value: boolean);
+procedure tmainform.lock1;
+begin
+  lockinternal1(false);
+end;
+
+procedure tmainform.unlock1;
+begin
+  lockinternal1(true);
+end;
+
+procedure tmainform.lockinternal2(value: boolean);
 begin
   // main menu::file
   loadmi       .enabled := value;
@@ -900,11 +918,22 @@ begin
   application  .processmessages;
 end;
 
+
+procedure tmainform.lock2;
+begin
+    lockinternal1(false);
+end;
+
+procedure tmainform.unlock2;
+begin
+    lockinternal1(true);
+end;
+
 // PLOTTER THREAD EVENTS
 
 procedure tmainform.onplotterstart;
 begin
-  lock1(false);
+  lock1;
   application.processmessages;
 end;
 
@@ -916,7 +945,7 @@ begin
   driver.zoff   := false;
   driver.zcount := setting.zmax;
 
-  lock1(true);
+  unlock1;
   application.processmessages;
 end;
 

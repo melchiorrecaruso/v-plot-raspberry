@@ -1,7 +1,7 @@
 object mainform: Tmainform
   Left = 328
   Height = 448
-  Top = 602
+  Top = 246
   Width = 806
   Anchors = []
   Caption = 'vPlotter'
