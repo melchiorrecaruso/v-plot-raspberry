@@ -63,38 +63,40 @@ type
 
   tvpdriverthread = class(tthread)
   private
-    fenabled:  boolean;
-    fxcenter:  double;
-    fycenter:  double;
-    fxmax:     double;
-    fymax:     double;
-    fpaths:    tvppaths;
-    fprogress: longint;
-    fonstart:  tthreadmethod;
-    fonstop:   tthreadmethod;
-    fontick:   tthreadmethod;
+    fenabled:   boolean;
+    fxcenter:   double;
+    fycenter:   double;
+    fxmax:      double;
+    fymax:      double;
+    fpaths:     tvppaths;
+    ftick:      longint;
+    ftickcount: longint;
+    fonstart:   tthreadmethod;
+    fonstop:    tthreadmethod;
+    fontick:    tthreadmethod;
   protected
     procedure execute; override;
   public
     constructor create(paths: tvppaths);
     destructor destroy; override;
   public
-    property enabled:  boolean       read fenabled  write fenabled;
-    property xcenter:  double        read fxcenter  write fxcenter;
-    property ycenter:  double        read fycenter  write fycenter;
-    property xmax:     double        read fxmax     write fxmax;
-    property ymax:     double        read fymax     write fymax;
-    property onstart:  tthreadmethod read fonstart  write fonstart;
-    property onstop:   tthreadmethod read fonstop   write fonstop;
-    property ontick:   tthreadmethod read fontick   write fontick;
-    property progress: longint       read fprogress;
+    property enabled:   boolean       read fenabled   write fenabled;
+    property xcenter:   double        read fxcenter   write fxcenter;
+    property ycenter:   double        read fycenter   write fycenter;
+    property xmax:      double        read fxmax      write fxmax;
+    property ymax:      double        read fymax      write fymax;
+    property tick:      longint       read ftick      write ftick;
+    property tickcount: longint       read ftickcount write ftickcount;
+    property onstart:   tthreadmethod read fonstart   write fonstart;
+    property onstop:    tthreadmethod read fonstop    write fonstop;
+    property ontick:    tthreadmethod read fontick    write fontick;
   end;
 
   procedure optimize(const p: tvppoint; out mx, my: longint);
 
 var
-  driver:        tvpdriver       = nil;
-  driverthread:  tvpdriverthread = nil;
+  driver:         tvpdriver       = nil;
+  driverthread:   tvpdriverthread = nil;
 
 implementation
 
@@ -276,7 +278,7 @@ begin
   fxmax     := 0;
   fymax     := 0;
   fpaths    := paths;
-  fprogress := 0;
+
 
   freeonterminate := true;
   inherited create(true);
@@ -352,7 +354,8 @@ begin
       end;
   end;
 
-  fprogress := 0;
+  ftick      := 0;
+  ftickcount := 0;
   if list.count > 0 then
   begin
     pvppoint(list[0])^.z := setting.zmax;
@@ -363,6 +366,7 @@ begin
       else
         pvppoint(list[i])^.z := setting.zmax;
 
+    ftickcount := list.count;
     for i := 0 to list.count -1 do
     begin
       point := pvppoint(list[i])^;
@@ -380,7 +384,7 @@ begin
 
         while not enabled do sleep(250);
       end;
-      fprogress := (100*i) div list.count;
+      inc(ftick);
     end;
   end;
   list.destroy;

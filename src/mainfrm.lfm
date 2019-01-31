@@ -1,7 +1,7 @@
 object mainform: Tmainform
-  Left = 328
+  Left = 346
   Height = 448
-  Top = 246
+  Top = 185
   Width = 806
   Anchors = []
   Caption = 'vPlotter'
@@ -46,10 +46,10 @@ object mainform: Tmainform
     Width = 806
     Panels = <    
       item
-        Width = 50
+        Width = 200
       end    
       item
-        Width = 50
+        Width = 200
       end>
     SimplePanel = False
     SizeGrip = False
@@ -298,5 +298,11 @@ object mainform: Tmainform
       Caption = 'Divide Selected'
       OnClick = divideselpmClick
     end
+  end
+  object timer: TIdleTimer
+    Enabled = False
+    OnTimer = timerTimer
+    left = 296
+    top = 24
   end
 end

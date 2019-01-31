@@ -36,6 +36,7 @@ type
   tmainform = class(tform)
     Bevel1: TBevel;
     divideselpm: TMenuItem;
+    timer: TIdleTimer;
     selattachedpm: TMenuItem;
     selbylayerpm: TMenuItem;
     hidebylayerpm: TMenuItem;
@@ -103,6 +104,7 @@ type
     procedure formcreate           (sender: tobject);
     procedure formdestroy          (sender: tobject);
     procedure formclose            (sender: tobject; var closeaction: tcloseaction);
+    procedure timerTimer(Sender: TObject);
     // MAIN MENU::FILE
     procedure loadmiclick          (sender: tobject);
     procedure savemiclick          (sender: tobject);
@@ -154,7 +156,7 @@ type
       wheeldelta: integer; mousepos: tpoint; var handled: boolean);
   private
          bit: tbgrabitmap;
-
+  timercount: longint;
  mouseisdown: boolean;
           px: longint;
           py: longint;
@@ -162,6 +164,7 @@ type
    pagewidth: longint;
   pageheight: longint;
        paths: tvppaths;
+        tick: longint;
         zoom: single;
 
        movex: longint;
@@ -249,6 +252,11 @@ begin
     closeaction := cafree;
 end;
 
+procedure tmainform.timerTimer(Sender: TObject);
+begin
+  inc(timercount);
+end;
+
 // MAIN-MENU::FILE
 
 procedure tmainform.loadmiclick(sender: tobject);
@@ -296,7 +304,6 @@ var
  path: tvppath;
    p1: tvppoint;
    p2: tvppoint;
-    a: array of tpointf;
 begin
   bit.setsize(round(pagewidth *zoom),
               round(pageheight*zoom));
@@ -350,7 +357,6 @@ begin
     else
       if lowercase(extractfileext(opendialog.filename)) = '.svg' then
         svg2paths(opendialog.filename, paths);
-
     //decodePNG(opendialog.filename, 100, 1, 1, 100);
     paths.createtoolpath;
     updatescreen;
@@ -523,6 +529,7 @@ begin
     driverthread.enabled := true;
   end else
   begin
+    timercount           := 0;
     driverthread         := tvpdriverthread.create(paths);
     driverthread.xcenter := setting.layout08.x;
     driverthread.ycenter := setting.layout08.y+pageheight/2;
@@ -533,6 +540,7 @@ begin
     driverthread.ontick  := @onplottertick;
     driverthread.start;
   end;
+  timer.enabled := driverthread.enabled;
 end;
 
 procedure tmainform.stopmiclick(sender: tobject);
@@ -541,6 +549,7 @@ begin
   begin
     driverthread.enabled := false;
   end;
+  timer.enabled := driverthread.enabled;
   driver.zcount := setting.zmax;
   driver.xoff   := true;
   driver.yoff   := true;
@@ -944,14 +953,23 @@ begin
   driver.yoff   := false;
   driver.zoff   := false;
   driver.zcount := setting.zmax;
+  timer.enabled := false;
 
   unlock1;
   application.processmessages;
 end;
 
 procedure tmainform.onplottertick;
-begin
 
+begin
+  if (driverthread.tick mod 100) = 0 then
+  begin
+    statusbar.panels[0].text := 'Time Elapsed ' + inttostr(timercount) + ' sec';
+    statusbar.panels[1].text := 'Time Remaining ' +
+
+    inttostr(trunc(timercount/driverthread.tick*(driverthread.tickcount - driverthread.tick))) + ' sec';
+
+  end;
   application.processmessages;
 end;
 
