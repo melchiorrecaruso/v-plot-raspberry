@@ -548,8 +548,8 @@ begin
   if assigned(driverthread) then
   begin
     driverthread.enabled := false;
+    timer.enabled        := false;
   end;
-  timer.enabled := driverthread.enabled;
   driver.zcount := setting.zmax;
   driver.xoff   := true;
   driver.yoff   := true;
@@ -560,8 +560,8 @@ procedure tmainform.killmiclick(sender: tobject);
 begin
   if assigned(driverthread) then
   begin
-    driverthread.terminate;
     driverthread.enabled := true;
+    driverthread.terminate;
   end;
 end;
 
@@ -879,7 +879,7 @@ begin
   // main menu::help
   aboutmi      .enabled := value;
   // popup menu
-  if value then
+  if value = false then
     screen.popupmenu := nil
   else
     screen.popupmenu := popup;
@@ -920,7 +920,7 @@ begin
   // main menu::help
   aboutmi      .enabled := value;
   // popup menu
-  if value then
+  if value = false then
     screen.popupmenu := nil
   else
     screen.popupmenu := popup;
@@ -955,6 +955,9 @@ begin
   driver.zcount := setting.zmax;
   timer.enabled := false;
 
+  statusbar.panels[0].text := '';
+  statusbar.panels[1].text := '';
+
   unlock1;
   application.processmessages;
 end;
@@ -962,13 +965,11 @@ end;
 procedure tmainform.onplottertick;
 
 begin
-  if (driverthread.tick mod 100) = 0 then
+  if (driverthread.tick > 0) and (driverthread.tick mod 3200 = 0) then
   begin
-    statusbar.panels[0].text := 'Time Elapsed ' + inttostr(timercount) + ' sec';
-    statusbar.panels[1].text := 'Time Remaining ' +
-
-    inttostr(trunc(timercount/driverthread.tick*(driverthread.tickcount - driverthread.tick))) + ' sec';
-
+    statusbar.panels[0].text := 'Elapsed Time ' + inttostr(timercount) + ' sec';
+    statusbar.panels[1].text := 'Remaining Time ' +
+      inttostr(trunc(timercount/driverthread.tick*(driverthread.tickcount - driverthread.tick))) + ' sec';
   end;
   application.processmessages;
 end;

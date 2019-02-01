@@ -161,6 +161,8 @@ procedure tvpdriver.move(axcount, aycount: longint);
 var
   dx: longint;
   dy: longint;
+  bx: boolean;
+  by: boolean;
 {$endif}
 begin
   {$ifdef cpuarm}
@@ -196,21 +198,22 @@ begin
 
   dx := abs(dx);
   dy := abs(dy);
-  while (dx > 0) or (dy > 0) do
+  bx := (dx > 0) and (fxoff = false);
+  by := (dy > 0) and (fyoff = false);
+  while (bx) or (by) do
   begin
-    if (fxoff = false) and (dx > 0) then
-    begin
-      digitalwrite(motx_step, HIGH); delaymicroseconds(fxdelay);
-      digitalwrite(motx_step,  LOW); delaymicroseconds(fxdelay);
-    end;
-
-    if (fyoff = false) and (dy > 0) then
-    begin
-      digitalwrite(moty_step, HIGH); delaymicroseconds(fydelay);
-      digitalwrite(moty_step,  LOW); delaymicroseconds(fydelay);
-    end;
+    if bx then digitalwrite(motx_step, HIGH);
+    if by then digitalwrite(moty_step, HIGH);
+    delaymicroseconds(fxdelay);
     dec(dx);
+
+    if bx then digitalwrite(motx_step,  LOW);
+    if by then digitalwrite(moty_step,  LOW);
+    delaymicroseconds(fydelay);
     dec(dy);
+
+    bx := (dx > 0) and (fxoff = false);
+    by := (dy > 0) and (fyoff = false);
   end;
   {$endif}
   fxcount := axcount;
