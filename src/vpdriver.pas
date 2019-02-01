@@ -235,32 +235,30 @@ end;
 procedure tvpdriver.setzcount(value: longint);
 begin
   if fzoff then exit;
-
+  {$ifdef cpuarm}
   if fzcount > value then
   begin
-    if setting.zdir = 0 then delaymicroseconds($f*fzdelay);
+    if setting.zdir = 0 then
+      delaymicroseconds($f*fzdelay);
     while fzcount > value do
     begin
-      dec(fzcount, setting.zinc);
-      {$ifdef cpuarm}
       pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fzcount/100, motz_freq));
       delaymicroseconds(fzdelay);
-      {$endif}
+      dec(fzcount, setting.zinc);
     end;
   end else
     if fzcount < value then
     begin
-      if setting.zdir = 1 then delaymicroseconds($f*fzdelay);
+      if setting.zdir = 1 then
+        delaymicroseconds($f*fzdelay);
       while fzcount < value do
       begin
-        inc(fzcount, setting.zinc);
-        {$ifdef cpuarm}
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fzcount/100, motz_freq));
         delaymicroseconds(fzdelay);
-        {$endif}
+        inc(fzcount, setting.zinc);
       end;
     end;
-
+  {$endif}
   fzcount := value;
   if enabledebug then
   begin
@@ -272,13 +270,12 @@ end;
 
 constructor tvpdriverthread.create(paths: tvppaths);
 begin
-  fenabled  := true;
-  fxcenter  := 0;
-  fycenter  := 0;
-  fxmax     := 0;
-  fymax     := 0;
-  fpaths    := paths;
-
+  fenabled := true;
+  fxcenter := 0;
+  fycenter := 0;
+  fxmax    := 0;
+  fymax    := 0;
+  fpaths   := paths;
 
   freeonterminate := true;
   inherited create(true);
