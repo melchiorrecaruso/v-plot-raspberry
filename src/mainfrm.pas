@@ -38,9 +38,9 @@ type
     screen: TBGRAVirtualScreen;
     divideselpm: tmenuitem;
     fitmi: TMenuItem;
-    MenuItem1: TMenuItem;
-    MenuItem2: TMenuItem;
-    N9: TMenuItem;
+    zoominmi: TMenuItem;
+    zoomoutmi: TMenuItem;
+    n9: TMenuItem;
     viewmi: TMenuItem;
     timer: tidletimer;
     selattachedpm: tmenuitem;
@@ -106,8 +106,6 @@ type
     filemi: tmenuitem;
     opendialog: topendialog;
 
-
-
     procedure formcreate           (sender: tobject);
     procedure formdestroy          (sender: tobject);
     procedure formclose            (sender: tobject; var closeaction: tcloseaction);
@@ -129,9 +127,9 @@ type
     procedure horizontalmiclick    (sender: tobject);
     procedure layoutmiclick        (sender: tobject);
     // MAIN-MENU::VIEW
+    procedure zoomoutmiclick       (sender: tobject);
+    procedure zoominmiclick        (sender: tobject);
     procedure fitmiclick           (sender: tobject);
-
-
     // MAIN-MENU::PRINTER
     procedure startmiclick         (sender: tobject);
     procedure stopmiclick          (sender: tobject);
@@ -328,7 +326,7 @@ begin
   close;
 end;
 
-// MAIN-MENU::editmi
+// MAIN-MENU::EDIT
 
 procedure tmainform.rotate90miclick(sender: tobject);
 begin
@@ -432,7 +430,7 @@ begin
     pageheight := amin;
     pagewidth  := amax;
   end;         
-  fitmi.click;
+  fitmiclick(nil);
 
   lock2;
   updatescreen;
@@ -474,6 +472,36 @@ begin
 end;
 
 // MAIN MENU::VIEW
+
+procedure tmainform.zoominmiclick(sender: tobject);
+var
+  value: single;
+begin
+  value := max(min(zoom*1.5, 25.0), 0.5);
+
+  if value <> zoom then
+  begin
+    zoom  := value;
+    movex := movex + round((bit.width  -(pagewidth *zoom))*(movex)/bit.width );
+    movey := movey + round((bit.height -(pageheight*zoom))*(movey)/bit.height);
+    updatescreen;
+  end;
+end;
+
+procedure tmainform.zoomoutmiclick(sender: tobject);
+var
+  value: single;
+begin
+  value := max(min(zoom/1.5, 25.0), 0.5);
+
+  if value <> zoom then
+  begin
+    zoom  := value;
+    movex := movex + round((bit.width  -(pagewidth *zoom))*(movex)/bit.width );
+    movey := movey + round((bit.height -(pageheight*zoom))*(movey)/bit.height);
+    updatescreen;
+  end;
+end;
 
 procedure tmainform.fitmiclick(sender: tobject);
 begin
@@ -967,6 +995,8 @@ end;
 procedure tmainform.onplotterstart;
 begin
   lock1;
+  statusbar.panels[0].text := '';
+  statusbar.panels[1].text := '';
   application.processmessages;
 end;
 

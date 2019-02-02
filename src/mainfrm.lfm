@@ -5,7 +5,7 @@ object mainform: Tmainform
   Width = 806
   Anchors = []
   Caption = 'vPlotter'
-  ClientHeight = 424
+  ClientHeight = 426
   ClientWidth = 806
   Menu = mainmenu
   OnClose = FormClose
@@ -15,7 +15,7 @@ object mainform: Tmainform
   object statusbar: TStatusBar
     Left = 0
     Height = 20
-    Top = 404
+    Top = 406
     Width = 806
     Panels = <    
       item
@@ -23,6 +23,9 @@ object mainform: Tmainform
       end    
       item
         Width = 200
+      end    
+      item
+        Width = 50
       end>
     SimplePanel = False
     SizeGrip = False
@@ -36,13 +39,12 @@ object mainform: Tmainform
   end
   object screen: TBGRAVirtualScreen
     Left = 0
-    Height = 400
-    Top = 4
+    Height = 404
+    Top = 2
     Width = 806
     OnRedraw = screenredraw
     Align = alClient
     Alignment = taLeftJustify
-    BorderSpacing.Top = 2
     Color = clForm
     ParentColor = False
     TabOrder = 1
@@ -161,7 +163,7 @@ object mainform: Tmainform
           Caption = 'A5'
           OnClick = a0miClick
         end
-        object N7: TMenuItem
+        object n7: TMenuItem
           Caption = '-'
         end
         object horizontalmi: TMenuItem
@@ -181,17 +183,20 @@ object mainform: Tmainform
       end
       object toolpathmi: TMenuItem
         Caption = 'Optimize ToolPath'
+        OnClick = toolpathmiclick
       end
     end
     object viewmi: TMenuItem
       Caption = 'View'
-      object MenuItem1: TMenuItem
+      object zoominmi: TMenuItem
         Caption = 'Zoom In'
+        OnClick = zoominmiClick
       end
-      object MenuItem2: TMenuItem
+      object zoomoutmi: TMenuItem
         Caption = 'Zoom Out'
+        OnClick = zoomoutmiClick
       end
-      object N9: TMenuItem
+      object n9: TMenuItem
         Caption = '-'
       end
       object fitmi: TMenuItem
@@ -203,24 +208,29 @@ object mainform: Tmainform
       Caption = 'Printer'
       object startmi: TMenuItem
         Caption = 'Start'
+        OnClick = startmiclick
       end
       object stopmi: TMenuItem
         Caption = 'Stop'
+        OnClick = stopmiclick
       end
       object n5: TMenuItem
         Caption = '-'
       end
       object killmi: TMenuItem
         Caption = 'Kill'
+        OnClick = killmiclick
       end
       object n6: TMenuItem
         Caption = '-'
       end
       object calibrationmi: TMenuItem
         Caption = 'Calibration ...'
+        OnClick = calibrationmiclick
       end
       object movetohomemi: TMenuItem
         Caption = 'Move to Home'
+        OnClick = movetohomemiclick
       end
       object n8: TMenuItem
         Caption = '-'
@@ -234,6 +244,7 @@ object mainform: Tmainform
       Caption = 'Help'
       object aboutmi: TMenuItem
         Caption = 'About ...'
+        OnClick = aboutmiclick
       end
     end
   end
@@ -248,48 +259,61 @@ object mainform: Tmainform
     top = 24
     object selallpm: TMenuItem
       Caption = 'Select All'
+      OnClick = selallpmclick
     end
     object selbylayerpm: TMenuItem
       Caption = 'Select by Layer'
+      OnClick = selbylayerpmclick
     end
     object selattachedpm: TMenuItem
       Caption = 'Select Attached'
+      OnClick = selattachedpmclick
     end
     object invertselpm: TMenuItem
       Caption = 'Invert Selected'
+      OnClick = invertselpmclick
     end
     object deselallpm: TMenuItem
       Caption = 'Deselect All'
+      OnClick = deselallpmclick
     end
     object deselbylayerpm: TMenuItem
       Caption = '-'
     end
     object showallpm: TMenuItem
       Caption = 'Show All'
+      OnClick = showallpmclick
     end
     object showbylayerpm: TMenuItem
       Caption = 'Show by Layer'
+      OnClick = showbylayerpmclick
     end
     object inverthiddenpm: TMenuItem
       Caption = 'Invert hidden'
+      OnClick = inverthiddenpmclick
     end
     object hideallpm: TMenuItem
       Caption = 'Hide All'
+      OnClick = hideallpmclick
     end
     object hidebylayerpm: TMenuItem
       Caption = 'Hide by Layer'
+      OnClick = hidebylayerpmclick
     end
     object hideselpm: TMenuItem
       Caption = 'Hide Selected'
+      OnClick = hideselpmclick
     end
     object n2pm: TMenuItem
       Caption = '-'
     end
     object mergesel: TMenuItem
       Caption = 'Merge Selected'
+      OnClick = mergeselclick
     end
     object divideselpm: TMenuItem
       Caption = 'Divide Selected'
+      OnClick = divideselpmclick
     end
   end
   object timer: TIdleTimer
