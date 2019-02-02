@@ -28,14 +28,20 @@ interface
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls, comctrls,
   buttons, menus, spin, vppaths, vpsetting, vpdriver, bgrabitmap,  types,
-  bgrabitmaptypes, bgravirtualscreen, bgragradientscanner;
+  bgrabitmaptypes, bgravirtualscreen, bgragradientscanner, BCTypes;
 
 type
   { tmainform }
 
   tmainform = class(tform)
-    bevel1: tbevel;
+    bevel: tbevel;
+    screen: TBGRAVirtualScreen;
     divideselpm: tmenuitem;
+    fitmi: TMenuItem;
+    MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
+    N9: TMenuItem;
+    viewmi: TMenuItem;
     timer: tidletimer;
     selattachedpm: tmenuitem;
     selbylayerpm: tmenuitem;
@@ -52,7 +58,6 @@ type
     hideallpm: tmenuitem;
     selallpm: tmenuitem;
     popup: tpopupmenu;
-    screen: tbgravirtualscreen;
     mainmenu: tmainmenu;
     editmi: tmenuitem;
     calibrationmi: tmenuitem;
@@ -101,6 +106,8 @@ type
     filemi: tmenuitem;
     opendialog: topendialog;
 
+
+
     procedure formcreate           (sender: tobject);
     procedure formdestroy          (sender: tobject);
     procedure formclose            (sender: tobject; var closeaction: tcloseaction);
@@ -110,7 +117,7 @@ type
     procedure clearmiclick         (sender: tobject);
     procedure importmiclick        (sender: tobject);
     procedure exitmiclick          (sender: tobject);
-    // MAIN MENU::editmi
+    // MAIN MENU::EDIT
     procedure rotate180miclick     (sender: tobject);
     procedure rotate270miclick     (sender: tobject);
     procedure rotate90miclick      (sender: tobject);
@@ -121,6 +128,10 @@ type
     procedure a0miclick            (sender: tobject);
     procedure horizontalmiclick    (sender: tobject);
     procedure layoutmiclick        (sender: tobject);
+    // MAIN-MENU::VIEW
+    procedure fitmiclick           (sender: tobject);
+
+
     // MAIN-MENU::PRINTER
     procedure startmiclick         (sender: tobject);
     procedure stopmiclick          (sender: tobject);
@@ -262,7 +273,7 @@ begin
     lock2;
     paths.clear;
     paths.load(opendialog.filename);
-    updatescreen;
+    fitmiclick(sender);
     unlock2;
   end;
 end;
@@ -287,7 +298,7 @@ begin
 
   lock2;
   paths.clear;
-  updatescreen;
+  fitmiclick(sender);
   unlock2;
 end;
 
@@ -307,7 +318,7 @@ begin
         svg2paths(opendialog.filename, paths);
     //decodePNG(opendialog.filename, 100, 1, 1, 100);
     paths.createtoolpath;
-    updatescreen;
+    fitmiclick(sender);
     unlock2;
   end;
 end;
@@ -420,11 +431,8 @@ begin
   begin
     pageheight := amin;
     pagewidth  := amax;
-  end;
-
-  zoom  := 1.0;
-  movex := (screen.width  - pagewidth ) div 2;
-  movey := (screen.height - pageheight) div 2;
+  end;         
+  fitmi.click;
 
   lock2;
   updatescreen;
@@ -463,6 +471,16 @@ begin
   paths.createtoolpath;
   updatescreen;
   unlock2;
+end;
+
+// MAIN MENU::VIEW
+
+procedure tmainform.fitmiclick(sender: tobject);
+begin
+  zoom  := 1.0;
+  movex := (screen.width  - pagewidth ) div 2;
+  movey := (screen.height - pageheight) div 2;
+  updatescreen;
 end;
 
 // MAIN MENU::PRINT
