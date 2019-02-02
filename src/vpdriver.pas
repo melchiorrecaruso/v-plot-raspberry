@@ -361,7 +361,7 @@ begin
     pvppoint(list[0])^.z := setting.zmax;
     for i := 1 to list.count -1 do
       if distance_between_two_points(
-        pvppoint(list[i])^, pvppoint(list[i-1])^) < 0.2 then
+        pvppoint(list[i])^, pvppoint(list[i-1])^) < 0.25 then
         pvppoint(list[i])^.z := setting.zmin
       else
         pvppoint(list[i])^.z := setting.zmax;

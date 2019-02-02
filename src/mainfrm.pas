@@ -181,7 +181,6 @@ type
     procedure lock2;
     procedure unlock1;
     procedure unlock2;
-
     procedure updatescreen;
   end;
 

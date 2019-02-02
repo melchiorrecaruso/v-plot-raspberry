@@ -26,7 +26,7 @@ unit vppaths;
 interface
 
 uses
-  classes, vpmath, vpsetting, sketchyimage;
+  classes, vpmath, vpsetting;
 
 type
   tvppath = class(tobject)
@@ -45,7 +45,6 @@ type
     destructor destroy; override;
     procedure add(p: pvppoint);
     procedure clear;
-    procedure clean;
     procedure delete(index: longint);
     procedure invert;
   public
@@ -295,31 +294,6 @@ begin
   flist.clear;
 end;
 
-procedure tvppath.clean;
-var
-  i, j: longint;
-     k: longint;
-begin
-  i := 0;
-  j := 3;
-  k := 0;
-  while (i < flist.count) and
-        (j < flist.count) do
-  begin
-    if distance_between_two_points(
-      pvppoint(flist[i])^,
-      pvppoint(flist[j])^) < minlen then
-    begin
-      delete(j);
-      inc(k);
-    end;
-    inc(i);
-    inc(j);
-  end;
-  if k > 0 then
-    writeln('deleted', k);
-end;
-
 procedure tvppath.add(p: pvppoint);
 var
   point: pvppoint;
@@ -393,11 +367,8 @@ begin
 end;
 
 procedure tvppaths.clean;
-var
-  i: longint;
 begin
-  for i := 0 to flist.count - 1 do
-    tvppath(flist[i]).clean;
+  //...
 end;
 
 procedure tvppaths.addline(entity: pvpline);
@@ -658,11 +629,11 @@ begin
         if j <> -1 then
         begin
           path := tvppath(flist[j]);
+          if path.selected then
+            break;
           path.selected := true;
-          if j = i then
-            j := -1;
         end;
-      until j = -1;
+      until (j = -1) or (j = i);
 
       path := tvppath(flist[i]);
       repeat
@@ -670,11 +641,12 @@ begin
         if j <> -1 then
         begin
           path := tvppath(flist[j]);
+          if path.selected then
+            break;
           path.selected := true;
-          if j = i then
-            j := -1;
         end;
-      until j = -1;
+      until (j = -1) or (j = i);
+
     end;
   end;
 end;
