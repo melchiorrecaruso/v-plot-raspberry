@@ -34,77 +34,76 @@ type
   { tmainform }
 
   tmainform = class(tform)
-    Bevel1: TBevel;
-    divideselpm: TMenuItem;
-    timer: TIdleTimer;
-    selattachedpm: TMenuItem;
-    selbylayerpm: TMenuItem;
-    hidebylayerpm: TMenuItem;
-    mergesel: TMenuItem;
-    n2pm: TMenuItem;
-    invertselpm: TMenuItem;
-    deselallpm: TMenuItem;
-    deselbylayerpm: TMenuItem;
-    hideselpm: TMenuItem;
-    showallpm: TMenuItem;
-    showbylayerpm: TMenuItem;
-    inverthiddenpm: TMenuItem;
-    hideallpm: TMenuItem;
-    selallpm: TMenuItem;
-    popup: TPopupMenu;
-    screen: TBGRAVirtualScreen;
-    mainmenu: TMainMenu;
-    editmi: TMenuItem;
-    calibrationmi: TMenuItem;
-    layoutmi: TMenuItem;
-    a0mi: TMenuItem;
-    a1mi: TMenuItem;
-    a2mi: TMenuItem;
-    a3mi: TMenuItem;
-    a4mi: TMenuItem;
-    a5mi: TMenuItem;
-    horizontalmi: TMenuItem;
-    movetohomemi: TMenuItem;
-    n8: TMenuItem;
-    statusbar: TStatusBar;
-    verticalmi: TMenuItem;
-    N7: TMenuItem;
-    rotate90mi: TMenuItem;
-    rotate180mi: TMenuItem;
-    rotate270mi: TMenuItem;
-    mirrorxmi: TMenuItem;
-    mirrorymi: TMenuItem;
-    n6: TMenuItem;
-    killmi: TMenuItem;
-    n5: TMenuItem;
-    savedialog: TSaveDialog;
-    stopmi: TMenuItem;
-    startmi: TMenuItem;
-    aboutmi: TMenuItem;
-    toolpathmi: TMenuItem;
-    n4: TMenuItem;
-    mirrormi: TMenuItem;
-    scalemi: TMenuItem;
-    offsetmi: TMenuItem;
-    pagesizemi: TMenuItem;
-    n3: TMenuItem;
-    rotatemi: TMenuItem;
-    clearmi: TMenuItem;
-    exitmi: TMenuItem;
-    loadmi: TMenuItem;
-    savemi: TMenuItem;
-    importmi: TMenuItem;
-    n2: TMenuItem;
-    n1: TMenuItem;
-    helpmi: TMenuItem;
-    miprinter: TMenuItem;
-    filemi: TMenuItem;
+    bevel1: tbevel;
+    divideselpm: tmenuitem;
+    timer: tidletimer;
+    selattachedpm: tmenuitem;
+    selbylayerpm: tmenuitem;
+    hidebylayerpm: tmenuitem;
+    mergesel: tmenuitem;
+    n2pm: tmenuitem;
+    invertselpm: tmenuitem;
+    deselallpm: tmenuitem;
+    deselbylayerpm: tmenuitem;
+    hideselpm: tmenuitem;
+    showallpm: tmenuitem;
+    showbylayerpm: tmenuitem;
+    inverthiddenpm: tmenuitem;
+    hideallpm: tmenuitem;
+    selallpm: tmenuitem;
+    popup: tpopupmenu;
+    screen: tbgravirtualscreen;
+    mainmenu: tmainmenu;
+    editmi: tmenuitem;
+    calibrationmi: tmenuitem;
+    layoutmi: tmenuitem;
+    a0mi: tmenuitem;
+    a1mi: tmenuitem;
+    a2mi: tmenuitem;
+    a3mi: tmenuitem;
+    a4mi: tmenuitem;
+    a5mi: tmenuitem;
+    horizontalmi: tmenuitem;
+    movetohomemi: tmenuitem;
+    n8: tmenuitem;
+    statusbar: tstatusbar;
+    verticalmi: tmenuitem;
+    n7: tmenuitem;
+    rotate90mi: tmenuitem;
+    rotate180mi: tmenuitem;
+    rotate270mi: tmenuitem;
+    mirrorxmi: tmenuitem;
+    mirrorymi: tmenuitem;
+    n6: tmenuitem;
+    killmi: tmenuitem;
+    n5: tmenuitem;
+    savedialog: tsavedialog;
+    stopmi: tmenuitem;
+    startmi: tmenuitem;
+    aboutmi: tmenuitem;
+    toolpathmi: tmenuitem;
+    n4: tmenuitem;
+    mirrormi: tmenuitem;
+    scalemi: tmenuitem;
+    offsetmi: tmenuitem;
+    pagesizemi: tmenuitem;
+    n3: tmenuitem;
+    rotatemi: tmenuitem;
+    clearmi: tmenuitem;
+    exitmi: tmenuitem;
+    loadmi: tmenuitem;
+    savemi: tmenuitem;
+    importmi: tmenuitem;
+    n2: tmenuitem;
+    n1: tmenuitem;
+    helpmi: tmenuitem;
+    miprinter: tmenuitem;
+    filemi: tmenuitem;
     opendialog: topendialog;
 
     procedure formcreate           (sender: tobject);
     procedure formdestroy          (sender: tobject);
     procedure formclose            (sender: tobject; var closeaction: tcloseaction);
-    procedure timerTimer(Sender: TObject);
     // MAIN MENU::FILE
     procedure loadmiclick          (sender: tobject);
     procedure savemiclick          (sender: tobject);
@@ -128,7 +127,7 @@ type
     procedure killmiclick          (sender: tobject);
     procedure calibrationmiclick   (sender: tobject);
     procedure movetohomemiclick    (sender: tobject);
-    procedure toolpathmiClick(sender: tobject);
+    procedure toolpathmiclick      (sender: tobject);
     // MAIN-FORM::HELP
     procedure aboutmiclick         (sender: tobject);
     // POPUP-MENU
@@ -148,6 +147,7 @@ type
     procedure showallpmclick       (sender: tobject);
     procedure showbylayerpmclick   (sender: tobject);
     // virtual screen events
+    procedure timertimer      (sender: tobject);
     procedure screenredraw    (sender: tobject; bitmap: tbgrabitmap);
     procedure imagemouseup    (sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
     procedure imagemousedown  (sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
@@ -164,12 +164,11 @@ type
    pagewidth: longint;
   pageheight: longint;
        paths: tvppaths;
-        tick: longint;
         zoom: single;
 
        movex: longint;
        movey: longint;
-        lock: boolean;
+      locked: boolean;
 
     // ---
     procedure lockinternal1(value: boolean);
@@ -252,11 +251,6 @@ begin
     closeaction := cafree;
 end;
 
-procedure tmainform.timerTimer(Sender: TObject);
-begin
-  inc(timercount);
-end;
-
 // MAIN-MENU::FILE
 
 procedure tmainform.loadmiclick(sender: tobject);
@@ -296,51 +290,6 @@ begin
   paths.clear;
   updatescreen;
   unlock2;
-end;
-
-procedure tmainform.updatescreen;
-var
- i, j: longint;
- path: tvppath;
-   p1: tvppoint;
-   p2: tvppoint;
-begin
-  bit.setsize(round(pagewidth *zoom),
-              round(pageheight*zoom));
-  bit.fillrect(0, 0, bit.width,   bit.height,   bgra(100, 100, 100), dmset);
-  bit.fillrect(1, 1, bit.width-1, bit.height-1, bgra(255, 255, 255), dmset);
-  // updtare preview ...
-  for i := 0 to paths.count -1 do
-  begin
-    path := paths.items[i];
-    if (path.enabled) and (path.count > 1) then
-    begin
-      p1    := path.items[0]^;
-      p1.x  := (bit.width  div 2) + p1.x*zoom;
-      p1.y  := (bit.height div 2) - p1.y*zoom;
-      for j := 1 to path.count -1 do
-      begin
-        p2   := path.items[j]^;
-        p2.x := (bit.width  div 2) + p2.x*zoom;
-        p2.y := (bit.height div 2) - p2.y*zoom;
-        if path.hidden = false then
-        begin
-          if path.selected then
-            bit.drawline(
-              round(p1.x), round(p1.y),
-              round(p2.x), round(p2.y),
-              bgra(57, 255, 20), true, dmset)
-          else
-            bit.drawline(
-              round(p1.x), round(p1.y),
-              round(p2.x), round(p2.y),
-              bgra(  0,  0,  0), true, dmset);
-        end;
-        p1 := p2;
-      end;
-    end;
-  end;
-  screen.redrawbitmap;
 end;
 
 procedure tmainform.importmiclick(sender: tobject);
@@ -827,9 +776,9 @@ procedure tmainform.screenmousewheel(sender: tobject; shift: tshiftstate;
 var
   value: single;
 begin
-  if lock = false then
+  if locked = false then
   begin
-    lock := true;
+    locked := true;
     if wheeldelta > 0 then
       value := max(min(zoom*1.5, 25.0), 0.5)
     else
@@ -842,21 +791,79 @@ begin
       movey := movey + round((bit.height -(pageheight*zoom))*(mousepos.y-movey)/bit.height);
       updatescreen;
     end;
-    lock := false;
+    locked := false;
   end;
 end;
 
-// LOAD EVENTS
+// SCREEN/STATUS EVENTS
+
+procedure tmainform.updatescreen;
+var
+ i, j: longint;
+    k: longint = 0;
+ path: tvppath;
+   p1: tvppoint;
+   p2: tvppoint;
+begin
+  bit.setsize(round(pagewidth *zoom),
+              round(pageheight*zoom));
+  bit.fillrect(0, 0, bit.width,   bit.height,   bgra(100, 100, 100), dmset);
+  bit.fillrect(1, 1, bit.width-1, bit.height-1, bgra(255, 255, 255), dmset);
+  // updtare preview ...
+  for i := 0 to paths.count -1 do
+  begin
+    path := paths.items[i];
+    if (path.enabled) and (path.count > 1) then
+    begin
+      p1    := path.items[0]^;
+      p1.x  := (bit.width  div 2) + p1.x*zoom;
+      p1.y  := (bit.height div 2) - p1.y*zoom;
+      for j := 1 to path.count -1 do
+      begin
+        p2   := path.items[j]^;
+        p2.x := (bit.width  div 2) + p2.x*zoom;
+        p2.y := (bit.height div 2) - p2.y*zoom;
+        if path.hidden = false then
+        begin
+          if path.selected then
+          begin
+            inc(k);
+            bit.drawline(
+              round(p1.x), round(p1.y),
+              round(p2.x), round(p2.y),
+              bgra(57, 255, 20), true, dmset)
+          end else
+          begin
+            bit.drawline(
+              round(p1.x), round(p1.y),
+              round(p2.x), round(p2.y),
+              bgra(  0,  0,  0), true, dmset);
+          end;
+        end;
+        p1 := p2;
+      end;
+    end;
+  end;
+  statusbar.panels[0].text := 'Selected Items ' + inttostr(k);
+  statusbar.panels[1].text := '';
+  screen.redrawbitmap;
+end;
 
 procedure tmainform.screenredraw(sender: tobject; bitmap: tbgrabitmap);
 begin
   bitmap.putimage(movex, movey, bit, dmset);
 end;
 
+procedure tmainform.timertimer(sender: tobject);
+begin
+  inc(timercount);
+end;
+
 // LOCK/UNLOCK EVENTS
 
 procedure tmainform.lockinternal1(value: boolean);
 begin
+  locked                := not value;
   // main menu::file
   loadmi       .enabled := value;
   savemi       .enabled := value;
@@ -886,18 +893,9 @@ begin
   application  .processmessages;
 end;
 
-procedure tmainform.lock1;
-begin
-  lockinternal1(false);
-end;
-
-procedure tmainform.unlock1;
-begin
-  lockinternal1(true);
-end;
-
 procedure tmainform.lockinternal2(value: boolean);
 begin
+  locked                := not value;
   // main menu::file
   loadmi       .enabled := value;
   savemi       .enabled := value;
@@ -927,15 +925,24 @@ begin
   application  .processmessages;
 end;
 
+procedure tmainform.lock1;
+begin
+  lockinternal1(false);
+end;
+
+procedure tmainform.unlock1;
+begin
+  lockinternal1(true);
+end;
 
 procedure tmainform.lock2;
 begin
-    lockinternal1(false);
+  lockinternal1(false);
 end;
 
 procedure tmainform.unlock2;
 begin
-    lockinternal1(true);
+  lockinternal1(true);
 end;
 
 // PLOTTER THREAD EVENTS
@@ -963,9 +970,8 @@ begin
 end;
 
 procedure tmainform.onplottertick;
-
 begin
-  if (driverthread.tick > 0) and (driverthread.tick mod 3200 = 0) then
+  if(driverthread.tick mod 3200 = 0) then
   begin
     statusbar.panels[0].text := 'Elapsed Time ' + inttostr(timercount) + ' sec';
     statusbar.panels[1].text := 'Remaining Time ' +

@@ -1,7 +1,7 @@
 {
   Description: vPlot paths class.
 
-  Copyright (C) 2017-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
+  Copyright (C) 2017-2019 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
   This source is free software; you can redistribute it and/or modify it under
   the terms of the GNU General Public License as published by the Free
@@ -54,7 +54,6 @@ type
     property hidden:   boolean  read fhidden   write fhidden;
     property layer:    longword read flayer    write flayer;
     property selected: boolean  read fselected write fselected;
-
     property items[index: longint]: pvppoint  read get;
   end;
 
@@ -676,9 +675,7 @@ begin
             j := -1;
         end;
       until j = -1;
-
     end;
-
   end;
 end;
 

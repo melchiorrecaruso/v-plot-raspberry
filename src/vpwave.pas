@@ -1,7 +1,7 @@
 {
   Description: vPlot wave class.
 
-  Copyright (C) 2017-2018 Melchiorre Caruso <melchiorrecaruso@gmail.com>
+  Copyright (C) 2017-2019 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
   This source is free software; you can redistribute it and/or modify it under
   the terms of the GNU General Public License as published by the Free

@@ -5,7 +5,7 @@ object mainform: Tmainform
   Width = 806
   Anchors = []
   Caption = 'vPlotter'
-  ClientHeight = 424
+  ClientHeight = 426
   ClientWidth = 806
   Menu = mainmenu
   OnClose = FormClose
@@ -14,14 +14,14 @@ object mainform: Tmainform
   LCLVersion = '2.1.0.0'
   object screen: TBGRAVirtualScreen
     Left = 0
-    Height = 402
+    Height = 404
     Top = 2
     Width = 806
     OnRedraw = screenRedraw
     Align = alClient
     Alignment = taLeftJustify
     BorderSpacing.Top = 2
-    ClientHeight = 402
+    ClientHeight = 404
     ClientWidth = 806
     Color = clForm
     ParentColor = False
@@ -42,7 +42,7 @@ object mainform: Tmainform
   object statusbar: TStatusBar
     Left = 0
     Height = 20
-    Top = 404
+    Top = 406
     Width = 806
     Panels = <    
       item

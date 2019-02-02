@@ -379,12 +379,12 @@ begin
         driver.zcount := trunc(point.z);
         optimize(point, mx, my);
         driver.move(mx, my);
-        if assigned(ontick) then
-          synchronize(ontick);
 
         while not enabled do sleep(250);
       end;
       inc(ftick);
+      if assigned(ontick) then
+        synchronize(ontick);
     end;
   end;
   list.destroy;
