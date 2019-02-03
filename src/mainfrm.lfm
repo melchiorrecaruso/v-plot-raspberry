@@ -5,31 +5,13 @@ object mainform: Tmainform
   Width = 806
   Anchors = []
   Caption = 'vPlotter'
-  ClientHeight = 426
+  ClientHeight = 424
   ClientWidth = 806
   Menu = mainmenu
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   LCLVersion = '2.1.0.0'
-  object statusbar: TStatusBar
-    Left = 0
-    Height = 20
-    Top = 406
-    Width = 806
-    Panels = <    
-      item
-        Width = 200
-      end    
-      item
-        Width = 200
-      end    
-      item
-        Width = 50
-      end>
-    SimplePanel = False
-    SizeGrip = False
-  end
   object bevel: TBevel
     Left = 0
     Height = 2
@@ -39,7 +21,7 @@ object mainform: Tmainform
   end
   object screen: TBGRAVirtualScreen
     Left = 0
-    Height = 404
+    Height = 421
     Top = 2
     Width = 806
     OnRedraw = screenredraw
@@ -47,11 +29,19 @@ object mainform: Tmainform
     Alignment = taLeftJustify
     Color = clForm
     ParentColor = False
-    TabOrder = 1
+    TabOrder = 0
     OnMouseDown = imagemousedown
     OnMouseMove = imagemousemove
     OnMouseUp = imagemouseup
     OnMouseWheel = screenmousewheel
+  end
+  object statuslabel: TLabel
+    Left = 0
+    Height = 1
+    Top = 423
+    Width = 806
+    Align = alBottom
+    ParentColor = False
   end
   object opendialog: TOpenDialog
     Options = [ofPathMustExist, ofFileMustExist, ofEnableSizing, ofViewDetail]
@@ -315,10 +305,5 @@ object mainform: Tmainform
       Caption = 'Divide Selected'
       OnClick = divideselpmclick
     end
-  end
-  object timer: TIdleTimer
-    Enabled = False
-    left = 296
-    top = 24
   end
 end

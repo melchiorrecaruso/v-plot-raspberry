@@ -35,6 +35,7 @@ type
 
   tmainform = class(tform)
     bevel: tbevel;
+    statuslabel: TLabel;
     screen: TBGRAVirtualScreen;
     divideselpm: tmenuitem;
     fitmi: TMenuItem;
@@ -42,7 +43,6 @@ type
     zoomoutmi: TMenuItem;
     n9: TMenuItem;
     viewmi: TMenuItem;
-    timer: tidletimer;
     selattachedpm: tmenuitem;
     selbylayerpm: tmenuitem;
     hidebylayerpm: tmenuitem;
@@ -71,7 +71,6 @@ type
     horizontalmi: tmenuitem;
     movetohomemi: tmenuitem;
     n8: tmenuitem;
-    statusbar: tstatusbar;
     verticalmi: tmenuitem;
     n7: tmenuitem;
     rotate90mi: tmenuitem;
@@ -156,7 +155,6 @@ type
     procedure showallpmclick       (sender: tobject);
     procedure showbylayerpmclick   (sender: tobject);
     // virtual screen events
-    procedure timertimer      (sender: tobject);
     procedure screenredraw    (sender: tobject; bitmap: tbgrabitmap);
     procedure imagemouseup    (sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
     procedure imagemousedown  (sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
@@ -165,7 +163,8 @@ type
       wheeldelta: integer; mousepos: tpoint; var handled: boolean);
   private
          bit: tbgrabitmap;
-  timercount: longint;
+   starttime: tdatetime;
+   tickcount: longint;
  mouseisdown: boolean;
           px: longint;
           py: longint;
@@ -523,7 +522,6 @@ begin
     driverthread.enabled := true;
   end else
   begin
-    timercount           := 0;
     driverthread         := tvpdriverthread.create(paths);
     driverthread.xcenter := setting.layout08.x;
     driverthread.ycenter := setting.layout08.y+pageheight/2;
@@ -534,7 +532,8 @@ begin
     driverthread.ontick  := @onplottertick;
     driverthread.start;
   end;
-  timer.enabled := driverthread.enabled;
+  starttime := now;
+  tickcount := 0
 end;
 
 procedure tmainform.stopmiclick(sender: tobject);
@@ -542,7 +541,6 @@ begin
   if assigned(driverthread) then
   begin
     driverthread.enabled := false;
-    timer.enabled        := false;
   end;
   driver.zcount := setting.zmax;
   driver.xoff   := true;
@@ -554,8 +552,8 @@ procedure tmainform.killmiclick(sender: tobject);
 begin
   if assigned(driverthread) then
   begin
-    driverthread.enabled := true;
     driverthread.terminate;
+    driverthread.enabled := true;
   end;
 end;
 
@@ -762,6 +760,7 @@ var
    path: tvppath;
   point: tvppoint;
 begin
+  if locked then exit;
   popup.autopopup:= true;
   // search path ...
   for i := 0 to paths.count -1 do
@@ -802,18 +801,22 @@ end;
 procedure tmainform.imagemousemove(sender: tobject;
   shift: tshiftstate; x, y: integer);
 begin
-  if mouseisdown then
-  begin
-    movex := x - px;
-    movey := y - py;
-    screen.redrawbitmap;
-  end;
+  if locked = false then
+    if mouseisdown then
+    begin
+      movex := x - px;
+      movey := y - py;
+      screen.redrawbitmap;
+    end;
 end;
 
 procedure tmainform.imagemouseup(sender: tobject;
   button: tmousebutton; shift: tshiftstate; x, y: integer);
 begin
-  mouseisdown := false;
+  if locked = false then
+  begin
+    mouseisdown := false;
+  end;
 end;
 
 procedure tmainform.screenmousewheel(sender: tobject; shift: tshiftstate;
@@ -889,19 +892,17 @@ begin
       end;
     end;
   end;
-  statusbar.panels[0].text := 'Selected Items ' + inttostr(k);
-  statusbar.panels[1].text := '';
+
+  if k > 0 then
+    statuslabel.caption := 'Selected Items ' + inttostr(k)
+  else
+    statuslabel.caption := '';
   screen.redrawbitmap;
 end;
 
 procedure tmainform.screenredraw(sender: tobject; bitmap: tbgrabitmap);
 begin
   bitmap.putimage(movex, movey, bit, dmset);
-end;
-
-procedure tmainform.timertimer(sender: tobject);
-begin
-  inc(timercount);
 end;
 
 // LOCK/UNLOCK EVENTS
@@ -921,6 +922,10 @@ begin
   offsetmi     .enabled := value;
   pagesizemi   .enabled := value;
   toolpathmi   .enabled := value;
+  // main menu::view
+  zoominmi     .enabled := value;
+  zoomoutmi    .enabled := value;
+  fitmi        .enabled := value;
   // main menu::printer
   startmi      .enabled := true;
   stopmi       .enabled := true;
@@ -953,6 +958,10 @@ begin
   offsetmi     .enabled := value;
   pagesizemi   .enabled := value;
   toolpathmi   .enabled := value;
+  // main menu::view
+  zoominmi     .enabled := value;
+  zoomoutmi    .enabled := value;
+  fitmi        .enabled := value;
   // main menu::printer
   startmi      .enabled := value;
   stopmi       .enabled := value;
@@ -995,8 +1004,7 @@ end;
 procedure tmainform.onplotterstart;
 begin
   lock1;
-  statusbar.panels[0].text := '';
-  statusbar.panels[1].text := '';
+  statuslabel.caption := '';
   application.processmessages;
 end;
 
@@ -1007,22 +1015,19 @@ begin
   driver.yoff   := false;
   driver.zoff   := false;
   driver.zcount := setting.zmax;
-  timer.enabled := false;
-
-  statusbar.panels[0].text := '';
-  statusbar.panels[1].text := '';
 
   unlock1;
+  statuslabel.caption := '';
   application.processmessages;
 end;
 
 procedure tmainform.onplottertick;
 begin
-  if(driverthread.tick mod 3200 = 0) then
+  inc(tickcount);
+  if(tickcount mod 800) = 0 then
   begin
-    statusbar.panels[0].text := 'Elapsed Time ' + inttostr(timercount) + ' sec';
-    statusbar.panels[1].text := 'Remaining Time ' +
-      inttostr(trunc(timercount/driverthread.tick*(driverthread.tickcount - driverthread.tick))) + ' sec';
+    statuslabel.caption := 'Remaining Time ' +
+      formatdatetime('hh:nn:ss', (now-starttime)/tickcount*driverthread.tick);
   end;
   application.processmessages;
 end;

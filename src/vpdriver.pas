@@ -70,7 +70,6 @@ type
     fymax:      double;
     fpaths:     tvppaths;
     ftick:      longint;
-    ftickcount: longint;
     fonstart:   tthreadmethod;
     fonstop:    tthreadmethod;
     fontick:    tthreadmethod;
@@ -85,8 +84,7 @@ type
     property ycenter:   double        read fycenter   write fycenter;
     property xmax:      double        read fxmax      write fxmax;
     property ymax:      double        read fymax      write fymax;
-    property tick:      longint       read ftick      write ftick;
-    property tickcount: longint       read ftickcount write ftickcount;
+    property tick:      longint       read ftick;
     property onstart:   tthreadmethod read fonstart   write fonstart;
     property onstop:    tthreadmethod read fonstop    write fonstop;
     property ontick:    tthreadmethod read fontick    write fontick;
@@ -279,6 +277,7 @@ begin
   fxmax    := 0;
   fymax    := 0;
   fpaths   := paths;
+  ftick    := 0;
 
   freeonterminate := true;
   inherited create(true);
@@ -354,8 +353,6 @@ begin
       end;
   end;
 
-  ftick      := 0;
-  ftickcount := 0;
   if list.count > 0 then
   begin
     pvppoint(list[0])^.z := setting.zmax;
@@ -366,7 +363,7 @@ begin
       else
         pvppoint(list[i])^.z := setting.zmax;
 
-    ftickcount := list.count;
+    ftick := list.count;
     for i := 0 to list.count -1 do
     begin
       point := pvppoint(list[i])^;
@@ -379,12 +376,12 @@ begin
         driver.zcount := trunc(point.z);
         optimize(point, mx, my);
         driver.move(mx, my);
+        if assigned(ontick) then
+          synchronize(ontick);
 
         while not enabled do sleep(250);
       end;
-      inc(ftick);
-      if assigned(ontick) then
-        synchronize(ontick);
+      dec(ftick);
     end;
   end;
   list.destroy;
