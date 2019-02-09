@@ -28,7 +28,7 @@ interface
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls, comctrls,
   buttons, menus, spin, vppaths, vpsetting, vpdriver, bgrabitmap,  types,
-  bgrabitmaptypes, bgravirtualscreen, bgragradientscanner, BCTypes;
+  bgrabitmaptypes, bgravirtualscreen, bgragradientscanner;
 
 type
   { tmainform }
@@ -203,7 +203,7 @@ implementation
 
 uses
   math, sysutils, aboutfrm, calibrationfrm, offsetfrm,
-  scalefrm, vpmath, vpwave, sketchyimage;
+  scalefrm, vpmath, vpsvgreader, vpdxfreader, vpwave, sketchyimage;
 
 // FORM EVENTS
 

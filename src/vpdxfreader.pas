@@ -120,6 +120,9 @@ type
     procedure readfromfile(const afilename: string; apaths: tvppaths);
   end;
 
+  procedure dxf2paths(const afilename: string; apaths: tvppaths);
+
+
 implementation
 
 const
@@ -1209,6 +1212,20 @@ begin
   s.loadfromfile(afilename);
   readfromstrings(s, apaths);
   s.destroy;
+end;
+
+// dxf2paths
+
+procedure dxf2paths(const afilename: string; apaths: tvppaths);
+var
+  reader: tvdxfreader;
+begin
+  reader := tvdxfreader.create;
+  reader.readfromfile(afilename, apaths);
+  reader.destroy;
+
+  apaths.clean;
+  apaths.zerocenter;
 end;
 
 end.

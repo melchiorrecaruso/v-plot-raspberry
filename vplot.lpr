@@ -23,8 +23,9 @@ program vplot;
 {$mode objfpc}
 
 uses
-  {$ifdef unix} cthreads, {$endif} interfaces, forms, mainfrm, vpsetting, vppaths,
-  aboutfrm, vpmath, vpwave, calibrationfrm, scalefrm, offsetfrm;
+  {$ifdef unix} cthreads, interfaces, forms, mainfrm, vpsetting, vppaths,
+  aboutfrm, vpmath, vpwave, calibrationfrm, scalefrm, offsetfrm, vpsvgreader,
+  vpdriverthread;
 
   {$R *.res}
 
