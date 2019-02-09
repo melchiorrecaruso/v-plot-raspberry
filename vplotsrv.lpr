@@ -24,7 +24,7 @@ program vplotsrv;
 {$mode objfpc}
 
 uses
- classes, crt, lnet, lnetbase, sha1, sysutils, vpsrvdriver, vpsrvsetting;
+ cthreads, classes, crt, lnet, lnetbase, sha1, sysutils, vpsrvdriver, vpsrvsetting;
 
 type
 
@@ -151,10 +151,13 @@ begin
       if pos('END ', m) = 1 then
       begin
         parse_prefix('SHA1', m, s);
-        //if s = sha1print(sha1string(flst.text)) then
+        if s = sha1print(sha1string(flst.text)) then
         begin
-          fvth := tvplotthread.create(flst);
-          fvth.start;
+
+          writeln('s = sha1print(sha1string(flst.text)) = true');
+
+          // fvth := tvplotthread.create(flst);
+          // fvth.start;
         end;
       end else
       begin
@@ -200,41 +203,27 @@ end;
 procedure tvplotserver.run;
 var
   quit: boolean;
-  port: word;
 begin
-  if paramcount > 0 then
-  begin
-    try
-      port := word(strtoint(paramstr(1)));
-    except
-      on e: exception do
-      begin
-        writeln(e.message);
-        halt;
-      end;
-    end;
-    quit := false;
+  quit := false;
  
-    if fcon.listen(port) then
-    begin
-      writeln('vplotsrv running!');
-      writeln('press ''escape'' to quit, ''r'' to restart');
-      repeat
-        fcon.callaction;
-        if keypressed then
-          case readkey of
-            #27: quit := true;
-            'r': begin
-                   writeln('restarting...');
-                   fcon.disconnect;
-                   fcon.listen(port);
-                   quit := false;
-                 end;
-          end;
-      until quit;
-    end;
-  end else
-    writeln('usage: ', paramstr(0), ' <port>');
+  if fcon.listen(srvsetting.port) then
+  begin
+    writeln('vplotsrv running!');
+    writeln('press ''escape'' to quit, ''r'' to restart');
+    repeat
+      fcon.callaction;
+      if keypressed then
+        case readkey of
+          #27: quit := true;
+          'r': begin
+                 writeln('restarting...');
+                 fcon.disconnect;
+                 fcon.listen(srvsetting.port);
+                 quit := false;
+               end;
+        end;
+    until quit;
+  end;
 end;
 
 // tvplotthread

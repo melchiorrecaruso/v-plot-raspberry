@@ -86,8 +86,6 @@ type
     property port:     longint   read fport;
  end;
 
-var
-  srvsetting: tvpsrvsetting = nil;
 
 implementation
 
@@ -176,27 +174,8 @@ begin
   writeln(format('  Z-AXIS::RADIUS = %12.5f', [fzradius ]));
   writeln(format('  Z-AXIS::RATIO  = %12.5f', [fzratio  ]));
 
-  writeln(format('  Z-AXIS::RATIO  = %12.5f', [fzratio  ]));
+  writeln(format(' NETWORK::PORT   = %12.5u', [fport    ]));
 end;
-
-procedure initialize;
-begin
-  srvsetting := tvpsrvsetting.create;
-  srvsetting.load(changefileext(paramstr(0), '.ini'));
-end;
-
-procedure finalize;
-begin
-  srvsetting.destroy;
-end;
-
-initialization
-
-initialize;
-
-finalization
-
-finalize;
 
 end.
 
