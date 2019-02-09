@@ -27,14 +27,26 @@ interface
 
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls, comctrls,
-  buttons, menus, spin, vppaths, vpsetting, vpdriver, bgrabitmap,  types,
-  bgrabitmaptypes, bgravirtualscreen, bgragradientscanner;
+  buttons, menus, spin, vppaths, vpsetting, bgrabitmap,  types,
+  bgrabitmaptypes, bgravirtualscreen, lNetComponents, bgragradientscanner, sha1, lNet;
 
 type
   { tmainform }
 
   tmainform = class(tform)
-    bevel: tbevel;
+    bevel: TBevel;
+    leftdownbtn: TBitBtn;
+    edit: TSpinEdit;
+    leftupbtn: TBitBtn;
+    ltcp: TLTCPComponent;
+    calibrationpanel: TPanel;
+    disconnectmi: TMenuItem;
+    calibrationmi: TMenuItem;
+    n10: TMenuItem;
+    pendownbtn: TBitBtn;
+    penupbtn: TBitBtn;
+    rightdownbtn: TBitBtn;
+    rightupbtn: TBitBtn;
     statuslabel: TLabel;
     screen: TBGRAVirtualScreen;
     divideselpm: tmenuitem;
@@ -60,8 +72,7 @@ type
     popup: tpopupmenu;
     mainmenu: tmainmenu;
     editmi: tmenuitem;
-    calibrationmi: tmenuitem;
-    layoutmi: tmenuitem;
+    connectmi: tmenuitem;
     a0mi: tmenuitem;
     a1mi: tmenuitem;
     a2mi: tmenuitem;
@@ -70,7 +81,6 @@ type
     a5mi: tmenuitem;
     horizontalmi: tmenuitem;
     movetohomemi: tmenuitem;
-    n8: tmenuitem;
     verticalmi: tmenuitem;
     n7: tmenuitem;
     rotate90mi: tmenuitem;
@@ -80,7 +90,6 @@ type
     mirrorymi: tmenuitem;
     n6: tmenuitem;
     killmi: tmenuitem;
-    n5: tmenuitem;
     savedialog: tsavedialog;
     stopmi: tmenuitem;
     startmi: tmenuitem;
@@ -105,11 +114,14 @@ type
     filemi: tmenuitem;
     opendialog: topendialog;
 
+    procedure calibrationmiClick(Sender: TObject);
     procedure formcreate           (sender: tobject);
     procedure formdestroy          (sender: tobject);
-    procedure formclose            (sender: tobject; var closeaction: tcloseaction);
+    procedure leftupbtnClick(Sender: TObject);
     // MAIN MENU::FILE
     procedure loadmiclick          (sender: tobject);
+    procedure ltcpReceive(aSocket: TLSocket);
+    procedure penupbtnClick(Sender: TObject);
     procedure savemiclick          (sender: tobject);
     procedure clearmiclick         (sender: tobject);
     procedure importmiclick        (sender: tobject);
@@ -124,16 +136,16 @@ type
     procedure offsetmiclick        (sender: tobject);
     procedure a0miclick            (sender: tobject);
     procedure horizontalmiclick    (sender: tobject);
-    procedure layoutmiclick        (sender: tobject);
     // MAIN-MENU::VIEW
     procedure zoomoutmiclick       (sender: tobject);
     procedure zoominmiclick        (sender: tobject);
     procedure fitmiclick           (sender: tobject);
     // MAIN-MENU::PRINTER
+    procedure connectmiclick       (sender: tobject);
     procedure startmiclick         (sender: tobject);
     procedure stopmiclick          (sender: tobject);
     procedure killmiclick          (sender: tobject);
-    procedure calibrationmiclick   (sender: tobject);
+
     procedure movetohomemiclick    (sender: tobject);
     procedure toolpathmiclick      (sender: tobject);
     // MAIN-FORM::HELP
@@ -163,8 +175,6 @@ type
       wheeldelta: integer; mousepos: tpoint; var handled: boolean);
   private
          bit: tbgrabitmap;
-   starttime: tdatetime;
-   tickcount: longint;
  mouseisdown: boolean;
           px: longint;
           py: longint;
@@ -174,6 +184,9 @@ type
        paths: tvppaths;
         zoom: single;
 
+
+      buffer: tstringlist;
+
        movex: longint;
        movey: longint;
       locked: boolean;
@@ -181,9 +194,6 @@ type
     // ---
     procedure lockinternal1(value: boolean);
     procedure lockinternal2(value: boolean);
-    procedure onplotterstart;
-    procedure onplotterstop;
-    procedure onplottertick;
   public
     procedure lock1;
     procedure lock2;
@@ -202,24 +212,18 @@ implementation
 {$R *.lfm}
 
 uses
-  math, sysutils, aboutfrm, calibrationfrm, offsetfrm,
+  math, sysutils, aboutfrm, offsetfrm,
   scalefrm, vpmath, vpsvgreader, vpdxfreader, vpwave, sketchyimage;
 
 // FORM EVENTS
 
 procedure tmainform.formcreate(sender: tobject);
-var
-  mx: longint;
-  my: longint;
 begin
+  // buffer
+  buffer := tstringlist.create;
   // load setting
   setting := tvpsetting.create;
   setting.load(changefileext(paramstr(0), '.ini'));
-  // create plotter driver
-  driver         := tvpdriver.create;
-  driver.xdelay  := setting.xdelay;
-  driver.ydelay  := setting.ydelay;
-  driver.zdelay  := setting.zdelay;
   // create preview and empty paths
     bit := tbgrabitmap.create;
   paths := tvppaths.create;
@@ -232,30 +236,61 @@ begin
     setting.wave);
   wave.enabled := false;
   wave.test;
-  // initialize driver
-  optimize(setting.layout09, mx, my);
-  driver.init(mx, my);
+  // connect to server
+  connectmiclick(nil);
 end;
 
 procedure tmainform.formdestroy(sender: tobject);
 begin
-  movetohomemiclick(sender);
-  // ---
+  if ltcp.connected then
+    ltcp.disconnect(true);
   wave.destroy;
   paths.destroy;
   bit.destroy;
-  driver.destroy;
   setting.destroy;
+  buffer.destroy;
 end;
 
-procedure tmainform.formclose(sender: tobject; var closeaction: tcloseaction);
+procedure tmainform.leftupbtnclick(sender: tobject);
+var
+  mx: longint = 0;
+  my: longint = 0;
+   s: string;
 begin
-  if assigned(driverthread) then
+  if sender = leftupbtn    then mx := - edit.value;
+  if sender = leftdownbtn  then mx := + edit.value;
+  if sender = rightupbtn   then my := - edit.value;
+  if sender = rightdownbtn then my := + edit.value;
+
+  if ltcp.connected then
   begin
-    messagedlg('vPlotter Error', 'There is an active process!', mterror, [mbok], 0);
-    closeaction := canone;
-  end else
-    closeaction := cafree;
+    buffer.clear;
+    buffer.add(format('MOVED X%u Y%u Z%u', [ 0,  0, $F]));
+    buffer.add(format('INIT  X%u Y%u Z%u', [mx, my, $F]));
+
+    s := sha1print(sha1string(buffer.text));
+    buffer.add(format('END SHA1%s', [s]));
+    ltcp.sendmessage('BEGIN');
+  end;
+end;
+
+procedure tmainform.penupbtnclick(sender: tobject);
+var
+  mz: longint = 0;
+   s: string;
+begin
+  if sender = penupbtn   then mz := + $F;
+  if sender = pendownbtn then mz := - $F;
+
+  if ltcp.connected then
+  begin
+    buffer.clear;
+    buffer.add(format('MOVED X%u Y%u Z%u', [ 0,  0, mz]));
+
+    s := sha1print(sha1string(buffer.text));
+    buffer.add(format('END SHA1%s', [s]));
+    ltcp.sendmessage('BEGIN');
+  end;
 end;
 
 // MAIN-MENU::FILE
@@ -512,90 +547,52 @@ end;
 
 // MAIN MENU::PRINT
 
+procedure tmainform.connectmiclick(sender: tobject);
+begin
+  connectmi    .enabled := not ltcp.connect(setting.srvip, setting.srvport); ;
+  disconnectmi .enabled := not connectmi.enabled;
+  startmi      .enabled := not connectmi.enabled;
+  stopmi       .enabled := not connectmi.enabled;
+  killmi       .enabled := not connectmi.enabled;
+  calibrationmi.enabled := not connectmi.enabled;
+  movetohomemi .enabled := not connectmi.enabled;
+
+  if ltcp.connecting then
+    statuslabel.caption := 'Connected'
+  else
+    statuslabel.caption := 'Not connected';
+end;
+
 procedure tmainform.startmiclick(sender: tobject);
 begin
-  driver.xoff := false;
-  driver.yoff := false;
-  driver.zoff := false;
-  if assigned(driverthread) then
-  begin
-    driverthread.enabled := true;
-  end else
-  begin
-    driverthread         := tvpdriverthread.create(paths);
-    driverthread.xcenter := setting.layout08.x;
-    driverthread.ycenter := setting.layout08.y+pageheight/2;
-    driverthread.xmax    := pagewidth /2 + 2;
-    driverthread.ymax    := pageheight/2 + 2;
-    driverthread.onstart := @onplotterstart;
-    driverthread.onstop  := @onplotterstop;
-    driverthread.ontick  := @onplottertick;
-    driverthread.start;
-  end;
-  starttime := now;
-  tickcount := 0
+  if ltcp.connected then
+    ltcp.sendmessage('START');
 end;
 
 procedure tmainform.stopmiclick(sender: tobject);
 begin
-  if assigned(driverthread) then
-  begin
-    driverthread.enabled := false;
-  end;
-  driver.zcount := setting.zmax;
-  driver.xoff   := true;
-  driver.yoff   := true;
-  driver.zoff   := true;
+  if ltcp.connected then
+    ltcp.sendmessage('STOP');
 end;
 
 procedure tmainform.killmiclick(sender: tobject);
 begin
-  if assigned(driverthread) then
-  begin
-    driverthread.terminate;
-    driverthread.enabled := true;
-  end;
+  if ltcp.connected then
+    ltcp.sendmessage('KILL');
 end;
 
 procedure tmainform.calibrationmiclick(sender: tobject);
-var
-  f: tcalibrationform;
 begin
-  f := tcalibrationform.create(nil);
-  f.showmodal;
-  f.destroy;
+  lock2;
+  calibrationmi   .enabled := true;
+  calibrationmi   .checked := not calibrationmi.checked;
+  calibrationpanel.visible :=     calibrationmi.checked;
 end;
 
 procedure tmainform.movetohomemiclick(sender: tobject);
-var
-  mx: longint = 0;
-  my: longint = 0;
 begin
-  driver.zcount := setting.zmax;
-  driver.xoff   := false;
-  driver.yoff   := false;
-  driver.zoff   := false;
-
-  optimize(setting.layout09, mx, my);
-  driver.move(mx, my);
-end;
-
-procedure tmainform.layoutmiclick(sender: tobject);
-var
-  mx: longint = 0;
-  my: longint = 0;
-begin
-  movetohomemiclick(sender);
-  // load configuration
-  setting.clear;
-  setting.load(changefileext(paramstr(0), '.ini'));
-  // update plotter driver
-  driver.xdelay := setting.xdelay;
-  driver.ydelay := setting.ydelay;
-  driver.zdelay := setting.zdelay;
-
-  optimize(setting.layout09, mx, my);
-  driver.init(mx, my);
+  if ltcp.connected then
+    ltcp.sendmessage('HOME');
 end;
 
 // MAIN-MENU::HELP
@@ -927,12 +924,13 @@ begin
   zoomoutmi    .enabled := value;
   fitmi        .enabled := value;
   // main menu::printer
+  connectmi    .enabled := value;
+  disconnectmi .enabled := value;
   startmi      .enabled := true;
   stopmi       .enabled := true;
   killmi       .enabled := true;
   calibrationmi.enabled := value;
   movetohomemi .enabled := value;
-  layoutmi     .enabled := value;
   // main menu::help
   aboutmi      .enabled := value;
   // popup menu
@@ -963,12 +961,13 @@ begin
   zoomoutmi    .enabled := value;
   fitmi        .enabled := value;
   // main menu::printer
+  connectmi    .enabled := value;
+  disconnectmi .enabled := value;
   startmi      .enabled := value;
   stopmi       .enabled := value;
   killmi       .enabled := value;
   calibrationmi.enabled := value;
   movetohomemi .enabled := value;
-  layoutmi     .enabled := value;
   // main menu::help
   aboutmi      .enabled := value;
   // popup menu
@@ -999,38 +998,24 @@ begin
   lockinternal1(true);
 end;
 
-// PLOTTER THREAD EVENTS
+// LTCP EVENTS
 
-procedure tmainform.onplotterstart;
+procedure tmainform.ltcpreceive(asocket: tlsocket);
+var
+   m: ansistring;
 begin
-  lock1;
-  statuslabel.caption := '';
-  application.processmessages;
-end;
-
-procedure tmainform.onplotterstop;
-begin
-  driverthread  := nil;
-  driver.xoff   := false;
-  driver.yoff   := false;
-  driver.zoff   := false;
-  driver.zcount := setting.zmax;
-
-  unlock1;
-  statuslabel.caption := '';
-  application.processmessages;
-end;
-
-procedure tmainform.onplottertick;
-begin
-  inc(tickcount);
-  if(tickcount mod 800) = 0 then
+  if ltcp.getmessage(m) > 0 then
   begin
-    statuslabel.caption := 'Remaining Time ' +
-      formatdatetime('hh:nn:ss', (now-starttime)/tickcount*driverthread.tick);
-  end;
-  application.processmessages;
+    if buffer.count > 0 then
+    begin
+      ltcp.sendmessage(buffer[0]);
+      buffer.delete(0);
+    end;
+  end else
+    unlock2;
 end;
+
+
 
 end.
 

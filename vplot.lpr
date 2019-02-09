@@ -24,8 +24,8 @@ program vplot;
 
 uses
   cthreads, interfaces, forms, mainfrm, vpsetting, vppaths,
-  aboutfrm, vpmath, vpwave, calibrationfrm, scalefrm, offsetfrm, vpsvgreader,
-  vpdriverthread;
+  aboutfrm, vpmath, vpwave, scalefrm, offsetfrm, vpsvgreader,
+  lnetvisual;
 
   {$R *.res}
 
