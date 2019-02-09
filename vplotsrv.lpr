@@ -119,17 +119,14 @@ begin
 
       if m = 'START' then
       begin
-        writeln('fvth.enabled := true;');
         fvth.enabled := true;
       end else
       if m = 'STOP' then
       begin
-        writeln('fvth.enabled := false;');
         fvth.enabled := false;
       end else
       if m = 'KILL' then
       begin
-        writeln('fvth.terminate;');
         fvth.terminate;
         fvth.enabled := true;
       end else
@@ -138,30 +135,29 @@ begin
         writeln('INFO;');
       end;
 
-
-
     end else
     begin
 
       if m = 'BEGIN' then
       begin
-        writeln('flst.clear;');
         flst.clear;
       end else
       if pos('END ', m) = 1 then
       begin
+
+
+        writeln(m);
         parse_prefix('SHA1', m, s);
-        if s = sha1print(sha1string(flst.text)) then
+        writeln(s);
+
+
+        // if s = sha1print(sha1string(flst.text)) then
         begin
-
-          writeln('s = sha1print(sha1string(flst.text)) = true');
-
-          // fvth := tvplotthread.create(flst);
-          // fvth.start;
+          fvth := tvplotthread.create(flst);
+          fvth.start;
         end;
       end else
       begin
-        writeln('flst.add(m);');
         flst.add(m);
       end;
 

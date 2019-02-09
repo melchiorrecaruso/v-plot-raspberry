@@ -34,8 +34,8 @@
         <Filename Value="vplotsrv.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="137"/>
-        <CursorPos X="20" Y="157"/>
+        <TopLine Value="131"/>
+        <CursorPos X="18" Y="151"/>
         <FoldState Value=" T3iM0G1M"/>
         <UsageCount Value="31"/>
         <Loaded Value="True"/>
@@ -65,7 +65,7 @@
       <Unit4>
         <Filename Value="src/vpsrvdriver.pas"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="225"/>
+        <TopLine Value="198"/>
         <CursorPos X="112" Y="227"/>
         <UsageCount Value="13"/>
         <Loaded Value="True"/>
@@ -135,123 +135,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="src/vpsrvsetting.pas"/>
-        <Caret Line="128" Column="3" TopLine="103"/>
+        <Caret Line="122" Column="23" TopLine="106"/>
       </Position1>
       <Position2>
         <Filename Value="src/vpsrvsetting.pas"/>
-        <Caret Line="120" Column="3" TopLine="106"/>
+        <Caret Line="150" Column="3" TopLine="107"/>
       </Position2>
       <Position3>
         <Filename Value="src/vpsrvsetting.pas"/>
-        <Caret Line="124" TopLine="106"/>
+        <Caret Line="120" Column="5" TopLine="107"/>
       </Position3>
       <Position4>
         <Filename Value="src/vpsrvsetting.pas"/>
-        <Caret Line="122" Column="23" TopLine="106"/>
+        <Caret Line="124" Column="57" TopLine="107"/>
       </Position4>
       <Position5>
         <Filename Value="src/vpsrvsetting.pas"/>
-        <Caret Line="150" Column="3" TopLine="107"/>
+        <Caret Line="123" Column="51" TopLine="107"/>
       </Position5>
       <Position6>
         <Filename Value="src/vpsrvsetting.pas"/>
-        <Caret Line="120" Column="5" TopLine="107"/>
+        <Caret Line="86" Column="48" TopLine="19"/>
       </Position6>
       <Position7>
-        <Filename Value="src/vpsrvsetting.pas"/>
-        <Caret Line="124" Column="57" TopLine="107"/>
+        <Filename Value="vplotsrv.lpr"/>
+        <Caret Line="27" Column="60" TopLine="4"/>
       </Position7>
       <Position8>
-        <Filename Value="src/vpsrvsetting.pas"/>
-        <Caret Line="123" Column="51" TopLine="107"/>
+        <Filename Value="vplotsrv.lpr"/>
+        <Caret Line="287" Column="3" TopLine="252"/>
       </Position8>
       <Position9>
-        <Filename Value="src/vpsrvsetting.pas"/>
-        <Caret Line="86" Column="48" TopLine="19"/>
+        <Filename Value="vplotsrv.lpr"/>
+        <Caret Line="288" Column="3" TopLine="252"/>
       </Position9>
       <Position10>
         <Filename Value="vplotsrv.lpr"/>
-        <Caret Line="27" Column="60" TopLine="4"/>
+        <Caret Line="295" Column="3" TopLine="252"/>
       </Position10>
       <Position11>
-        <Filename Value="vplotsrv.lpr"/>
-        <Caret Line="287" Column="3" TopLine="252"/>
+        <Filename Value="src/vpsrvsetting.pas"/>
+        <Caret Line="86" Column="14" TopLine="64"/>
       </Position11>
       <Position12>
         <Filename Value="vplotsrv.lpr"/>
-        <Caret Line="288" Column="3" TopLine="252"/>
+        <Caret Line="287" Column="18" TopLine="252"/>
       </Position12>
       <Position13>
-        <Filename Value="vplotsrv.lpr"/>
-        <Caret Line="295" Column="3" TopLine="252"/>
+        <Filename Value="src/vpsrvsetting.pas"/>
+        <Caret Line="86" Column="28" TopLine="57"/>
       </Position13>
       <Position14>
-        <Filename Value="src/vpsrvsetting.pas"/>
-        <Caret Line="86" Column="14" TopLine="64"/>
+        <Filename Value="vplotsrv.lpr"/>
+        <Caret Line="121" TopLine="98"/>
       </Position14>
       <Position15>
         <Filename Value="vplotsrv.lpr"/>
-        <Caret Line="287" Column="18" TopLine="252"/>
+        <Caret Line="122" Column="25" TopLine="99"/>
       </Position15>
       <Position16>
-        <Filename Value="src/vpsrvsetting.pas"/>
-        <Caret Line="86" Column="28" TopLine="57"/>
+        <Filename Value="vplotsrv.lpr"/>
+        <Caret Line="119" Column="26" TopLine="99"/>
       </Position16>
       <Position17>
         <Filename Value="vplotsrv.lpr"/>
-        <Caret Line="121" TopLine="98"/>
+        <Caret Line="53" Column="9" TopLine="16"/>
       </Position17>
       <Position18>
         <Filename Value="vplotsrv.lpr"/>
-        <Caret Line="122" Column="25" TopLine="99"/>
+        <Caret Line="305" Column="5" TopLine="269"/>
       </Position18>
       <Position19>
-        <Filename Value="vplotsrv.lpr"/>
-        <Caret Line="119" Column="26" TopLine="99"/>
+        <Filename Value="src/vpsrvsetting.pas"/>
+        <Caret Line="151" Column="57" TopLine="121"/>
       </Position19>
       <Position20>
         <Filename Value="vplotsrv.lpr"/>
-        <Caret Line="53" Column="9" TopLine="16"/>
+        <Caret Line="265" Column="37" TopLine="232"/>
       </Position20>
       <Position21>
-        <Filename Value="vplotsrv.lpr"/>
-        <Caret Line="305" Column="5" TopLine="269"/>
+        <Filename Value="src/vpsrvdriver.pas"/>
+        <Caret Line="135" Column="9" TopLine="118"/>
       </Position21>
       <Position22>
-        <Filename Value="src/vpsrvsetting.pas"/>
-        <Caret Line="151" Column="57" TopLine="121"/>
+        <Filename Value="src/vpsrvdriver.pas"/>
+        <Caret Line="150" Column="9" TopLine="134"/>
       </Position22>
       <Position23>
-        <Filename Value="vplotsrv.lpr"/>
-        <Caret Line="265" Column="37" TopLine="232"/>
+        <Filename Value="src/vpsrvdriver.pas"/>
+        <Caret Line="207" Column="11" TopLine="191"/>
       </Position23>
       <Position24>
         <Filename Value="src/vpsrvdriver.pas"/>
-        <Caret Line="135" Column="9" TopLine="118"/>
+        <Caret Line="213" Column="23" TopLine="196"/>
       </Position24>
       <Position25>
         <Filename Value="src/vpsrvdriver.pas"/>
-        <Caret Line="150" Column="9" TopLine="134"/>
+        <Caret Line="218" Column="13" TopLine="201"/>
       </Position25>
       <Position26>
         <Filename Value="src/vpsrvdriver.pas"/>
-        <Caret Line="207" Column="11" TopLine="191"/>
+        <Caret Line="64" Column="36" TopLine="45"/>
       </Position26>
       <Position27>
-        <Filename Value="src/vpsrvdriver.pas"/>
-        <Caret Line="213" Column="23" TopLine="196"/>
+        <Filename Value="vplotsrv.lpr"/>
+        <Caret Line="202" Column="17" TopLine="193"/>
       </Position27>
       <Position28>
-        <Filename Value="src/vpsrvdriver.pas"/>
-        <Caret Line="218" Column="13" TopLine="201"/>
+        <Filename Value="vplotsrv.lpr"/>
+        <Caret Line="150" Column="44" TopLine="132"/>
       </Position28>
       <Position29>
-        <Filename Value="src/vpsrvdriver.pas"/>
-        <Caret Line="64" Column="36" TopLine="45"/>
+        <Filename Value="vplotsrv.lpr"/>
+        <Caret Line="149" Column="16" TopLine="130"/>
       </Position29>
       <Position30>
         <Filename Value="vplotsrv.lpr"/>
-        <Caret Line="202" Column="17" TopLine="193"/>
+        <Caret Line="150" Column="44" TopLine="131"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>
