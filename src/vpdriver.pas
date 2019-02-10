@@ -132,7 +132,7 @@ var
 begin
   {$ifdef cpuarm}
   dx := axcount - fxcount;
-  if srvsetting.xdir = 0 then
+  if setting.xdir = 0 then
   begin
     if dx < 0 then
       digitalwrite(motx_dir,  LOW)
@@ -147,7 +147,7 @@ begin
   end;
 
   dy := aycount - fycount;
-  if srvsetting.ydir = 0 then
+  if setting.ydir = 0 then
   begin;
     if dy < 0 then
       digitalwrite(moty_dir,  LOW)
@@ -204,24 +204,24 @@ begin
   {$ifdef cpuarm}
   if fzcount > value then
   begin
-    if srvsetting.zdir = 0 then
+    if setting.zdir = 0 then
       delaymicroseconds($f*fzdelay);
     while fzcount > value do
     begin
       pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fzcount/100, motz_freq));
       delaymicroseconds(fzdelay);
-      dec(fzcount, srvsetting.zinc);
+      dec(fzcount, setting.zinc);
     end;
   end else
     if fzcount < value then
     begin
-      if srvsetting.zdir = 1 then
+      if setting.zdir = 1 then
         delaymicroseconds($f*fzdelay);
       while fzcount < value do
       begin
         pwmwrite(PCA9685_PIN_BASE + 0, calcticks(fzcount/100, motz_freq));
         delaymicroseconds(fzdelay);
-        inc(fzcount, srvsetting.zinc);
+        inc(fzcount, setting.zinc);
       end;
     end;
   {$endif}

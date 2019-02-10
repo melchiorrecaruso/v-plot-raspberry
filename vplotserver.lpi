@@ -29,13 +29,13 @@
         <PackageName Value="lnetbase"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="20">
+    <Units Count="21">
       <Unit0>
         <Filename Value="vplotserver.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="136"/>
-        <CursorPos X="43" Y="170"/>
+        <TopLine Value="306"/>
+        <CursorPos X="58" Y="335"/>
         <FoldState Value=" T3iR0H1e"/>
         <UsageCount Value="38"/>
         <Loaded Value="True"/>
@@ -65,11 +65,10 @@
       </Unit3>
       <Unit4>
         <Filename Value="src/vpsrvdriver.pas"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="30"/>
         <CursorPos X="21" Y="64"/>
         <UsageCount Value="16"/>
-        <Loaded Value="True"/>
       </Unit4>
       <Unit5>
         <Filename Value="src/vpmath.pas"/>
@@ -169,40 +168,41 @@
       <Unit19>
         <Filename Value="src/vpsetting.pas"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="47" Y="23"/>
+        <TopLine Value="191"/>
+        <CursorPos X="5" Y="206"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit19>
+      <Unit20>
+        <Filename Value="src/vpdriver.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="62"/>
+        <CursorPos X="20" Y="82"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit20>
     </Units>
-    <JumpHistory Count="7" HistoryIndex="6">
+    <JumpHistory Count="5" HistoryIndex="4">
       <Position1>
-        <Filename Value="src/vpsrvdriver.pas"/>
-        <Caret Line="61" Column="7" TopLine="61"/>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="170" Column="43" TopLine="136"/>
       </Position1>
       <Position2>
-        <Filename Value="src/vpsrvdriver.pas"/>
-        <Caret Line="29" Column="68" TopLine="6"/>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="27" Column="66" TopLine="7"/>
       </Position2>
       <Position3>
-        <Filename Value="src/vpsrvdriver.pas"/>
-        <Caret Line="32" Column="15" TopLine="8"/>
+        <Filename Value="src/vpdriver.pas"/>
+        <Caret Line="135" Column="6" TopLine="115"/>
       </Position3>
       <Position4>
-        <Filename Value="src/vpsrvdriver.pas"/>
-        <Caret Line="87" Column="15" TopLine="59"/>
+        <Filename Value="src/vpdriver.pas"/>
+        <Caret Line="150" Column="6" TopLine="131"/>
       </Position4>
       <Position5>
-        <Filename Value="src/vpsrvdriver.pas"/>
-        <Caret Line="110" Column="13" TopLine="88"/>
+        <Filename Value="src/vpdriver.pas"/>
+        <Caret Line="224" Column="22" TopLine="188"/>
       </Position5>
-      <Position6>
-        <Filename Value="src/vpsrvdriver.pas"/>
-        <Caret Line="247" Column="3" TopLine="213"/>
-      </Position6>
-      <Position7>
-        <Filename Value="src/vpsrvdriver.pas"/>
-        <Caret Line="235" Column="17" TopLine="212"/>
-      </Position7>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

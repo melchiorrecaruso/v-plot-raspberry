@@ -24,7 +24,7 @@ program vplotserver;
 {$mode objfpc}
 
 uses
- cthreads, cmem, classes, crt, lnet, lnetbase, sha1, sysutils, vpsrvdriver, vpsetting;
+ cthreads, cmem, classes, crt, lnet, lnetbase, sha1, sysutils, vpdriver, vpsetting;
 
 type
 
@@ -331,15 +331,15 @@ var
   vploserver: tvplotserver;
 
 begin
-  driver     := tvpdriver.create;
   setting    := tvpsetting.create;
-  setting.load(extractfilepath(paramstr(0) + 'vplot.ini'));
+  setting.load(extractfilepath(paramstr(0)) + 'vplot.ini');
+  driver     := tvpdriver.create;
   begin
     vploserver := tvplotserver.create;
     vploserver.start;
     vploserver.destroy;
   end;
-  setting.destroy;
   driver.destroy;
+  setting.destroy;
 end.
 

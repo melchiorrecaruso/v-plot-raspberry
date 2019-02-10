@@ -203,7 +203,7 @@ begin
   fip          := ini.readstring ('NETWORK', 'IP',    '');
   fport        := ini.readinteger('NETWORK', 'PORT',   0);
 
-  if enabledebug then
+  //if enabledebug then
   begin
     writeln(format('  LAYOUT::0.X    = %12.5f  00.Y = %12.5f', [flayout0.x, flayout0.y]));
     writeln(format('  LAYOUT::1.X    = %12.5f  01.Y = %12.5f', [flayout1.x, flayout1.y]));
