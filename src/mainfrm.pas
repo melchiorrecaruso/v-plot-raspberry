@@ -115,6 +115,7 @@ type
     opendialog: topendialog;
 
     procedure calibrationmiClick(Sender: TObject);
+    procedure disconnectmiClick(Sender: TObject);
     procedure formcreate           (sender: tobject);
     procedure formdestroy          (sender: tobject);
     procedure leftupbtnClick(Sender: TObject);
@@ -552,6 +553,11 @@ end;
 procedure tmainform.connectmiclick(sender: tobject);
 begin
   ltcp.connect(setting.srvip, setting.srvport);
+end;
+
+procedure tmainform.disconnectmiclick(sender: tobject);
+begin
+  ltcp.disconnect(true);
 end;
 
 procedure tmainform.startmiclick(sender: tobject);

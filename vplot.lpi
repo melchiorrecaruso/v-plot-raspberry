@@ -219,9 +219,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="260"/>
-        <CursorPos X="30" Y="277"/>
-        <FoldState Value=" T3yC0h4 pj6kI03]9iXj5031-"/>
+        <TopLine Value="257"/>
+        <CursorPos X="3" Y="263"/>
+        <FoldState Value=" T3yI0h4 pj6kI03]9iXj5031S"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1544,123 +1544,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="537" Column="11" TopLine="514"/>
+        <Caret Line="904" Column="15" TopLine="881"/>
       </Position1>
       <Position2>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="530" TopLine="520"/>
+        <Caret Line="946" Column="34" TopLine="910"/>
       </Position2>
       <Position3>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="566" Column="56" TopLine="542"/>
+        <Caret Line="976" TopLine="852"/>
       </Position3>
       <Position4>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="572" Column="5" TopLine="558"/>
+        <Caret Line="192" Column="45" TopLine="170"/>
       </Position4>
       <Position5>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="895" Column="57" TopLine="879"/>
+        <Caret Line="30" Column="41"/>
       </Position5>
       <Position6>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="904" Column="15" TopLine="881"/>
+        <Caret Line="119" Column="54" TopLine="101"/>
       </Position6>
       <Position7>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="946" Column="34" TopLine="910"/>
+        <Caret Line="186" Column="7" TopLine="167"/>
       </Position7>
       <Position8>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="976" TopLine="852"/>
+        <Caret Line="259" Column="12" TopLine="231"/>
       </Position8>
       <Position9>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="192" Column="45" TopLine="170"/>
+        <Caret Line="31" Column="80"/>
       </Position9>
       <Position10>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="30" Column="41"/>
+        <Caret Line="262" TopLine="237"/>
       </Position10>
       <Position11>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="119" Column="54" TopLine="101"/>
+        <Caret Line="258" Column="45" TopLine="237"/>
       </Position11>
       <Position12>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="186" Column="7" TopLine="167"/>
+        <Caret Line="259" Column="45" TopLine="237"/>
       </Position12>
       <Position13>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="259" Column="12" TopLine="231"/>
+        <Caret Line="269" Column="42" TopLine="246"/>
       </Position13>
       <Position14>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="31" Column="80"/>
+        <Caret Line="270" Column="42" TopLine="247"/>
       </Position14>
       <Position15>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="262" TopLine="237"/>
+        <Caret Line="256" Column="19" TopLine="239"/>
       </Position15>
       <Position16>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="258" Column="45" TopLine="237"/>
+        <Caret Line="290" Column="43" TopLine="252"/>
       </Position16>
       <Position17>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="259" Column="45" TopLine="237"/>
+        <Caret Line="287" Column="55" TopLine="259"/>
       </Position17>
       <Position18>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="269" Column="42" TopLine="246"/>
+        <Caret Line="273" Column="28" TopLine="261"/>
       </Position18>
       <Position19>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="270" Column="42" TopLine="247"/>
+        <Caret Line="1009" Column="7" TopLine="888"/>
       </Position19>
       <Position20>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="256" Column="19" TopLine="239"/>
+        <Caret Line="1010" Column="13" TopLine="888"/>
       </Position20>
       <Position21>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="290" Column="43" TopLine="252"/>
+        <Caret Line="560" Column="26" TopLine="541"/>
       </Position21>
       <Position22>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="287" Column="55" TopLine="259"/>
+        <Caret Line="542" Column="92"/>
       </Position22>
       <Position23>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="273" Column="28" TopLine="261"/>
+        <Caret Line="559" TopLine="544"/>
       </Position23>
       <Position24>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="1009" Column="7" TopLine="888"/>
+        <Caret Line="558" Column="48" TopLine="544"/>
       </Position24>
       <Position25>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="1010" Column="13" TopLine="888"/>
+        <Caret Line="993" TopLine="885"/>
       </Position25>
       <Position26>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="560" Column="26" TopLine="541"/>
+        <Caret Line="277" Column="30" TopLine="260"/>
       </Position26>
       <Position27>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="542" Column="92"/>
+        <Caret Line="556" Column="6" TopLine="552"/>
       </Position27>
       <Position28>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="559" TopLine="544"/>
+        <Caret Line="560" Column="31" TopLine="537"/>
       </Position28>
       <Position29>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="558" Column="48" TopLine="544"/>
+        <Caret Line="263" Column="3" TopLine="275"/>
       </Position29>
       <Position30>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="993" TopLine="885"/>
+        <Caret Line="285" Column="3" TopLine="266"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

@@ -1,7 +1,7 @@
 object mainform: Tmainform
   Left = 322
   Height = 448
-  Top = 180
+  Top = 182
   Width = 806
   Anchors = []
   Caption = 'vPlotter'
@@ -141,6 +141,7 @@ object mainform: Tmainform
         0000000000000000000000000000000000000000000000000000
       }
       Margin = 5
+      OnClick = leftupbtnClick
       TabOrder = 0
     end
     object penupbtn: TBitBtn
@@ -173,7 +174,7 @@ object mainform: Tmainform
       Width = 85
       Anchors = [akTop, akRight, akBottom]
       Caption = 'Pen Down'
-      OnClick = leftupbtnClick
+      OnClick = penupbtnClick
       TabOrder = 2
     end
     object rightdownbtn: TBitBtn
@@ -641,6 +642,7 @@ object mainform: Tmainform
       object disconnectmi: TMenuItem
         Caption = 'Disconnect'
         Enabled = False
+        OnClick = disconnectmiClick
       end
       object n10: TMenuItem
         Caption = '-'
