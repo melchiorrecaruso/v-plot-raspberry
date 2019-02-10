@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="11"/>
+    <General>
+      <Flags>
+        <MainUnitHasCreateFormStatements Value="False"/>
+        <MainUnitHasTitleStatement Value="False"/>
+        <MainUnitHasScaledStatement Value="False"/>
+      </Flags>
+      <MainUnit Value="0"/>
+      <Title Value="vplotserver"/>
+      <UseAppBundle Value="False"/>
+      <ResourceType Value="res"/>
+    </General>
+    <BuildModes Count="1" Active="Default">
+      <Item1 Name="Default" Default="True"/>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0"/>
+    </RunParams>
+    <RequiredPackages Count="1">
+      <Item1>
+        <PackageName Value="lnetbase"/>
+      </Item1>
+    </RequiredPackages>
+    <Units Count="20">
+      <Unit0>
+        <Filename Value="vplotserver.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="136"/>
+        <CursorPos X="43" Y="170"/>
+        <FoldState Value=" T3iR0H1e"/>
+        <UsageCount Value="38"/>
+        <Loaded Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="../../.lazarus/onlinepackagemanager/packages/lnet/examples/console/ltcp/lserver.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="77"/>
+        <CursorPos X="42" Y="121"/>
+        <UsageCount Value="10"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="../../.lazarus/onlinepackagemanager/packages/lnet/lib/lnet.pp"/>
+        <UnitName Value="lNet"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="338"/>
+        <CursorPos X="15" Y="386"/>
+        <UsageCount Value="10"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="src/vppaths.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="108"/>
+        <CursorPos X="20" Y="184"/>
+        <FoldState Value=" T3jU0I28"/>
+        <UsageCount Value="12"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="src/vpsrvdriver.pas"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="30"/>
+        <CursorPos X="21" Y="64"/>
+        <UsageCount Value="16"/>
+        <Loaded Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="src/vpmath.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="43"/>
+        <UsageCount Value="11"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="/usr/share/fpcsrc/3.0.4/packages/hash/src/md5.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="175"/>
+        <UsageCount Value="10"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="/usr/share/fpcsrc/3.0.4/packages/hash/src/crc.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <CursorPos X="67" Y="30"/>
+        <UsageCount Value="10"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="/usr/share/fpcsrc/3.0.4/packages/hash/src/sha1.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="31"/>
+        <CursorPos X="19" Y="49"/>
+        <UsageCount Value="11"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="src/vpgcode.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="58"/>
+        <CursorPos Y="73"/>
+        <UsageCount Value="11"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="/usr/share/fpcsrc/3.0.4/rtl/objpas/sysutils/sysstrh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="91"/>
+        <CursorPos X="52" Y="98"/>
+        <UsageCount Value="10"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="src/vpsrvsetting.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="12"/>
+        <CursorPos X="43" Y="29"/>
+        <UsageCount Value="14"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="/usr/share/fpcsrc/3.0.4/packages/fcl-base/src/inifiles.pp"/>
+        <UnitName Value="IniFiles"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="133"/>
+        <CursorPos X="14" Y="166"/>
+        <UsageCount Value="10"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="src/vpdriverthread.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="../fpc/source/rtl/objpas/classes/classesh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1689"/>
+        <CursorPos X="14" Y="1706"/>
+        <UsageCount Value="11"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="../fpc/source/rtl/unix/tthread.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="267"/>
+        <CursorPos X="3" Y="285"/>
+        <UsageCount Value="10"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="../fpc/source/packages/rtl-console/src/unix/crt.pp"/>
+        <UnitName Value="Crt"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="310"/>
+        <UsageCount Value="10"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="../fpc/source/rtl/objpas/sysutils/sysstrh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="103"/>
+        <CursorPos X="21" Y="118"/>
+        <UsageCount Value="10"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="../fpc/source/rtl/objpas/sysutils/sysstr.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="813"/>
+        <CursorPos X="5" Y="816"/>
+        <UsageCount Value="10"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="src/vpsetting.pas"/>
+        <EditorIndex Value="2"/>
+        <CursorPos X="47" Y="23"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit19>
+    </Units>
+    <JumpHistory Count="7" HistoryIndex="6">
+      <Position1>
+        <Filename Value="src/vpsrvdriver.pas"/>
+        <Caret Line="61" Column="7" TopLine="61"/>
+      </Position1>
+      <Position2>
+        <Filename Value="src/vpsrvdriver.pas"/>
+        <Caret Line="29" Column="68" TopLine="6"/>
+      </Position2>
+      <Position3>
+        <Filename Value="src/vpsrvdriver.pas"/>
+        <Caret Line="32" Column="15" TopLine="8"/>
+      </Position3>
+      <Position4>
+        <Filename Value="src/vpsrvdriver.pas"/>
+        <Caret Line="87" Column="15" TopLine="59"/>
+      </Position4>
+      <Position5>
+        <Filename Value="src/vpsrvdriver.pas"/>
+        <Caret Line="110" Column="13" TopLine="88"/>
+      </Position5>
+      <Position6>
+        <Filename Value="src/vpsrvdriver.pas"/>
+        <Caret Line="247" Column="3" TopLine="213"/>
+      </Position6>
+      <Position7>
+        <Filename Value="src/vpsrvdriver.pas"/>
+        <Caret Line="235" Column="17" TopLine="212"/>
+      </Position7>
+    </JumpHistory>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <Target>
+      <Filename Value="build/$(TargetCPU)-$(TargetOS)/bin/vplotserver"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir);src"/>
+      <OtherUnitFiles Value="src"/>
+      <UnitOutputDirectory Value="build/$(TargetCPU)-$(TargetOS)/lib"/>
+    </SearchPaths>
+    <Parsing>
+      <SyntaxOptions>
+        <CStyleOperator Value="False"/>
+        <IncludeAssertionCode Value="True"/>
+        <AllowLabel Value="False"/>
+        <CPPInline Value="False"/>
+        <UseAnsiStrings Value="False"/>
+      </SyntaxOptions>
+    </Parsing>
+    <CodeGeneration>
+      <Checks>
+        <IOChecks Value="True"/>
+        <RangeChecks Value="True"/>
+        <OverflowChecks Value="True"/>
+        <StackChecks Value="True"/>
+      </Checks>
+      <VerifyObjMethodCallValidity Value="True"/>
+      <Optimizations>
+        <OptimizationLevel Value="0"/>
+      </Optimizations>
+    </CodeGeneration>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="3">
+      <Item1>
+        <Name Value="EAbort"/>
+      </Item1>
+      <Item2>
+        <Name Value="ECodetoolError"/>
+      </Item2>
+      <Item3>
+        <Name Value="EFOpenError"/>
+      </Item3>
+    </Exceptions>
+  </Debugging>
+</CONFIG>
