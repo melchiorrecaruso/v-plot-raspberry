@@ -71,6 +71,7 @@ begin
   i := pos(prefix, code);
   if i > 0 then
   begin
+    i := i + length(prefix) - 1;
     while (i <= length(code)) and (code[i] <> ' ') do
     begin
       s := s + code[i];
@@ -144,14 +145,7 @@ begin
       end else
       if pos('SHA1', m) = 1 then
       begin
-        writeln(m);
         parse_prefix('SHA1', m, s);
-
-
-        writeln(s);
-
-
-
         if s = sha1print(sha1string(flst.text)) then
         begin
           fvth := tvplotthread.create(flst);
@@ -252,7 +246,6 @@ begin
     s := flist[i];
     writeln(s);
 
-    (*
     if pos('INIT ', s) = 1 then
     begin
       if parse_prefix('X', s, x) and
@@ -272,7 +265,7 @@ begin
           driver.zcount := srvsetting.zmin
         else
           driver.zcount := srvsetting.zmax;
-        driver.move(x, y);
+        //driver.move(x, y);
       end;
 
     end else
@@ -290,10 +283,9 @@ begin
           driver.zcount := srvsetting.zmin
         else
           driver.zcount := srvsetting.zmax;
-        driver.move(x, y);
+        //driver.move(x, y);
       end;
     end;
-    *)
 
   end;
 end;

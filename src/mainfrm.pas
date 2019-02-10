@@ -271,8 +271,8 @@ begin
     buffer.add(format('INIT  X%u Y%u Z%u', [mx, my, $F]));
 
     s := sha1print(sha1string(buffer.text));
-    buffer.add(format('END SHA1%s', [s]));
-    ltcp.sendmessage('BEGIN');
+    buffer.add(format('SHA1%s', [s]));
+    ltcp.sendmessage('SEND');
   end;
 end;
 
