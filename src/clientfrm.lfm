@@ -519,7 +519,7 @@ object clientform: Tclientform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 44
-    Top = 310
+    Top = 308
     Width = 806
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -878,6 +878,7 @@ object clientform: Tclientform
       end
       object disconnectmi: TMenuItem
         Caption = 'Disconnect'
+        Enabled = False
         OnClick = disconnectmiClick
       end
       object n10: TMenuItem
@@ -885,14 +886,17 @@ object clientform: Tclientform
       end
       object startmi: TMenuItem
         Caption = 'Start'
+        Enabled = False
         OnClick = startmiclick
       end
       object stopmi: TMenuItem
         Caption = 'Stop'
+        Enabled = False
         OnClick = stopmiclick
       end
       object killmi: TMenuItem
         Caption = 'Kill'
+        Enabled = False
         OnClick = killmiclick
       end
       object n6: TMenuItem
@@ -900,10 +904,12 @@ object clientform: Tclientform
       end
       object calibrationmi: TMenuItem
         Caption = 'Calibration ...'
+        Enabled = False
         OnClick = scalemiClick
       end
       object movetohomemi: TMenuItem
         Caption = 'Move to Home'
+        Enabled = False
         OnClick = movetohomemiclick
       end
     end
@@ -986,6 +992,7 @@ object clientform: Tclientform
   object ltcp: TLTCPComponent
     Port = 0
     OnReceive = ltcpReceive
+    OnError = ltcpError
     OnDisconnect = ltcpDisconnect
     OnConnect = ltcpConnect
     Timeout = 0

@@ -137,6 +137,7 @@ type
     procedure loadmiclick          (sender: tobject);
     procedure ltcpConnect(aSocket: TLSocket);
     procedure ltcpDisconnect(aSocket: TLSocket);
+    procedure ltcpError(const msg: string; aSocket: TLSocket);
     procedure ltcpReceive(aSocket: TLSocket);
     procedure offsetupdatebtnClick(Sender: TObject);
     procedure penupbtnClick(Sender: TObject);
@@ -237,7 +238,7 @@ uses
 
 // FORM EVENTS
 
-procedure Tclientform.formcreate(sender: tobject);
+procedure tclientform.formcreate(sender: tobject);
 var
   wavemesh: twavemesh;
 begin
@@ -286,7 +287,7 @@ begin
   buffer.destroy;
 end;
 
-procedure Tclientform.leftupbtnclick(sender: tobject);
+procedure tclientform.leftupbtnclick(sender: tobject);
 var
   mx: longint = 0;
   my: longint = 0;
@@ -306,10 +307,11 @@ begin
     s := sha1print(sha1string(buffer.text));
     buffer.add(format('SHA1%s', [s]));
     ltcp.sendmessage('SEND');
-  end;
+  end else
+    messagedlg('Error', 'Server is disconnected ', mterror, [mbok], 0);
 end;
 
-procedure Tclientform.penupbtnclick(sender: tobject);
+procedure tclientform.penupbtnclick(sender: tobject);
 var
   mz: longint = 0;
    s: string;
@@ -325,12 +327,13 @@ begin
     s := sha1print(sha1string(buffer.text));
     buffer.add(format('SHA1%s', [s]));
     ltcp.sendmessage('SEND');
-  end;
+  end else
+    messagedlg('Error', 'Server is disconnected ', mterror, [mbok], 0);
 end;
 
 // MAIN-MENU::FILE
 
-procedure Tclientform.loadmiclick(sender: tobject);
+procedure tclientform.loadmiclick(sender: tobject);
 begin
   opendialog.filter := 'vplot files (*.vplot)|*.vplot';
   if opendialog.execute then
@@ -345,7 +348,7 @@ begin
   end;
 end;
 
-procedure Tclientform.savemiclick(sender: tobject);
+procedure tclientform.savemiclick(sender: tobject);
 begin
   savedialog.filter := 'vplot files (*.vplot)|*.vplot';
   if savedialog.execute then
@@ -359,7 +362,7 @@ begin
   end;
 end;
 
-procedure Tclientform.clearmiclick(sender: tobject);
+procedure tclientform.clearmiclick(sender: tobject);
 begin
   caption := 'vPlotter';
 
@@ -369,7 +372,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.importmiclick(sender: tobject);
+procedure tclientform.importmiclick(sender: tobject);
 begin
   opendialog.filter := 'Supported files (*.svg, *.dxf)|*.svg; *.dxf';
   if opendialog.execute then
@@ -390,7 +393,7 @@ begin
   end;
 end;
 
-procedure Tclientform.exitmiclick(sender: tobject);
+procedure tclientform.exitmiclick(sender: tobject);
 begin
   close;
 end;
@@ -468,7 +471,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.a0miclick(sender: tobject);
+procedure tclientform.a0miclick(sender: tobject);
 var
   amin: longint = 297;
   amax: longint = 420;
@@ -503,7 +506,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.horizontalmiclick(sender: tobject);
+procedure tclientform.horizontalmiclick(sender: tobject);
 var
   amin: longint;
   amax: longint;
@@ -528,7 +531,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.toolpathmiclick(sender: tobject);
+procedure tclientform.toolpathmiclick(sender: tobject);
 begin
   lock2;
   paths.selectall(false);
@@ -539,7 +542,7 @@ end;
 
 // MAIN MENU::VIEW
 
-procedure Tclientform.zoominmiclick(sender: tobject);
+procedure tclientform.zoominmiclick(sender: tobject);
 var
   value: single;
 begin
@@ -554,7 +557,7 @@ begin
   end;
 end;
 
-procedure Tclientform.zoomoutmiclick(sender: tobject);
+procedure tclientform.zoomoutmiclick(sender: tobject);
 var
   value: single;
 begin
@@ -569,7 +572,7 @@ begin
   end;
 end;
 
-procedure Tclientform.fitmiclick(sender: tobject);
+procedure tclientform.fitmiclick(sender: tobject);
 begin
   zoom  := 1.0;
   movex := (screen.width  - pagewidth ) div 2;
@@ -579,14 +582,15 @@ end;
 
 // MAIN MENU::PRINT
 
-procedure Tclientform.connectmiclick(sender: tobject);
+procedure tclientform.connectmiclick(sender: tobject);
 begin
   ltcp.connect(setting.ip, setting.port);
 end;
 
 procedure tclientform.disconnectmiclick(sender: tobject);
 begin
-  ltcp.disconnect(true);
+  scalemiclick(sender);
+  ltcp.disconnect(false);
 end;
 
 procedure tclientform.startmiclick(sender: tobject);
@@ -949,13 +953,13 @@ begin
   zoomoutmi    .enabled := value;
   fitmi        .enabled := value;
   // main menu::printer
-  connectmi    .enabled := value;
-  disconnectmi .enabled := value;
-  startmi      .enabled := true;
-  stopmi       .enabled := true;
-  killmi       .enabled := true;
-  calibrationmi.enabled := value;
-  movetohomemi .enabled := value;
+//connectmi    .enabled := value;
+//disconnectmi .enabled := value;
+//startmi      .enabled := true;
+//stopmi       .enabled := true;
+//killmi       .enabled := true;
+//calibrationmi.enabled := value;
+//movetohomemi .enabled := value;
   // main menu::help
   aboutmi      .enabled := value;
   // popup menu
@@ -986,13 +990,13 @@ begin
   zoomoutmi    .enabled := value;
   fitmi        .enabled := value;
   // main menu::printer
-  connectmi    .enabled := value;
-  disconnectmi .enabled := value;
-  startmi      .enabled := value;
-  stopmi       .enabled := value;
-  killmi       .enabled := value;
-  calibrationmi.enabled := value;
-  movetohomemi .enabled := value;
+//connectmi    .enabled := value;
+//disconnectmi .enabled := value;
+//startmi      .enabled := value;
+//stopmi       .enabled := value;
+//killmi       .enabled := value;
+//calibrationmi.enabled := value;
+//movetohomemi .enabled := value;
   // main menu::help
   aboutmi      .enabled := value;
   // popup menu
@@ -1036,7 +1040,7 @@ begin
   movetohomemi .enabled := true;
 end;
 
-procedure Tclientform.ltcpDisconnect(aSocket: TLSocket);
+procedure tclientform.ltcpdisconnect(asocket: tlsocket);
 begin
   connectmi    .enabled := true;
   disconnectmi .enabled := false;
@@ -1047,6 +1051,12 @@ begin
   movetohomemi .enabled := false;
 end;
 
+procedure tclientform.ltcperror(const msg: string; asocket: tlsocket);
+begin
+  ltcpdisconnect(asocket);
+  messagedlg('Server Error', msg , mterror, [mbok], 0);
+end;
+
 procedure Tclientform.ltcpreceive(asocket: tlsocket);
 var
    m: ansistring;
@@ -1054,15 +1064,21 @@ begin
   if ltcp.getmessage(m) > 0 then
   begin
 
-
-
-
-
-    if buffer.count > 0 then
+    if m = 'UNLOKED' then
     begin
-      ltcp.sendmessage(buffer[0]);
-      buffer.delete(0);
-    end;
+      if buffer.count > 0 then
+      begin
+        ltcp.sendmessage(buffer[0]);
+        buffer.delete(0);
+      end;
+    end else
+    if m = 'LOCKED' then
+    begin
+
+
+    end else
+      statuslabel.caption := m;
+
   end else
     unlock2;
 end;
