@@ -26,39 +26,103 @@ unit vpsetting;
 interface
 
 uses
-  vpmath, vpwave;
+  inifiles, sysutils, vpmath;
 
 type
   tvpsetting = class
   private
-    flayout00: tvppoint;
-    flayout01: tvppoint;
-    flayout08: tvppoint;
-    flayout09: tvppoint;
-
-    fwave:     twavemesh;
+    // layout
+    flayout0:  tvppoint;
+    flayout1:  tvppoint;
+    flayout8:  tvppoint;
+    flayout9:  tvppoint;
+    // x-axis
+    fxmin:     longint;
+    fxmax:     longint;
+    fxinc:     longint;
+    fxdelay:   longint;
+    fxdir:     longint;
+    fxradius:  single;
+    fxratio:   single;
+    // y-axis
+    fymin:     longint;
+    fymax:     longint;
+    fyinc:     longint;
+    fydelay:   longint;
+    fydir:     longint;
+    fyradius:  single;
+    fyratio:   single;
+    // z-axis
+    fzmin:     longint;
+    fzmax:     longint;
+    fzinc:     longint;
+    fzdelay:   longint;
+    fzdir:     longint;
+    fzradius:  single;
+    fzratio:   single;
+    // wave
+    fwave0:    tvppoint;
+    fwave1:    tvppoint;
+    fwave2:    tvppoint;
+    fwave3:    tvppoint;
+    fwave4:    tvppoint;
+    fwave5:    tvppoint;
+    fwave6:    tvppoint;
+    fwave7:    tvppoint;
+    fwave8:    tvppoint;
     fwavexmax: single;
     fwaveymax: single;
-
-    fsrvip:    string;
-    fsrvport:  longint;
+    // network
+    fip:       string;
+    fport:     longint;
  public
     constructor create;
     destructor  destroy; override;
     procedure   load(const filename: rawbytestring);
-    procedure   clear;
  public
-    property layout00: tvppoint  read flayout00;
-    property layout01: tvppoint  read flayout01;
-    property layout08: tvppoint  read flayout08;
-    property layout09: tvppoint  read flayout09;
+    property layout0: tvppoint read flayout0;
+    property layout1: tvppoint read flayout1;
+    property layout8: tvppoint read flayout8;
+    property layout9: tvppoint read flayout9;
 
-    property wave:     twavemesh read fwave;
-    property wavexmax: single    read fwavexmax;
-    property waveymax: single    read fwaveymax;
+    property xmin:     longint read fxmin;
+    property xmax:     longint read fxmax;
+    property xinc:     longint read fxinc;
+    property xdelay:   longint read fxdelay;
+    property xdir:     longint read fxdir;
+    property xradius:  single  read fxradius;
+    property xratio:   single  read fxratio;
 
-    property srvip:    string    read fsrvip;
-    property srvport:  longint   read fsrvport;
+    property ymin:     longint read fymin;
+    property ymax:     longint read fymax;
+    property yinc:     longint read fyinc;
+    property ydelay:   longint read fydelay;
+    property ydir:     longint read fydir;
+    property yradius:  single  read fyradius;
+    property yratio:   single  read fyratio;
+
+    property zmin:     longint read fzmin;
+    property zmax:     longint read fzmax;
+    property zinc:     longint read fzinc;
+    property zdelay:   longint read fzdelay;
+    property zdir:     longint read fzdir;
+    property zradius:  single  read fzradius;
+    property zratio:   single  read fzratio;
+
+    property wave0:   tvppoint read fwave0;
+    property wave1:   tvppoint read fwave1;
+    property wave2:   tvppoint read fwave2;
+    property wave3:   tvppoint read fwave3;
+    property wave4:   tvppoint read fwave4;
+    property wave5:   tvppoint read fwave5;
+    property wave6:   tvppoint read fwave6;
+    property wave7:   tvppoint read fwave7;
+    property wave8:   tvppoint read fwave8;
+    property wavexmax: single  read fwavexmax;
+    property waveymax: single  read fwaveymax;
+
+    property ip:       string  read fip;
+    property port:     longint read fport;
  end;
 
 var
@@ -66,39 +130,14 @@ var
 
 implementation
 
-uses
-  inifiles, sysutils;
-
 constructor tvpsetting.create;
 begin
   inherited create;
-  clear;
 end;
 
 destructor tvpsetting.destroy;
-begin        inherited destroy;
-end;
-
-procedure tvpsetting.clear;
 begin
-  flayout00.x := 0;  flayout00.y := 0;
-  flayout01.x := 0;  flayout01.y := 0;
-  flayout08.x := 0;  flayout08.y := 0;
-  flayout09.x := 0;  flayout09.y := 0;
-
-  fwave[0].x  := 0;  fwave[0].y  := 0;
-  fwave[1].x  := 0;  fwave[1].y  := 0;
-  fwave[2].x  := 0;  fwave[2].y  := 0;
-  fwave[3].x  := 0;  fwave[3].y  := 0;
-  fwave[4].x  := 0;  fwave[4].y  := 0;
-  fwave[5].x  := 0;  fwave[5].y  := 0;
-  fwave[6].x  := 0;  fwave[6].y  := 0;
-  fwave[7].x  := 0;  fwave[7].y  := 0;
-  fwave[8].x  := 0;  fwave[8].y  := 0;
-  fwavexmax   := 0;  fwaveymax   := 0;
-
-  fsrvip   := '';
-  fsrvport :=  0;
+  inherited destroy;
 end;
 
 procedure tvpsetting.load(const filename: rawbytestring);
@@ -108,59 +147,107 @@ begin
   ini := tinifile.create(filename);
   ini.formatsettings.decimalseparator := '.';
 
-  flayout00.x  := ini.readfloat ('LAYOUT',  '00.X',  0);
-  flayout00.y  := ini.readfloat ('LAYOUT',  '00.Y',  0);
-  flayout01.x  := ini.readfloat ('LAYOUT',  '01.X',  0);
-  flayout01.y  := ini.readfloat ('LAYOUT',  '01.Y',  0);
-  flayout08.x  := ini.readfloat ('LAYOUT',  '08.X',  0);
-  flayout08.y  := ini.readfloat ('LAYOUT',  '08.Y',  0);
-  flayout09.x  := ini.readfloat ('LAYOUT',  '09.X',  0);
-  flayout09.y  := ini.readfloat ('LAYOUT',  '09.Y',  0);
+  flayout0.x   := ini.readfloat   ('LAYOUT',  '0.X',   0);
+  flayout0.y   := ini.readfloat   ('LAYOUT',  '0.Y',   0);
+  flayout1.x   := ini.readfloat   ('LAYOUT',  '1.X',   0);
+  flayout1.y   := ini.readfloat   ('LAYOUT',  '1.Y',   0);
+  flayout8.x   := ini.readfloat   ('LAYOUT',  '8.X',   0);
+  flayout8.y   := ini.readfloat   ('LAYOUT',  '8.Y',   0);
+  flayout9.x   := ini.readfloat   ('LAYOUT',  '9.X',   0);
+  flayout9.y   := ini.readfloat   ('LAYOUT',  '9.Y',   0);
 
-  fwave[0].x  := ini.readfloat  ('WAVE',    '00.X',   0);
-  fwave[0].y  := ini.readfloat  ('WAVE',    '00.Y',   0);
-  fwave[1].x  := ini.readfloat  ('WAVE',    '01.X',   0);
-  fwave[1].y  := ini.readfloat  ('WAVE',    '01.Y',   0);
-  fwave[2].x  := ini.readfloat  ('WAVE',    '02.X',   0);
-  fwave[2].y  := ini.readfloat  ('WAVE',    '02.Y',   0);
-  fwave[3].x  := ini.readfloat  ('WAVE',    '03.X',   0);
-  fwave[3].y  := ini.readfloat  ('WAVE',    '03.Y',   0);
-  fwave[4].x  := ini.readfloat  ('WAVE',    '04.X',   0);
-  fwave[4].y  := ini.readfloat  ('WAVE',    '04.Y',   0);
-  fwave[5].x  := ini.readfloat  ('WAVE',    '05.X',   0);
-  fwave[5].y  := ini.readfloat  ('WAVE',    '05.Y',   0);
-  fwave[6].x  := ini.readfloat  ('WAVE',    '06.X',   0);
-  fwave[6].y  := ini.readfloat  ('WAVE',    '06.Y',   0);
-  fwave[7].x  := ini.readfloat  ('WAVE',    '07.X',   0);
-  fwave[7].y  := ini.readfloat  ('WAVE',    '07.Y',   0);
-  fwave[8].x  := ini.readfloat  ('WAVE',    '08.X',   0);
-  fwave[8].y  := ini.readfloat  ('WAVE',    '08.Y',   0);
-  fwavexmax   := ini.readfloat  ('WAVE',    'XMAX',   0);
-  fwaveymax   := ini.readfloat  ('WAVE',    'YMAX',   0);
+  fxmin        := ini.readinteger('X-AXIS',  'MIN',    0);
+  fxmax        := ini.readinteger('X-AXIS',  'MAX',    0);
+  fxinc        := ini.readinteger('X-AXIS',  'INC',    0);
+  fxdelay      := ini.readinteger('X-AXIS',  'DELAY',  0);
+  fxdir        := ini.readinteger('X-AXIS',  'DIR',    0);
+  fxradius     := ini.readfloat  ('X-AXIS',  'RADIUS', 0);
+  fxratio      := ini.readfloat  ('X-AXIS',  'RATIO',  0);
 
-  fsrvip      := ini.readstring ('NETWORK', 'IP',    '');
-  fsrvport    := ini.readinteger('NETWORK', 'PORT',   0);
+  fymin        := ini.readinteger('Y-AXIS',  'MIN',    0);
+  fymax        := ini.readinteger('Y-AXIS',  'MAX',    0);
+  fyinc        := ini.readinteger('Y-AXIS',  'INC',    0);
+  fydelay      := ini.readinteger('Y-AXIS',  'DELAY',  0);
+  fydir        := ini.readinteger('Y-AXIS',  'DIR',    0);
+  fyradius     := ini.readfloat  ('Y-AXIS',  'RADIUS', 0);
+  fyratio      := ini.readfloat  ('Y-AXIS',  'RATIO',  0);
+
+  fzmin        := ini.readinteger('Z-AXIS',  'MIN',    0);
+  fzmax        := ini.readinteger('Z-AXIS',  'MAX',    0);
+  fzinc        := ini.readinteger('Z-AXIS',  'INC',    0);
+  fzdelay      := ini.readinteger('Z-AXIS',  'DELAY',  0);
+  fzdir        := ini.readinteger('Z-AXIS',  'DIR',    0);
+  fzradius     := ini.readfloat  ('Z-AXIS',  'RADIUS', 0);
+
+  fwave0.x     := ini.readfloat  ('WAVE',    '0.X',    0);
+  fwave0.y     := ini.readfloat  ('WAVE',    '0.Y',    0);
+  fwave1.x     := ini.readfloat  ('WAVE',    '1.X',    0);
+  fwave1.y     := ini.readfloat  ('WAVE',    '1.Y',    0);
+  fwave2.x     := ini.readfloat  ('WAVE',    '2.X',    0);
+  fwave2.y     := ini.readfloat  ('WAVE',    '2.Y',    0);
+  fwave3.x     := ini.readfloat  ('WAVE',    '3.X',    0);
+  fwave3.y     := ini.readfloat  ('WAVE',    '3.Y',    0);
+  fwave4.x     := ini.readfloat  ('WAVE',    '4.X',    0);
+  fwave4.y     := ini.readfloat  ('WAVE',    '4.Y',    0);
+  fwave5.x     := ini.readfloat  ('WAVE',    '5.X',    0);
+  fwave5.y     := ini.readfloat  ('WAVE',    '5.Y',    0);
+  fwave6.x     := ini.readfloat  ('WAVE',    '6.X',    0);
+  fwave6.y     := ini.readfloat  ('WAVE',    '6.Y',    0);
+  fwave7.x     := ini.readfloat  ('WAVE',    '7.X',    0);
+  fwave7.y     := ini.readfloat  ('WAVE',    '7.Y',    0);
+  fwave8.x     := ini.readfloat  ('WAVE',    '8.X',    0);
+  fwave8.y     := ini.readfloat  ('WAVE',    '8.Y',    0);
+  fwavexmax    := ini.readfloat  ('WAVE',    'XMAX',   0);
+  fwaveymax    := ini.readfloat  ('WAVE',    'YMAX',   0);
+
+  fip          := ini.readstring ('NETWORK', 'IP',    '');
+  fport        := ini.readinteger('NETWORK', 'PORT',   0);
 
   if enabledebug then
   begin
-    writeln(format('  LAYOUT::00.X   = %12.5f  00.Y = %12.5f', [flayout00.x, flayout00.y]));
-    writeln(format('  LAYOUT::01.X   = %12.5f  01.Y = %12.5f', [flayout01.x, flayout01.y]));
-    writeln(format('  LAYOUT::08.X   = %12.5f  08.Y = %12.5f', [flayout08.x, flayout08.y]));
-    writeln(format('  LAYOUT::09.X   = %12.5f  09.Y = %12.5f', [flayout09.x, flayout09.y]));
+    writeln(format('  LAYOUT::0.X    = %12.5f  00.Y = %12.5f', [flayout0.x, flayout0.y]));
+    writeln(format('  LAYOUT::1.X    = %12.5f  01.Y = %12.5f', [flayout1.x, flayout1.y]));
+    writeln(format('  LAYOUT::8.X    = %12.5f  08.Y = %12.5f', [flayout8.x, flayout8.y]));
+    writeln(format('  LAYOUT::9.X    = %12.5f  09.Y = %12.5f', [flayout9.x, flayout9.y]));
 
-    writeln(format('    WAVE::00.X   = %12.5f  00.Y = %12.5f', [ fwave[0].x,  fwave[0].y]));
-    writeln(format('    WAVE::01.X   = %12.5f  01.Y = %12.5f', [ fwave[1].x,  fwave[1].y]));
-    writeln(format('    WAVE::02.X   = %12.5f  02.Y = %12.5f', [ fwave[2].x,  fwave[2].y]));
-    writeln(format('    WAVE::03.X   = %12.5f  03.Y = %12.5f', [ fwave[3].x,  fwave[3].y]));
-    writeln(format('    WAVE::04.X   = %12.5f  04.Y = %12.5f', [ fwave[4].x,  fwave[4].y]));
-    writeln(format('    WAVE::05.X   = %12.5f  05.Y = %12.5f', [ fwave[5].x,  fwave[5].y]));
-    writeln(format('    WAVE::06.X   = %12.5f  06.Y = %12.5f', [ fwave[6].x,  fwave[6].y]));
-    writeln(format('    WAVE::07.X   = %12.5f  07.Y = %12.5f', [ fwave[7].x,  fwave[7].y]));
-    writeln(format('    WAVE::08.X   = %12.5f  08.Y = %12.5f', [ fwave[8].x,  fwave[8].y]));
+    writeln(format('  X-AXIS::MIN    = %12.5u', [fxmin    ]));
+    writeln(format('  X-AXIS::MAX    = %12.5u', [fxmax    ]));
+    writeln(format('  X-AXIS::INC    = %12.5u', [fxinc    ]));
+    writeln(format('  X-AXIS::DELAY  = %12.5u', [fxdelay  ]));
+    writeln(format('  X-AXIS::DIR    = %12.5u', [fxdir    ]));
+    writeln(format('  X-AXIS::RADIUS = %12.5f', [fxradius ]));
+    writeln(format('  X-AXIS::RATIO  = %12.5f', [fxratio  ]));
+
+    writeln(format('  Y-AXIS::MIN    = %12.5u', [fymin    ]));
+    writeln(format('  Y-AXIS::MAX    = %12.5u', [fymax    ]));
+    writeln(format('  Y-AXIS::INC    = %12.5u', [fyinc    ]));
+    writeln(format('  Y-AXIS::DELAY  = %12.5u', [fydelay  ]));
+    writeln(format('  Y-AXIS::DIR    = %12.5u', [fydir    ]));
+    writeln(format('  Y-AXIS::RADIUS = %12.5f', [fyradius ]));
+    writeln(format('  Y-AXIS::RATIO  = %12.5f', [fyratio  ]));
+
+    writeln(format('  Z-AXIS::MIN    = %12.5u', [fzmin    ]));
+    writeln(format('  Z-AXIS::MAX    = %12.5u', [fzmax    ]));
+    writeln(format('  Z-AXIS::INC    = %12.5u', [fzinc    ]));
+    writeln(format('  Z-AXIS::DELAY  = %12.5u', [fzdelay  ]));
+    writeln(format('  Z-AXIS::DIR    = %12.5u', [fzdir    ]));
+    writeln(format('  Z-AXIS::RADIUS = %12.5f', [fzradius ]));
+    writeln(format('  Z-AXIS::RATIO  = %12.5f', [fzratio  ]));
+
+    writeln(format('    WAVE::0.X    = %12.5f  0.Y = %12.5f', [fwave0.x, fwave0.y]));
+    writeln(format('    WAVE::1.X    = %12.5f  1.Y = %12.5f', [fwave1.x, fwave1.y]));
+    writeln(format('    WAVE::2.X    = %12.5f  2.Y = %12.5f', [fwave2.x, fwave2.y]));
+    writeln(format('    WAVE::3.X    = %12.5f  3.Y = %12.5f', [fwave3.x, fwave3.y]));
+    writeln(format('    WAVE::4.X    = %12.5f  4.Y = %12.5f', [fwave4.x, fwave4.y]));
+    writeln(format('    WAVE::5.X    = %12.5f  5.Y = %12.5f', [fwave5.x, fwave5.y]));
+    writeln(format('    WAVE::6.X    = %12.5f  6.Y = %12.5f', [fwave6.x, fwave6.y]));
+    writeln(format('    WAVE::7.X    = %12.5f  7.Y = %12.5f', [fwave7.x, fwave7.y]));
+    writeln(format('    WAVE::8.X    = %12.5f  8.Y = %12.5f', [fwave8.x, fwave8.y]));
     writeln(format('    WAVE::XMAX   = %12.5f', [fwavexmax]));
     writeln(format('    WAVE::YMAX   = %12.5f', [fwaveymax]));
-    writeln(format(' NETWORK::IP     = %s',     [fsrvip   ]));
-    writeln(format(' NETWORK::PORT   = %12u',   [fsrvport] ));
+
+    writeln(format(' NETWORK::IP     = %s',     [fip  ]));
+    writeln(format(' NETWORK::PORT   = %12u',   [fport]));
   end;
   ini.destroy;
 end;

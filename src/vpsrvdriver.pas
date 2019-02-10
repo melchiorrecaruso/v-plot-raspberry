@@ -26,10 +26,10 @@ unit vpsrvdriver;
 interface
 
 uses
-  classes, sysutils, {$ifdef cpuarm} pca9685, wiringpi, {$endif} vpsrvsetting;
+  classes, sysutils, {$ifdef cpuarm} pca9685, wiringpi, {$endif} vpsetting;
 
 type
-  tvpsrvdriver = class
+  tvpdriver = class
   private
     fxcount:  longint;
     fycount:  longint;
@@ -61,8 +61,7 @@ type
   end;
 
 var
-  srvdriver:  tvpsrvdriver  = nil;
-  srvsetting: tvpsrvsetting = nil;
+  driver:  tvpdriver = nil;
 
 implementation
 
@@ -77,15 +76,15 @@ const
   motz_freq = 50;
 {$endif}
 
-constructor tvpsrvdriver.create;
+constructor tvpdriver.create;
 begin
   inherited create;
-  fxcount  := srvsetting.xmin;
-  fycount  := srvsetting.ymin;
-  fzcount  := srvsetting.zmin;
-  fxdelay  := srvsetting.xdelay;
-  fydelay  := srvsetting.ydelay;
-  fzdelay  := srvsetting.zdelay;
+  fxcount  := setting.xmin;
+  fycount  := setting.ymin;
+  fzcount  := setting.zmin;
+  fxdelay  := setting.xdelay;
+  fydelay  := setting.ydelay;
+  fzdelay  := setting.zdelay;
   fxoff    := false;
   fyoff    := false;
   fzoff    := false;
@@ -108,21 +107,21 @@ begin
   digitalwrite(moty_dir,  LOW);
   digitalwrite(moty_step, LOW);
   {$endif}
-  setzcount(srvsetting.zmax);
+  setzcount(setting.zmax);
 end;
 
-destructor tvpsrvdriver.destroy;
+destructor tvpdriver.destroy;
 begin
   inherited destroy;
 end;
 
-procedure  tvpsrvdriver.init(axcount, aycount: longint);
+procedure  tvpdriver.init(axcount, aycount: longint);
 begin
   fxcount := axcount;
   fycount := aycount;
 end;
 
-procedure tvpsrvdriver.move(axcount, aycount: longint);
+procedure tvpdriver.move(axcount, aycount: longint);
 {$ifdef cpuarm}
 var
   dx: longint;
@@ -189,17 +188,17 @@ begin
 //writeln(format('  DRIVER::CNT.Y  = %12.5u', [fycount]));
 end;
 
-procedure tvpsrvdriver.setxcount(value: longint);
+procedure tvpdriver.setxcount(value: longint);
 begin
   move(value, fycount);
 end;
 
-procedure tvpsrvdriver.setycount(value: longint);
+procedure tvpdriver.setycount(value: longint);
 begin
   move(fxcount, value);
 end;
 
-procedure tvpsrvdriver.setzcount(value: longint);
+procedure tvpdriver.setzcount(value: longint);
 begin
   if fzoff then exit;
   {$ifdef cpuarm}
@@ -230,32 +229,6 @@ begin
 
 //writeln(format('  DRIVER::CNT.Z  = %12.5u', [fzcount]));
 end;
-
-procedure initialize;
-begin
-  srvsetting := tvpsrvsetting.create;
-  srvsetting.load(changefileext(paramstr(0), '.ini'));
-  begin
-    srvdriver := tvpsrvdriver.create;
-    srvdriver.xoff  := false;
-    srvdriver.yoff  := false;
-    srvdriver.zoff  := false;
-  end;
-end;
-
-procedure finalize;
-begin
-  srvdriver.destroy;
-  srvsetting.destroy;
-end;
-
-initialization
-
-initialize;
-
-finalization
-
-finalize;
 
 end.
 

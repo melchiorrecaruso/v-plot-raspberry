@@ -26,7 +26,7 @@ unit vppaths;
 interface
 
 uses
-  classes, vpmath, vpsetting;
+  classes, sysutils, vpmath, vpsetting, vpwave;
 
 type
   tvppath = class(tobject)
@@ -101,11 +101,14 @@ type
     property items[index: longint]: tvppath read get;
   end;
 
+  procedure optimize(paths: tvppaths; const xcenter, ycenter, xmax, ymax: double; buf: tstringlist); overload;
+  procedure optimize(const p: tvppoint; out mx, my: longint);
+
 
 implementation
 
 uses
-  math, sysutils, vpdxfreader;
+  math, vpdxfreader;
 
 const
   minlen = 0.15;
@@ -841,6 +844,86 @@ end;
 function tvppaths.get(index: longint): tvppath;
 begin
   result := tvppath(flist[index]);
+end;
+
+
+
+procedure optimize(const p: tvppoint; out mx, my: longint); inline;
+var
+  cx, cy, ct: tvpcircleimp;
+      lx, ly: double;
+  sx, sy, st: tvppoint;
+      tx, ty: tvppoint;
+begin
+  tx := setting.layout0;
+  ty := setting.layout1;
+  //find tangent point tx
+  lx := sqrt(sqr(distance_between_two_points(tx, p))-sqr(setting.xradius));
+  cx := circle_by_center_and_radius(tx, setting.xradius);
+  ct := circle_by_center_and_radius(p, lx);
+  if intersection_of_two_circles(cx, ct, sx, st) = 0 then
+    raise exception.create('intersection_of_two_circles [c0c2]');
+  lx := lx + get_angle(line_by_two_points(sx, tx))*setting.xradius;
+  //find tangent point ty
+  ly := sqrt(sqr(distance_between_two_points(ty, p))-sqr(setting.yradius));
+  cy := circle_by_center_and_radius(ty, setting.yradius);
+  ct := circle_by_center_and_radius(p, ly);
+  if intersection_of_two_circles(cy, ct, sy, st) = 0 then
+    raise exception.create('intersection_of_two_circles [c1c2]');
+  ly := ly + (pi-get_angle(line_by_two_points(sy, ty)))*setting.yradius;
+  // calculate steps
+  mx := round(lx/setting.xratio);
+  my := round(ly/setting.yratio);
+end;
+
+
+procedure optimize(paths: tvppaths; const xcenter, ycenter, xmax, ymax: double; buf: tstringlist); overload;
+var
+   i, j: longint;
+     mx: longint = 0;
+     my: longint = 0;
+   path: tvppath;
+  point: tvppoint;
+   list: tfplist;
+begin
+  list := tfplist.create;
+  for i := 0 to paths.count -1 do
+  begin
+    path := paths.items[i];
+    if path.enabled then
+      for j := 0 to path.count -1 do
+      begin
+        point:= path.items[j]^;
+        point:= wave.update(point);
+
+        if (abs(point.x) <= (xmax)) and
+           (abs(point.y) <= (ymax)) then
+          list.add(path.items[j]);
+      end;
+  end;
+
+  if list.count > 0 then
+  begin
+    pvppoint(list[0])^.z := setting.zmax;
+    for i := 1 to list.count -1 do
+      if distance_between_two_points(
+        pvppoint(list[i])^, pvppoint(list[i-1])^) < 0.25 then
+        pvppoint(list[i])^.z := setting.zmin
+      else
+        pvppoint(list[i])^.z := setting.zmax;
+
+    for i := 0 to list.count -1 do
+    begin
+      point   := pvppoint(list[i])^;
+      point   := wave.update(point);
+      point.x := point.x + xcenter;
+      point.y := point.y + ycenter;
+
+      optimize(point, mx, my);
+      buf.add(format('MOVE X%d Y%d Z%d', [mx, my, trunc(point.z)]));
+    end;
+  end;
+  list.destroy;
 end;
 
 end.
