@@ -81,9 +81,9 @@
       <Unit0>
         <Filename Value="vplot.lpr"/>
         <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
         <CursorPos X="56" Y="21"/>
         <UsageCount Value="200"/>
-        <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="src/main.pas"/>
@@ -219,9 +219,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
         <TopLine Value="265"/>
-        <CursorPos X="24" Y="293"/>
+        <CursorPos X="61" Y="284"/>
         <FoldState Value=" T3yC0h4 pj6kI03]9iXj5031-"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -331,7 +330,7 @@
       <Unit33>
         <Filename Value="src/vpsetting.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="2"/>
         <TopLine Value="113"/>
         <CursorPos X="72" Y="133"/>
         <UsageCount Value="200"/>
@@ -365,7 +364,7 @@
       <Unit37>
         <Filename Value="src/vppaths.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="92"/>
         <CursorPos X="7" Y="102"/>
         <UsageCount Value="200"/>
@@ -1528,7 +1527,7 @@
       </Unit222>
       <Unit223>
         <Filename Value="src/vpdriverthread.pas"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="1"/>
         <TopLine Value="39"/>
         <CursorPos X="40" Y="61"/>
         <UsageCount Value="24"/>

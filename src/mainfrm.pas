@@ -291,7 +291,7 @@ begin
 
     s := sha1print(sha1string(buffer.text));
     buffer.add(format('SHA1%s', [s]));
-    ltcp.sendmessage('BEGIN');
+    ltcp.sendmessage('SEND');
   end;
 end;
 

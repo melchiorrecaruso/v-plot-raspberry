@@ -144,10 +144,12 @@ begin
       end else
       if pos('SHA1', m) = 1 then
       begin
+        writeln(m);
         parse_prefix('SHA1', m, s);
 
-        writeln(m);
+
         writeln(s);
+
 
 
         if s = sha1print(sha1string(flst.text)) then
