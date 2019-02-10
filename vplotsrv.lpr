@@ -251,7 +251,7 @@ begin
       if parse_prefix('X', s, x) and
          parse_prefix('Y', s, y) then
       begin
-        driver.init(x, y);
+        srvdriver.init(x, y);
       end;
 
     end else
@@ -262,10 +262,10 @@ begin
          parse_prefix('Z', s, z) then
       begin
         if z < 0 then
-          driver.zcount := srvsetting.zmin
+          srvdriver.zcount := srvsetting.zmin
         else
-          driver.zcount := srvsetting.zmax;
-        //driver.move(x, y);
+          srvdriver.zcount := srvsetting.zmax;
+        //srvdriver.move(x, y);
       end;
 
     end else
@@ -275,15 +275,24 @@ begin
          parse_prefix('Y', s, y) and
          parse_prefix('Z', s, z) then
       begin
-        x := x + driver.xcount;
-        y := y + driver.ycount;
-        z := z + driver.zcount;
+        x := x + srvdriver.xcount;
+        y := y + srvdriver.ycount;
+        z := z + srvdriver.zcount;
 
         if z < 0 then
-          driver.zcount := srvsetting.zmin
+          srvdriver.zcount := srvsetting.zmin
         else
-          driver.zcount := srvsetting.zmax;
-        //driver.move(x, y);
+          srvdriver.zcount := srvsetting.zmax;
+
+
+
+
+                 writeln(x);
+                 writeln(y);
+                 writeln(z);
+
+
+        //srvdriver.move(x, y);
       end;
     end;
 
