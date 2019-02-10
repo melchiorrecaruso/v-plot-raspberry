@@ -1,12 +1,12 @@
 object clientform: Tclientform
-  Left = 247
-  Height = 448
-  Top = 113
-  Width = 806
+  Left = 349
+  Height = 569
+  Top = 136
+  Width = 766
   Anchors = []
   Caption = 'vPlotter'
-  ClientHeight = 426
-  ClientWidth = 806
+  ClientHeight = 547
+  ClientWidth = 766
   Menu = mainmenu
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -14,25 +14,25 @@ object clientform: Tclientform
   object statuslabel: TLabel
     Left = 0
     Height = 1
-    Top = 425
-    Width = 806
+    Top = 546
+    Width = 766
     Align = alBottom
     ParentColor = False
   end
   object screen: TBGRAVirtualScreen
     Left = 0
-    Height = 421
-    Top = 4
-    Width = 800
+    Height = 539
+    Top = 7
+    Width = 760
     OnRedraw = screenredraw
     Align = alClient
     Alignment = taLeftJustify
-    AutoSize = True
+    Anchors = []
+    BorderSpacing.Top = 5
     BorderSpacing.Right = 6
     Color = clForm
     ParentColor = False
     TabOrder = 0
-    OnClick = leftupbtnClick
     OnMouseDown = imagemousedown
     OnMouseMove = imagemousemove
     OnMouseUp = imagemouseup
@@ -40,18 +40,20 @@ object clientform: Tclientform
   end
   object calibrationpanel: TPanel
     AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Bevel2
+    AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 80
-    Top = 200
-    Width = 806
-    Anchors = [akLeft, akRight]
+    Height = 72
+    Top = 12
+    Width = 766
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 10
     BevelOuter = bvNone
-    ClientHeight = 80
-    ClientWidth = 806
+    ClientHeight = 72
+    ClientWidth = 766
     Color = clForm
     ParentColor = False
     TabOrder = 1
@@ -64,7 +66,7 @@ object clientform: Tclientform
       AnchorSideBottom.Side = asrBottom
       Left = 6
       Height = 30
-      Top = 44
+      Top = 36
       Width = 85
       Anchors = [akLeft, akBottom]
       BorderSpacing.Left = 6
@@ -159,7 +161,7 @@ object clientform: Tclientform
       AnchorSideBottom.Side = asrBottom
       Left = 97
       Height = 30
-      Top = 8
+      Top = 0
       Width = 85
       Anchors = [akTop, akLeft, akRight, akBottom]
       Caption = 'Pen Up'
@@ -175,7 +177,7 @@ object clientform: Tclientform
       AnchorSideBottom.Side = asrBottom
       Left = 97
       Height = 30
-      Top = 44
+      Top = 36
       Width = 85
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 6
@@ -193,7 +195,7 @@ object clientform: Tclientform
       AnchorSideBottom.Side = asrBottom
       Left = 188
       Height = 30
-      Top = 44
+      Top = 36
       Width = 85
       BorderSpacing.Left = 6
       Caption = 'Right'
@@ -285,8 +287,8 @@ object clientform: Tclientform
       AnchorSideBottom.Side = asrBottom
       Left = 279
       Height = 30
-      Top = 44
-      Width = 430
+      Top = 36
+      Width = 390
       Alignment = taRightJustify
       Anchors = [akTop, akLeft, akRight]
       AutoSize = False
@@ -305,7 +307,7 @@ object clientform: Tclientform
       AnchorSideBottom.Side = asrBottom
       Left = 188
       Height = 30
-      Top = 8
+      Top = 0
       Width = 85
       Anchors = [akTop, akLeft, akRight, akBottom]
       Caption = 'Right'
@@ -394,7 +396,7 @@ object clientform: Tclientform
       AnchorSideBottom.Control = leftdownbtn
       Left = 6
       Height = 30
-      Top = 8
+      Top = 0
       Width = 85
       Anchors = [akLeft, akBottom]
       BorderSpacing.Bottom = 6
@@ -484,9 +486,9 @@ object clientform: Tclientform
       AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Control = calibrationpanel
       AnchorSideBottom.Side = asrBottom
-      Left = 715
+      Left = 675
       Height = 30
-      Top = 44
+      Top = 36
       Width = 85
       Anchors = [akRight, akBottom]
       BorderSpacing.Right = 6
@@ -498,34 +500,28 @@ object clientform: Tclientform
     object calibrationbevel: TBevel
       Left = 0
       Height = 2
-      Top = 0
-      Width = 806
-      Align = alTop
+      Top = 70
+      Width = 766
+      Align = alBottom
     end
-  end
-  object bevel: TBevel
-    Left = 0
-    Height = 2
-    Top = 0
-    Width = 806
-    Align = alTop
-    BorderSpacing.Bottom = 2
   end
   object scalepanel: TPanel
     AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Bevel2
+    AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 44
-    Top = 308
-    Width = 806
-    Anchors = [akLeft, akRight]
+    Height = 42
+    Top = 12
+    Width = 766
+    Anchors = [akTop, akLeft, akRight]
     AutoSize = True
+    BorderSpacing.Top = 10
     BevelOuter = bvNone
-    ClientHeight = 44
-    ClientWidth = 806
+    ClientHeight = 42
+    ClientWidth = 766
     Color = clForm
     ParentColor = False
     TabOrder = 2
@@ -538,8 +534,8 @@ object clientform: Tclientform
       AnchorSideBottom.Side = asrBottom
       Left = 6
       Height = 30
-      Top = 8
-      Width = 612
+      Top = 6
+      Width = 572
       Alignment = taRightJustify
       Anchors = [akTop, akLeft, akRight, akBottom]
       BorderSpacing.Left = 6
@@ -550,15 +546,16 @@ object clientform: Tclientform
       Value = 1
     end
     object scaleclosebtn: TBitBtn
-      AnchorSideTop.Control = scalebevel
       AnchorSideTop.Side = asrBottom
       AnchorSideRight.Control = scalepanel
       AnchorSideRight.Side = asrBottom
-      Left = 715
+      AnchorSideBottom.Control = scalepanel
+      AnchorSideBottom.Side = asrBottom
+      Left = 675
       Height = 30
-      Top = 8
+      Top = 6
       Width = 85
-      Anchors = [akTop, akRight]
+      Anchors = [akRight, akBottom]
       BorderSpacing.Top = 6
       BorderSpacing.Right = 6
       BorderSpacing.Bottom = 6
@@ -571,9 +568,9 @@ object clientform: Tclientform
       AnchorSideRight.Control = scaleclosebtn
       AnchorSideBottom.Control = scaleclosebtn
       AnchorSideBottom.Side = asrBottom
-      Left = 624
+      Left = 584
       Height = 30
-      Top = 8
+      Top = 6
       Width = 85
       Anchors = [akTop, akRight, akBottom]
       BorderSpacing.Right = 6
@@ -581,30 +578,33 @@ object clientform: Tclientform
       OnClick = scaleupdatebtnClick
       TabOrder = 2
     end
-    object scalebevel: TBevel
+    object Bevel1: TBevel
+      AnchorSideTop.Side = asrBottom
       Left = 0
       Height = 2
-      Top = 0
-      Width = 806
-      Align = alTop
+      Top = 40
+      Width = 766
+      Align = alBottom
+      BorderSpacing.Top = 6
     end
   end
   object offsetpanel: TPanel
     AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Bevel2
+    AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 78
-    Top = 96
-    Width = 806
-    Anchors = [akLeft, akRight]
-    AutoSize = True
+    Height = 75
+    Top = 12
+    Width = 766
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 10
     BevelColor = clForm
     BevelOuter = bvNone
-    ClientHeight = 78
-    ClientWidth = 806
+    ClientHeight = 75
+    ClientWidth = 766
     Color = clForm
     ParentColor = False
     TabOrder = 3
@@ -614,9 +614,9 @@ object clientform: Tclientform
       AnchorSideRight.Control = offsetclosebtn
       AnchorSideBottom.Control = offsetclosebtn
       AnchorSideBottom.Side = asrBottom
-      Left = 624
+      Left = 584
       Height = 30
-      Top = 42
+      Top = 35
       Width = 85
       Anchors = [akTop, akRight, akBottom]
       BorderSpacing.Right = 6
@@ -633,7 +633,7 @@ object clientform: Tclientform
       AnchorSideBottom.Side = asrBottom
       Left = 0
       Height = 28
-      Top = 10
+      Top = 3
       Width = 51
       Alignment = taRightJustify
       Anchors = [akTop, akLeft, akRight, akBottom]
@@ -649,7 +649,7 @@ object clientform: Tclientform
       AnchorSideBottom.Side = asrBottom
       Left = 9
       Height = 28
-      Top = 44
+      Top = 37
       Width = 42
       Alignment = taRightJustify
       Anchors = [akTop, akLeft, akBottom]
@@ -667,13 +667,13 @@ object clientform: Tclientform
       AnchorSideBottom.Side = asrBottom
       Left = 57
       Height = 28
-      Top = 44
-      Width = 561
+      Top = 37
+      Width = 521
       Alignment = taRightJustify
       Anchors = [akLeft, akRight, akBottom]
       BorderSpacing.Left = 6
       BorderSpacing.Right = 6
-      BorderSpacing.Bottom = 6
+      BorderSpacing.Bottom = 10
       MaxValue = 0
       TabOrder = 1
     end
@@ -685,8 +685,8 @@ object clientform: Tclientform
       AnchorSideBottom.Control = yoffsetedit
       Left = 57
       Height = 28
-      Top = 10
-      Width = 561
+      Top = 3
+      Width = 521
       Alignment = taRightJustify
       Anchors = [akLeft, akRight, akBottom]
       BorderSpacing.Left = 6
@@ -694,40 +694,48 @@ object clientform: Tclientform
       BorderSpacing.Bottom = 6
       MaxValue = 0
       TabOrder = 2
+      Value = 1
     end
     object offsetclosebtn: TSpeedButton
       AnchorSideRight.Control = offsetpanel
       AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Control = offsetpanel
       AnchorSideBottom.Side = asrBottom
-      Left = 715
+      Left = 675
       Height = 30
-      Top = 42
+      Top = 35
       Width = 85
       Anchors = [akRight, akBottom]
       BorderSpacing.Right = 6
-      BorderSpacing.Bottom = 6
+      BorderSpacing.Bottom = 10
       Caption = 'Close'
       OnClick = scaleclosebtnClick
     end
     object offsetbevel: TBevel
       Left = 0
       Height = 2
-      Top = 0
-      Width = 806
-      Align = alTop
+      Top = 67
+      Width = 766
+      Align = alBottom
       BorderSpacing.Bottom = 6
     end
+  end
+  object Bevel2: TBevel
+    Left = 0
+    Height = 2
+    Top = 0
+    Width = 766
+    Align = alTop
   end
   object opendialog: TOpenDialog
     Options = [ofPathMustExist, ofFileMustExist, ofEnableSizing, ofViewDetail]
     left = 104
-    top = 24
+    top = 120
   end
   object mainmenu: TMainMenu
     OwnerDraw = True
     left = 32
-    top = 24
+    top = 120
     object filemi: TMenuItem
       Caption = 'File'
       object loadmi: TMenuItem
@@ -924,12 +932,12 @@ object clientform: Tclientform
   object savedialog: TSaveDialog
     Options = [ofOverwritePrompt, ofPathMustExist, ofEnableSizing, ofViewDetail]
     left = 176
-    top = 24
+    top = 120
   end
   object popup: TPopupMenu
     AutoPopup = False
-    left = 240
-    top = 24
+    left = 248
+    top = 120
     object selallpm: TMenuItem
       Caption = 'Select All'
       OnClick = selallpmclick
@@ -997,7 +1005,7 @@ object clientform: Tclientform
     OnConnect = ltcpConnect
     Timeout = 0
     ReuseAddress = False
-    left = 296
-    top = 24
+    left = 304
+    top = 120
   end
 end

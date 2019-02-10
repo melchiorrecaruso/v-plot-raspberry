@@ -220,9 +220,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="116"/>
-        <CursorPos X="54" Y="137"/>
-        <FoldState Value=" T3qF069 pibjK0N479C p0sS033w"/>
+        <TopLine Value="246"/>
+        <CursorPos X="44" Y="264"/>
+        <FoldState Value=" T3qE069 pibjK0N479="/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1516,7 +1516,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
         <CursorPos X="15" Y="31"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="34"/>
         <Loaded Value="True"/>
       </Unit221>
       <Unit222>
@@ -1557,123 +1557,123 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="234" Column="27" TopLine="211"/>
+        <Caret Line="308" Column="5" TopLine="285"/>
       </Position1>
       <Position2>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="233" Column="27" TopLine="210"/>
+        <Caret Line="321" Column="6" TopLine="285"/>
       </Position2>
       <Position3>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="234" Column="27" TopLine="211"/>
+        <Caret Line="328" Column="5" TopLine="290"/>
       </Position3>
       <Position4>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="235" Column="27" TopLine="212"/>
+        <Caret Line="586" Column="3" TopLine="455"/>
       </Position4>
       <Position5>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="236" Column="27" TopLine="213"/>
+        <Caret Line="592" Column="3" TopLine="455"/>
       </Position5>
       <Position6>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="464" TopLine="399"/>
+        <Caret Line="604" Column="6" TopLine="464"/>
       </Position6>
       <Position7>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="133" Column="4" TopLine="111"/>
+        <Caret Line="605" Column="5" TopLine="472"/>
       </Position7>
       <Position8>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="157" Column="4" TopLine="135"/>
+        <Caret Line="610" Column="6" TopLine="533"/>
       </Position8>
       <Position9>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="603" Column="5" TopLine="589"/>
+        <Caret Line="611" Column="5" TopLine="541"/>
       </Position9>
       <Position10>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="765" TopLine="606"/>
+        <Caret Line="616" Column="6" TopLine="559"/>
       </Position10>
       <Position11>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="274" TopLine="242"/>
+        <Caret Line="617" Column="5" TopLine="573"/>
       </Position11>
       <Position12>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="595" Column="3" TopLine="580"/>
+        <Caret Line="622" Column="6" TopLine="584"/>
       </Position12>
       <Position13>
-        <Filename Value="src/vppaths.pas"/>
-        <Caret Line="888" Column="6" TopLine="872"/>
+        <Filename Value="src/clientfrm.pas"/>
+        <Caret Line="623" Column="5" TopLine="585"/>
       </Position13>
       <Position14>
-        <Filename Value="src/vppaths.pas"/>
-        <Caret Line="923" Column="13" TopLine="885"/>
+        <Filename Value="src/clientfrm.pas"/>
+        <Caret Line="1029" Column="4" TopLine="1006"/>
       </Position14>
       <Position15>
-        <Filename Value="src/vppaths.pas"/>
-        <Caret Line="104" Column="100" TopLine="82"/>
+        <Filename Value="src/clientfrm.pas"/>
+        <Caret Line="1031" Column="23" TopLine="1006"/>
       </Position15>
       <Position16>
-        <Filename Value="src/vppaths.pas"/>
-        <Caret Line="880" Column="84" TopLine="857"/>
+        <Filename Value="src/clientfrm.pas"/>
+        <Caret Line="1042" Column="23" TopLine="1006"/>
       </Position16>
       <Position17>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="595" Column="3" TopLine="580"/>
+        <Caret Line="1053" Column="23" TopLine="1030"/>
       </Position17>
       <Position18>
-        <Filename Value="src/vppaths.pas"/>
-        <Caret Line="880" Column="60" TopLine="866"/>
+        <Filename Value="src/clientfrm.pas"/>
+        <Caret Line="1058" Column="23" TopLine="1030"/>
       </Position18>
       <Position19>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="1069" TopLine="1032"/>
+        <Caret Line="1062" Column="6" TopLine="1030"/>
       </Position19>
       <Position20>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="1070" Column="20" TopLine="1011"/>
+        <Caret Line="310" Column="5" TopLine="287"/>
       </Position20>
       <Position21>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="1030" Column="3" TopLine="1011"/>
+        <Caret Line="330" Column="5" TopLine="292"/>
       </Position21>
       <Position22>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="958" Column="5" TopLine="937"/>
+        <Caret Line="1048" Column="43" TopLine="1032"/>
       </Position22>
       <Position23>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="310" Column="76" TopLine="291"/>
+        <Caret Line="330" Column="17" TopLine="307"/>
       </Position23>
       <Position24>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="212" Column="9" TopLine="196"/>
+        <Caret Line="1055" Column="15" TopLine="1032"/>
       </Position24>
       <Position25>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="256" Column="46" TopLine="261"/>
+        <Caret Line="289" Column="37" TopLine="287"/>
       </Position25>
       <Position26>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="603" Column="82" TopLine="256"/>
+        <Caret Line="136" Column="15" TopLine="114"/>
       </Position26>
       <Position27>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="609" Column="30" TopLine="973"/>
+        <Caret Line="310" Column="17" TopLine="266"/>
       </Position27>
       <Position28>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="1037" Column="37" TopLine="1009"/>
+        <Caret Line="309" Column="17" TopLine="265"/>
       </Position28>
       <Position29>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="1062" Column="27" TopLine="1038"/>
+        <Caret Line="264" Column="44" TopLine="246"/>
       </Position29>
       <Position30>
         <Filename Value="src/clientfrm.pas"/>
-        <Caret Line="350" Column="5" TopLine="328"/>
+        <Caret Line="263" Column="44" TopLine="245"/>
       </Position30>
     </JumpHistory>
   </ProjectOptions>

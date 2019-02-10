@@ -34,13 +34,13 @@ type
   { Tclientform }
 
   Tclientform = class(tform)
-    bevel: TBevel;
+    Bevel1: TBevel;
+    Bevel2: TBevel;
     offsetbevel: TBevel;
     calibrationbevel: TBevel;
     calibrationclosebtn: TBitBtn;
     xoffsetlabel: TLabel;
     yoffsetlabel: TLabel;
-    scalebevel: TBevel;
     offsetupdatebtn: TBitBtn;
     scaleupdatebtn: TBitBtn;
     offsetpanel: TPanel;
@@ -128,6 +128,7 @@ type
     miprinter: tmenuitem;
     filemi: tmenuitem;
     opendialog: topendialog;
+
 
     procedure disconnectmiClick(Sender: TObject);
     procedure formcreate           (sender: tobject);
@@ -268,12 +269,10 @@ begin
     wavemesh);
   wave.enabled := false;
   wave.test;
-  // connect to server
-  connectmi.click;
   // update panels
-  scalepanel      .anchors := [akleft, akright, akbottom];
-  offsetpanel     .anchors := [akleft, akright, akbottom];
-  calibrationpanel.anchors := [akleft, akright, akbottom];
+  scalepanel      .anchors := [akleft, akright, aktop];
+  offsetpanel     .anchors := [akleft, akright, aktop];
+  calibrationpanel.anchors := [akleft, akright, aktop];
 end;
 
 procedure tclientform.formdestroy(sender: tobject);
@@ -1053,7 +1052,6 @@ end;
 
 procedure tclientform.ltcperror(const msg: string; asocket: tlsocket);
 begin
-  ltcpdisconnect(asocket);
   messagedlg('Server Error', msg , mterror, [mbok], 0);
 end;
 
