@@ -237,6 +237,9 @@ begin
   srvsetting.load(changefileext(paramstr(0), '.ini'));
   begin
     srvdriver := tvpsrvdriver.create;
+    srvdriver.xoff  := false;
+    srvdriver.yoff  := false;
+    srvdriver.zoff  := false;
   end;
 end;
 

@@ -49,22 +49,21 @@ type
 
 { tvploserver }
 
-  tvplotserver = class(tthread)
+  tvplotserver = class
   private
-    fcon: tltcp;
-    flst: tstringlist;
-    fvth: tvplotthread;
+    fconn: tltcp;
+    flist: tstringlist;
+    fthrd: tvplotthread;
     procedure oner(const msg: ansistring; asocket: tlsocket);
     procedure onac(asocket: tlsocket);
     procedure onre(asocket: tlsocket);
     procedure onds(asocket: tlsocket);
     procedure dostart;
     procedure dostop;
-  protected
-    procedure execute; override;
   public
     constructor create;
     destructor destroy; override;
+    procedure start;
   end;
 
 // parse_prefix
@@ -121,22 +120,22 @@ begin
   if asocket.getmessage(m) > 0 then
   begin
 
-    if assigned(fvth) then
+    if assigned(fthrd) then
     begin
       writeln('LOCKED');
 
       if m = 'START' then
       begin
-        fvth.enabled := true;
+        fthrd.enabled := true;
       end else
       if m = 'STOP' then
       begin
-        fvth.enabled := false;
+        fthrd.enabled := false;
       end else
       if m = 'KILL' then
       begin
-        fvth.terminate;
-        fvth.enabled := true;
+        fthrd.terminate;
+        fthrd.enabled := true;
       end else
       if m = 'INFO' then
       begin
@@ -149,29 +148,29 @@ begin
 
       if m = 'SEND' then
       begin
-        flst.clear;
+        flist.clear;
       end else
       if pos('SHA1', m) = 1 then
       begin
         parse_prefix('SHA1', m, s);
-        if s = sha1print(sha1string(flst.text)) then
+        if s = sha1print(sha1string(flist.text)) then
         begin
-          fvth := tvplotthread.create(flst);
-          fvth.onstart := @dostart;
-          fvth.onstop  := @dostop;
-          fvth.execute;
+          fthrd := tvplotthread.create(flist);
+          fthrd.onstart := @dostart;
+          fthrd.onstop  := @dostop;
+          fthrd.start;
         end;
       end else
       begin
-        flst.add(m);
+        flist.add(m);
       end;
 
     end;
 
-    fcon.iterreset;
-    while fcon.iternext do
+    fconn.iterreset;
+    while fconn.iternext do
     begin
-      fcon.sendmessage('NEXT', fcon.iterator);
+      fconn.sendmessage('NEXT', fconn.iterator);
     end;
   end;
 
@@ -190,53 +189,50 @@ end;
 procedure tvplotserver.dostop;
 begin
   writeln('stop thread');
-
-  fvth := nil;
-  flst.clear;
+  flist.clear;
+  fthrd := nil;
 end;
 
 constructor tvplotserver.create;
 begin
-  fcon := tltcp.create(nil);
-  fcon.onerror      := @oner;
-  fcon.onreceive    := @onre;
-  fcon.ondisconnect := @onds;
-  fcon.onaccept     := @onac;
-  fcon.timeout      := 100;
-  fcon.reuseaddress := true;
-  flst := tstringlist.create;
-  fvth := nil;
-
-  freeonterminate := true;
-  inherited create(true);
+  inherited create;
+  fconn := tltcp.create(nil);
+  fconn.onerror      := @oner;
+  fconn.onreceive    := @onre;
+  fconn.ondisconnect := @onds;
+  fconn.onaccept     := @onac;
+  fconn.timeout      := 100;
+  fconn.reuseaddress := true;
+  flist := tstringlist.create;
+  fthrd := nil;
 end;
 
 destructor tvplotserver.destroy;
 begin
-  flst.free;
-  fcon.free;
+  flist.destroy;
+  fconn.destroy;
   inherited destroy;
 end;
 
-procedure tvplotserver.execute;
+procedure tvplotserver.start;
 var
   quit: boolean;
 begin
   quit := false;
  
-  if fcon.listen(srvsetting.port) then
+  if fconn.listen(srvsetting.port) then
   begin
     writeln('vplotsrv2.0 running!');
     writeln('press ''escape'' to quit, ''r'' to restart');
     repeat
-      fcon.callaction;
+      fconn.callaction;
       if keypressed then
         case readkey of
           #27: quit := true;
           'r': begin
                  writeln('restarting...');
-                 fcon.disconnect;
-                 fcon.listen(srvsetting.port);
+                 fconn.disconnect;
+                 fconn.listen(srvsetting.port);
                  quit := false;
                end;
         end;
@@ -272,8 +268,7 @@ var
   y: longint = 0;
   z: longint = 0;
 begin
-  if assigned(fonstart) then
-    synchronize(fonstart);
+  if assigned(fonstart) then fonstart;
 
   for i := 0 to flist.count -1 do
   begin
@@ -306,15 +301,15 @@ begin
     end else
     if pos('MOVED ', s) = 1 then
     begin
-      writeln(s);
       if parse_prefix('X', s, x) and
          parse_prefix('Y', s, y) and
          parse_prefix('Z', s, z) then
       begin
+        writeln(s);
+
         x := x + srvdriver.xcount;
         y := y + srvdriver.ycount;
-        z := z + srvdriver.zcount;
-
+      //z := z + srvdriver.zcount;
         if z < 0 then
           srvdriver.zcount := srvsetting.zmin
         else
@@ -324,8 +319,7 @@ begin
     end;
   end;
 
-  if assigned(fonstop) then
-    synchronize(fonstop);
+  if assigned(fonstop) then fonstop;
 end;
 
 // MAIN BLOCK
@@ -335,6 +329,7 @@ var
 
 begin
   vploserver := tvplotserver.create;
-  vploserver.execute;
+  vploserver.start;
+  vploserver.destroy;
 end.
 
