@@ -330,7 +330,7 @@
       <Unit33>
         <Filename Value="src/vpsetting.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="1"/>
         <TopLine Value="113"/>
         <CursorPos X="72" Y="133"/>
         <UsageCount Value="200"/>
@@ -364,7 +364,7 @@
       <Unit37>
         <Filename Value="src/vppaths.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="2"/>
         <TopLine Value="92"/>
         <CursorPos X="7" Y="102"/>
         <UsageCount Value="200"/>
@@ -1527,11 +1527,10 @@
       </Unit222>
       <Unit223>
         <Filename Value="src/vpdriverthread.pas"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="39"/>
         <CursorPos X="40" Y="61"/>
         <UsageCount Value="24"/>
-        <Loaded Value="True"/>
       </Unit223>
       <Unit224>
         <Filename Value="/usr/share/fpcsrc/3.0.4/packages/hash/src/sha1.pp"/>
@@ -1541,7 +1540,7 @@
         <UsageCount Value="10"/>
       </Unit224>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="src/mainfrm.pas"/>
         <Caret Line="904" Column="15" TopLine="881"/>
@@ -1656,12 +1655,8 @@
       </Position28>
       <Position29>
         <Filename Value="src/mainfrm.pas"/>
-        <Caret Line="263" Column="3" TopLine="275"/>
-      </Position29>
-      <Position30>
-        <Filename Value="src/mainfrm.pas"/>
         <Caret Line="285" Column="3" TopLine="266"/>
-      </Position30>
+      </Position29>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

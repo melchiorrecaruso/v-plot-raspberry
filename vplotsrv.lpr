@@ -239,8 +239,6 @@ var
   y: longint = 0;
   z: longint = 0;
 begin
-  writeln('');
-
   for i := 0 to flist.count -1 do
   begin
     s := flist[i];
@@ -287,9 +285,9 @@ begin
 
 
 
-                 writeln(x);
-                 writeln(y);
-                 writeln(z);
+          writeln(x);
+          writeln(y);
+          writeln(z);
 
 
         //srvdriver.move(x, y);
@@ -297,6 +295,7 @@ begin
     end;
 
   end;
+  flist.clear;
 end;
 
 // MAIN BLOCK

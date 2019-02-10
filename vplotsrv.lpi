@@ -34,9 +34,9 @@
         <Filename Value="vplotsrv.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="259"/>
-        <CursorPos X="31" Y="292"/>
-        <FoldState Value=" T3if0B'"/>
+        <TopLine Value="273"/>
+        <CursorPos X="24" Y="298"/>
+        <FoldState Value=" T3iM0H1F"/>
         <UsageCount Value="31"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -65,7 +65,7 @@
       <Unit4>
         <Filename Value="src/vpsrvdriver.pas"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="219"/>
+        <TopLine Value="218"/>
         <CursorPos X="12" Y="245"/>
         <UsageCount Value="13"/>
         <Loaded Value="True"/>
