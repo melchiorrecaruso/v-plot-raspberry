@@ -19,7 +19,7 @@
   MA 02111-1307, USA.
 }
 
-unit vpsrvdriver;
+unit vpdriver;
 
 {$mode objfpc}
 
