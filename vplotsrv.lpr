@@ -71,7 +71,7 @@ begin
   i := pos(prefix, code);
   if i > 0 then
   begin
-    while (i < length(code)) and (code[i] <> ' ') do
+    while (i <= length(code)) and (code[i] <> ' ') do
     begin
       s := s + code[i];
       inc(i);
@@ -132,26 +132,25 @@ begin
       end else
       if m = 'INFO' then
       begin
-        writeln('INFO;');
+        writeln('INFO');
       end;
 
     end else
     begin
 
-      if m = 'BEGIN' then
+      if m = 'SEND' then
       begin
         flst.clear;
       end else
-      if pos('END ', m) = 1 then
+      if pos('SHA1', m) = 1 then
       begin
-
+        parse_prefix('SHA1', m, s);
 
         writeln(m);
-        parse_prefix('SHA1', m, s);
         writeln(s);
 
 
-        // if s = sha1print(sha1string(flst.text)) then
+        if s = sha1print(sha1string(flst.text)) then
         begin
           fvth := tvplotthread.create(flst);
           fvth.start;
@@ -166,7 +165,7 @@ begin
     fcon.iterreset;
     while fcon.iternext do
     begin
-      fcon.sendmessage('0', fcon.iterator);
+      fcon.sendmessage('NEXT', fcon.iterator);
     end;
   end;
 end;

@@ -1,7 +1,7 @@
 object mainform: Tmainform
-  Left = 325
+  Left = 322
   Height = 448
-  Top = 178
+  Top = 180
   Width = 806
   Anchors = []
   Caption = 'vPlotter'
@@ -753,6 +753,8 @@ object mainform: Tmainform
   object ltcp: TLTCPComponent
     Port = 0
     OnReceive = ltcpReceive
+    OnDisconnect = ltcpDisconnect
+    OnConnect = ltcpConnect
     Timeout = 0
     ReuseAddress = False
     left = 296

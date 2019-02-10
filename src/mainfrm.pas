@@ -120,6 +120,8 @@ type
     procedure leftupbtnClick(Sender: TObject);
     // MAIN MENU::FILE
     procedure loadmiclick          (sender: tobject);
+    procedure ltcpConnect(aSocket: TLSocket);
+    procedure ltcpDisconnect(aSocket: TLSocket);
     procedure ltcpReceive(aSocket: TLSocket);
     procedure penupbtnClick(Sender: TObject);
     procedure savemiclick          (sender: tobject);
@@ -288,7 +290,7 @@ begin
     buffer.add(format('MOVED X%u Y%u Z%u', [ 0,  0, mz]));
 
     s := sha1print(sha1string(buffer.text));
-    buffer.add(format('END SHA1%s', [s]));
+    buffer.add(format('SHA1%s', [s]));
     ltcp.sendmessage('BEGIN');
   end;
 end;
@@ -549,18 +551,7 @@ end;
 
 procedure tmainform.connectmiclick(sender: tobject);
 begin
-  connectmi    .enabled := not ltcp.connect(setting.srvip, setting.srvport); ;
-  disconnectmi .enabled := not connectmi.enabled;
-  startmi      .enabled := not connectmi.enabled;
-  stopmi       .enabled := not connectmi.enabled;
-  killmi       .enabled := not connectmi.enabled;
-  calibrationmi.enabled := not connectmi.enabled;
-  movetohomemi .enabled := not connectmi.enabled;
-
-  if ltcp.connecting then
-    statuslabel.caption := 'Connected'
-  else
-    statuslabel.caption := 'Not connected';
+  ltcp.connect(setting.srvip, setting.srvport);
 end;
 
 procedure tmainform.startmiclick(sender: tobject);
@@ -748,7 +739,7 @@ begin
   unlock2;
 end;
 
-// PREVIEW EVENTS
+// MOUSE EVENTS
 
 procedure tmainform.imagemousedown(sender: tobject;
   button: tmousebutton; shift: tshiftstate; x, y: integer);
@@ -840,7 +831,7 @@ begin
   end;
 end;
 
-// SCREEN/STATUS EVENTS
+// SCREEN EVENTS
 
 procedure tmainform.updatescreen;
 var
@@ -902,7 +893,7 @@ begin
   bitmap.putimage(movex, movey, bit, dmset);
 end;
 
-// LOCK/UNLOCK EVENTS
+// LOCK/UNLOCK ROUTINES
 
 procedure tmainform.lockinternal1(value: boolean);
 begin
@@ -999,6 +990,28 @@ begin
 end;
 
 // LTCP EVENTS
+
+procedure tmainform.ltcpconnect(asocket: tlsocket);
+begin
+  connectmi    .enabled := false;
+  disconnectmi .enabled := true;
+  startmi      .enabled := true;
+  stopmi       .enabled := true;
+  killmi       .enabled := true;
+  calibrationmi.enabled := true;
+  movetohomemi .enabled := true;
+end;
+
+procedure tmainform.ltcpDisconnect(aSocket: TLSocket);
+begin
+  connectmi    .enabled := true;
+  disconnectmi .enabled := false;
+  startmi      .enabled := false;
+  stopmi       .enabled := false;
+  killmi       .enabled := false;
+  calibrationmi.enabled := false;
+  movetohomemi .enabled := false;
+end;
 
 procedure tmainform.ltcpreceive(asocket: tlsocket);
 var
