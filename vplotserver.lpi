@@ -34,8 +34,8 @@
         <Filename Value="vplotserver.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="306"/>
-        <CursorPos X="58" Y="335"/>
+        <TopLine Value="208"/>
+        <CursorPos X="9" Y="239"/>
         <FoldState Value=" T3iR0H1e"/>
         <UsageCount Value="38"/>
         <Loaded Value="True"/>
@@ -182,7 +182,7 @@
         <Loaded Value="True"/>
       </Unit20>
     </Units>
-    <JumpHistory Count="5" HistoryIndex="4">
+    <JumpHistory Count="6" HistoryIndex="5">
       <Position1>
         <Filename Value="vplotserver.lpr"/>
         <Caret Line="170" Column="43" TopLine="136"/>
@@ -203,6 +203,10 @@
         <Filename Value="src/vpdriver.pas"/>
         <Caret Line="224" Column="22" TopLine="188"/>
       </Position5>
+      <Position6>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="27" Column="27" TopLine="7"/>
+      </Position6>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
@@ -218,24 +222,24 @@
     <Parsing>
       <SyntaxOptions>
         <CStyleOperator Value="False"/>
-        <IncludeAssertionCode Value="True"/>
         <AllowLabel Value="False"/>
         <CPPInline Value="False"/>
         <UseAnsiStrings Value="False"/>
       </SyntaxOptions>
     </Parsing>
     <CodeGeneration>
-      <Checks>
-        <IOChecks Value="True"/>
-        <RangeChecks Value="True"/>
-        <OverflowChecks Value="True"/>
-        <StackChecks Value="True"/>
-      </Checks>
-      <VerifyObjMethodCallValidity Value="True"/>
+      <SmartLinkUnit Value="True"/>
       <Optimizations>
-        <OptimizationLevel Value="0"/>
+        <OptimizationLevel Value="4"/>
       </Optimizations>
     </CodeGeneration>
+    <Linking>
+      <Debugging>
+        <GenerateDebugInfo Value="False"/>
+        <UseLineInfoUnit Value="False"/>
+      </Debugging>
+      <LinkSmart Value="True"/>
+    </Linking>
   </CompilerOptions>
   <Debugging>
     <Exceptions Count="3">

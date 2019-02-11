@@ -24,7 +24,7 @@ program vplotserver;
 {$mode objfpc}
 
 uses
- cthreads, cmem, classes, crt, lnet, lnetbase, sha1, sysutils, vpdriver, vpsetting;
+ cthreads, cmem, classes, lnet, lnetbase, sha1, sysutils, vpdriver, vpsetting;
 
 type
 
@@ -122,8 +122,6 @@ begin
 
     if assigned(fthrd) then
     begin
-      writeln('LOCKED');
-
       if m = 'START' then
       begin
         fthrd.enabled := true;
@@ -144,8 +142,6 @@ begin
 
     end else
     begin
-      writeln('UNLOCKED');
-
       if m = 'SEND' then
       begin
         flist.clear;
@@ -229,6 +225,7 @@ begin
     writeln('press ''escape'' to quit, ''r'' to restart');
     repeat
       fconn.callaction;
+      (*
       if keypressed then
         case readkey of
           #27: quit := true;
@@ -239,8 +236,7 @@ begin
                  quit := false;
                end;
         end;
-
-      sleep(100);
+      *)
     until quit;
   end;
 end;
