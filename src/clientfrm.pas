@@ -34,8 +34,13 @@ type
   { Tclientform }
 
   Tclientform = class(tform)
-    Bevel1: TBevel;
-    Bevel2: TBevel;
+    printmi: TMenuItem;
+    scalebevelleft: TBevel;
+    offsetbevelleft: TBevel;
+    calibrationbevelleft: TBevel;
+    scalelabel: TLabel;
+    scalebevel: TBevel;
+    clientformbevel: TBevel;
     offsetbevel: TBevel;
     calibrationbevel: TBevel;
     calibrationclosebtn: TBitBtn;
@@ -140,6 +145,7 @@ type
     procedure ltcpDisconnect(aSocket: TLSocket);
     procedure ltcpError(const msg: string; aSocket: TLSocket);
     procedure ltcpReceive(aSocket: TLSocket);
+    procedure printmiClick(Sender: TObject);
     procedure offsetupdatebtnClick(Sender: TObject);
     procedure penupbtnClick(Sender: TObject);
     procedure savemiclick          (sender: tobject);
@@ -592,15 +598,25 @@ begin
   ltcp.disconnect(false);
 end;
 
+procedure Tclientform.printmiClick(Sender: TObject);
+begin
+  lock2;
+  if ltcp.connected then
+  begin
+    optimize(paths,
+      setting.layout8.x,
+      setting.layout8.y,
+      setting.wavexmax,
+      setting.waveymax,
+      buffer);
+
+    ltcp.sendmessage('SEND');
+  end;
+  unlock2;
+end;
+
 procedure tclientform.startmiclick(sender: tobject);
 begin
-  optimize(paths,
-    setting.layout8.x,
-    setting.layout8.y,
-    setting.wavexmax,
-    setting.waveymax,
-    buffer);
-
   if ltcp.connected then
     ltcp.sendmessage('START');
 end;
@@ -1072,7 +1088,7 @@ begin
     end else
     if m = 'LOCKED' then
     begin
-
+      buffer.clear;
 
     end else
       statuslabel.caption := m;
