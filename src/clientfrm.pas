@@ -141,6 +141,7 @@ type
     procedure leftupbtnClick(Sender: TObject);
     // MAIN MENU::FILE
     procedure loadmiclick          (sender: tobject);
+    procedure ltcpCanSend(aSocket: TLSocket);
     procedure ltcpConnect(aSocket: TLSocket);
     procedure ltcpDisconnect(aSocket: TLSocket);
     procedure ltcpError(const msg: string; aSocket: TLSocket);
@@ -1071,30 +1072,38 @@ begin
   messagedlg('Server Error', msg , mterror, [mbok], 0);
 end;
 
-procedure Tclientform.ltcpreceive(asocket: tlsocket);
+procedure tclientform.ltcpreceive(asocket: tlsocket);
 var
-   m: ansistring;
+  m: ansistring;
 begin
   if ltcp.getmessage(m) > 0 then
   begin
 
-    if m = 'UNLOKED' then
-    begin
-      if buffer.count > 0 then
-      begin
-        ltcp.sendmessage(buffer[0]);
-        buffer.delete(0);
-      end;
-    end else
-    if m = 'LOCKED' then
-    begin
-      buffer.clear;
+  end;
+end;
 
-    end else
-      statuslabel.caption := m;
-
+procedure tclientform.ltcpcansend(asocket: tlsocket);
+var
+  m: string;
+begin
+  (*
+  if buffer.count > 50 then
+  begin
+    m := '';
+    for i := 0 to 48 do
+    begin
+      m := m + buffer[0] + ';';
+      buffer.delete(0);
+    end;
+    ltcp.sendmessage(m);
   end else
-    unlock2;
+  *)
+  if buffer.count > 0 then
+  begin
+    m := buffer[0];
+    buffer.delete(0);
+    ltcp.sendmessage(m);
+  end;
 end;
 
 end.
