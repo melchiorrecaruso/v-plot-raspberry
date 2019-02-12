@@ -163,14 +163,14 @@ begin
 
     end;
 
-    fconn.iterreset;
-    while fconn.iternext do
-    begin
-      if assigned(fthrd) then
-        fconn.sendmessage('LOCKED', fconn.iterator)
-      else
-        fconn.sendmessage('UNLOCKED',   fconn.iterator);
-    end;
+    //fconn.iterreset;
+    //while fconn.iternext do
+    //begin
+    //  if assigned(fthrd) then
+    //    fconn.sendmessage('LOCKED', fconn.iterator)
+    //  else
+    //    fconn.sendmessage('UNLOCKED',   fconn.iterator);
+    //end;
   end;
 
 end;

@@ -34,10 +34,10 @@
         <Filename Value="vplotserver.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="208"/>
-        <CursorPos X="9" Y="239"/>
+        <TopLine Value="127"/>
+        <CursorPos X="22" Y="161"/>
         <FoldState Value=" T3iR0H1e"/>
-        <UsageCount Value="38"/>
+        <UsageCount Value="39"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
