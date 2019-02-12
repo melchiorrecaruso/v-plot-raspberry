@@ -1079,6 +1079,14 @@ begin
   if ltcp.getmessage(m) > 0 then
   begin
 
+    (*
+    if buffer.count > 0 then
+    begin
+      m := buffer[0];
+      buffer.delete(0);
+      ltcp.sendmessage(m);
+    end;
+    *)
   end;
 end;
 
@@ -1098,6 +1106,8 @@ begin
     ltcp.sendmessage(m);
   end else
   *)
+  writeln(buffer.count);
+
   if buffer.count > 0 then
   begin
     m := buffer[0];

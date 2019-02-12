@@ -56,7 +56,7 @@ object clientform: Tclientform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 20
+    Top = 19
     Width = 766
     Anchors = [akLeft, akRight]
     AutoSize = True
