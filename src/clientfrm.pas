@@ -214,7 +214,7 @@ type
         zoom: single;
 
 
-      buffer: string;
+      buffer: ansistring;
     bufindex: longint;
 
        movex: longint;
@@ -611,6 +611,8 @@ begin
       setting.wavexmax,
       setting.waveymax,
       buffer);
+
+    writeln(length(buffer));
 
     bufindex := 1;
     //ltcp.sendmessage('SEND');
@@ -1099,7 +1101,6 @@ var
 begin
   writeln('ltcpcansend');
   writeln(bufindex, ' ', length(buffer));
-
 
   if bufindex <= length(buffer) then
   begin

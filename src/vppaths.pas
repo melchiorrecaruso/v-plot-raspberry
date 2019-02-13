@@ -101,7 +101,7 @@ type
     property items[index: longint]: tvppath read get;
   end;
 
-  procedure optimize2(paths: tvppaths; const xcenter, ycenter, xmax, ymax: double; s: string); overload;
+  procedure optimize2(paths: tvppaths; const xcenter, ycenter, xmax, ymax: double; var s: ansistring); overload;
   procedure optimize(paths: tvppaths; const xcenter, ycenter, xmax, ymax: double; buf: tstringlist); overload;
   procedure optimize(const p: tvppoint; out mx, my: longint);
 
@@ -927,7 +927,7 @@ begin
   list.destroy;
 end;
 
-procedure optimize2(paths: tvppaths; const xcenter, ycenter, xmax, ymax: double; s: string); overload;
+procedure optimize2(paths: tvppaths; const xcenter, ycenter, xmax, ymax: double; var s: ansistring); overload;
 var
    i, j: longint;
      mx: longint = 0;
