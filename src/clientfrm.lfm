@@ -1,11 +1,11 @@
 object clientform: Tclientform
   Left = 148
-  Height = 537
-  Top = 90
+  Height = 534
+  Top = 93
   Width = 766
   Anchors = []
   Caption = 'vPlotter'
-  ClientHeight = 515
+  ClientHeight = 512
   ClientWidth = 766
   Menu = mainmenu
   OnCreate = FormCreate
@@ -19,7 +19,7 @@ object clientform: Tclientform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 1
-    Top = 514
+    Top = 511
     Width = 766
     Anchors = [akLeft, akRight, akBottom]
     ParentColor = False
@@ -33,7 +33,7 @@ object clientform: Tclientform
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 513
+    Height = 510
     Top = 2
     Width = 766
     OnRedraw = screenredraw
@@ -56,7 +56,7 @@ object clientform: Tclientform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 19
+    Top = 12
     Width = 766
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -543,7 +543,7 @@ object clientform: Tclientform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 44
-    Top = 112
+    Top = 111
     Width = 766
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -658,7 +658,7 @@ object clientform: Tclientform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 168
+    Top = 176
     Width = 766
     Anchors = [akLeft, akRight]
     AutoSize = True

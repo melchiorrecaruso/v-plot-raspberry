@@ -159,6 +159,7 @@ begin
       end else
       begin
         flist.add(m);
+        writeln(length(m));
       end;
 
     end;

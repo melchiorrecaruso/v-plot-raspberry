@@ -101,6 +101,7 @@ type
     property items[index: longint]: tvppath read get;
   end;
 
+  procedure optimize2(paths: tvppaths; const xcenter, ycenter, xmax, ymax: double; s: string); overload;
   procedure optimize(paths: tvppaths; const xcenter, ycenter, xmax, ymax: double; buf: tstringlist); overload;
   procedure optimize(const p: tvppoint; out mx, my: longint);
 
@@ -921,6 +922,55 @@ begin
 
       optimize(point, mx, my);
       buf.add(format('MOVE X%d Y%d Z%d', [mx, my, trunc(point.z)]));
+    end;
+  end;
+  list.destroy;
+end;
+
+procedure optimize2(paths: tvppaths; const xcenter, ycenter, xmax, ymax: double; s: string); overload;
+var
+   i, j: longint;
+     mx: longint = 0;
+     my: longint = 0;
+   path: tvppath;
+  point: tvppoint;
+   list: tfplist;
+begin
+  list := tfplist.create;
+  for i := 0 to paths.count -1 do
+  begin
+    path := paths.items[i];
+    if path.enabled then
+      for j := 0 to path.count -1 do
+      begin
+        point:= path.items[j]^;
+        point:= wave.update(point);
+
+        if (abs(point.x) <= (xmax)) and
+           (abs(point.y) <= (ymax)) then
+          list.add(path.items[j]);
+      end;
+  end;
+
+  if list.count > 0 then
+  begin
+    pvppoint(list[0])^.z := setting.zmax;
+    for i := 1 to list.count -1 do
+      if distance_between_two_points(
+        pvppoint(list[i])^, pvppoint(list[i-1])^) < 0.25 then
+        pvppoint(list[i])^.z := setting.zmin
+      else
+        pvppoint(list[i])^.z := setting.zmax;
+
+    for i := 0 to list.count -1 do
+    begin
+      point   := pvppoint(list[i])^;
+      point   := wave.update(point);
+      point.x := point.x + xcenter;
+      point.y := point.y + ycenter;
+
+      optimize(point, mx, my);
+      s := s + format('MOVE X%d Y%d Z%d ;', [mx, my, trunc(point.z)]);
     end;
   end;
   list.destroy;

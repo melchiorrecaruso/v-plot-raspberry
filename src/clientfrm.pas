@@ -28,7 +28,7 @@ interface
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls, comctrls,
   buttons, menus, spin, vppaths, vpsetting, bgrabitmap,  types,                                         
-  bgrabitmaptypes, bgravirtualscreen, lnetcomponents, bgragradientscanner, sha1, lnet;
+  bgrabitmaptypes, bgravirtualscreen, lnetcomponents, bgragradientscanner, sha1, lnet, zstream;
 
 type
   { Tclientform }
@@ -214,7 +214,8 @@ type
         zoom: single;
 
 
-      buffer: tstringlist;
+      buffer: string;
+    bufindex: longint;
 
        movex: longint;
        movey: longint;
@@ -251,7 +252,7 @@ var
   wavemesh: twavemesh;
 begin
   // buffer
-  buffer := tstringlist.create;
+  buffer := '';
   // load setting
   setting := tvpsetting.create;
   setting.load(extractfilepath(paramstr(0)) + 'vplot.ini');
@@ -290,7 +291,6 @@ begin
   paths.destroy;
   bit.destroy;
   setting.destroy;
-  buffer.destroy;
 end;
 
 procedure tclientform.leftupbtnclick(sender: tobject);
@@ -306,12 +306,12 @@ begin
 
   if ltcp.connected then
   begin
-    buffer.clear;
-    buffer.add(format('MOVED X%d Y%d Z%d', [mx, my, $F]));
+    //buffer.clear;
+    //buffer.add(format('MOVED X%d Y%d Z%d', [mx, my, $F]));
     //buffer.add(format('INIT  X%d Y%d Z%d', [mx, my, $F]));
 
-    s := sha1print(sha1string(buffer.text));
-    buffer.add(format('SHA1%s', [s]));
+    //s := sha1print(sha1string(buffer.text));
+    //buffer.add(format('SHA1%s', [s]));
     ltcp.sendmessage('SEND');
   end else
     messagedlg('Error', 'Server is disconnected ', mterror, [mbok], 0);
@@ -327,11 +327,11 @@ begin
 
   if ltcp.connected then
   begin
-    buffer.clear;
-    buffer.add(format('MOVED X%d Y%d Z%d', [ 0,  0, mz]));
+    //buffer.clear;
+    //buffer.add(format('MOVED X%d Y%d Z%d', [ 0,  0, mz]));
 
-    s := sha1print(sha1string(buffer.text));
-    buffer.add(format('SHA1%s', [s]));
+    //s := sha1print(sha1string(buffer.text));
+    //buffer.add(format('SHA1%s', [s]));
     ltcp.sendmessage('SEND');
   end else
     messagedlg('Error', 'Server is disconnected ', mterror, [mbok], 0);
@@ -599,19 +599,22 @@ begin
   ltcp.disconnect(false);
 end;
 
-procedure Tclientform.printmiClick(Sender: TObject);
+procedure Tclientform.printmiclick(sender: tobject);
 begin
   lock2;
   if ltcp.connected then
   begin
-    optimize(paths,
+    buffer := '';
+    optimize2(paths,
       setting.layout8.x,
       setting.layout8.y,
       setting.wavexmax,
       setting.waveymax,
       buffer);
 
-    ltcp.sendmessage('SEND');
+    bufindex := 1;
+    //ltcp.sendmessage('SEND');
+    ltcpcansend(nil);
   end;
   unlock2;
 end;
@@ -1078,7 +1081,6 @@ var
 begin
   if ltcp.getmessage(m) > 0 then
   begin
-
     (*
     if buffer.count > 0 then
     begin
@@ -1092,28 +1094,24 @@ end;
 
 procedure tclientform.ltcpcansend(asocket: tlsocket);
 var
-  m: string;
-begin
-  (*
-  if buffer.count > 50 then
-  begin
-    m := '';
-    for i := 0 to 48 do
-    begin
-      m := m + buffer[0] + ';';
-      buffer.delete(0);
-    end;
-    ltcp.sendmessage(m);
-  end else
-  *)
-  writeln(buffer.count);
+  sent: longint;
 
-  if buffer.count > 0 then
+begin
+  writeln('ltcpcansend');
+  writeln(bufindex, ' ', length(buffer));
+
+
+  if bufindex <= length(buffer) then
   begin
-    m := buffer[0];
-    buffer.delete(0);
-    ltcp.sendmessage(m);
+    writeln(bufindex, ' ', length(buffer));
+    repeat
+      sent := ltcp.send(buffer[bufindex], min(length(buffer)-bufindex + 1, $ff));
+      inc(bufindex, sent);
+
+
+    until (bufindex > length(buffer)) or (sent = 0);
   end;
+
 end;
 
 end.
