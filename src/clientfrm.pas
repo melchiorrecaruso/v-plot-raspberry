@@ -1105,7 +1105,6 @@ begin
   if bufferindex = length(buffer) then
   begin
     unlock2;
-
   end;
 end;
 
