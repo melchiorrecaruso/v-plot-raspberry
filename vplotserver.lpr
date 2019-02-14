@@ -171,6 +171,11 @@ begin
           while fconn.iternext do
             fconn.sendmessage('SEND', fconn.iterator);
         end;
+      end else
+      begin
+        fconn.iterreset;
+        while fconn.iternext do
+          fconn.sendmessage('INFO READY', fconn.iterator);
       end;
 
     end;
