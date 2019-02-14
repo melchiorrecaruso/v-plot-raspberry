@@ -124,14 +124,17 @@ begin
 
       if m = 'START' then
       begin
+        writeln('START');
         fthrd.enabled := true;
       end else
       if m = 'STOP' then
       begin
+        writeln('STOP');
         fthrd.enabled := false;
       end else
       if m = 'KILL' then
       begin
+        writeln('KILL');
         fthrd.terminate;
         fthrd.enabled := true;
       end else
@@ -146,7 +149,7 @@ begin
       if length(fbuf) < fbuflen then
       begin
         fbuf := fbuf + m;
-        if fbuflen = length(fbuf) then
+        if length(fbuf) = fbuflen then
         begin
           writeln('CREATE THREAD');
         end;
@@ -163,15 +166,15 @@ begin
         fbuflen := 0;
         if parse_prefix('LEN', m, fbuflen) then
         begin
+          writeln('READING ', fbuflen);
           fconn.iterreset;
           while fconn.iternext do
             fconn.sendmessage('SEND', fconn.iterator);
         end;
-      end else
-
-
+      end;
 
     end;
+
   end;
 end;
 
