@@ -215,7 +215,7 @@ type
 
 
       buffer: ansistring;
-    bufindex: longint;
+ bufferindex: longint;
 
        movex: longint;
        movey: longint;
@@ -599,26 +599,20 @@ begin
   ltcp.disconnect(false);
 end;
 
-procedure Tclientform.printmiclick(sender: tobject);
+procedure tclientform.printmiclick(sender: tobject);
 begin
   lock2;
   if ltcp.connected then
   begin
-    buffer := '';
-    optimize2(paths,
+    bufferindex := 1;
+    buffer := optimize2(paths,
       setting.layout8.x,
       setting.layout8.y,
       setting.wavexmax,
-      setting.waveymax,
-      buffer);
+      setting.waveymax);
 
-    writeln(length(buffer));
-
-    bufindex := 1;
-    //ltcp.sendmessage('SEND');
-    ltcpcansend(nil);
+    ltcp.sendmessage(format('SEND LEN%d', [length(buffer)]));
   end;
-  unlock2;
 end;
 
 procedure tclientform.startmiclick(sender: tobject);
@@ -1083,36 +1077,23 @@ var
 begin
   if ltcp.getmessage(m) > 0 then
   begin
-    (*
-    if buffer.count > 0 then
+
+    if m = 'SEND' then
     begin
-      m := buffer[0];
-      buffer.delete(0);
-      ltcp.sendmessage(m);
+      ltcpcansend(asocket);
     end;
-    *)
+
   end;
 end;
 
 procedure tclientform.ltcpcansend(asocket: tlsocket);
 var
-  sent: longint;
-
+  n: longint;
 begin
-  writeln('ltcpcansend');
-  writeln(bufindex, ' ', length(buffer));
-
-  if bufindex <= length(buffer) then
-  begin
-    writeln(bufindex, ' ', length(buffer));
-    repeat
-      sent := ltcp.send(buffer[bufindex], min(length(buffer)-bufindex + 1, $ff));
-      inc(bufindex, sent);
-
-
-    until (bufindex > length(buffer)) or (sent = 0);
-  end;
-
+  repeat
+    n := ltcp.send(buffer[bufferindex], length(buffer) - bufferindex + 1);
+    inc(bufferindex, n);
+  until (n = 0) or (bufferindex > length(buffer));
 end;
 
 end.

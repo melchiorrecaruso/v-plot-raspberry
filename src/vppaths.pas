@@ -101,7 +101,7 @@ type
     property items[index: longint]: tvppath read get;
   end;
 
-  procedure optimize2(paths: tvppaths; const xcenter, ycenter, xmax, ymax: double; var s: ansistring); overload;
+  function optimize2(paths: tvppaths; const xcenter, ycenter, xmax, ymax: double): ansistring; overload;
   procedure optimize(paths: tvppaths; const xcenter, ycenter, xmax, ymax: double; buf: tstringlist); overload;
   procedure optimize(const p: tvppoint; out mx, my: longint);
 
@@ -927,16 +927,15 @@ begin
   list.destroy;
 end;
 
-procedure optimize2(paths: tvppaths; const xcenter, ycenter, xmax, ymax: double; var s: ansistring); overload;
+function optimize2(paths: tvppaths; const xcenter, ycenter, xmax, ymax: double): ansistring; overload;
 var
    i, j: longint;
-     mx: longint = 0;
-     my: longint = 0;
    path: tvppath;
   point: tvppoint;
    list: tfplist;
 begin
-  list := tfplist.create;
+  result := '';
+  list   := tfplist.create;
   for i := 0 to paths.count -1 do
   begin
     path := paths.items[i];
@@ -969,8 +968,7 @@ begin
       point.x := point.x + xcenter;
       point.y := point.y + ycenter;
 
-      optimize(point, mx, my);
-      s := s + format('MOVE X%d Y%d Z%d ;', [mx, my, trunc(point.z)]);
+      result := result + format('MOVE X%f.2 Y%f.2 Z%f.2;', [point.x, point.y, point.z]);
     end;
   end;
   list.destroy;

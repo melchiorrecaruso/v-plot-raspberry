@@ -34,10 +34,10 @@
         <Filename Value="vplotserver.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="133"/>
-        <CursorPos X="28" Y="162"/>
-        <FoldState Value=" T3iR0H1e"/>
-        <UsageCount Value="39"/>
+        <TopLine Value="168"/>
+        <CursorPos X="44" Y="195"/>
+        <FoldState Value=" T3iR0H$"/>
+        <UsageCount Value="41"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
@@ -170,7 +170,7 @@
         <EditorIndex Value="2"/>
         <TopLine Value="191"/>
         <CursorPos X="5" Y="206"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit19>
       <Unit20>
@@ -178,11 +178,11 @@
         <EditorIndex Value="1"/>
         <TopLine Value="62"/>
         <CursorPos X="20" Y="82"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="11"/>
         <Loaded Value="True"/>
       </Unit20>
     </Units>
-    <JumpHistory Count="6" HistoryIndex="5">
+    <JumpHistory Count="21" HistoryIndex="20">
       <Position1>
         <Filename Value="vplotserver.lpr"/>
         <Caret Line="170" Column="43" TopLine="136"/>
@@ -207,6 +207,66 @@
         <Filename Value="vplotserver.lpr"/>
         <Caret Line="27" Column="27" TopLine="7"/>
       </Position6>
+      <Position7>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="37" Column="31" TopLine="17"/>
+      </Position7>
+      <Position8>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="36" Column="32" TopLine="12"/>
+      </Position8>
+      <Position9>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="253" Column="24" TopLine="229"/>
+      </Position9>
+      <Position10>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="263" Column="14" TopLine="240"/>
+      </Position10>
+      <Position11>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="159" Column="11" TopLine="135"/>
+      </Position11>
+      <Position12>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="162" Column="9" TopLine="131"/>
+      </Position12>
+      <Position13>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="37" Column="31" TopLine="19"/>
+      </Position13>
+      <Position14>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="53" Column="13" TopLine="30"/>
+      </Position14>
+      <Position15>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="215" Column="24" TopLine="199"/>
+      </Position15>
+      <Position16>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="148" Column="26" TopLine="126"/>
+      </Position16>
+      <Position17>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="163" Column="7" TopLine="140"/>
+      </Position17>
+      <Position18>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="178" Column="26" TopLine="157"/>
+      </Position18>
+      <Position19>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="191" Column="30" TopLine="169"/>
+      </Position19>
+      <Position20>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="196" Column="6" TopLine="174"/>
+      </Position20>
+      <Position21>
+        <Filename Value="vplotserver.lpr"/>
+        <Caret Line="220" Column="6" TopLine="198"/>
+      </Position21>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

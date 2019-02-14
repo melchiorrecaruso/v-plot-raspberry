@@ -33,7 +33,6 @@ type
   tvplotthread = class(tthread)
   private
     fenabled: boolean;
-    flist:    tstringlist;
     fonstart: tthreadmethod;
     fonstop:  tthreadmethod;
   protected
@@ -51,9 +50,10 @@ type
 
   tvplotserver = class
   private
-    fconn: tltcp;
-    flist: tstringlist;
-    fthrd: tvplotthread;
+    fbuf:     ansistring;
+    fbuflen:  longint;
+    fconn:    tltcp;
+    fthrd:    tvplotthread;
     procedure oner(const msg: ansistring; asocket: tlsocket);
     procedure onac(asocket: tlsocket);
     procedure onre(asocket: tlsocket);
@@ -115,13 +115,13 @@ end;
 procedure tvplotserver.onre(asocket: tlsocket);
 var
   m: ansistring;
-  s: ansistring;
 begin
   if asocket.getmessage(m) > 0 then
   begin
 
     if assigned(fthrd) then
     begin
+
       if m = 'START' then
       begin
         fthrd.enabled := true;
@@ -142,38 +142,33 @@ begin
 
     end else
     begin
-      if m = 'SEND' then
+
+      if fbuflen < length(fbuf) then
       begin
-        flist.clear;
-      end else
-      if pos('SHA1', m) = 1 then
-      begin
-        parse_prefix('SHA1', m, s);
-        if s = sha1print(sha1string(flist.text)) then
+        fbuf := fbuf + m;
+        if fbuflen = length(fbuf) then
         begin
-          fthrd := tvplotthread.create(flist);
-          fthrd.onstart := @dostart;
-          fthrd.onstop  := @dostop;
-          fthrd.start;
+
+
+          writeln('ASDDDSDSDS');
+
+
         end;
       end else
+      if pos('SEND ', m) = 1 then
       begin
-        flist.add(m);
-        writeln(length(m));
+        fbuf := '';
+        fbuflen := 0;
+        if parse_prefix('LEN', m, fbuflen) then
+        begin
+          fconn.iterreset;
+          while fconn.iternext do
+            fconn.sendmessage('SEND', fconn.iterator);
+        end;
       end;
 
     end;
-
-    //fconn.iterreset;
-    //while fconn.iternext do
-    //begin
-    //  if assigned(fthrd) then
-    //    fconn.sendmessage('LOCKED', fconn.iterator)
-    //  else
-    //    fconn.sendmessage('UNLOCKED',   fconn.iterator);
-    //end;
   end;
-
 end;
 
 procedure tvplotserver.onds(asocket: tlsocket);
@@ -189,7 +184,6 @@ end;
 procedure tvplotserver.dostop;
 begin
   writeln('stop thread');
-  flist.clear;
   fthrd := nil;
 end;
 
@@ -203,13 +197,13 @@ begin
   fconn.onaccept     := @onac;
   fconn.timeout      := 100;
   fconn.reuseaddress := true;
-  flist := tstringlist.create;
-  fthrd := nil;
+  fthrd   := nil;
+  fbuf    := '';
+  fbuflen := 0;
 end;
 
 destructor tvplotserver.destroy;
 begin
-  flist.destroy;
   fconn.destroy;
   inherited destroy;
 end;
@@ -226,18 +220,6 @@ begin
     writeln('press ''escape'' to quit, ''r'' to restart');
     repeat
       fconn.callaction;
-      (*
-      if keypressed then
-        case readkey of
-          #27: quit := true;
-          'r': begin
-                 writeln('restarting...');
-                 fconn.disconnect;
-                 fconn.listen(setting.port);
-                 quit := false;
-               end;
-        end;
-      *)
     until quit;
   end;
 end;
@@ -246,7 +228,6 @@ end;
 
 constructor tvplotthread.create(list: tstringlist);
 begin
-  flist    := list;
   fonstart := nil;
   fonstop  := nil;
 
@@ -256,7 +237,6 @@ end;
 
 destructor tvplotthread.destroy;
 begin
-  flist := nil;
   inherited destroy;
 end;
 
@@ -270,6 +250,7 @@ var
 begin
   if assigned(fonstart) then fonstart;
 
+  (*
   for i := 0 to flist.count -1 do
   begin
     s := flist[i];
@@ -317,7 +298,9 @@ begin
         driver.move(x, y);
       end;
     end;
-  end;
+   end;
+    *)
+
 
   if assigned(fonstop) then fonstop;
 end;
