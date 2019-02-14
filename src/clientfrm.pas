@@ -604,7 +604,7 @@ begin
   lock2;
   if ltcp.connected then
   begin
-    bufferindex := 1;
+    bufferindex := 0;
     buffer := optimize2(paths,
       setting.layout8.x,
       setting.layout8.y,
@@ -1080,7 +1080,12 @@ begin
 
     if m = 'SEND' then
     begin
+      writeln('Sending ... ', length(buffer));
       ltcpcansend(asocket);
+    end else
+    if pos('INFO', m) = 1 then
+    begin
+      writeln('INFO');
     end;
 
   end;
@@ -1091,9 +1096,17 @@ var
   n: longint;
 begin
   repeat
-    n := ltcp.send(buffer[bufferindex], length(buffer) - bufferindex + 1);
+    n := ltcp.send(buffer[bufferindex + 1],
+      length(buffer) - bufferindex);
+
     inc(bufferindex, n);
-  until (n = 0) or (bufferindex > length(buffer));
+  until (n = 0) or (bufferindex = length(buffer));
+
+  if bufferindex = length(buffer) then
+  begin
+    unlock2;
+
+  end;
 end;
 
 end.

@@ -143,17 +143,19 @@ begin
     end else
     begin
 
-      if fbuflen < length(fbuf) then
+      if length(fbuf) < fbuflen then
       begin
         fbuf := fbuf + m;
         if fbuflen = length(fbuf) then
         begin
-
-
-          writeln('ASDDDSDSDS');
-
-
+          writeln('CREATE THREAD');
         end;
+      end else
+      if m = 'INFO' then
+      begin
+        fconn.iterreset;
+        while fconn.iternext do
+          fconn.sendmessage('INFO READY', fconn.iterator);
       end else
       if pos('SEND ', m) = 1 then
       begin
@@ -165,7 +167,9 @@ begin
           while fconn.iternext do
             fconn.sendmessage('SEND', fconn.iterator);
         end;
-      end;
+      end else
+
+
 
     end;
   end;
