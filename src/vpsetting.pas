@@ -72,9 +72,6 @@ type
     fwave8:    tvppoint;
     fwavexmax: single;
     fwaveymax: single;
-    // network
-    fip:       string;
-    fport:     longint;
  public
     constructor create;
     destructor  destroy; override;
@@ -120,9 +117,6 @@ type
     property wave8:   tvppoint read fwave8;
     property wavexmax: single  read fwavexmax;
     property waveymax: single  read fwaveymax;
-
-    property ip:       string  read fip;
-    property port:     longint read fport;
  end;
 
 var
@@ -200,9 +194,6 @@ begin
   fwavexmax    := ini.readfloat  ('WAVE',    'XMAX',   0);
   fwaveymax    := ini.readfloat  ('WAVE',    'YMAX',   0);
 
-  fip          := ini.readstring ('NETWORK', 'IP',    '');
-  fport        := ini.readinteger('NETWORK', 'PORT',   0);
-
   //if enabledebug then
   begin
     writeln(format('  LAYOUT::0.X    = %12.5f  00.Y = %12.5f', [flayout0.x, flayout0.y]));
@@ -245,9 +236,6 @@ begin
     writeln(format('    WAVE::8.X    = %12.5f  8.Y = %12.5f', [fwave8.x, fwave8.y]));
     writeln(format('    WAVE::XMAX   = %12.5f', [fwavexmax]));
     writeln(format('    WAVE::YMAX   = %12.5f', [fwaveymax]));
-
-    writeln(format(' NETWORK::IP     = %s',     [fip  ]));
-    writeln(format(' NETWORK::PORT   = %12u',   [fport]));
   end;
   ini.destroy;
 end;

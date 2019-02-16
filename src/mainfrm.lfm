@@ -1,30 +1,17 @@
 object tmainform: tmainform
-  Left = 194
+  Left = 410
   Height = 534
-  Top = 125
+  Top = 50
   Width = 766
   Anchors = []
   Caption = 'vPlotter'
-  ClientHeight = 512
+  ClientHeight = 510
   ClientWidth = 766
   Menu = mainmenu
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   LCLVersion = '2.1.0.0'
-  object statuslabel: TLabel
-    AnchorSideLeft.Control = Owner
-    AnchorSideRight.Control = Owner
-    AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = Owner
-    AnchorSideBottom.Side = asrBottom
-    Left = 0
-    Height = 1
-    Top = 511
-    Width = 766
-    Anchors = [akLeft, akRight, akBottom]
-    ParentColor = False
-  end
   object screen: TBGRAVirtualScreen
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = clientformbevel
@@ -34,12 +21,14 @@ object tmainform: tmainform
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 510
+    Height = 508
     Top = 2
     Width = 766
     OnRedraw = screenredraw
     Alignment = taLeftJustify
     Anchors = [akTop, akLeft, akRight, akBottom]
+    ClientHeight = 508
+    ClientWidth = 766
     Color = clForm
     ParentColor = False
     TabOrder = 0
@@ -47,6 +36,22 @@ object tmainform: tmainform
     OnMouseMove = imagemousemove
     OnMouseUp = imagemouseup
     OnMouseWheel = screenmousewheel
+    object statuslabel: TLabel
+      AnchorSideLeft.Control = screen
+      AnchorSideRight.Control = screen
+      AnchorSideRight.Side = asrBottom
+      AnchorSideBottom.Control = screen
+      AnchorSideBottom.Side = asrBottom
+      Left = 0
+      Height = 18
+      Top = 490
+      Width = 766
+      Alignment = taCenter
+      Anchors = [akLeft, akRight, akBottom]
+      Caption = 'Time'
+      Layout = tlCenter
+      ParentColor = False
+    end
   end
   object calibrationpanel: TPanel
     AnchorSideLeft.Control = Owner
@@ -57,7 +62,7 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 16
+    Top = 13
     Width = 766
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -544,7 +549,7 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 44
-    Top = 112
+    Top = 111
     Width = 766
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -659,7 +664,7 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 176
+    Top = 175
     Width = 766
     Anchors = [akLeft, akRight]
     AutoSize = True

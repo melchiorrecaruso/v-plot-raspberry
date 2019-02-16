@@ -129,21 +129,11 @@ type
     filemi: tmenuitem;
     opendialog: topendialog;
 
-    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure formcreate           (sender: tobject);
     procedure formdestroy          (sender: tobject);
-    procedure killmiClick(Sender: TObject);
-    procedure leftupbtnClick(Sender: TObject);
+    procedure formclose            (sender: tobject; var closeaction: tcloseaction);
     // MAIN MENU::FILE
     procedure loadmiclick          (sender: tobject);
-    procedure movetohomemiClick(Sender: TObject);
-
-
-
-
-
-    procedure offsetupdatebtnClick(Sender: TObject);
-    procedure penupbtnClick(Sender: TObject);
     procedure savemiclick          (sender: tobject);
     procedure clearmiclick         (sender: tobject);
     procedure importmiclick        (sender: tobject);
@@ -154,31 +144,25 @@ type
     procedure rotate90miclick      (sender: tobject);
     procedure mirrorxmiclick       (sender: tobject);
     procedure mirrorymiclick       (sender: tobject);
-    procedure scaleupdatebtnClick(Sender: TObject);
-    procedure scaleclosebtnClick(Sender: TObject);
     procedure scalemiclick         (sender: tobject);
-
     procedure a0miclick            (sender: tobject);
     procedure horizontalmiclick    (sender: tobject);
-    procedure startmiClick(Sender: TObject);
-    procedure stopmiClick(Sender: TObject);
+    procedure toolpathmiclick      (sender: tobject);
     // MAIN-MENU::VIEW
     procedure zoomoutmiclick       (sender: tobject);
     procedure zoominmiclick        (sender: tobject);
     procedure fitmiclick           (sender: tobject);
     // MAIN-MENU::PRINTER
-
-
-
-    procedure toolpathmiclick      (sender: tobject);
+    procedure startmiclick         (sender: tobject);
+    procedure stopmiclick          (sender: tobject);
+    procedure killmiclick          (sender: tobject);
+    procedure movetohomemiclick    (sender: tobject);
     // MAIN-FORM::HELP
     procedure aboutmiclick         (sender: tobject);
     // POPUP-MENU
     procedure selallpmclick        (sender: tobject);
-
     procedure deselallpmclick      (sender: tobject);
     procedure divideselpmclick     (sender: tobject);
-
     procedure hideallpmclick       (sender: tobject);
     procedure hidebylayerpmclick   (sender: tobject);
     procedure hideselpmclick       (sender: tobject);
@@ -196,6 +180,12 @@ type
     procedure imagemousemove  (sender: tobject; shift: tshiftstate; x, y: integer);
     procedure screenmousewheel(sender: tobject; shift: tshiftstate;
       wheeldelta: integer; mousepos: tpoint; var handled: boolean);
+    // panels event
+    procedure scaleupdatebtnclick  (sender: tobject);
+    procedure scaleclosebtnclick   (sender: tobject);
+    procedure offsetupdatebtnclick (sender: tobject);
+    procedure leftupbtnclick       (sender: tobject);
+    procedure penupbtnclick        (sender: tobject);
   private
          bit: tbgrabitmap;
  mouseisdown: boolean;
@@ -822,22 +812,20 @@ end;
 procedure tmainform.imagemousemove(sender: tobject;
   shift: tshiftstate; x, y: integer);
 begin
-  if locked = false then
-    if mouseisdown then
-    begin
-      movex := x - px;
-      movey := y - py;
-      screen.redrawbitmap;
-    end;
+  if locked then exit;
+  if mouseisdown then
+  begin
+    movex := x - px;
+    movey := y - py;
+    screen.redrawbitmap;
+  end;
 end;
 
 procedure tmainform.imagemouseup(sender: tobject;
   button: tmousebutton; shift: tshiftstate; x, y: integer);
 begin
-  if locked = false then
-  begin
-    mouseisdown := false;
-  end;
+  if locked then exit;
+  mouseisdown := false;
 end;
 
 procedure tmainform.screenmousewheel(sender: tobject; shift: tshiftstate;
@@ -845,24 +833,22 @@ procedure tmainform.screenmousewheel(sender: tobject; shift: tshiftstate;
 var
   value: single;
 begin
-  if locked = false then
+  if locked then exit;
+
+  locked := true;
+  if wheeldelta > 0 then
+    value := max(min(zoom*1.25, 25.0), 0.5)
+  else
+    value := max(min(zoom/1.25, 25.0), 0.5);
+
+  if value <> zoom then
   begin
-    locked := true;
-
-    if wheeldelta > 0 then
-      value := max(min(zoom*1.25, 25.0), 0.5)
-    else
-      value := max(min(zoom/1.25, 25.0), 0.5);
-
-    if value <> zoom then
-    begin
-      zoom  := value;
-      movex := movex + round((bit.width  -(pagewidth *zoom))*(mousepos.x-movex)/bit.width );
-      movey := movey + round((bit.height -(pageheight*zoom))*(mousepos.y-movey)/bit.height);
-      updatescreen;
-    end;
-    locked := false;
+    zoom  := value;
+    movex := movex + round((bit.width  -(pagewidth *zoom))*(mousepos.x-movex)/bit.width );
+    movey := movey + round((bit.height -(pageheight*zoom))*(mousepos.y-movey)/bit.height);
+    updatescreen;
   end;
+  locked := false;
 end;
 
 // PANEL EVENTS
@@ -871,29 +857,32 @@ procedure tmainform.leftupbtnclick(sender: tobject);
 var
   mx: longint = 0;
   my: longint = 0;
-   s: string;
 begin
-  if sender = leftupbtn    then mx := - edit.value;
-  if sender = leftdownbtn  then mx := + edit.value;
-  if sender = rightupbtn   then my := - edit.value;
-  if sender = rightdownbtn then my := + edit.value;
+  lock2;
+  driver.xoff   := false;
+  driver.yoff   := false;
+  driver.zoff   := false;
+  driver.zcount := setting.zmax;
 
+  if sender = leftupbtn    then driver.xcount := driver.xcount - edit.value;
+  if sender = leftdownbtn  then driver.xcount := driver.xcount + edit.value;
+  if sender = rightupbtn   then driver.ycount := driver.ycount - edit.value;
+  if sender = rightdownbtn then driver.ycount := driver.ycount + edit.value;
 
-
-
-
-
+  optimize(setting.layout9, mx, my);
+  driver.init(mx, my);
+  unlock2;
 end;
 
 procedure tmainform.penupbtnclick(sender: tobject);
-var
-  mz: longint = 0;
-   s: string;
 begin
-  if sender = penupbtn   then mz := + $F;
-  if sender = pendownbtn then mz := - $F;
-
-
+   lock2;
+  if sender = penupbtn then
+    driver.zcount := setting.zmax
+  else
+  if sender = pendownbtn then
+    driver.zcount := setting.zmin;
+  unlock2;
 end;
 
 // SCREEN EVENTS
@@ -962,6 +951,7 @@ end;
 
 procedure tmainform.lockinternal1(value: boolean);
 begin
+  locked                := not value;
   // main menu::file
   loadmi       .enabled := value;
   savemi       .enabled := value;
@@ -986,6 +976,8 @@ begin
   movetohomemi .enabled := value;
   // main menu::help
   aboutmi      .enabled := value;
+  // virtual screen
+  screen       .enabled := value;
   // popup menu
   if value = false then
     screen.popupmenu := nil
@@ -996,6 +988,7 @@ end;
 
 procedure tmainform.lockinternal2(value: boolean);
 begin
+  locked                := not value;
   // main menu::file
   loadmi       .enabled := value;
   savemi       .enabled := value;
@@ -1020,6 +1013,8 @@ begin
   movetohomemi .enabled := value;
   // main menu::help
   aboutmi      .enabled := value;
+  // virtual screen
+  screen       .enabled := value;
   // popup menu
   if value = false then
     screen.popupmenu := nil
@@ -1040,18 +1035,20 @@ end;
 
 procedure tmainform.lock2;
 begin
-  lockinternal1(false);
+  lockinternal2(false);
 end;
 
 procedure tmainform.unlock2;
 begin
-  lockinternal1(true);
+  lockinternal2(true);
 end;
 
 // PLOTTER THREAD EVENTS
 
 procedure tmainform.onplotterstart;
 begin
+  scalemiclick(nil);
+
   lock1;
   statuslabel.caption := '';
   application.processmessages;
@@ -1073,7 +1070,7 @@ end;
 procedure tmainform.onplottertick;
 begin
   inc(tickcount);
-  if(tickcount mod 800) = 0 then
+  if (tickcount mod 800) = 0 then
   begin
     statuslabel.caption := 'Remaining Time ' +
       formatdatetime('hh:nn:ss', (now-starttime)/tickcount*driverthread.tick);
