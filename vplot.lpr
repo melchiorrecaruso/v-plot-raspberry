@@ -18,22 +18,22 @@
   MA 02111-1307, USA.
 }
 
-program vplotclient;
+program vplot;
 
 {$mode objfpc}
 
 uses
-  cthreads, interfaces, forms, clientfrm, vpsetting, vppaths,
+  cthreads, interfaces, forms, mainfrm, vpsetting, vppaths,
   aboutfrm, vpmath, vpwave, vpsvgreader,
-  lnetvisual;
+  vpdriverthread, vpdriver;
 
-  {$R *.res}
+{$R *.res}
 
 begin
   requirederivedformresource := true;
-  application.title:='VPlot Driver';
+  Application.Title:='VPlot Driver';
   application.initialize;
-  application.createform(tclientform, clientform);
+  application.createform(tmainform, mainform);
   application.run;
 end.
 

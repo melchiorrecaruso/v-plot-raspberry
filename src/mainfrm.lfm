@@ -1,13 +1,14 @@
-object clientform: Tclientform
-  Left = 148
+object tmainform: tmainform
+  Left = 194
   Height = 534
-  Top = 93
+  Top = 125
   Width = 766
   Anchors = []
   Caption = 'vPlotter'
   ClientHeight = 512
   ClientWidth = 766
   Menu = mainmenu
+  OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   LCLVersion = '2.1.0.0'
@@ -56,7 +57,7 @@ object clientform: Tclientform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = -4
+    Top = 16
     Width = 766
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -543,7 +544,7 @@ object clientform: Tclientform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 44
-    Top = 111
+    Top = 112
     Width = 766
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -967,48 +968,27 @@ object clientform: Tclientform
     end
     object miprinter: TMenuItem
       Caption = 'Printer'
-      object connectmi: TMenuItem
-        Caption = 'Connect'
-        OnClick = connectmiclick
-      end
-      object disconnectmi: TMenuItem
-        Caption = 'Disconnect'
-        Enabled = False
-        OnClick = disconnectmiClick
-      end
-      object n10: TMenuItem
-        Caption = '-'
-      end
-      object printmi: TMenuItem
-        Caption = 'Print'
-        OnClick = printmiClick
-      end
       object startmi: TMenuItem
         Caption = 'Start'
-        Enabled = False
         OnClick = startmiclick
       end
       object stopmi: TMenuItem
         Caption = 'Stop'
-        Enabled = False
-        OnClick = stopmiclick
+        OnClick = stopmiClick
       end
       object killmi: TMenuItem
         Caption = 'Kill'
-        Enabled = False
-        OnClick = killmiclick
+        OnClick = killmiClick
       end
       object n6: TMenuItem
         Caption = '-'
       end
       object calibrationmi: TMenuItem
         Caption = 'Calibration ...'
-        Enabled = False
         OnClick = scalemiClick
       end
       object movetohomemi: TMenuItem
         Caption = 'Move to Home'
-        Enabled = False
         OnClick = movetohomemiclick
       end
     end
@@ -1087,17 +1067,5 @@ object clientform: Tclientform
       Caption = 'Divide Selected'
       OnClick = divideselpmclick
     end
-  end
-  object ltcp: TLTCPComponent
-    Port = 0
-    OnReceive = ltcpReceive
-    OnError = ltcpError
-    OnDisconnect = ltcpDisconnect
-    OnConnect = ltcpConnect
-    OnCanSend = ltcpCanSend
-    Timeout = 0
-    ReuseAddress = False
-    left = 304
-    top = 368
   end
 end

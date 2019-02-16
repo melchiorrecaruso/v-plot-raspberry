@@ -19,7 +19,7 @@
   MA 02111-1307, USA.
 }
 
-unit clientfrm;
+unit mainfrm;
 
 {$mode objfpc}
 
@@ -27,20 +27,19 @@ interface
 
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls, comctrls,
-  buttons, menus, spin, vppaths, vpsetting, bgrabitmap,  types,                                         
-  bgrabitmaptypes, bgravirtualscreen, lnetcomponents, bgragradientscanner, sha1, lnet, zstream;
+  buttons, menus, spin, vppaths, bgrabitmap,  types,
+  bgrabitmaptypes, bgravirtualscreen, bgragradientscanner;
 
 type
-  { Tclientform }
+  { tmainform }
 
-  Tclientform = class(tform)
-    printmi: TMenuItem;
+  tmainform = class(tform)
     scalebevelleft: TBevel;
     offsetbevelleft: TBevel;
     calibrationbevelleft: TBevel;
     scalelabel: TLabel;
     scalebevel: TBevel;
-    clientformbevel: TBevel;
+    mainformbevel: TBevel;
     offsetbevel: TBevel;
     calibrationbevel: TBevel;
     calibrationclosebtn: TBitBtn;
@@ -54,11 +53,8 @@ type
     leftdownbtn: TBitBtn;
     edit: TSpinEdit;
     leftupbtn: TBitBtn;
-    ltcp: TLTCPComponent;
     calibrationpanel: TPanel;
-    disconnectmi: TMenuItem;
     calibrationmi: TMenuItem;
-    n10: TMenuItem;
     scalepanel: TPanel;
     pendownbtn: TBitBtn;
     penupbtn: TBitBtn;
@@ -92,7 +88,6 @@ type
     popup: tpopupmenu;
     mainmenu: tmainmenu;
     editmi: tmenuitem;
-    connectmi: tmenuitem;
     a0mi: tmenuitem;
     a1mi: tmenuitem;
     a2mi: tmenuitem;
@@ -134,19 +129,19 @@ type
     filemi: tmenuitem;
     opendialog: topendialog;
 
-
-    procedure disconnectmiClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure formcreate           (sender: tobject);
     procedure formdestroy          (sender: tobject);
+    procedure killmiClick(Sender: TObject);
     procedure leftupbtnClick(Sender: TObject);
     // MAIN MENU::FILE
     procedure loadmiclick          (sender: tobject);
-    procedure ltcpCanSend(aSocket: TLSocket);
-    procedure ltcpConnect(aSocket: TLSocket);
-    procedure ltcpDisconnect(aSocket: TLSocket);
-    procedure ltcpError(const msg: string; aSocket: TLSocket);
-    procedure ltcpReceive(aSocket: TLSocket);
-    procedure printmiClick(Sender: TObject);
+    procedure movetohomemiClick(Sender: TObject);
+
+
+
+
+
     procedure offsetupdatebtnClick(Sender: TObject);
     procedure penupbtnClick(Sender: TObject);
     procedure savemiclick          (sender: tobject);
@@ -165,17 +160,16 @@ type
 
     procedure a0miclick            (sender: tobject);
     procedure horizontalmiclick    (sender: tobject);
+    procedure startmiClick(Sender: TObject);
+    procedure stopmiClick(Sender: TObject);
     // MAIN-MENU::VIEW
     procedure zoomoutmiclick       (sender: tobject);
     procedure zoominmiclick        (sender: tobject);
     procedure fitmiclick           (sender: tobject);
     // MAIN-MENU::PRINTER
-    procedure connectmiclick       (sender: tobject);
-    procedure startmiclick         (sender: tobject);
-    procedure stopmiclick          (sender: tobject);
-    procedure killmiclick          (sender: tobject);
 
-    procedure movetohomemiclick    (sender: tobject);
+
+
     procedure toolpathmiclick      (sender: tobject);
     // MAIN-FORM::HELP
     procedure aboutmiclick         (sender: tobject);
@@ -214,14 +208,18 @@ type
         zoom: single;
 
 
-      buffer: ansistring;
- bufferindex: longint;
+   starttime: tdatetime;
+   tickcount: longint;
+
 
        movex: longint;
        movey: longint;
       locked: boolean;
 
     // ---
+    procedure onplotterstart;
+    procedure onplotterstop;
+    procedure onplottertick;
     procedure lockinternal1(value: boolean);
     procedure lockinternal2(value: boolean);
   public
@@ -234,33 +232,32 @@ type
 
 
 var
-  clientform: Tclientform;
+  mainform: tmainform;
 
 
 implementation
 
-{$R *.lfm}
+{$r *.lfm}
 
 uses
-  math, sysutils, aboutfrm,
-  vpmath, vpsvgreader, vpdxfreader, vpwave, sketchyimage;
+  math, sysutils, aboutfrm, vpdriver, vpdriverthread, vpmath, vpsvgreader, vpdxfreader, vpsetting, vpwave, sketchyimage;
 
 // FORM EVENTS
 
-procedure tclientform.formcreate(sender: tobject);
+procedure tmainform.formcreate(sender: tobject);
 var
   wavemesh: twavemesh;
+  mx: longint = 0;
+  my: longint = 0;
 begin
-  // buffer
-  buffer := '';
   // load setting
   setting := tvpsetting.create;
-  setting.load(extractfilepath(paramstr(0)) + 'vplot.ini');
-  // create preview and empty paths
-    bit := tbgrabitmap.create;
-  paths := tvppaths.create;
-  // update virtual screen
-  a0miclick(a3mi);
+  setting.load(changefileext(paramstr(0), '.ini'));
+  // create plotter driver
+  driver        := tvpdriver.create;
+  driver.xdelay := setting.xdelay;
+  driver.ydelay := setting.ydelay;
+  driver.zdelay := setting.zdelay;
   // init wave
   wavemesh[0] := setting.wave0;
   wavemesh[1] := setting.wave1;
@@ -277,69 +274,44 @@ begin
     wavemesh);
   wave.enabled := false;
   wave.test;
+  // create preview and empty paths
+  paths := tvppaths.create;
+    bit := tbgrabitmap.create;
+  // update virtual screen
+  a0miclick(a3mi);
+  // initialize driver
+  optimize(setting.layout9, mx, my);
+  driver.init(mx, my);
   // update panels
   scalepanel      .anchors := [akleft, akright, aktop];
   offsetpanel     .anchors := [akleft, akright, aktop];
   calibrationpanel.anchors := [akleft, akright, aktop];
 end;
 
-procedure tclientform.formdestroy(sender: tobject);
+procedure tmainform.formdestroy(sender: tobject);
 begin
-  if ltcp.connected then
-    ltcp.disconnect(true);
-  wave.destroy;
-  paths.destroy;
+  movetohomemiclick(sender);
+  // ---
   bit.destroy;
+  paths.destroy;
+  wave.destroy;
+  driver.destroy;
   setting.destroy;
 end;
 
-procedure tclientform.leftupbtnclick(sender: tobject);
-var
-  mx: longint = 0;
-  my: longint = 0;
-   s: string;
+procedure tmainform.formclose(sender: tobject; var closeaction: tcloseaction);
 begin
-  if sender = leftupbtn    then mx := - edit.value;
-  if sender = leftdownbtn  then mx := + edit.value;
-  if sender = rightupbtn   then my := - edit.value;
-  if sender = rightdownbtn then my := + edit.value;
-
-  if ltcp.connected then
+  if assigned(driverthread) then
   begin
-    //buffer.clear;
-    //buffer.add(format('MOVED X%d Y%d Z%d', [mx, my, $F]));
-    //buffer.add(format('INIT  X%d Y%d Z%d', [mx, my, $F]));
-
-    //s := sha1print(sha1string(buffer.text));
-    //buffer.add(format('SHA1%s', [s]));
-    ltcp.sendmessage('SEND');
+    messagedlg('vPlotter Error', 'There is an active process!', mterror, [mbok], 0);
+    closeaction := canone;
   end else
-    messagedlg('Error', 'Server is disconnected ', mterror, [mbok], 0);
-end;
-
-procedure tclientform.penupbtnclick(sender: tobject);
-var
-  mz: longint = 0;
-   s: string;
-begin
-  if sender = penupbtn   then mz := + $F;
-  if sender = pendownbtn then mz := - $F;
-
-  if ltcp.connected then
-  begin
-    //buffer.clear;
-    //buffer.add(format('MOVED X%d Y%d Z%d', [ 0,  0, mz]));
-
-    //s := sha1print(sha1string(buffer.text));
-    //buffer.add(format('SHA1%s', [s]));
-    ltcp.sendmessage('SEND');
-  end else
-    messagedlg('Error', 'Server is disconnected ', mterror, [mbok], 0);
+    closeaction := cafree;
 end;
 
 // MAIN-MENU::FILE
 
-procedure tclientform.loadmiclick(sender: tobject);
+procedure tmainform.loadmiclick(sender: tobject);
 begin
   opendialog.filter := 'vplot files (*.vplot)|*.vplot';
   if opendialog.execute then
@@ -354,7 +326,7 @@ begin
   end;
 end;
 
-procedure tclientform.savemiclick(sender: tobject);
+procedure tmainform.savemiclick(sender: tobject);
 begin
   savedialog.filter := 'vplot files (*.vplot)|*.vplot';
   if savedialog.execute then
@@ -368,7 +340,7 @@ begin
   end;
 end;
 
-procedure tclientform.clearmiclick(sender: tobject);
+procedure tmainform.clearmiclick(sender: tobject);
 begin
   caption := 'vPlotter';
 
@@ -378,7 +350,7 @@ begin
   unlock2;
 end;
 
-procedure tclientform.importmiclick(sender: tobject);
+procedure tmainform.importmiclick(sender: tobject);
 begin
   opendialog.filter := 'Supported files (*.svg, *.dxf)|*.svg; *.dxf';
   if opendialog.execute then
@@ -399,14 +371,14 @@ begin
   end;
 end;
 
-procedure tclientform.exitmiclick(sender: tobject);
+procedure tmainform.exitmiclick(sender: tobject);
 begin
   close;
 end;
 
 // MAIN-MENU::EDIT
 
-procedure Tclientform.rotate90miclick(sender: tobject);
+procedure tmainform.rotate90miclick(sender: tobject);
 begin
   lock2;
   paths.rotate(degtorad(90));
@@ -414,7 +386,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.rotate180miclick(sender: tobject);
+procedure tmainform.rotate180miclick(sender: tobject);
 begin
   lock2;
   paths.rotate(degtorad(180));
@@ -422,7 +394,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.rotate270miclick(sender: tobject);
+procedure tmainform.rotate270miclick(sender: tobject);
 begin
   lock2;
   paths.rotate(degtorad(270));
@@ -430,7 +402,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.mirrorxmiclick(sender: tobject);
+procedure tmainform.mirrorxmiclick(sender: tobject);
 begin
   lock2;
   paths.mirror(true);
@@ -438,7 +410,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.mirrorymiclick(sender: tobject);
+procedure tmainform.mirrorymiclick(sender: tobject);
 begin
   lock2;
   paths.mirror(false);
@@ -446,21 +418,21 @@ begin
   unlock2;
 end;
 
-procedure tclientform.scalemiclick(sender: tobject);
+procedure tmainform.scalemiclick(sender: tobject);
 begin
   scalepanel      .visible := sender = scalemi;
   calibrationpanel.visible := sender = calibrationmi;
   offsetpanel     .visible := sender = offsetmi;
 end;
 
-procedure tclientform.scaleclosebtnclick(sender: tobject);
+procedure tmainform.scaleclosebtnclick(sender: tobject);
 begin
   scalepanel      .visible := false;
   calibrationpanel.visible := false;
   offsetpanel     .visible := false;
 end;
 
-procedure tclientform.scaleupdatebtnclick(sender: tobject);
+procedure tmainform.scaleupdatebtnclick(sender: tobject);
 begin
   lock2;
   paths.scale(scaleedit.value);
@@ -468,7 +440,7 @@ begin
   unlock2;
 end;
 
-procedure tclientform.offsetupdatebtnclick(sender: tobject);
+procedure tmainform.offsetupdatebtnclick(sender: tobject);
 begin
   lock2;
   paths.offset(xoffsetedit.value,
@@ -477,7 +449,7 @@ begin
   unlock2;
 end;
 
-procedure tclientform.a0miclick(sender: tobject);
+procedure tmainform.a0miclick(sender: tobject);
 var
   amin: longint = 297;
   amax: longint = 420;
@@ -512,7 +484,7 @@ begin
   unlock2;
 end;
 
-procedure tclientform.horizontalmiclick(sender: tobject);
+procedure tmainform.horizontalmiclick(sender: tobject);
 var
   amin: longint;
   amax: longint;
@@ -537,7 +509,7 @@ begin
   unlock2;
 end;
 
-procedure tclientform.toolpathmiclick(sender: tobject);
+procedure tmainform.toolpathmiclick(sender: tobject);
 begin
   lock2;
   paths.selectall(false);
@@ -548,11 +520,11 @@ end;
 
 // MAIN MENU::VIEW
 
-procedure tclientform.zoominmiclick(sender: tobject);
+procedure tmainform.zoominmiclick(sender: tobject);
 var
   value: single;
 begin
-  value := max(min(zoom*1.5, 25.0), 0.5);
+  value := max(min(zoom*1.25, 25.0), 0.5);
 
   if value <> zoom then
   begin
@@ -563,11 +535,11 @@ begin
   end;
 end;
 
-procedure tclientform.zoomoutmiclick(sender: tobject);
+procedure tmainform.zoomoutmiclick(sender: tobject);
 var
   value: single;
 begin
-  value := max(min(zoom/1.5, 25.0), 0.5);
+  value := max(min(zoom/1.25, 25.0), 0.5);
 
   if value <> zoom then
   begin
@@ -578,7 +550,7 @@ begin
   end;
 end;
 
-procedure tclientform.fitmiclick(sender: tobject);
+procedure tmainform.fitmiclick(sender: tobject);
 begin
   zoom  := 1.0;
   movex := (screen.width  - pagewidth ) div 2;
@@ -588,60 +560,68 @@ end;
 
 // MAIN MENU::PRINT
 
-procedure tclientform.connectmiclick(sender: tobject);
+procedure tmainform.startmiclick(sender: tobject);
 begin
-  ltcp.connect(setting.ip, setting.port);
-end;
-
-procedure tclientform.disconnectmiclick(sender: tobject);
-begin
-  scalemiclick(sender);
-  ltcp.disconnect(false);
-end;
-
-procedure tclientform.printmiclick(sender: tobject);
-begin
-  lock2;
-  if ltcp.connected then
+  driver.xoff := false;
+  driver.yoff := false;
+  driver.zoff := false;
+  if assigned(driverthread) then
   begin
-    bufferindex := 0;
-    buffer := optimize2(paths,
-      setting.layout8.x,
-      setting.layout8.y,
-      setting.wavexmax,
-      setting.waveymax);
+    driverthread.enabled := true;
+  end else
+  begin
+    driverthread         := tvpdriverthread.create(paths);
+    driverthread.xcenter := setting.layout8.x;
+    driverthread.ycenter := setting.layout8.y+pageheight/2;
+    driverthread.xmax    := pagewidth /2 + 2;
+    driverthread.ymax    := pageheight/2 + 2;
+    driverthread.onstart := @onplotterstart;
+    driverthread.onstop  := @onplotterstop;
+    driverthread.ontick  := @onplottertick;
+    driverthread.start;
+  end;
+  starttime := now;
+  tickcount := 0
+end;
 
-    ltcp.sendmessage(format('SEND LEN%d', [length(buffer)]));
+procedure tmainform.stopmiclick(sender: tobject);
+begin
+  if assigned(driverthread) then
+  begin
+    driverthread.enabled := false;
+  end;
+  driver.zcount := setting.zmax;
+  driver.xoff   := true;
+  driver.yoff   := true;
+  driver.zoff   := true;
+end;
+
+procedure tmainform.killmiclick(sender: tobject);
+begin
+  if assigned(driverthread) then
+  begin
+    driverthread.terminate;
+    driverthread.enabled := true;
   end;
 end;
 
-procedure tclientform.startmiclick(sender: tobject);
+procedure tmainform.movetohomemiclick(sender: tobject);
+var
+  mx: longint = 0;
+  my: longint = 0;
 begin
-  if ltcp.connected then
-    ltcp.sendmessage('START');
-end;
+  driver.zcount := setting.zmax;
+  driver.xoff   := false;
+  driver.yoff   := false;
+  driver.zoff   := false;
 
-procedure tclientform.stopmiclick(sender: tobject);
-begin
-  if ltcp.connected then
-    ltcp.sendmessage('STOP');
-end;
-
-procedure tclientform.killmiclick(sender: tobject);
-begin
-  if ltcp.connected then
-    ltcp.sendmessage('KILL');
-end;
-
-procedure Tclientform.movetohomemiclick(sender: tobject);
-begin
-  if ltcp.connected then
-    ltcp.sendmessage('HOME');
+  optimize(setting.layout9, mx, my);
+  driver.move(mx, my);
 end;
 
 // MAIN-MENU::HELP
 
-procedure Tclientform.aboutmiclick(sender: tobject);
+procedure tmainform.aboutmiclick(sender: tobject);
 var
   about: taboutform;
 begin
@@ -652,7 +632,7 @@ end;
 
 // POPUP-MENU
 
-procedure Tclientform.selallpmclick(sender: tobject);
+procedure tmainform.selallpmclick(sender: tobject);
 begin
   lock2;
   paths.selectall(true);
@@ -660,7 +640,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.selbylayerpmclick(sender: tobject);
+procedure tmainform.selbylayerpmclick(sender: tobject);
 var
      i: longint;
   path: tvppath;
@@ -676,7 +656,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.invertselpmclick(sender: tobject);
+procedure tmainform.invertselpmclick(sender: tobject);
 begin
   lock2;
   paths.invertselected;
@@ -684,7 +664,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.deselallpmclick(sender: tobject);
+procedure tmainform.deselallpmclick(sender: tobject);
 begin
   lock2;
   paths.selectall(false);
@@ -692,7 +672,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.showallpmclick(sender: tobject);
+procedure tmainform.showallpmclick(sender: tobject);
 begin
   lock2;
   paths.showall(true);
@@ -700,7 +680,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.showbylayerpmclick(sender: tobject);
+procedure tmainform.showbylayerpmclick(sender: tobject);
 var
      i: longint;
   path: tvppath;
@@ -716,7 +696,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.inverthiddenpmclick(sender: tobject);
+procedure tmainform.inverthiddenpmclick(sender: tobject);
 begin
   lock2;
   paths.inverthidden;
@@ -725,7 +705,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.hideallpmclick(sender: tobject);
+procedure tmainform.hideallpmclick(sender: tobject);
 begin
   lock2;
   paths.showall(false);
@@ -734,7 +714,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.hidebylayerpmclick(sender: tobject);
+procedure tmainform.hidebylayerpmclick(sender: tobject);
 var
      i: longint;
   path: tvppath;
@@ -751,7 +731,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.hideselpmclick(sender: tobject);
+procedure tmainform.hideselpmclick(sender: tobject);
 var
      i: longint;
   path: tvppath;
@@ -768,7 +748,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.mergeselclick(sender: tobject);
+procedure tmainform.mergeselclick(sender: tobject);
 begin
   lock2;
   paths.mergeselected;
@@ -776,7 +756,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.selattachedpmclick(sender: tobject);
+procedure tmainform.selattachedpmclick(sender: tobject);
 begin
   lock2;
   paths.selectattached;
@@ -784,7 +764,7 @@ begin
   unlock2;
 end;
 
-procedure Tclientform.divideselpmclick(sender: tobject);
+procedure tmainform.divideselpmclick(sender: tobject);
 begin
   lock2;
   paths.unmergeselected;
@@ -794,7 +774,7 @@ end;
 
 // MOUSE EVENTS
 
-procedure tclientform.imagemousedown(sender: tobject;
+procedure tmainform.imagemousedown(sender: tobject;
   button: tmousebutton; shift: tshiftstate; x, y: integer);
 var
    i, j: longint;
@@ -839,7 +819,7 @@ begin
     end;
 end;
 
-procedure Tclientform.imagemousemove(sender: tobject;
+procedure tmainform.imagemousemove(sender: tobject;
   shift: tshiftstate; x, y: integer);
 begin
   if locked = false then
@@ -851,7 +831,7 @@ begin
     end;
 end;
 
-procedure Tclientform.imagemouseup(sender: tobject;
+procedure tmainform.imagemouseup(sender: tobject;
   button: tmousebutton; shift: tshiftstate; x, y: integer);
 begin
   if locked = false then
@@ -860,7 +840,7 @@ begin
   end;
 end;
 
-procedure Tclientform.screenmousewheel(sender: tobject; shift: tshiftstate;
+procedure tmainform.screenmousewheel(sender: tobject; shift: tshiftstate;
   wheeldelta: integer; mousepos: tpoint; var handled: boolean);
 var
   value: single;
@@ -868,10 +848,11 @@ begin
   if locked = false then
   begin
     locked := true;
+
     if wheeldelta > 0 then
-      value := max(min(zoom*1.5, 25.0), 0.5)
+      value := max(min(zoom*1.25, 25.0), 0.5)
     else
-      value := max(min(zoom/1.5, 25.0), 0.5);
+      value := max(min(zoom/1.25, 25.0), 0.5);
 
     if value <> zoom then
     begin
@@ -884,9 +865,40 @@ begin
   end;
 end;
 
+// PANEL EVENTS
+
+procedure tmainform.leftupbtnclick(sender: tobject);
+var
+  mx: longint = 0;
+  my: longint = 0;
+   s: string;
+begin
+  if sender = leftupbtn    then mx := - edit.value;
+  if sender = leftdownbtn  then mx := + edit.value;
+  if sender = rightupbtn   then my := - edit.value;
+  if sender = rightdownbtn then my := + edit.value;
+
+
+
+
+
+
+end;
+
+procedure tmainform.penupbtnclick(sender: tobject);
+var
+  mz: longint = 0;
+   s: string;
+begin
+  if sender = penupbtn   then mz := + $F;
+  if sender = pendownbtn then mz := - $F;
+
+
+end;
+
 // SCREEN EVENTS
 
-procedure Tclientform.updatescreen;
+procedure tmainform.updatescreen;
 var
  i, j: longint;
     k: longint = 0;
@@ -941,16 +953,15 @@ begin
   screen.redrawbitmap;
 end;
 
-procedure Tclientform.screenredraw(sender: tobject; bitmap: tbgrabitmap);
+procedure tmainform.screenredraw(sender: tobject; bitmap: tbgrabitmap);
 begin
   bitmap.putimage(movex, movey, bit, dmset);
 end;
 
 // LOCK/UNLOCK ROUTINES
 
-procedure Tclientform.lockinternal1(value: boolean);
+procedure tmainform.lockinternal1(value: boolean);
 begin
-  locked                := not value;
   // main menu::file
   loadmi       .enabled := value;
   savemi       .enabled := value;
@@ -968,144 +979,106 @@ begin
   zoomoutmi    .enabled := value;
   fitmi        .enabled := value;
   // main menu::printer
-//connectmi    .enabled := value;
-//disconnectmi .enabled := value;
-//startmi      .enabled := true;
-//stopmi       .enabled := true;
-//killmi       .enabled := true;
-//calibrationmi.enabled := value;
-//movetohomemi .enabled := value;
-  // main menu::help
-  aboutmi      .enabled := value;
-  // popup menu
-  if value = false then
-    screen.popupmenu := nil
-  else
-    screen.popupmenu := popup;
-  application  .processmessages;
-end;
-
-procedure Tclientform.lockinternal2(value: boolean);
-begin
-  locked                := not value;
-  // main menu::file
-  loadmi       .enabled := value;
-  savemi       .enabled := value;
-  clearmi      .enabled := value;
-  importmi     .enabled := value;
-  // main menu::editmi
-  rotatemi     .enabled := value;
-  mirrormi     .enabled := value;
-  scalemi      .enabled := value;
-  offsetmi     .enabled := value;
-  pagesizemi   .enabled := value;
-  toolpathmi   .enabled := value;
-  // main menu::view
-  zoominmi     .enabled := value;
-  zoomoutmi    .enabled := value;
-  fitmi        .enabled := value;
-  // main menu::printer
-//connectmi    .enabled := value;
-//disconnectmi .enabled := value;
-//startmi      .enabled := value;
-//stopmi       .enabled := value;
-//killmi       .enabled := value;
-//calibrationmi.enabled := value;
-//movetohomemi .enabled := value;
-  // main menu::help
-  aboutmi      .enabled := value;
-  // popup menu
-  if value = false then
-    screen.popupmenu := nil
-  else
-    screen.popupmenu := popup;
-  application  .processmessages;
-end;
-
-procedure Tclientform.lock1;
-begin
-  lockinternal1(false);
-end;
-
-procedure Tclientform.unlock1;
-begin
-  lockinternal1(true);
-end;
-
-procedure Tclientform.lock2;
-begin
-  lockinternal1(false);
-end;
-
-procedure Tclientform.unlock2;
-begin
-  lockinternal1(true);
-end;
-
-// LTCP EVENTS
-
-procedure Tclientform.ltcpconnect(asocket: tlsocket);
-begin
-  connectmi    .enabled := false;
-  disconnectmi .enabled := true;
   startmi      .enabled := true;
   stopmi       .enabled := true;
   killmi       .enabled := true;
-  calibrationmi.enabled := true;
-  movetohomemi .enabled := true;
+  calibrationmi.enabled := value;
+  movetohomemi .enabled := value;
+  // main menu::help
+  aboutmi      .enabled := value;
+  // popup menu
+  if value = false then
+    screen.popupmenu := nil
+  else
+    screen.popupmenu := popup;
+  application  .processmessages;
 end;
 
-procedure tclientform.ltcpdisconnect(asocket: tlsocket);
+procedure tmainform.lockinternal2(value: boolean);
 begin
-  connectmi    .enabled := true;
-  disconnectmi .enabled := false;
-  startmi      .enabled := false;
-  stopmi       .enabled := false;
-  killmi       .enabled := false;
-  calibrationmi.enabled := false;
-  movetohomemi .enabled := false;
+  // main menu::file
+  loadmi       .enabled := value;
+  savemi       .enabled := value;
+  clearmi      .enabled := value;
+  importmi     .enabled := value;
+  // main menu::editmi
+  rotatemi     .enabled := value;
+  mirrormi     .enabled := value;
+  scalemi      .enabled := value;
+  offsetmi     .enabled := value;
+  pagesizemi   .enabled := value;
+  toolpathmi   .enabled := value;
+  // main menu::view
+  zoominmi     .enabled := value;
+  zoomoutmi    .enabled := value;
+  fitmi        .enabled := value;
+  // main menu::printer
+  startmi      .enabled := value;
+  stopmi       .enabled := value;
+  killmi       .enabled := value;
+  calibrationmi.enabled := value;
+  movetohomemi .enabled := value;
+  // main menu::help
+  aboutmi      .enabled := value;
+  // popup menu
+  if value = false then
+    screen.popupmenu := nil
+  else
+    screen.popupmenu := popup;
+  application  .processmessages;
 end;
 
-procedure tclientform.ltcperror(const msg: string; asocket: tlsocket);
+procedure tmainform.lock1;
 begin
-  messagedlg('Server Error', msg , mterror, [mbok], 0);
+  lockinternal1(false);
 end;
 
-procedure tclientform.ltcpreceive(asocket: tlsocket);
-var
-  m: ansistring;
+procedure tmainform.unlock1;
 begin
-  if ltcp.getmessage(m) > 0 then
+  lockinternal1(true);
+end;
+
+procedure tmainform.lock2;
+begin
+  lockinternal1(false);
+end;
+
+procedure tmainform.unlock2;
+begin
+  lockinternal1(true);
+end;
+
+// PLOTTER THREAD EVENTS
+
+procedure tmainform.onplotterstart;
+begin
+  lock1;
+  statuslabel.caption := '';
+  application.processmessages;
+end;
+
+procedure tmainform.onplotterstop;
+begin
+  driverthread  := nil;
+  driver.xoff   := false;
+  driver.yoff   := false;
+  driver.zoff   := false;
+  driver.zcount := setting.zmax;
+
+  unlock1;
+  statuslabel.caption := '';
+  application.processmessages;
+end;
+
+procedure tmainform.onplottertick;
+begin
+  inc(tickcount);
+  if(tickcount mod 800) = 0 then
   begin
-
-    if m = 'SEND' then
-    begin
-      writeln('Sending ... ', length(buffer));
-      ltcpcansend(asocket);
-    end else
-    if pos('INFO', m) = 1 then
-    begin
-      writeln('INFO');
-    end;
-
+    statuslabel.caption := 'Remaining Time ' +
+      formatdatetime('hh:nn:ss', (now-starttime)/tickcount*driverthread.tick);
   end;
-end;
-
-procedure tclientform.ltcpcansend(asocket: tlsocket);
-var
-  n: longint;
-begin
-  repeat
-    n := ltcp.send(buffer[bufferindex + 1],
-      length(buffer) - bufferindex);
-
-    inc(bufferindex, n);
-  until (n = 0) or (bufferindex = length(buffer));
-
-  if bufferindex = length(buffer) then
-  begin
-    unlock2;
-  end;
+  application.processmessages;
 end;
 
 end.
