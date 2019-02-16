@@ -259,11 +259,11 @@ begin
   wavemesh[7] := setting.wave7;
   wavemesh[8] := setting.wave8;
   wave := twave.create(
-    setting.wavexmax,
-    setting.waveymax,
+    setting.wavedxmax,
+    setting.wavedymax,
     wavemesh);
-  wave.enabled := false;
-  wave.test;
+  wave.enabled := setting.waveoff = 1;
+  wave.debug;
   // create preview and empty paths
   paths := tvppaths.create;
     bit := tbgrabitmap.create;
@@ -563,8 +563,8 @@ begin
     driverthread         := tvpdriverthread.create(paths);
     driverthread.xcenter := setting.layout8.x;
     driverthread.ycenter := setting.layout8.y+pageheight/2;
-    driverthread.xmax    := pagewidth /2 + 2;
-    driverthread.ymax    := pageheight/2 + 2;
+    driverthread.dxmax   := pagewidth /2 + 2;
+    driverthread.dymax   := pageheight/2 + 2;
     driverthread.onstart := @onplotterstart;
     driverthread.onstop  := @onplotterstop;
     driverthread.ontick  := @onplottertick;

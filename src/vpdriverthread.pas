@@ -1,3 +1,24 @@
+{
+  Description: vPlot server driver library.
+
+  Copyright (C) 2017-2019 Melchiorre Caruso <melchiorrecaruso@gmail.com>
+
+  This source is free software; you can redistribute it and/or modify it under
+  the terms of the GNU General Public License as published by the Free
+  Software Foundation; either version 2 of the License, or (at your option)
+  any later version.
+
+  This code is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+  details.
+
+  A copy of the GNU General Public License is available on the World Wide Web
+  at <http://www.gnu.org/copyleft/gpl.html>. You can also obtain it by writing
+  to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+  MA 02111-1307, USA.
+}
+
 unit vpdriverthread;
 
 {$mode objfpc}
@@ -13,8 +34,8 @@ type
     fenabled:   boolean;
     fxcenter:   double;
     fycenter:   double;
-    fxmax:      double;
-    fymax:      double;
+    fdxmax:     double;
+    fdymax:     double;
     fpaths:     tvppaths;
     ftick:      longint;
     fonstart:   tthreadmethod;
@@ -29,8 +50,8 @@ type
     property enabled:   boolean       read fenabled   write fenabled;
     property xcenter:   double        read fxcenter   write fxcenter;
     property ycenter:   double        read fycenter   write fycenter;
-    property xmax:      double        read fxmax      write fxmax;
-    property ymax:      double        read fymax      write fymax;
+    property dxmax:     double        read fdxmax     write fdxmax;
+    property dymax:     double        read fdymax     write fdymax;
     property tick:      longint       read ftick;
     property onstart:   tthreadmethod read fonstart   write fonstart;
     property onstop:    tthreadmethod read fonstop    write fonstop;
@@ -81,8 +102,8 @@ begin
   fenabled := true;
   fxcenter := 0;
   fycenter := 0;
-  fxmax    := 0;
-  fymax    := 0;
+  fdxmax   := 0;
+  fdymax   := 0;
   fpaths   := paths;
   ftick    := 0;
 
@@ -110,10 +131,10 @@ begin
 
   if enabledebug then
   begin
-    writeln(format('DRIVER.THREAD::XMAX   = %12.5f', [fxmax   ]));
-    writeln(format('DRIVER.THREAD::YMAX   = %12.5f', [fymax   ]));
-    writeln(format('DRIVER.THREAD::X-CNTR = %12.5f', [fxcenter]));
-    writeln(format('DRIVER.THREAD::Y-CNTR = %12.5f', [fycenter]));
+    writeln(format('  THREAD::DXMAX  = %12.5f', [fdxmax  ]));
+    writeln(format('  THREAD::DYMAX  = %12.5f', [fdymax  ]));
+    writeln(format('  THREAD::X-CNTR = %12.5f', [fxcenter]));
+    writeln(format('  THREAD::Y-CNTR = %12.5f', [fycenter]));
   end;
 
   list := tfplist.create;
@@ -126,8 +147,8 @@ begin
         point:= path.items[j]^;
         point:= wave.update(point);
 
-        if (abs(point.x) <= (fxmax)) and
-           (abs(point.y) <= (fymax)) then
+        if (abs(point.x) <= (fdxmax)) and
+           (abs(point.y) <= (fdymax)) then
           list.add(path.items[j]);
       end;
   end;

@@ -48,7 +48,7 @@ type
     constructor create(xmax, ymax: double; const mesh: twavemesh);
     destructor destroy; override;
     function update(const p: tvppoint): tvppoint;
-    procedure test;
+    procedure debug;
   published
     property enabled: boolean read fenabled write fenabled;
   end;
@@ -180,7 +180,7 @@ begin
   end;
 end;
 
-procedure twave.test;
+procedure twave.debug;
 var
   p0,p1: tvppoint;
 

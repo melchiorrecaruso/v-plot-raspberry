@@ -62,7 +62,7 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 13
+    Top = 11
     Width = 766
     Anchors = [akLeft, akRight]
     AutoSize = True
