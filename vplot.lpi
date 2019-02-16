@@ -215,8 +215,9 @@
         <ComponentName Value="tmainform"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="542"/>
+        <TopLine Value="511"/>
         <CursorPos X="23" Y="566"/>
         <FoldState Value=" T3o20D9142339R"/>
         <UsageCount Value="200"/>
@@ -1528,7 +1529,6 @@
       </Unit222>
       <Unit223>
         <Filename Value="src/vpdriverthread.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <TopLine Value="131"/>
         <CursorPos X="23" Y="137"/>

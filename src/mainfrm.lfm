@@ -1,12 +1,12 @@
 object tmainform: tmainform
-  Left = 410
+  Left = 459
   Height = 534
-  Top = 50
-  Width = 766
+  Top = 53
+  Width = 763
   Anchors = []
   Caption = 'vPlotter'
   ClientHeight = 510
-  ClientWidth = 766
+  ClientWidth = 763
   Menu = mainmenu
   OnClose = FormClose
   OnCreate = FormCreate
@@ -23,12 +23,12 @@ object tmainform: tmainform
     Left = 0
     Height = 508
     Top = 2
-    Width = 766
+    Width = 763
     OnRedraw = screenredraw
     Alignment = taLeftJustify
     Anchors = [akTop, akLeft, akRight, akBottom]
     ClientHeight = 508
-    ClientWidth = 766
+    ClientWidth = 763
     Color = clForm
     ParentColor = False
     TabOrder = 0
@@ -45,12 +45,16 @@ object tmainform: tmainform
       Left = 0
       Height = 18
       Top = 490
-      Width = 766
+      Width = 763
       Alignment = taCenter
       Anchors = [akLeft, akRight, akBottom]
       Caption = 'Time'
+      Color = clForm
+      Font.Style = [fsBold]
       Layout = tlCenter
       ParentColor = False
+      ParentFont = False
+      Transparent = False
     end
   end
   object calibrationpanel: TPanel
@@ -62,13 +66,13 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 11
-    Width = 766
+    Top = 1
+    Width = 763
     Anchors = [akLeft, akRight]
     AutoSize = True
     BevelOuter = bvNone
     ClientHeight = 80
-    ClientWidth = 766
+    ClientWidth = 763
     Color = clYellow
     ParentColor = False
     TabOrder = 1
@@ -523,7 +527,7 @@ object tmainform: tmainform
       Left = 0
       Height = 2
       Top = 78
-      Width = 766
+      Width = 763
       Anchors = [akLeft, akRight, akBottom]
     end
     object calibrationbevelleft: TBevel
@@ -550,12 +554,12 @@ object tmainform: tmainform
     Left = 0
     Height = 44
     Top = 111
-    Width = 766
+    Width = 763
     Anchors = [akLeft, akRight]
     AutoSize = True
     BevelOuter = bvNone
     ClientHeight = 44
-    ClientWidth = 766
+    ClientWidth = 763
     Color = clSkyBlue
     ParentColor = False
     TabOrder = 2
@@ -621,7 +625,7 @@ object tmainform: tmainform
       Left = 0
       Height = 2
       Top = 42
-      Width = 766
+      Width = 763
       Align = alBottom
     end
     object scalelabel: TLabel
@@ -665,13 +669,13 @@ object tmainform: tmainform
     Left = 0
     Height = 80
     Top = 175
-    Width = 766
+    Width = 763
     Anchors = [akLeft, akRight]
     AutoSize = True
     BevelColor = clForm
     BevelOuter = bvNone
     ClientHeight = 80
-    ClientWidth = 766
+    ClientWidth = 763
     Color = clSkyBlue
     ParentColor = False
     TabOrder = 3
@@ -792,7 +796,7 @@ object tmainform: tmainform
       Left = 0
       Height = 2
       Top = 78
-      Width = 766
+      Width = 763
       Anchors = [akLeft, akRight, akBottom]
     end
     object offsetbevelleft: TBevel
@@ -817,7 +821,7 @@ object tmainform: tmainform
     Left = 0
     Height = 2
     Top = 0
-    Width = 766
+    Width = 763
     Anchors = [akTop, akLeft, akRight]
   end
   object opendialog: TOpenDialog
