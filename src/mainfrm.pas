@@ -604,8 +604,8 @@ begin
     driverthread         := tvpdriverthread.create(paths);
     driverthread.xcenter := setting.layout8.x;
     driverthread.ycenter := setting.layout8.y+pageheight/2;
-    driverthread.dxmax   := pagewidth /2 + 2;
-    driverthread.dymax   := pageheight/2 + 2;
+    driverthread.dxmax   := pagewidth /2+2;
+    driverthread.dymax   := pageheight/2+2;
     driverthread.onstart := @onplotterstart;
     driverthread.onstop  := @onplotterstop;
     driverthread.ontick  := @onplottertick;

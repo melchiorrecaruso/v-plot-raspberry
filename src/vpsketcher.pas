@@ -90,7 +90,6 @@ begin
     end;
 
   result := round( (patternw/dotsize) - ((patternw/dotsize) * (k/(4*w*h))/$FFFF ));
-  writeln('darkness = ', result);
 end;
 
 function tvpsketcher.getpattern(n, width, height: single): tvppath;

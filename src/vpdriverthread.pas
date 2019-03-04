@@ -129,14 +129,6 @@ begin
   if assigned(onstart) then
     synchronize(fonstart);
 
-  if enabledebug then
-  begin
-    writeln(format('  THREAD::DXMAX  = %12.5f', [fdxmax  ]));
-    writeln(format('  THREAD::DYMAX  = %12.5f', [fdymax  ]));
-    writeln(format('  THREAD::X-CNTR = %12.5f', [fxcenter]));
-    writeln(format('  THREAD::Y-CNTR = %12.5f', [fycenter]));
-  end;
-
   list := tfplist.create;
   for i := 0 to fpaths.count -1 do
   begin

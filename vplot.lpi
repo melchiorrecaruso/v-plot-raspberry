@@ -79,7 +79,6 @@
       <Unit0>
         <Filename Value="vplot.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <CursorPos X="30" Y="27"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -360,7 +359,7 @@
         <ComponentName Value="aboutform"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="6"/>
         <CursorPos X="10" Y="32"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -432,9 +431,11 @@
       </Unit47>
       <Unit48>
         <Filename Value="src/vpgcode.pas"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="4"/>
         <CursorPos X="26" Y="4"/>
         <UsageCount Value="78"/>
+        <Loaded Value="True"/>
       </Unit48>
       <Unit49>
         <Filename Value="/usr/share/fpcsrc/3.0.4/rtl/objpas/sysutils/osutilsh.inc"/>
@@ -504,9 +505,10 @@
       </Unit57>
       <Unit58>
         <Filename Value="src/sketchyimage.pas"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="26" Y="4"/>
+        <EditorIndex Value="1"/>
+        <CursorPos X="55" Y="24"/>
         <UsageCount Value="86"/>
+        <Loaded Value="True"/>
       </Unit58>
       <Unit59>
         <Filename Value="../../.lazarus/onlinepackagemanager/packages/bgrabitmap-master/bgrabitmap/bgrasvg.pas"/>
@@ -1492,10 +1494,10 @@
       <Unit220>
         <Filename Value="src/vpsvgreader.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="13"/>
+        <EditorIndex Value="3"/>
         <CursorPos X="97" Y="19"/>
         <UsageCount Value="61"/>
+        <Loaded Value="True"/>
       </Unit220>
       <Unit221>
         <Filename Value="../../.lazarus/onlinepackagemanager/packages/bgrabitmap-master/bgrabitmap/geometrytypes.inc"/>
@@ -1505,9 +1507,12 @@
       </Unit221>
       <Unit222>
         <Filename Value="src/vpdriverthread.pas"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="23" Y="137"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="142"/>
+        <CursorPos Y="167"/>
         <UsageCount Value="28"/>
+        <Loaded Value="True"/>
       </Unit222>
       <Unit223>
         <Filename Value="/usr/share/fpcsrc/3.0.4/packages/hash/src/sha1.pp"/>
@@ -1577,7 +1582,7 @@
         <ComponentName Value="importform"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="7"/>
         <CursorPos X="25" Y="9"/>
         <UsageCount Value="25"/>
         <Loaded Value="True"/>
@@ -1585,9 +1590,11 @@
       </Unit232>
       <Unit233>
         <Filename Value="src/vpsketcher.pas"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="36" Y="2"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="73"/>
+        <CursorPos X="38" Y="84"/>
         <UsageCount Value="12"/>
+        <Loaded Value="True"/>
       </Unit233>
       <Unit234>
         <Filename Value="src/sketcherfrm.lfm"/>
@@ -1604,9 +1611,9 @@
         <ComponentName Value="tmainform"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="221"/>
-        <CursorPos X="3" Y="233"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="1032"/>
+        <CursorPos X="58" Y="601"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
