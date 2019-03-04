@@ -1,4 +1,5 @@
-{ Description: vPlotter application.
+{
+  Description: vPlotter application.
 
   Copyright (C) 2017-2019 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
@@ -24,17 +25,17 @@ program vplot;
 
 uses
  {$ifdef usecthreads} cthreads, {$endif} interfaces, forms,
- aboutfrm, mainfrm, sketcherfrm;
+ aboutfrm, importfrm, mainfrm;
 
 {$R *.res}
 
 begin
   requirederivedformresource := true;
-  Application.Title:='VPlot Driver';
+  application.title:='VPlot Driver';
   application.initialize;
   application.createform(tmainform, mainform);
-  application.createform(tsketcherform, sketcherform);
   application.createform(taboutform, aboutform);
+  application.createform(timportform, importform);
   application.run;
 end.
 

@@ -1,5 +1,5 @@
 {
-  Description: vPlot sketcher form.
+  Description: vPlot import form.
 
   Copyright (C) 2017-2019 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
@@ -19,21 +19,21 @@
   MA 02111-1307, USA.
 }
 
-unit sketcherfrm;
+unit importfrm;
 
-{$mode objfpc}{$H+}
+{$mode objfpc}
 
 interface
 
 uses
-  sysutils, forms, controls, graphics, dialogs, spin, editbtn, buttons,
-  StdCtrls, ExtCtrls;
+  classes, sysutils, forms, controls, graphics, dialogs,
+  spin, editbtn, buttons, stdctrls, extctrls;
 
 type
 
-  { tsketcherform }
+  { timportform }
 
-  tsketcherform = class(tform)
+  timportform = class(tform)
     Bevel1: TBevel;
     otpcb: TCheckBox;
     okbtn: tbitbtn;
@@ -56,7 +56,7 @@ type
   end;
 
 var
-  sketcherform: tsketcherform;
+  importform: timportform;
 
 implementation
 

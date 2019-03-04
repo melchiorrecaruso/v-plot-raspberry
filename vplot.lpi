@@ -75,11 +75,11 @@
         <PackageName Value="LCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="235">
+    <Units Count="237">
       <Unit0>
         <Filename Value="vplot.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="41" Y="12"/>
+        <CursorPos X="3" Y="2"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
       </Unit0>
@@ -1571,24 +1571,22 @@
         <UsageCount Value="10"/>
       </Unit231>
       <Unit232>
-        <Filename Value="src/sketcherfrm.pas"/>
+        <Filename Value="src/importfrm.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="sketcherform"/>
+        <ComponentName Value="importform"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="3"/>
-        <CursorPos X="99" Y="9"/>
+        <EditorIndex Value="2"/>
+        <CursorPos X="25" Y="9"/>
         <UsageCount Value="25"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit232>
       <Unit233>
         <Filename Value="src/vpsketcher.pas"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <CursorPos X="36" Y="2"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit233>
       <Unit234>
         <Filename Value="src/sketcherfrm.lfm"/>
@@ -1600,8 +1598,27 @@
         <UsageCount Value="10"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit234>
+      <Unit235>
+        <Filename Value="src/mainfrm.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="221"/>
+        <CursorPos X="3" Y="233"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit235>
+      <Unit236>
+        <Filename Value="src/importfrm.lfm"/>
+        <ComponentName Value="importform"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="84" Y="16"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit236>
     </Units>
-    <JumpHistory Count="3" HistoryIndex="2">
+    <JumpHistory Count="11" HistoryIndex="10">
       <Position1>
         <Filename Value="vplot.lpr"/>
         <Caret Line="36" Column="27"/>
@@ -1614,6 +1631,38 @@
         <Filename Value="vplot.lpr"/>
         <Caret Line="39" Column="9"/>
       </Position3>
+      <Position4>
+        <Filename Value="src/importfrm.pas"/>
+        <Caret Line="36" Column="14"/>
+      </Position4>
+      <Position5>
+        <Filename Value="src/importfrm.pas"/>
+        <Caret Line="59" Column="13" TopLine="22"/>
+      </Position5>
+      <Position6>
+        <Filename Value="src/importfrm.pas"/>
+        <Caret Line="33" Column="35" TopLine="22"/>
+      </Position6>
+      <Position7>
+        <Filename Value="src/mainfrm.pas"/>
+        <Caret Line="234" Column="19" TopLine="211"/>
+      </Position7>
+      <Position8>
+        <Filename Value="src/mainfrm.pas"/>
+        <Caret Line="379" Column="7" TopLine="348"/>
+      </Position8>
+      <Position9>
+        <Filename Value="src/mainfrm.pas"/>
+        <Caret Line="357" Column="15" TopLine="335"/>
+      </Position9>
+      <Position10>
+        <Filename Value="src/mainfrm.pas"/>
+        <Caret Line="358" Column="7" TopLine="5"/>
+      </Position10>
+      <Position11>
+        <Filename Value="src/mainfrm.pas"/>
+        <Caret Line="234" Column="39" TopLine="218"/>
+      </Position11>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>

@@ -27,8 +27,8 @@ interface
 
 uses
   classes, forms, controls, graphics, dialogs, extctrls, stdctrls, comctrls,
-  buttons, menus, spin, vppaths, bgrabitmap,  types,
-  bgrabitmaptypes, bgravirtualscreen, bgragradientscanner;
+  buttons, menus, spin, vppaths, types,
+  bgrabitmap, bgrabitmaptypes, bgravirtualscreen, bgragradientscanner;
 
 type
   { tmainform }
@@ -198,15 +198,12 @@ type
        paths: tvppaths;
         zoom: single;
 
-
    starttime: tdatetime;
    tickcount: longint;
-
 
        movex: longint;
        movey: longint;
       locked: boolean;
-
     // ---
     procedure onplotterstart;
     procedure onplotterstop;
@@ -231,7 +228,9 @@ implementation
 {$r *.lfm}
 
 uses
-  math, sysutils, aboutfrm, sketcherfrm, vpdriver, vpdriverthread, vpsketcher, vpmath, vpsvgreader, vpdxfreader, vpsetting, vpwave, sketchyimage;
+  math, sysutils, importfrm, aboutfrm,
+  vpdriver, vpdriverthread, vpsketcher, vpmath, vpsvgreader,
+  vpdxfreader, vpsetting, vpwave;
 
 // FORM EVENTS
 
@@ -355,14 +354,14 @@ begin
     if (lowercase(extractfileext(opendialog.filename)) = '.dxf') or
        (lowercase(extractfileext(opendialog.filename)) = '.svg') then
     begin
-      sketcherform.imcb.itemindex := 0;
-      sketcherform.imcb .enabled  := false;
-      sketcherform.ipwse.enabled  := false;
-      sketcherform.iphse.enabled  := false;
-      sketcherform.pwse .enabled  := false;
-      sketcherform.phse .enabled  := false;
-      sketcherform.otpcb.enabled  := true;
-      if sketcherform.showmodal = mrok then
+      importform.imcb.itemindex := 0;
+      importform.imcb .enabled  := false;
+      importform.ipwse.enabled  := false;
+      importform.iphse.enabled  := false;
+      importform.pwse .enabled  := false;
+      importform.phse .enabled  := false;
+      importform.otpcb.enabled  := true;
+      if importform.showmodal = mrok then
       begin
         if (lowercase(extractfileext(opendialog.filename)) = '.dxf') then
           dxf2paths(opendialog.filename, paths)
@@ -370,30 +369,30 @@ begin
         if (lowercase(extractfileext(opendialog.filename)) = '.svg') then
           svg2paths(opendialog.filename, paths);
 
-        if sketcherform.otpcb.checked then
+        if importform.otpcb.checked then
           paths.createtoolpath;
       end;
     end else
     if (lowercase(extractfileext(opendialog.filename)) = '.png') then
     begin
-      sketcherform.imcb.itemindex := 1;
-      sketcherform.imcb .enabled  := false;
-      sketcherform.ipwse.enabled  := true;
-      sketcherform.iphse.enabled  := true;
-      sketcherform.pwse .enabled  := true;
-      sketcherform.phse .enabled  := true;
-      sketcherform.otpcb.enabled  := false;
-      sketcherform.otpcb.checked  := false;
-      if sketcherform.showmodal = mrok then
+      importform.imcb.itemindex := 1;
+      importform.imcb .enabled  := false;
+      importform.ipwse.enabled  := true;
+      importform.iphse.enabled  := true;
+      importform.pwse .enabled  := true;
+      importform.phse .enabled  := true;
+      importform.otpcb.enabled  := false;
+      importform.otpcb.checked  := false;
+      if importform.showmodal = mrok then
       begin
         bit.canvas.clear;
         bit.loadfromfile(opendialog.filename);
         sk := tvpsketcher.create(bit);
-        sk.patternbw := sketcherform.ipwse.value;
-        sk.patternbh := sketcherform.iphse.value;
-        sk.patternw  := sketcherform. pwse.value;
-        sk.patternh  := sketcherform. phse.value;
-        sk.dotsize   := sketcherform.dsfse.value;
+        sk.patternbw := importform.ipwse.value;
+        sk.patternbh := importform.iphse.value;
+        sk.patternw  := importform. pwse.value;
+        sk.patternh  := importform. phse.value;
+        sk.dotsize   := importform.dsfse.value;
         sk.run(paths);
         sk.destroy;
       end;

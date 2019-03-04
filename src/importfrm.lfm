@@ -1,4 +1,4 @@
-object sketcherform: Tsketcherform
+object importform: Timportform
   Left = 447
   Height = 325
   Top = 211
