@@ -1,0 +1,261 @@
+object sketcherform: Tsketcherform
+  Left = 447
+  Height = 325
+  Top = 211
+  Width = 345
+  BorderStyle = bsDialog
+  Caption = 'Import ...'
+  ClientHeight = 325
+  ClientWidth = 345
+  Constraints.MaxHeight = 325
+  Constraints.MaxWidth = 345
+  Constraints.MinHeight = 325
+  Constraints.MinWidth = 345
+  LCLVersion = '2.1.0.0'
+  object ipwse: TSpinEdit
+    AnchorSideLeft.Control = imcb
+    AnchorSideTop.Control = imcb
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = imcb
+    AnchorSideRight.Side = asrBottom
+    Left = 180
+    Height = 28
+    Top = 51
+    Width = 150
+    Alignment = taRightJustify
+    Anchors = [akTop, akRight]
+    BorderSpacing.Top = 10
+    TabOrder = 0
+    Value = 10
+  end
+  object iphse: TSpinEdit
+    AnchorSideLeft.Control = ipwse
+    AnchorSideTop.Control = ipwse
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = imcb
+    AnchorSideRight.Side = asrBottom
+    Left = 180
+    Height = 28
+    Top = 89
+    Width = 150
+    Alignment = taRightJustify
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 10
+    TabOrder = 1
+    Value = 10
+  end
+  object pwse: TSpinEdit
+    AnchorSideLeft.Control = iphse
+    AnchorSideTop.Control = iphse
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = imcb
+    AnchorSideRight.Side = asrBottom
+    Left = 180
+    Height = 28
+    Top = 127
+    Width = 150
+    Alignment = taRightJustify
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 10
+    TabOrder = 2
+    Value = 10
+  end
+  object phse: TSpinEdit
+    AnchorSideLeft.Control = pwse
+    AnchorSideTop.Control = pwse
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = pwse
+    AnchorSideRight.Side = asrBottom
+    Left = 180
+    Height = 28
+    Top = 165
+    Width = 150
+    Alignment = taRightJustify
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 10
+    TabOrder = 3
+    Value = 10
+  end
+  object dsfse: TFloatSpinEdit
+    AnchorSideLeft.Control = phse
+    AnchorSideTop.Control = phse
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = imcb
+    AnchorSideRight.Side = asrBottom
+    Left = 180
+    Height = 28
+    Top = 203
+    Width = 150
+    Alignment = taRightJustify
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 10
+    Increment = 0.1
+    MinValue = 0
+    TabOrder = 4
+    Value = 0.5
+  end
+  object okbtn: TBitBtn
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 245
+    Height = 30
+    Top = 285
+    Width = 85
+    Anchors = [akRight, akBottom]
+    BorderSpacing.Right = 15
+    BorderSpacing.Bottom = 10
+    Caption = 'Ok'
+    ModalResult = 1
+    TabOrder = 5
+  end
+  object imcb: TComboBox
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 120
+    Height = 26
+    Top = 15
+    Width = 210
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 15
+    BorderSpacing.Right = 15
+    ItemHeight = 0
+    ItemIndex = 0
+    Items.Strings = (
+      'Vector graphics'
+      'Raster graphics - Pattern1'
+    )
+    Style = csDropDownList
+    TabOrder = 6
+    Text = 'Vector graphics'
+  end
+  object importmethodl: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = imcb
+    AnchorSideRight.Control = imcb
+    AnchorSideBottom.Control = imcb
+    AnchorSideBottom.Side = asrBottom
+    Left = 15
+    Height = 26
+    Top = 15
+    Width = 95
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Left = 15
+    BorderSpacing.Right = 10
+    Caption = 'Import Method:'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object imagepatternwidthl: TLabel
+    AnchorSideLeft.Control = importmethodl
+    AnchorSideTop.Control = ipwse
+    AnchorSideRight.Control = ipwse
+    AnchorSideBottom.Control = ipwse
+    AnchorSideBottom.Side = asrBottom
+    Left = 15
+    Height = 28
+    Top = 51
+    Width = 155
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Right = 10
+    Caption = 'Image Pattern Width:'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object imagepatternheightl: TLabel
+    AnchorSideLeft.Control = importmethodl
+    AnchorSideTop.Control = iphse
+    AnchorSideRight.Control = iphse
+    AnchorSideBottom.Control = iphse
+    AnchorSideBottom.Side = asrBottom
+    Left = 15
+    Height = 28
+    Top = 89
+    Width = 155
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Right = 10
+    Caption = 'Image Pattern Height:'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object patternwidthl: TLabel
+    AnchorSideLeft.Control = importmethodl
+    AnchorSideTop.Control = pwse
+    AnchorSideRight.Control = pwse
+    AnchorSideBottom.Control = pwse
+    AnchorSideBottom.Side = asrBottom
+    Left = 15
+    Height = 28
+    Top = 127
+    Width = 155
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Right = 10
+    Caption = 'Pattern Width:'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object patternheightl: TLabel
+    AnchorSideLeft.Control = importmethodl
+    AnchorSideTop.Control = phse
+    AnchorSideRight.Control = phse
+    AnchorSideBottom.Control = phse
+    AnchorSideBottom.Side = asrBottom
+    Left = 15
+    Height = 28
+    Top = 165
+    Width = 155
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Right = 10
+    Caption = 'Pattern Height:'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object dotsizel: TLabel
+    AnchorSideLeft.Control = importmethodl
+    AnchorSideTop.Control = dsfse
+    AnchorSideRight.Control = dsfse
+    AnchorSideBottom.Control = dsfse
+    AnchorSideBottom.Side = asrBottom
+    Left = 15
+    Height = 28
+    Top = 203
+    Width = 155
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Right = 10
+    Caption = 'Dot Size:'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object otpcb: TCheckBox
+    AnchorSideLeft.Control = importmethodl
+    AnchorSideTop.Control = dotsizel
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 15
+    Height = 21
+    Top = 241
+    Width = 116
+    BorderSpacing.Top = 10
+    BorderSpacing.Right = 12
+    Caption = 'Optimize ToolPath'
+    TabOrder = 7
+  end
+  object Bevel1: TBevel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = otpcb
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 2
+    Height = 2
+    Top = 272
+    Width = 341
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Left = 2
+    BorderSpacing.Top = 10
+    BorderSpacing.Right = 2
+  end
+end

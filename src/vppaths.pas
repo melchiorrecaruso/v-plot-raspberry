@@ -44,6 +44,7 @@ type
     constructor create;
     destructor destroy; override;
     procedure add(p: pvppoint);
+    procedure copyfrom(path: tvppath);
     procedure clear;
     procedure delete(index: longint);
     procedure invert;
@@ -102,15 +103,42 @@ type
   end;
 
 
+  function interpolate_line(entity: pvpline): tvppath;
+  function interpolate_circle(entity: pvpcircle): tvppath;
+  function interpolate_circlearc(entity: pvpcirclearc): tvppath;
+  function interpolate_elipse(entity: pvpellipse): tvppath;
+
+  procedure interpolate_line(p0, p1: pvppoint; var path: tvppath);
+
+
 implementation
 
 uses
-  math, vpdxfreader;
+  math;
 
 const
   minlen = 0.15;
 
 // internal toolpath routines
+
+procedure interpolate_line(p0, p1: pvppoint; var path: tvppath);
+var
+  dx, dy: double;
+   i,  j: longint;
+       p: tvppoint;
+begin
+    j := max(1, round(distance_between_two_points(p0^, p1^)/minlen));
+   dx := (p1^.x - p0^.x)/j;
+   dy := (p1^.y - p0^.y)/j;
+
+  for i := 0 to j do
+  begin
+    p.x := i * dx;
+    p.y := i * dy;
+    p   := translate_point(p0^, p);
+    path.add(@p);
+  end;
+end;
 
 function interpolate_line(entity: pvpline): tvppath;
 var
@@ -300,6 +328,16 @@ begin
   point^.y := p^.y;
   point^.z := p^.z;
   flist.add(point);
+end;
+
+procedure tvppath.copyfrom(path: tvppath);
+var
+  i: longint;
+begin
+  for i := 0 to path.count -1 do
+  begin
+    add(path.items[i]);
+  end;
 end;
 
 procedure tvppath.invert;
@@ -665,6 +703,9 @@ var
   point: pvppoint;
       s: tfilestream;
 begin
+
+  writeln('save file ',  filename);
+
   s := tfilestream.create(filename, fmcreate);
   s.writeansistring('vpl3.0');
   s.write(flist.count, sizeof(longint));

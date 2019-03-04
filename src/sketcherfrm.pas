@@ -1,4 +1,5 @@
-{ Description: vPlotter application.
+{
+  Description: vPlot sketcher form.
 
   Copyright (C) 2017-2019 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
@@ -18,23 +19,51 @@
   MA 02111-1307, USA.
 }
 
-program vplot;
+unit sketcherfrm;
 
-{$mode objfpc}
+{$mode objfpc}{$H+}
+
+interface
 
 uses
- {$ifdef usecthreads} cthreads, {$endif} interfaces, forms,
- aboutfrm, mainfrm, sketcherfrm;
+  sysutils, forms, controls, graphics, dialogs, spin, editbtn, buttons,
+  StdCtrls, ExtCtrls;
 
-{$R *.res}
+type
 
-begin
-  requirederivedformresource := true;
-  Application.Title:='VPlot Driver';
-  application.initialize;
-  application.createform(tmainform, mainform);
-  application.createform(tsketcherform, sketcherform);
-  application.createform(taboutform, aboutform);
-  application.run;
+  { tsketcherform }
+
+  tsketcherform = class(tform)
+    Bevel1: TBevel;
+    otpcb: TCheckBox;
+    okbtn: tbitbtn;
+    imcb: TComboBox;
+    dsfse: tfloatspinedit;
+    importmethodl: TLabel;
+    imagepatternwidthl: TLabel;
+    imagepatternheightl: TLabel;
+    patternwidthl: TLabel;
+    patternheightl: TLabel;
+    dotsizel: TLabel;
+    ipwse: tspinedit;
+    iphse: tspinedit;
+    pwse: tspinedit;
+    phse: tspinedit;
+  private
+
+  public
+
+  end;
+
+var
+  sketcherform: tsketcherform;
+
+implementation
+
+{$R *.lfm}
+
+uses
+  bgrabitmap, vpsketcher, vppaths;
+
 end.
 

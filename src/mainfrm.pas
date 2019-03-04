@@ -34,6 +34,7 @@ type
   { tmainform }
 
   tmainform = class(tform)
+    clientformbevel: TBevel;
     scalebevelleft: TBevel;
     offsetbevelleft: TBevel;
     calibrationbevelleft: TBevel;
@@ -230,7 +231,7 @@ implementation
 {$r *.lfm}
 
 uses
-  math, sysutils, aboutfrm, vpdriver, vpdriverthread, vpmath, vpsvgreader, vpdxfreader, vpsetting, vpwave, sketchyimage;
+  math, sysutils, aboutfrm, sketcherfrm, vpdriver, vpdriverthread, vpsketcher, vpmath, vpsvgreader, vpdxfreader, vpsetting, vpwave, sketchyimage;
 
 // FORM EVENTS
 
@@ -341,21 +342,62 @@ begin
 end;
 
 procedure tmainform.importmiclick(sender: tobject);
+var
+  sk: tvpsketcher;
 begin
-  opendialog.filter := 'Supported files (*.svg, *.dxf)|*.svg; *.dxf';
+  opendialog.filter := 'Supported files (*.svg, *.dxf, *.png, *.bmp)|*.svg; *.dxf; *.png; *.bmp';
   if opendialog.execute then
   begin
     caption := 'vPlotter - ' + opendialog.filename;
 
     lock2;
     paths.clear;
-    if lowercase(extractfileext(opendialog.filename)) = '.dxf' then
-      dxf2paths(opendialog.filename, paths)
-    else
-      if lowercase(extractfileext(opendialog.filename)) = '.svg' then
-        svg2paths(opendialog.filename, paths);
-    //decodePNG(opendialog.filename, 100, 1, 1, 100);
-    paths.createtoolpath;
+    if (lowercase(extractfileext(opendialog.filename)) = '.dxf') or
+       (lowercase(extractfileext(opendialog.filename)) = '.svg') then
+    begin
+      sketcherform.imcb.itemindex := 0;
+      sketcherform.imcb .enabled  := false;
+      sketcherform.ipwse.enabled  := false;
+      sketcherform.iphse.enabled  := false;
+      sketcherform.pwse .enabled  := false;
+      sketcherform.phse .enabled  := false;
+      sketcherform.otpcb.enabled  := true;
+      if sketcherform.showmodal = mrok then
+      begin
+        if (lowercase(extractfileext(opendialog.filename)) = '.dxf') then
+          dxf2paths(opendialog.filename, paths)
+        else
+        if (lowercase(extractfileext(opendialog.filename)) = '.svg') then
+          svg2paths(opendialog.filename, paths);
+
+        if sketcherform.otpcb.checked then
+          paths.createtoolpath;
+      end;
+    end else
+    if (lowercase(extractfileext(opendialog.filename)) = '.png') then
+    begin
+      sketcherform.imcb.itemindex := 1;
+      sketcherform.imcb .enabled  := false;
+      sketcherform.ipwse.enabled  := true;
+      sketcherform.iphse.enabled  := true;
+      sketcherform.pwse .enabled  := true;
+      sketcherform.phse .enabled  := true;
+      sketcherform.otpcb.enabled  := false;
+      sketcherform.otpcb.checked  := false;
+      if sketcherform.showmodal = mrok then
+      begin
+        bit.canvas.clear;
+        bit.loadfromfile(opendialog.filename);
+        sk := tvpsketcher.create(bit);
+        sk.patternbw := sketcherform.ipwse.value;
+        sk.patternbh := sketcherform.iphse.value;
+        sk.patternw  := sketcherform. pwse.value;
+        sk.patternh  := sketcherform. phse.value;
+        sk.dotsize   := sketcherform.dsfse.value;
+        sk.run(paths);
+        sk.destroy;
+      end;
+    end;
     fitmiclick(sender);
     unlock2;
   end;
@@ -612,12 +654,8 @@ end;
 // MAIN-MENU::HELP
 
 procedure tmainform.aboutmiclick(sender: tobject);
-var
-  about: taboutform;
 begin
-  about := taboutform.create(nil);
-  about.showmodal;
-  about.destroy;
+  aboutform.showmodal;
 end;
 
 // POPUP-MENU
