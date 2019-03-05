@@ -89,7 +89,7 @@ begin
       k := k + c.alpha;
     end;
 
-  result := round( (patternw/dotsize) - ((patternw/dotsize) * (k/(4*w*h))/$FFFF ));
+  result := round( (patternw/dotsize) - ((patternw/dotsize) * (k/(4*w*h))/$FFFF));
 end;
 
 function tvpsketcher.getpattern(n, width, height: single): tvppath;

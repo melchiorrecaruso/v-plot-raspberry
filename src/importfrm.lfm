@@ -90,7 +90,7 @@ object importform: Timportform
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 10
     Increment = 0.1
-    MinValue = 0
+    MinValue = 0.1
     TabOrder = 4
     Value = 0.5
   end
