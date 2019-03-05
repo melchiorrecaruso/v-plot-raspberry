@@ -134,15 +134,16 @@ begin
   begin
     path := fpaths.items[i];
     if path.enabled then
-      for j := 0 to path.count -1 do
-      begin
-        point:= path.items[j]^;
-        point:= wave.update(point);
+      if not path.hidden then
+        for j := 0 to path.count -1 do
+        begin
+          point:= path.items[j]^;
+          point:= wave.update(point);
 
-        if (abs(point.x) <= (fdxmax)) and
-           (abs(point.y) <= (fdymax)) then
-          list.add(path.items[j]);
-      end;
+          if (abs(point.x) <= (fdxmax)) and
+             (abs(point.y) <= (fdymax)) then
+            list.add(path.items[j]);
+        end;
   end;
 
   if list.count > 0 then

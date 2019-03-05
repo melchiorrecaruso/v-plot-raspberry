@@ -1,7 +1,7 @@
 object aboutform: Taboutform
   Left = 457
   Height = 320
-  Top = 220
+  Top = 253
   Width = 400
   BorderStyle = bsDialog
   Caption = 'About ...'

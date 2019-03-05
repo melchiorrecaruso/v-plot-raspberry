@@ -1,7 +1,7 @@
 object importform: Timportform
   Left = 447
   Height = 325
-  Top = 211
+  Top = 244
   Width = 345
   BorderStyle = bsDialog
   Caption = 'Import ...'

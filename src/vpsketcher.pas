@@ -176,7 +176,6 @@ begin
         end;
         path1.copyfrom(path2);
       end;
-
       path2.destroy;
       inc(i, 1);
     end;
