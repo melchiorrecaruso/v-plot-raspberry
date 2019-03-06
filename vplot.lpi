@@ -430,7 +430,6 @@
         <TopLine Value="31"/>
         <CursorPos X="23" Y="2"/>
         <UsageCount Value="3"/>
-        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit47>
       <Unit48>
         <Filename Value="src/vpgcode.pas"/>
@@ -571,7 +570,6 @@
         <TopLine Value="27"/>
         <CursorPos X="14" Y="49"/>
         <UsageCount Value="6"/>
-        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit66>
       <Unit67>
         <Filename Value="../../.lazarus/onlinepackagemanager/packages/bgrabitmap-master/bgrabitmap/bgracanvas2d.pas"/>
@@ -1594,7 +1592,6 @@
         <EditorIndex Value="4"/>
         <TopLine Value="64"/>
         <CursorPos X="43" Y="88"/>
-        <FoldState Value=" T3j80f\"/>
         <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit233>
