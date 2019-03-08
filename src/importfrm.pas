@@ -34,17 +34,17 @@ type
   { timportform }
 
   timportform = class(tform)
-    Bevel1: TBevel;
-    otpcb: TCheckBox;
+    bevel1: tbevel;
+    otpcb: tcheckbox;
     okbtn: tbitbtn;
-    imcb: TComboBox;
+    imcb: tcombobox;
     dsfse: tfloatspinedit;
-    importmethodl: TLabel;
-    imagepatternwidthl: TLabel;
-    imagepatternheightl: TLabel;
-    patternwidthl: TLabel;
-    patternheightl: TLabel;
-    dotsizel: TLabel;
+    importmethodl: tlabel;
+    imagepatternwidthl: tlabel;
+    imagepatternheightl: tlabel;
+    patternwidthl: tlabel;
+    patternheightl: tlabel;
+    dotsizel: tlabel;
     ipwse: tspinedit;
     iphse: tspinedit;
     pwse: tspinedit;
@@ -61,9 +61,6 @@ var
 implementation
 
 {$R *.lfm}
-
-uses
-  bgrabitmap, vpsketcher, vppaths;
 
 end.
 

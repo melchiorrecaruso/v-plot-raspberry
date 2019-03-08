@@ -381,8 +381,8 @@ begin
       importform.iphse.enabled  := true;
       importform.pwse .enabled  := true;
       importform.phse .enabled  := true;
-      importform.otpcb.enabled  := false;
-      importform.otpcb.checked  := false;
+      importform.otpcb.enabled  := true;
+      importform.otpcb.checked  := true;
       if importform.showmodal = mrok then
       begin
         bit.canvas.clear;
@@ -395,6 +395,9 @@ begin
         sk.dotsize   := importform.dsfse.value;
         sk.run(paths);
         sk.destroy;
+
+        if importform.otpcb.checked then
+          paths.createtoolpath;
       end;
     end;
     fitmiclick(sender);

@@ -54,6 +54,8 @@ type
 
 implementation
 
+uses
+  math;
 
 constructor tvpsketcher.create(bit: tbgrabitmap);
 begin
@@ -83,13 +85,12 @@ begin
     for i := 0 to w -1 do
     begin
       c := fbit.colors[x+i, y+j];
-      k := k + c.blue ;
+      k := k + c.blue;
       k := k + c.green;
       k := k + c.red;
-      k := k + c.alpha;
     end;
 
-  result := round( (patternw/dotsize) - ((patternw/dotsize) * (k/(4*w*h))/$FFFF));
+  result := round((patternw/dotsize)-(patternw/dotsize)*(k/(3*$FFFF*w*h)))-1;
 end;
 
 function tvpsketcher.getpattern(n, width, height: single): tvppath;

@@ -163,11 +163,6 @@ begin
 
   dx := abs(dx);
   dy := abs(dy);
-
-
-  //writeln('DXY = ', dx-dy);
-
-
   bx := (dx > 0) and (fxoff = false);
   by := (dy > 0) and (fyoff = false);
   while (bx) or (by) do
