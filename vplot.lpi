@@ -302,9 +302,12 @@
       <Unit31>
         <Filename Value="src/vpdriver.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="27" Y="25"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="149"/>
+        <CursorPos X="5" Y="168"/>
         <UsageCount Value="200"/>
+        <Loaded Value="True"/>
       </Unit31>
       <Unit32>
         <Filename Value="src/vpsetting.pas"/>
@@ -342,7 +345,7 @@
       <Unit36>
         <Filename Value="src/vppaths.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="138"/>
         <CursorPos X="5" Y="844"/>
         <UsageCount Value="200"/>
@@ -1610,7 +1613,6 @@
         <ComponentName Value="tmainform"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="7"/>
         <TopLine Value="359"/>
         <CursorPos X="56" Y="372"/>
