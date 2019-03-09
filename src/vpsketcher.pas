@@ -1,5 +1,5 @@
 {
-  Description: vPlot sketcher form class.
+  Description: vPlot sketcher class.
 
   Copyright (C) 2017-2019 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 

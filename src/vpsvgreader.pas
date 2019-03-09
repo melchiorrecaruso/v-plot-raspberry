@@ -1,5 +1,5 @@
 {
-  Description: vPlot svg converter class.
+  Description: vPlot svg reader class.
 
   Copyright (C) 2017-2019 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 

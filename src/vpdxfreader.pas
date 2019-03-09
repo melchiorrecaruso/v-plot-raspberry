@@ -1,5 +1,5 @@
 {
-  Description: vPlot dfxreader class.
+  Description: vPlot dfx reader class.
 
   This unit derives from LAZARUS/FREEPASCAL dxfvectorialreader unit.
 

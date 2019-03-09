@@ -1,5 +1,5 @@
 {
-  Description: vPlot server driver library.
+  Description: vPlot driver class.
 
   Copyright (C) 2017-2019 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 

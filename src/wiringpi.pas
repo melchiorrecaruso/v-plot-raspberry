@@ -3,6 +3,7 @@
  * The source can be found at https://http://wiringpi.com
  *
  * wiringpi.pas: version 0.1 by Melchiorre Caruso
+ *   Copyright (c) 2014-2019 Melchiorre Caruso
  *
  * wiringPi.h:
  *    Arduino like Wiring library for the Raspberry Pi.

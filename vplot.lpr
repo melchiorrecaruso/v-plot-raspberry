@@ -1,5 +1,5 @@
 {
-  Description: vPlotter application.
+  Description: vPlot application.
 
   Copyright (C) 2017-2019 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
@@ -30,7 +30,7 @@ uses
 
 begin
   requirederivedformresource := true;
-  Application.Title:='VPlot Driver';
+  application.title:='VPlot Driver';
   application.initialize;
   application.createform(tmainform, mainform);
   application.createform(taboutform, aboutform);
