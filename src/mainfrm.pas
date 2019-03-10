@@ -360,7 +360,7 @@ begin
       importform.iphse.enabled  := false;
       importform.pwse .enabled  := false;
       importform.phse .enabled  := false;
-      importform.otpcb.enabled  := true;
+      importform.otpcb.enabled  := false;
       if importform.showmodal = mrok then
       begin
         if (lowercase(extractfileext(opendialog.filename)) = '.dxf') then

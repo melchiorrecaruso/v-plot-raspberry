@@ -5,7 +5,7 @@ object tmainform: tmainform
   Width = 763
   Anchors = []
   Caption = 'vPlotter'
-  ClientHeight = 512
+  ClientHeight = 510
   ClientWidth = 763
   Menu = mainmenu
   OnClose = FormClose
@@ -21,13 +21,13 @@ object tmainform: tmainform
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 510
+    Height = 508
     Top = 2
     Width = 763
     OnRedraw = screenredraw
     Alignment = taLeftJustify
     Anchors = [akTop, akLeft, akRight, akBottom]
-    ClientHeight = 510
+    ClientHeight = 508
     ClientWidth = 763
     Color = clForm
     ParentColor = False
@@ -43,8 +43,8 @@ object tmainform: tmainform
       AnchorSideBottom.Control = screen
       AnchorSideBottom.Side = asrBottom
       Left = 0
-      Height = 16
-      Top = 494
+      Height = 18
+      Top = 490
       Width = 763
       Alignment = taCenter
       Anchors = [akLeft, akRight, akBottom]
@@ -66,7 +66,7 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 8
+    Top = 6
     Width = 763
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -553,7 +553,7 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 44
-    Top = 112
+    Top = 111
     Width = 763
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -668,7 +668,7 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 176
+    Top = 175
     Width = 763
     Anchors = [akLeft, akRight]
     AutoSize = True

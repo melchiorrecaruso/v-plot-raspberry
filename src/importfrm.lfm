@@ -19,8 +19,8 @@ object importform: Timportform
     AnchorSideRight.Control = imcb
     AnchorSideRight.Side = asrBottom
     Left = 180
-    Height = 28
-    Top = 51
+    Height = 30
+    Top = 49
     Width = 150
     Alignment = taRightJustify
     Anchors = [akTop, akRight]
@@ -35,7 +35,7 @@ object importform: Timportform
     AnchorSideRight.Control = imcb
     AnchorSideRight.Side = asrBottom
     Left = 180
-    Height = 28
+    Height = 30
     Top = 89
     Width = 150
     Alignment = taRightJustify
@@ -51,8 +51,8 @@ object importform: Timportform
     AnchorSideRight.Control = imcb
     AnchorSideRight.Side = asrBottom
     Left = 180
-    Height = 28
-    Top = 127
+    Height = 30
+    Top = 129
     Width = 150
     Alignment = taRightJustify
     Anchors = [akTop, akLeft, akRight]
@@ -67,8 +67,8 @@ object importform: Timportform
     AnchorSideRight.Control = pwse
     AnchorSideRight.Side = asrBottom
     Left = 180
-    Height = 28
-    Top = 165
+    Height = 30
+    Top = 169
     Width = 150
     Alignment = taRightJustify
     Anchors = [akTop, akLeft, akRight]
@@ -83,8 +83,8 @@ object importform: Timportform
     AnchorSideRight.Control = imcb
     AnchorSideRight.Side = asrBottom
     Left = 180
-    Height = 28
-    Top = 203
+    Height = 30
+    Top = 209
     Width = 150
     Alignment = taRightJustify
     Anchors = [akTop, akLeft, akRight]
@@ -92,7 +92,7 @@ object importform: Timportform
     Increment = 0.1
     MinValue = 0.1
     TabOrder = 4
-    Value = 0.5
+    Value = 0.4
   end
   object okbtn: TBitBtn
     AnchorSideRight.Control = Owner
@@ -115,7 +115,7 @@ object importform: Timportform
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 120
-    Height = 26
+    Height = 24
     Top = 15
     Width = 210
     Anchors = [akTop, akLeft, akRight]
@@ -138,7 +138,7 @@ object importform: Timportform
     AnchorSideBottom.Control = imcb
     AnchorSideBottom.Side = asrBottom
     Left = 15
-    Height = 26
+    Height = 24
     Top = 15
     Width = 95
     Anchors = [akTop, akLeft, akRight, akBottom]
@@ -155,8 +155,8 @@ object importform: Timportform
     AnchorSideBottom.Control = ipwse
     AnchorSideBottom.Side = asrBottom
     Left = 15
-    Height = 28
-    Top = 51
+    Height = 30
+    Top = 49
     Width = 155
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Right = 10
@@ -171,7 +171,7 @@ object importform: Timportform
     AnchorSideBottom.Control = iphse
     AnchorSideBottom.Side = asrBottom
     Left = 15
-    Height = 28
+    Height = 30
     Top = 89
     Width = 155
     Anchors = [akTop, akLeft, akRight, akBottom]
@@ -187,8 +187,8 @@ object importform: Timportform
     AnchorSideBottom.Control = pwse
     AnchorSideBottom.Side = asrBottom
     Left = 15
-    Height = 28
-    Top = 127
+    Height = 30
+    Top = 129
     Width = 155
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Right = 10
@@ -203,8 +203,8 @@ object importform: Timportform
     AnchorSideBottom.Control = phse
     AnchorSideBottom.Side = asrBottom
     Left = 15
-    Height = 28
-    Top = 165
+    Height = 30
+    Top = 169
     Width = 155
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Right = 10
@@ -219,8 +219,8 @@ object importform: Timportform
     AnchorSideBottom.Control = dsfse
     AnchorSideBottom.Side = asrBottom
     Left = 15
-    Height = 28
-    Top = 203
+    Height = 30
+    Top = 209
     Width = 155
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Right = 10
@@ -235,9 +235,9 @@ object importform: Timportform
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 15
-    Height = 21
-    Top = 241
-    Width = 116
+    Height = 23
+    Top = 249
+    Width = 130
     BorderSpacing.Top = 10
     BorderSpacing.Right = 12
     Caption = 'Optimize ToolPath'
@@ -251,7 +251,7 @@ object importform: Timportform
     AnchorSideRight.Side = asrBottom
     Left = 2
     Height = 2
-    Top = 272
+    Top = 282
     Width = 341
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Left = 2
