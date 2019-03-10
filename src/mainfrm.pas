@@ -360,7 +360,9 @@ begin
       importform.iphse.enabled  := false;
       importform.pwse .enabled  := false;
       importform.phse .enabled  := false;
-      importform.otpcb.enabled  := false;
+      importform.dsfse.enabled  := false;
+      importform.otpcb.enabled  := true;
+      importform.otpcb.checked  := true;
       if importform.showmodal = mrok then
       begin
         if (lowercase(extractfileext(opendialog.filename)) = '.dxf') then
@@ -381,6 +383,7 @@ begin
       importform.iphse.enabled  := true;
       importform.pwse .enabled  := true;
       importform.phse .enabled  := true;
+      importform.dsfse.enabled  := true;
       importform.otpcb.enabled  := true;
       importform.otpcb.checked  := true;
       if importform.showmodal = mrok then
@@ -625,9 +628,9 @@ begin
     driverthread.enabled := false;
   end;
   driver.zcount := setting.zmax;
-  driver.xoff   := true;
-  driver.yoff   := true;
-  driver.zoff   := true;
+  driver.xoff   := false;
+  driver.yoff   := false;
+  driver.zoff   := false;
 end;
 
 procedure tmainform.killmiclick(sender: tobject);
