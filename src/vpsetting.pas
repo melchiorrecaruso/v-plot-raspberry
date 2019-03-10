@@ -197,7 +197,7 @@ begin
   fwavedymax   := ini.readfloat  ('WAVE',    'DYMAX',  0);
   fwaveoff     := ini.readinteger('WAVE',    'OFF',    0);
 
-  //if enabledebug then
+  if enabledebug then
   begin
     writeln(format('  LAYOUT::L0.X   = %12.5f  L0.Y = %12.5f', [flayout0.x, flayout0.y]));
     writeln(format('  LAYOUT::L1.X   = %12.5f  L1.Y = %12.5f', [flayout1.x, flayout1.y]));

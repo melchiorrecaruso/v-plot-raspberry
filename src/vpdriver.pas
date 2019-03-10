@@ -26,7 +26,7 @@ unit vpdriver;
 interface
 
 uses
-  classes, sysutils, {$ifdef cpuarm} pca9685, wiringpi, {$endif} vpsetting;
+  classes, sysutils, {$ifdef cpuarm} pca9685, wiringpi, {$endif} vpmath, vpsetting;
 
 type
   tvpdriver = class
@@ -183,9 +183,11 @@ begin
   {$endif}
   fxcount := axcount;
   fycount := aycount;
-
-//writeln(format('  DRIVER::CNT.X  = %12.5u', [fxcount]));
-//writeln(format('  DRIVER::CNT.Y  = %12.5u', [fycount]));
+  if enabledebug then
+  begin
+    writeln(format('  DRIVER::CNT.X  = %12.5u', [fxcount]));
+    writeln(format('  DRIVER::CNT.Y  = %12.5u', [fycount]));
+  end;
 end;
 
 procedure tvpdriver.setxcount(value: longint);
@@ -226,8 +228,10 @@ begin
     end;
   {$endif}
   fzcount := value;
-
-//writeln(format('  DRIVER::CNT.Z  = %12.5u', [fzcount]));
+  if enabledebug then
+  begin
+    writeln(format('  DRIVER::CNT.Z  = %12.5u', [fzcount]));
+  end;
 end;
 
 end.
