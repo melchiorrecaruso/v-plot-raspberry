@@ -90,7 +90,7 @@ begin
       k := k + c.red;
     end;
 
-  result := round((patternw/dotsize)-(patternw/dotsize)*(k/(3*$FFFF*w*h)));
+  result := round((patternw/dotsize)-(patternw/dotsize)*(k/((3*$FFFF)*w*h)));
 end;
 
 function tvpsketcher.getpattern(n, width, height: single): tvppath;
@@ -109,7 +109,6 @@ begin
 
     while width > p1.x do
     begin
-
       if p1.x - p0.x > 0  then
       begin
         p0 := p1;
@@ -128,60 +127,61 @@ begin
     end;
   end else
   begin
-    p0.x   := 0;
-    p0.y   := 0;
-    p1.x   := width;
-    p1.y   := 0;
+    p0.x := 0;
+    p0.y := 0;
+    p1.x := width;
+    p1.y := 0;
     interpolate_line(@p0, @p1, result);
   end;
 end;
 
 procedure tvpsketcher.run(paths: tvppaths);
 var
-  i, j, k: longint;
-   aw, ah: longint;
-   mirror: boolean;
-    path1: tvppath;
-    path2: tvppath;
+    x, y: longint;
+       i: longint;
+  aw, ah: longint;
+   path1: tvppath;
+   path2: tvppath;
+       m: boolean;
 begin
   aw := (fbit.width  div fpatternbw);
   ah := (fbit.height div fpatternbh);
-  mirror := false;
+   m := false;
 
-  j := 0;
-  while j < ah do
+  y := 0;
+  while y < ah do
   begin
     path1 := tvppath.create;
 
-    i := 0;
-    while i < aw do
+    x := 0;
+    while x < aw do
     begin
       path2 := getpattern(getdarkness(
-        fpatternbw*i, fpatternbh*j,
+        fpatternbw*x, fpatternbh*y,
         fpatternbw,   fpatternbh),
         fpatternw,    fpatternh);
 
-      if path2.count > 0 then
-      begin
-        if mirror then
-          for k := 0 to path2.count -1 do
-          begin
-            path2.items[k]^.y := -path2.items[k]^.y + patternh;
-          end;
-
-        mirror := path2.items[path2.count -1]^.y > 0;
-        for k := 0 to path2.count -1 do
+      if m then
+        for i := 0 to path2.count -1 do
         begin
-          path2.items[k]^.x := path2.items[k]^.x + patternw*i;
-          path2.items[k]^.y := path2.items[k]^.y + patternh*j;
+          path2.items[i]^.y := -path2.items[i]^.y + patternh;
         end;
-        path1.copyfrom(path2);
+      m := path2.items[path2.count -1]^.y > 0;
+
+      for i := 0 to path2.count -1 do
+      begin
+        path2.items[i]^.x := path2.items[i]^.x + patternw*x;
+        path2.items[i]^.y := path2.items[i]^.y + patternh*y;
       end;
+      path1.copyfrom(path2);
       path2.destroy;
-      inc(i, 1);
+      inc(x, 1);
     end;
+
+    if y mod 2 = 1 then
+      path1.invert;
     paths.addpath(path1);
-    inc(j, 1);
+    inc(y, 1);
   end;
   paths.zerocenter;
   paths.mirror(true);

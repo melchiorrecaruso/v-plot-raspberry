@@ -163,23 +163,21 @@ begin
 
   dx := abs(dx);
   dy := abs(dy);
-  bx := (dx > 0) and (fxoff = false);
-  by := (dy > 0) and (fyoff = false);
-  while (bx) or (by) do
-  begin
-    if bx then digitalwrite(motx_step, HIGH);
-    if by then digitalwrite(moty_step, HIGH);
-    delaymicroseconds(fxdelay);
-    dec(dx);
+  repeat
+    if dx > 0 then
+    begin
+      digitalwrite(motx_step, HIGH); delaymicroseconds(fxdelay);
+      digitalwrite(motx_step,  LOW); delaymicroseconds(fxdelay);
+      dec(dx);
+    end;
 
-    if bx then digitalwrite(motx_step,  LOW);
-    if by then digitalwrite(moty_step,  LOW);
-    delaymicroseconds(fydelay);
-    dec(dy);
-
-    bx := (dx > 0) and (fxoff = false);
-    by := (dy > 0) and (fyoff = false);
-  end;
+    if dy > 0 then
+    begin
+      digitalwrite(moty_step, HIGH); delaymicroseconds(fydelay);
+      digitalwrite(moty_step,  LOW); delaymicroseconds(fydelay);
+      dec(dy);
+    end;
+  until (dx = 0) and (dy = 0);
   {$endif}
   fxcount := axcount;
   fycount := aycount;

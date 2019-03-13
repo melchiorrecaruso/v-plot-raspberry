@@ -149,6 +149,7 @@ type
     procedure a0miclick            (sender: tobject);
     procedure horizontalmiclick    (sender: tobject);
     procedure toolpathmiclick      (sender: tobject);
+    procedure trackbarChange(Sender: TObject);
     // MAIN-MENU::VIEW
     procedure zoomoutmiclick       (sender: tobject);
     procedure zoominmiclick        (sender: tobject);
@@ -384,8 +385,8 @@ begin
       importform.pwse .enabled  := true;
       importform.phse .enabled  := true;
       importform.dsfse.enabled  := true;
-      importform.otpcb.enabled  := true;
-      importform.otpcb.checked  := true;
+      importform.otpcb.enabled  := false;
+      importform.otpcb.checked  := false;
       if importform.showmodal = mrok then
       begin
         bit.canvas.clear;
@@ -398,9 +399,6 @@ begin
         sk.dotsize   := importform.dsfse.value;
         sk.run(paths);
         sk.destroy;
-
-        if importform.otpcb.checked then
-          paths.createtoolpath;
       end;
     end;
     fitmiclick(sender);
@@ -553,6 +551,11 @@ begin
   paths.createtoolpath;
   updatescreen;
   unlock2;
+end;
+
+procedure tmainform.trackbarchange(sender: tobject);
+begin
+  updatescreen;
 end;
 
 // MAIN MENU::VIEW
@@ -826,8 +829,8 @@ begin
       point.x := (bit.width  div 2) + point.x*zoom;
       point.y := (bit.height div 2) - point.y*zoom;
 
-      if (abs(point.x + movex - x) < 3) and
-         (abs(point.y + movey - y) < 3) then
+      if (abs(point.x + movex - x)<2) and
+         (abs(point.y + movey - y)<2) then
         if path.hidden = false then
         begin
           if not (ssctrl in shift) then
