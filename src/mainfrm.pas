@@ -819,27 +819,27 @@ var
 begin
   if locked then exit;
   popup.autopopup:= true;
-  // search path ...
-  for i := 0 to paths.count -1 do
-  begin
-    path := paths.items[i];
-    for j := 0 to path.count -1 do
-    begin
-      point   := path.items[j]^;
-      point.x := (bit.width  div 2) + point.x*zoom;
-      point.y := (bit.height div 2) - point.y*zoom;
 
-      if (abs(point.x + movex - x)<2) and
-         (abs(point.y + movey - y)<2) then
-        if path.hidden = false then
-        begin
-          if not (ssctrl in shift) then
+  if (ssctrl in shift) then
+  begin
+    // search path ...
+    for i := 0 to paths.count -1 do
+    begin
+      path := paths.items[i];
+      for j := 0 to path.count -1 do
+      begin
+        point   := path.items[j]^;
+        point.x := (bit.width  div 2) + point.x*zoom;
+        point.y := (bit.height div 2) - point.y*zoom;
+
+        if (abs(point.x + movex - x)<2) and
+           (abs(point.y + movey - y)<2) then
+          if path.hidden = false then
           begin
-            paths.selectall(false);
+            path.selected   := button = mbleft;
+            popup.autopopup := false;
           end;
-          path.selected   := button = mbleft;
-          popup.autopopup := false;
-        end;
+      end;
     end;
   end;
 
@@ -954,6 +954,7 @@ begin
       p1    := path.items[0]^;
       p1.x  := (bit.width  div 2) + p1.x*zoom;
       p1.y  := (bit.height div 2) - p1.y*zoom;
+
       for j := 1 to path.count -1 do
       begin
         p2   := path.items[j]^;
@@ -967,7 +968,7 @@ begin
             bit.drawline(
               round(p1.x), round(p1.y),
               round(p2.x), round(p2.y),
-              bgra(57, 255, 20), true, dmset)
+              bgra(57, 255, 20), true, dmset);
           end else
           begin
             bit.drawline(
