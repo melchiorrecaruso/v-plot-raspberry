@@ -137,51 +137,50 @@ end;
 
 procedure tvpsketcher.run(paths: tvppaths);
 var
-    x, y: longint;
-       i: longint;
-  aw, ah: longint;
-   path1: tvppath;
-   path2: tvppath;
-       m: boolean;
+  i, j, k: longint;
+   aw, ah: longint;
+    path1: tvppath;
+    path2: tvppath;
+        m: boolean;
 begin
   aw := (fbit.width  div fpatternbw);
   ah := (fbit.height div fpatternbh);
    m := false;
 
-  y := 0;
-  while y < ah do
+  j := 0;
+  while j < ah do
   begin
     path1 := tvppath.create;
 
-    x := 0;
-    while x < aw do
+    i := 0;
+    while i < aw do
     begin
       path2 := getpattern(getdarkness(
-        fpatternbw*x, fpatternbh*y,
+        fpatternbw*i, fpatternbh*j,
         fpatternbw,   fpatternbh),
         fpatternw,    fpatternh);
 
       if m then
-        for i := 0 to path2.count -1 do
+        for k := 0 to path2.count -1 do
         begin
-          path2.items[i]^.y := -path2.items[i]^.y + patternh;
+          path2.items[k]^.y := -path2.items[k]^.y + patternh;
         end;
       m := path2.items[path2.count -1]^.y > 0;
 
-      for i := 0 to path2.count -1 do
+      for k := 0 to path2.count -1 do
       begin
-        path2.items[i]^.x := path2.items[i]^.x + patternw*x;
-        path2.items[i]^.y := path2.items[i]^.y + patternh*y;
+        path2.items[k]^.x := path2.items[k]^.x + patternw*i;
+        path2.items[k]^.y := path2.items[k]^.y + patternh*j;
       end;
       path1.copyfrom(path2);
       path2.destroy;
-      inc(x, 1);
+      inc(i, 1);
     end;
 
-    if y mod 2 = 1 then
+    if j mod 2 = 1 then
       path1.invert;
     paths.addpath(path1);
-    inc(y, 1);
+    inc(j, 1);
   end;
   paths.zerocenter;
   paths.mirror(true);

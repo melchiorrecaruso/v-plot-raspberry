@@ -818,10 +818,11 @@ var
   point: tvppoint;
 begin
   if locked then exit;
-  popup.autopopup:= true;
+  popup.autopopup := true;
 
   if (ssctrl in shift) then
   begin
+    popup.autopopup := false;
     // search path ...
     for i := 0 to paths.count -1 do
     begin
@@ -836,8 +837,7 @@ begin
            (abs(point.y + movey - y)<2) then
           if path.hidden = false then
           begin
-            path.selected   := button = mbleft;
-            popup.autopopup := false;
+            path.selected := button = mbleft;
           end;
       end;
     end;
@@ -922,7 +922,7 @@ end;
 
 procedure tmainform.penupbtnclick(sender: tobject);
 begin
-   lock2;
+  lock2;
   if sender = penupbtn then
     driver.zcount := setting.zmax
   else

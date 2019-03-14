@@ -117,7 +117,7 @@ uses
   math;
 
 const
-  minlen = 0.15;
+  minlen = 0.10;
 
 // internal toolpath routines
 
@@ -701,12 +701,9 @@ var
    i, j: longint;
    path: tvppath;
   point: pvppoint;
-      s: tfilestream;
+      s: tmemorystream;
 begin
-
-  writeln('save file ',  filename);
-
-  s := tfilestream.create(filename, fmcreate);
+  s := tmemorystream.create;
   s.writeansistring('vpl3.0');
   s.write(flist.count, sizeof(longint));
   for i := 0 to flist.count -1 do
@@ -721,6 +718,7 @@ begin
       s.write(point^.y, sizeof(single));
     end;
   end;
+  s.savetofile(filename);
   s.destroy;
 end;
 
@@ -731,11 +729,11 @@ var
     i, j: longint;
     path: tvppath;
    point: tvppoint;
-       s: tfilestream;
+       s: tmemorystream;
 begin
   clear;
-
-  s := tfilestream.create(filename, fmopenread or fmsharedenywrite);
+  s := tmemorystream.create;
+  s.loadfromfile(filename);
   if s.readansistring = 'vpl3.0' then
   begin
     s.read(count1, sizeof(longint));
