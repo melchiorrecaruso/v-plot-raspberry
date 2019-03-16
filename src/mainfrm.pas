@@ -35,6 +35,19 @@ type
 
   tmainform = class(tform)
     clientformbevel: TBevel;
+    zoom800mi: TMenuItem;
+    zoom300mi: TMenuItem;
+    zoom350mi: TMenuItem;
+    zoom400mi: TMenuItem;
+    zoom600mi: TMenuItem;
+    zoom50mi: TMenuItem;
+    zoom75mi: TMenuItem;
+    zoom100mi: TMenuItem;
+    zoom125mi: TMenuItem;
+    zoom150mi: TMenuItem;
+    zoom175mi: TMenuItem;
+    zoom200mi: TMenuItem;
+    zoom250mi: TMenuItem;
     scalebevelleft: TBevel;
     offsetbevelleft: TBevel;
     calibrationbevelleft: TBevel;
@@ -68,8 +81,6 @@ type
     screen: TBGRAVirtualScreen;
     divideselpm: tmenuitem;
     fitmi: TMenuItem;
-    zoominmi: TMenuItem;
-    zoomoutmi: TMenuItem;
     n9: TMenuItem;
     viewmi: TMenuItem;
     selattachedpm: tmenuitem;
@@ -151,8 +162,7 @@ type
     procedure toolpathmiclick      (sender: tobject);
     procedure trackbarChange(Sender: TObject);
     // MAIN-MENU::VIEW
-    procedure zoomoutmiclick       (sender: tobject);
-    procedure zoominmiclick        (sender: tobject);
+    procedure zoommiclick          (sender: tobject);
     procedure fitmiclick           (sender: tobject);
     // MAIN-MENU::PRINTER
     procedure startmiclick         (sender: tobject);
@@ -180,8 +190,6 @@ type
     procedure imagemouseup    (sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
     procedure imagemousedown  (sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
     procedure imagemousemove  (sender: tobject; shift: tshiftstate; x, y: integer);
-    procedure screenmousewheel(sender: tobject; shift: tshiftstate;
-      wheeldelta: integer; mousepos: tpoint; var handled: boolean);
     // panels event
     procedure scaleupdatebtnclick  (sender: tobject);
     procedure scaleclosebtnclick   (sender: tobject);
@@ -560,42 +568,44 @@ end;
 
 // MAIN MENU::VIEW
 
-procedure tmainform.zoominmiclick(sender: tobject);
+procedure tmainform.zoommiclick(sender: tobject);
 var
+      i: longint;
   value: single;
 begin
-  value := max(min(zoom*1.25, 25.0), 0.5);
+  value := 1.00;
 
-  if value <> zoom then
+  if sender = zoom50mi  then value := 0.50;
+  if sender = zoom75mi  then value := 0.75;
+  if sender = zoom100mi then value := 1.00;
+  if sender = zoom125mi then value := 1.25;
+  if sender = zoom150mi then value := 1.50;
+  if sender = zoom175mi then value := 1.75;
+  if sender = zoom200mi then value := 2.00;
+  if sender = zoom250mi then value := 2.50;
+  if sender = zoom300mi then value := 3.00;
+  if sender = zoom350mi then value := 3.50;
+  if sender = zoom400mi then value := 4.00;
+  if sender = zoom600mi then value := 6.00;
+  if sender = zoom800mi then value := 8.00;
+
+  for i := 0 to viewmi.count - 1 do
   begin
-    zoom  := value;
-    movex := movex + round((bit.width  -(pagewidth *zoom))*(movex)/bit.width );
-    movey := movey + round((bit.height -(pageheight*zoom))*(movey)/bit.height);
-    updatescreen;
+    viewmi.items[i].checked := viewmi.items[i] = sender;
   end;
-end;
-
-procedure tmainform.zoomoutmiclick(sender: tobject);
-var
-  value: single;
-begin
-  value := max(min(zoom/1.25, 25.0), 0.5);
 
   if value <> zoom then
   begin
     zoom  := value;
-    movex := movex + round((bit.width  -(pagewidth *zoom))*(movex)/bit.width );
-    movey := movey + round((bit.height -(pageheight*zoom))*(movey)/bit.height);
+    movex := (screen.width  - round(pagewidth *zoom)) div 2;
+    movey := (screen.height - round(pageheight*zoom)) div 2;
     updatescreen;
   end;
 end;
 
 procedure tmainform.fitmiclick(sender: tobject);
 begin
-  zoom  := 1.0;
-  movex := (screen.width  - pagewidth ) div 2;
-  movey := (screen.height - pageheight) div 2;
-  updatescreen;
+  zoommiclick(zoom100mi);
 end;
 
 // MAIN MENU::PRINT
@@ -874,29 +884,6 @@ begin
   mouseisdown := false;
 end;
 
-procedure tmainform.screenmousewheel(sender: tobject; shift: tshiftstate;
-  wheeldelta: integer; mousepos: tpoint; var handled: boolean);
-var
-  value: single;
-begin
-  if locked then exit;
-
-  locked := true;
-  if wheeldelta > 0 then
-    value := max(min(zoom*1.25, 25.0), 0.5)
-  else
-    value := max(min(zoom/1.25, 25.0), 0.5);
-
-  if value <> zoom then
-  begin
-    zoom  := value;
-    movex := movex + round((bit.width  -(pagewidth *zoom))*(mousepos.x-movex)/bit.width );
-    movey := movey + round((bit.height -(pageheight*zoom))*(mousepos.y-movey)/bit.height);
-    updatescreen;
-  end;
-  locked := false;
-end;
-
 // PANEL EVENTS
 
 procedure tmainform.leftupbtnclick(sender: tobject);
@@ -1012,8 +999,19 @@ begin
   pagesizemi   .enabled := value;
   toolpathmi   .enabled := value;
   // main menu::view
-  zoominmi     .enabled := value;
-  zoomoutmi    .enabled := value;
+  zoom50mi     .enabled := value;
+  zoom75mi     .enabled := value;
+  zoom100mi    .enabled := value;
+  zoom125mi    .enabled := value;
+  zoom150mi    .enabled := value;
+  zoom175mi    .enabled := value;
+  zoom200mi    .enabled := value;
+  zoom250mi    .enabled := value;
+  zoom300mi    .enabled := value;
+  zoom350mi    .enabled := value;
+  zoom400mi    .enabled := value;
+  zoom600mi    .enabled := value;
+  zoom800mi    .enabled := value;
   fitmi        .enabled := value;
   // main menu::printer
   startmi      .enabled := true;
@@ -1049,8 +1047,19 @@ begin
   pagesizemi   .enabled := value;
   toolpathmi   .enabled := value;
   // main menu::view
-  zoominmi     .enabled := value;
-  zoomoutmi    .enabled := value;
+  zoom50mi     .enabled := value;
+  zoom75mi     .enabled := value;
+  zoom100mi    .enabled := value;
+  zoom125mi    .enabled := value;
+  zoom150mi    .enabled := value;
+  zoom175mi    .enabled := value;
+  zoom200mi    .enabled := value;
+  zoom250mi    .enabled := value;
+  zoom300mi    .enabled := value;
+  zoom350mi    .enabled := value;
+  zoom400mi    .enabled := value;
+  zoom600mi    .enabled := value;
+  zoom800mi    .enabled := value;
   fitmi        .enabled := value;
   // main menu::printer
   startmi      .enabled := value;

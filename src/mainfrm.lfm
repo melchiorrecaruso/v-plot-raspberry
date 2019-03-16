@@ -35,7 +35,6 @@ object tmainform: tmainform
     OnMouseDown = imagemousedown
     OnMouseMove = imagemousemove
     OnMouseUp = imagemouseup
-    OnMouseWheel = screenmousewheel
     object statuslabel: TLabel
       AnchorSideLeft.Control = screen
       AnchorSideRight.Control = screen
@@ -66,7 +65,7 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = -5
+    Top = 16
     Width = 763
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -959,13 +958,71 @@ object tmainform: tmainform
     end
     object viewmi: TMenuItem
       Caption = 'View'
-      object zoominmi: TMenuItem
-        Caption = 'Zoom In'
-        OnClick = zoominmiClick
+      object zoom50mi: TMenuItem
+        AutoCheck = True
+        Caption = 'Zoom 50%'
+        OnClick = zoommiclick
       end
-      object zoomoutmi: TMenuItem
-        Caption = 'Zoom Out'
-        OnClick = zoomoutmiClick
+      object zoom75mi: TMenuItem
+        AutoCheck = True
+        Caption = 'Zoom 75%'
+        OnClick = zoommiclick
+      end
+      object zoom100mi: TMenuItem
+        AutoCheck = True
+        Caption = 'Zoom 100%'
+        Checked = True
+        OnClick = zoommiclick
+      end
+      object zoom125mi: TMenuItem
+        AutoCheck = True
+        Caption = 'Zoom 125%'
+        OnClick = zoommiclick
+      end
+      object zoom150mi: TMenuItem
+        AutoCheck = True
+        Caption = 'Zoom 150%'
+        OnClick = zoommiclick
+      end
+      object zoom175mi: TMenuItem
+        AutoCheck = True
+        Caption = 'Zoom 175%'
+        OnClick = zoommiclick
+      end
+      object zoom200mi: TMenuItem
+        AutoCheck = True
+        Caption = 'Zoom 200%'
+        OnClick = zoommiclick
+      end
+      object zoom250mi: TMenuItem
+        AutoCheck = True
+        Caption = 'Zoom 250%'
+        OnClick = zoommiclick
+      end
+      object zoom300mi: TMenuItem
+        AutoCheck = True
+        Caption = 'Zoom 300%'
+        OnClick = zoommiclick
+      end
+      object zoom350mi: TMenuItem
+        AutoCheck = True
+        Caption = 'Zoom 350%'
+        OnClick = zoommiclick
+      end
+      object zoom400mi: TMenuItem
+        AutoCheck = True
+        Caption = 'Zoom 400%'
+        OnClick = zoommiclick
+      end
+      object zoom600mi: TMenuItem
+        AutoCheck = True
+        Caption = 'Zoom 600%'
+        OnClick = zoommiclick
+      end
+      object zoom800mi: TMenuItem
+        AutoCheck = True
+        Caption = 'Zoom 800%'
+        OnClick = zoommiclick
       end
       object n9: TMenuItem
         Caption = '-'
