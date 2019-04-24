@@ -29,11 +29,11 @@ uses
   bgrabitmap, bgrabitmaptypes, bgrasvg, bgrasvgshapes, bgrasvgtype,
   bgravectorize, classes, vpmath, vppaths, sysutils;
 
-procedure svg2paths(const afilename: string; apaths: tvppaths);
+procedure svg2paths(const afilename: string; elements: tvpelementlist);
 
 implementation
 
-procedure element2paths(element: tsvgelement; apaths: tvppaths);
+procedure element2paths(element: tsvgelement; elements: tvpelementlist);
 var
      bmp: tbgrabitmap;
        i: longint;
@@ -52,15 +52,15 @@ begin
   begin
     element.draw(bmp.canvas2d, cucustom);
     points := bmp.canvas2d.currentpath;
-    for i := 0 to length(points) -2 do
+    for i := 0 to system.length(points) -2 do
       if (not isemptypointf(points[i  ])) and
          (not isemptypointf(points[i+1])) then
       begin
-        line.p0.x := points[i  ].x;
-        line.p0.y := points[i  ].y;
-        line.p1.x := points[i+1].x;
-        line.p1.y := points[i+1].y;
-        apaths.addline(@line);
+        line.p0.x := points[i    ].x;
+        line.p0.y := points[i    ].y;
+        line.p1.x := points[i + 1].x;
+        line.p1.y := points[i + 1].y;
+        elements.add(line);
       end;
     setlength(points, 0);
   end else
@@ -68,14 +68,14 @@ begin
   begin
     with tsvggroup(element).content do
       for i := 0 to elementcount -1 do
-        element2paths(element[i], apaths);
+        element2paths(element[i], elements);
   end else
   if enabledebug then
     writeln(element.classname);
   bmp.destroy;
 end;
 
-procedure svg2paths(const afilename: string; apaths: tvppaths);
+procedure svg2paths(const afilename: string; elements: tvpelementlist);
 var
     i: longint;
   svg: tbgrasvg;
@@ -83,13 +83,12 @@ begin
   svg := tbgrasvg.create(afilename);
   for i := 0 to svg.content.elementcount - 1 do
   begin
-    element2paths(svg.content.element[i], apaths);
+    element2paths(svg.content.element[i], elements);
   end;
   svg.destroy;
 
-  apaths.clean;
-  apaths.mirror(true);
-  apaths.zerocenter;
+  elements.mirrorx;
+  elements.movetoorigin;
 end;
 
 end.

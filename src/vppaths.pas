@@ -26,422 +26,752 @@ unit vppaths;
 interface
 
 uses
-  classes, sysutils, vpmath, vpsetting, vpwave;
+  classes, sysutils, vpmath, vpwave;
 
 type
-  tvppath = class(tobject)
+  tvpelement = class(tobject)
   private
-    fenabled:  boolean;
-    fhidden:   boolean;
-    flist:     tfplist;
-    flayer:    longword;
-    fselected: boolean;
-    function get(index: longint): pvppoint;
-    function getcount: longint;
+    fhidden: boolean;
+    finverted: boolean;
+    flayer: longword;
+    flen: single;
+    fpath: tvppolygonal;
+    fselected:  boolean;
     function getfirst: pvppoint;
     function getlast: pvppoint;
+    function getcount: longint;
+    function getitem(index: longint): pvppoint;
   public
     constructor create;
     destructor destroy; override;
-    procedure add(p: pvppoint);
-    procedure copyfrom(path: tvppath);
-    procedure clear;
-    procedure delete(index: longint);
-    procedure invert;
+    procedure invert; virtual;
+    procedure interpolate(value: single); virtual;
+    procedure move(dx, dy: single); virtual;
+    procedure rotate(angle: single); virtual;
+    procedure scale(value: single); virtual;
+    procedure mirrorx; virtual;
+    procedure mirrory; virtual;
+    procedure read(stream: tstream); virtual;
+    procedure write(stream: tstream); virtual;
   public
-    property count:    longint  read getcount;
-    property enabled:  boolean  read fenabled  write fenabled;
-    property hidden:   boolean  read fhidden   write fhidden;
-    property layer:    longword read flayer    write flayer;
-    property selected: boolean  read fselected write fselected;
-    property items[index: longint]: pvppoint  read get;
+    property first: pvppoint read getfirst;
+    property hidden: boolean read fhidden write fhidden;
+    property layer: longword read flayer  write flayer;
+    property last: pvppoint read getlast;
+    property len: single read flen;
+    property selected: boolean read fselected write fselected;
+    property items[index: longint]: pvppoint read getitem;
+    property count: longint read getcount;
   end;
 
-  tvppaths = class(tobject)
+  tvpelementline = class(tvpelement)
+  private
+    fline: tvpline;
+  public
+    constructor create;
+    constructor create(const aline: tvpline);
+    procedure invert; override;
+    procedure interpolate(value: single); override;
+    procedure move(dx, dy: single); override;
+    procedure rotate(angle: single); override;
+    procedure scale(value: single); override;
+    procedure mirrorx; override;
+    procedure mirrory; override;
+    procedure read(stream: tstream); override;
+    procedure write(stream: tstream); override;
+  end;
+
+  tvpelementcircle = class(tvpelement)
+  private
+    fcircle: tvpcircle;
+  public
+    constructor create;
+    constructor create(const acircle: tvpcircle);
+    procedure invert; override;
+    procedure interpolate(value: single); override;
+    procedure move(dx, dy: single); override;
+    procedure rotate(angle: single); override;
+    procedure scale(value: single); override;
+    procedure mirrorx; override;
+    procedure mirrory; override;
+    procedure read(stream: tstream); override;
+    procedure write(stream: tstream); override;
+  end;
+
+  tvpelementcirclearc = class(tvpelement)
+  private
+    fcirclearc: tvpcirclearc;
+  public
+    constructor create;
+    constructor create(const acirclearc: tvpcirclearc);
+    procedure invert; override;
+    procedure interpolate(value: single); override;
+    procedure move(dx, dy: single); override;
+    procedure rotate(angle: single); override;
+    procedure scale(value: single); override;
+    procedure mirrorx; override;
+    procedure mirrory; override;
+    procedure read(stream: tstream); override;
+    procedure write(stream: tstream); override;
+  end;
+
+  tvpelementpolygonal = class(tvpelement)
+  private
+    fpolygonal: tvppolygonal;
+  public
+    constructor create;
+    constructor create(const apolygonal: tvppolygonal);
+    procedure invert; override;
+    procedure interpolate(value: single); override;
+    procedure move(dx, dy: single); override;
+    procedure rotate(angle: single); override;
+    procedure scale(value: single); override;
+    procedure mirrorx; override;
+    procedure mirrory; override;
+    procedure read(stream: tstream); override;
+    procedure write(stream: tstream); override;
+  end;
+
+  tvpelementlist = class(tobject)
   private
     flist: tfplist;
-    function get(index: longint): tvppath;
-    function getcount:  longint;
     procedure createtoolpath4layer(list: tfplist);
+    function getitem(index: longint): tvpelement;
+    function getcount: longint;
   public
     constructor create;
     destructor destroy; override;
-    procedure addline(entity: pvpline);
-    procedure addcircle(entity: pvpcircle);
-    procedure addcirclearc(entity: pvpcirclearc);
-    procedure addellipse(entity: pvpellipse);
-    procedure addpath(entity: tvppath);
+    procedure add(const line: tvpline);
+    procedure add(const circle: tvpcircle);
+    procedure add(const circlearc: tvpcirclearc);
+    procedure add(const polygonal: tvppolygonal);
+    procedure add(element: tvpelement);
+    procedure add(elements: tvpelementlist);
+    procedure insert(index: longint; element: tvpelement);
+    function  extract(index: longint): tvpelement;
     procedure delete(index: longint);
     procedure clear;
-    procedure clean;
-    procedure createtoolpath;
-    procedure zerocenter;
-    procedure mirror(xaxis: boolean);
-    procedure scale(const factor: single);
-    procedure rotate(const alpha: single);
-    procedure offset(const x, y: single);
     //
-    procedure showall(value: boolean);
-    procedure showlayer(value: longint);
-    procedure hidelayer(value: longint);
+    procedure interpolate(value: single);
+    procedure offset(var x, y: single);
+    procedure move(dx, dy: single);
+    procedure rotate(angle: single);
+    procedure scale(value: single);
+    procedure mirrorx;
+    procedure mirrory;
+    procedure invert;
+    procedure invert(index: longint);
+    procedure movetoorigin;
+    procedure createtoolpath;
+    //
+    procedure hide(value: boolean);
+    procedure hide(value: boolean; layer: longint);
     procedure hideselected;
     procedure inverthidden;
     //
-    procedure selectall(value: boolean);
-    procedure selectlayer(value: longint);
+    procedure select(value: boolean);
+    procedure select(value: boolean; layer: longint);
     procedure selectattached;
     procedure invertselected;
-    //
+
     procedure mergeselected;
     procedure unmergeselected;
-    //
-    procedure load(const filename: rawbytestring);
-    procedure save(const filename: rawbytestring);
+
+    procedure load(const filename: string);
+    procedure save(const filename: string);
   public
     property count: longint read getcount;
-    property items[index: longint]: tvppath read get;
+    property items[index: longint]: tvpelement read getitem;
   end;
 
-
-  function interpolate_line(entity: pvpline): tvppath;
-  function interpolate_circle(entity: pvpcircle): tvppath;
-  function interpolate_circlearc(entity: pvpcirclearc): tvppath;
-  function interpolate_elipse(entity: pvpellipse): tvppath;
-
-  procedure interpolate_line(p0, p1: pvppoint; var path: tvppath);
-
+  tvppath = class
+  private
+    flist: tfplist;
+    function getcount: longint;
+    function getitem(index: longint): pvppoint;
+  public
+    constructor create;
+    destructor destroy; override;
+    procedure clear;
+    procedure update(elemlist: tvpelementlist; dxmax, dymax: single);
+    function getraises: longint;
+    function getlength: single;
+  public
+    property items[index: longint]: pvppoint read getitem;
+    property count: longint read getcount;
+  end;
 
 implementation
 
 uses
-  math;
+  math, vpsetting;
 
-const
-  minlen = 0.10;
+// tvpelement routines
 
-// internal toolpath routines
-
-procedure interpolate_line(p0, p1: pvppoint; var path: tvppath);
-var
-  dx, dy: double;
-   i,  j: longint;
-       p: tvppoint;
-begin
-    j := max(1, round(distance_between_two_points(p0^, p1^)/minlen));
-   dx := (p1^.x - p0^.x)/j;
-   dy := (p1^.y - p0^.y)/j;
-
-  for i := 0 to j do
-  begin
-    p.x := i * dx;
-    p.y := i * dy;
-    p   := translate_point(p0^, p);
-    path.add(@p);
-  end;
-end;
-
-function interpolate_line(entity: pvpline): tvppath;
-var
-  dx, dy: double;
-   i,  j: longint;
-       p: tvppoint;
-begin
-    j := max(1, round(len_segment(entity)/minlen));
-   dx := (entity^.p1.x - entity^.p0.x)/j;
-   dy := (entity^.p1.y - entity^.p0.y)/j;
-
-  result := tvppath.create;
-  for i := 0 to j do
-  begin
-    p.x := i * dx;
-    p.y := i * dy;
-    p   := translate_point(entity^.p0, p);
-    result.add(@p);
-  end;
-end;
-
-function interpolate_circle(entity: pvpcircle): tvppath;
-var
-   i, j: longint;
-      p: tvppoint;
-  start: tvppoint;
-  sweep: double;
-begin
-  start.x := entity^.radius;
-  start.y := 0.0;
-  sweep   := 2 * pi;
-
-  j := max(1, round((abs(sweep)*entity^.radius)/minlen));
-
-  result := tvppath.create;
-  for i := 0 to j do
-  begin
-    p := rotate_point(start, (i * (sweep / j)));
-    p := translate_point(entity^.center, p);
-    result.add(@p);
-  end;
-end;
-
-function interpolate_circlearc(entity: pvpcirclearc): tvppath;
-var
-   i, j: longint;
-      p: tvppoint;
-  start: tvppoint;
-  sweep: double;
-begin
-  start.x := entity^.radius;
-  start.y := 0.0;
-  start   := rotate_point(start, degtorad(entity^.startangle));
-  sweep   := degtorad(entity^.endangle - entity^.startangle);
-
-  j := max(1, round(abs(sweep)*entity^.radius/minlen));
-
-  result := tvppath.create;
-  for i := 0 to j do
-  begin
-    p := rotate_point(start, (i * (sweep / j)));
-    p := translate_point(entity^.center, p);
-    result.add(@p);
-  end;
-end;
-
-function interpolate_elipse(entity: pvpellipse): tvppath;
-begin
-  // ...
-end;
-
-// internal commont routines
-
-function distance_between_two_position(p0, p1: pvppoint): double;
-begin
-  result := sqrt(sqr(p1^.x - p0^.x) + sqr(p1^.y - p0^.y));
-end;
-
-function compare_position(p0, p1: pvppoint): boolean;
-begin
-  result := distance_between_two_position(p0, p1) < 0.02;
-end;
-
-function getfirst(p0: pvppoint; list: tfplist): longint;
+function getfirst(const p: tvppoint; list: tfplist): longint;
 var
   i: longint;
 begin
   result := -1;
   for i := 0 to list.count -1 do
-    if compare_position(p0, tvppath(list[i]).getfirst) then
+    if distance_between_two_points(p, tvpelement(list[i]).getfirst^) < 0.05 then
     begin
       result := i;
       exit;
     end;
 end;
 
-function getlast(p0: pvppoint; list: tfplist): longint;
+function getlast(const p: tvppoint; list: tfplist): longint;
 var
   i: longint;
 begin
   result := -1;
   for i := 0 to list.count -1 do
-    if compare_position(p0, tvppath(list[i]).getlast) then
+    if distance_between_two_points(p, tvpelement(list[i]).getlast^) < 0.05 then
     begin
       result := i;
       exit;
     end;
 end;
 
-function get_near(p0: pvppoint; list: tfplist): longint;
+function getnear(const p: tvppoint; list: tfplist): longint;
 var
-     i: longint;
-  len1: double = $FFFFFFF;
-  len2: double = $FFFFFFF;
+        i: longint;
+     len1: double = $FFFFFFF;
+     len2: double = $FFFFFFF;
+  element: tvpelement;
 begin
-  result := 0;
-  for i := 0 to list.count - 1 do
+  result := -1;
+  for i := 0 to list.count -1 do
   begin
+    element := tvpelement(list[i]);
 
-    len2 := distance_between_two_position(p0, tvppath(list[i]).getfirst);
+    len2 := distance_between_two_points(p, element.getfirst^);
     if len1 > len2 then
     begin
-      len1 := len2;
+      len1   := len2;
       result := i;
     end;
 
-    len2 := distance_between_two_position(p0, tvppath(list[i]).getlast);
+    len2 := distance_between_two_points(p, element.getlast^);
     if len1 > len2 then
     begin
-      tvppath(list[i]).invert;
-      len1 := len2;
+      element.invert;
+      len1   := len2;
       result := i;
     end;
 
   end;
 end;
 
-function is_closed(entity: tvppath): boolean;
+function isaloop(const element: tvpelement): boolean;
 begin
-  result := true;
-  if entity.count > 1 then
-  begin
-    result := compare_position(entity.get(0), entity.get(entity.count-1));
-  end;
+  result := distance_between_two_points(element.getfirst^, element.getlast^) < 0.05;
 end;
 
-// tvppath
+// tvpelement
 
-constructor tvppath.create;
+constructor tvpelement.create;
 begin
   inherited create;
-  fenabled  := true;
   fhidden   := false;
+  finverted := false;
   flayer    := 0;
-  flist     := tfplist.create;
+  flen      := 0;;
   fselected := false;
+  setlength(fpath, 0);
 end;
 
-destructor tvppath.destroy;
+destructor tvpelement.destroy;
 begin
-  clear;
-  flist.destroy;
+  setlength(fpath, 0);
   inherited destroy;
 end;
 
-procedure tvppath.delete(index: longint);
+function tvpelement.getfirst: pvppoint;
 begin
-  dispose(pvppoint(flist[index]));
-  flist.delete(index);
+  result := @fpath[0];
 end;
 
-procedure tvppath.clear;
+function tvpelement.getlast: pvppoint;
+begin
+  result := @fpath[high(fpath)];
+end;
+
+function tvpelement.getitem(index: longint): pvppoint;
+begin
+  result := @fpath[index];
+end;
+
+function tvpelement.getcount: longint;
+begin
+  result := system.length(fpath);
+end;
+
+procedure tvpelement.invert;
+begin
+  finverted := not finverted;
+  vpmath.invert(fpath);
+end;
+
+procedure tvpelement.interpolate(value: single);
 var
   i: longint;
 begin
-  for i := 0 to flist.count - 1 do
-    dispose(pvppoint(flist[i]));
-  flist.clear;
-end;
-
-procedure tvppath.add(p: pvppoint);
-var
-  point: pvppoint;
-begin
-  new(point);
-  point^.x := p^.x;
-  point^.y := p^.y;
-  point^.z := p^.z;
-  flist.add(point);
-end;
-
-procedure tvppath.copyfrom(path: tvppath);
-var
-  i: longint;
-begin
-  for i := 0 to path.count -1 do
+  flen := 0;
+  for i := 0 to high(fpath) -1 do
   begin
-    add(path.items[i]);
+    flen := flen + distance_between_two_points(fpath[i], fpath[i+1]);
   end;
 end;
 
-procedure tvppath.invert;
+procedure tvpelement.move(dx, dy: single);
+begin
+  vpmath.move(fpath, dx, dy);
+end;
+
+procedure tvpelement.rotate(angle: single);
+begin
+  vpmath.rotate(fpath, angle);
+end;
+
+procedure tvpelement.scale(value: single);
+begin
+  vpmath.scale(fpath, value);
+end;
+
+procedure tvpelement.mirrorx;
+begin
+  vpmath.mirrorx(fpath);
+end;
+
+procedure tvpelement.mirrory;
+begin
+  vpmath.mirrory(fpath);
+end;
+
+procedure tvpelement.read(stream: tstream);
+begin
+  stream.read(fhidden,   sizeof(boolean));
+  stream.read(finverted, sizeof(boolean));
+  stream.read(flayer,    sizeof(longint));
+  stream.read(flen,      sizeof(single ));
+  stream.read(fselected, sizeof(boolean));
+end;
+
+procedure tvpelement.write(stream: tstream);
+begin
+  stream.write(fhidden,   sizeof(boolean));
+  stream.write(finverted, sizeof(boolean));
+  stream.write(flayer,    sizeof(longint));
+  stream.write(flen,      sizeof(single ));
+  stream.write(fselected, sizeof(boolean));
+end;
+
+// tvpelementline
+
+constructor tvpelementline.create;
+begin
+  inherited create;
+end;
+
+constructor tvpelementline.create(const aline: tvpline);
+begin
+  inherited create;
+  fline := aline;
+end;
+
+procedure tvpelementline.invert;
+begin
+  vpmath.invert(fline);
+  inherited invert;
+end;
+
+procedure tvpelementline.interpolate(value: single);
+begin
+  vpmath.interpolate(fline, fpath, value);
+  inherited interpolate(value);
+end;
+
+procedure tvpelementline.move(dx, dy: single);
+begin
+  vpmath.move(fline, dx, dy);
+  inherited move(dx, dy);
+end;
+
+procedure tvpelementline.rotate(angle: single);
+begin
+  vpmath.rotate(fline, angle);
+  inherited rotate(angle);
+end;
+
+procedure tvpelementline.scale(value: single);
+begin
+  vpmath.scale(fline, value);
+  inherited scale(value);
+end;
+
+procedure tvpelementline.mirrorx;
+begin
+  vpmath.mirrorx(fline);
+  inherited mirrorx;
+end;
+
+procedure tvpelementline.mirrory;
+begin
+  vpmath.mirrory(fline);
+  inherited mirrory;
+end;
+
+procedure tvpelementline.read(stream: tstream);
+begin
+  inherited read(stream);
+  stream.read(fline, sizeof(tvpline));
+end;
+
+procedure tvpelementline.write(stream: tstream);
+begin
+  inherited write(stream);
+  stream.write(fline, sizeof(tvpline));
+end;
+
+// tvpelementcircle
+
+constructor tvpelementcircle.create;
+begin
+  inherited create;
+end;
+
+constructor tvpelementcircle.create(const acircle: tvpcircle);
+begin
+  inherited create;
+  fcircle := acircle;
+end;
+
+procedure tvpelementcircle.invert;
+begin
+  vpmath.invert(fcircle);
+  inherited invert;
+end;
+
+procedure tvpelementcircle.interpolate(value: single);
+begin
+  vpmath.interpolate(fcircle, fpath, value);
+  inherited interpolate(value);
+end;
+
+procedure tvpelementcircle.move(dx, dy: single);
+begin
+  vpmath.move(fcircle, dx, dy);
+  inherited move(dx, dy);
+end;
+
+procedure tvpelementcircle.rotate(angle: single);
+begin
+  vpmath.rotate(fcircle, angle);
+  inherited rotate(angle);
+end;
+
+procedure tvpelementcircle.scale(value: single);
+begin
+  vpmath.scale(fcircle, value);
+  inherited scale(value);
+end;
+
+procedure tvpelementcircle.mirrorx;
+begin
+  vpmath.mirrorx(fcircle);
+  inherited mirrorx;
+end;
+
+procedure tvpelementcircle.mirrory;
+begin
+  vpmath.mirrory(fcircle);
+  inherited mirrory;
+end;
+
+procedure tvpelementcircle.read(stream: tstream);
+begin
+  inherited read(stream);
+  stream.read(fcircle, sizeof(tvpcircle));
+end;
+
+procedure tvpelementcircle.write(stream: tstream);
+begin
+  inherited write(stream);
+  stream.write(fcircle, sizeof(tvpcircle));
+end;
+
+// tvpelementcirclearc
+
+constructor tvpelementcirclearc.create;
+begin
+  inherited create;
+end;
+
+constructor tvpelementcirclearc.create(const acirclearc: tvpcirclearc);
+begin
+  inherited create;
+  fcirclearc := acirclearc;
+end;
+
+procedure tvpelementcirclearc.invert;
+begin
+  vpmath.invert(fcirclearc);
+  inherited invert;
+end;
+
+procedure tvpelementcirclearc.interpolate(value: single);
+begin
+  vpmath.interpolate(fcirclearc, fpath, value);
+  inherited interpolate(value);
+end;
+
+procedure tvpelementcirclearc.move(dx, dy: single);
+begin
+  vpmath.move(fcirclearc, dx, dy);
+  inherited move(dx, dy);
+end;
+
+procedure tvpelementcirclearc.rotate(angle: single);
+begin
+  vpmath.rotate(fcirclearc, angle);
+  inherited rotate(angle);
+end;
+
+procedure tvpelementcirclearc.scale(value: single);
+begin
+  vpmath.scale(fcirclearc, value);
+  inherited scale(value);
+end;
+
+procedure tvpelementcirclearc.mirrorx;
+begin
+  vpmath.mirrorx(fcirclearc);
+  inherited mirrorx;
+end;
+
+procedure tvpelementcirclearc.mirrory;
+begin
+  vpmath.mirrory(fcirclearc);
+  inherited mirrory;
+end;
+
+procedure tvpelementcirclearc.read(stream: tstream);
+begin
+  inherited read(stream);
+  stream.read(fcirclearc, sizeof(tvpcirclearc));
+end;
+
+procedure tvpelementcirclearc.write(stream: tstream);
+begin
+  inherited write(stream);
+  stream.write(fcirclearc, sizeof(tvpcirclearc));
+end;
+
+// tvpelementpolygonal
+
+constructor tvpelementpolygonal.create;
+begin
+  inherited create;
+end;
+
+constructor tvpelementpolygonal.create(const apolygonal: tvppolygonal);
 var
-    i: longint;
-  tmp: tlist;
+  i: longint;
 begin
-  tmp := tlist.create;
-  for i := flist.count - 1 downto 0 do tmp.add(flist[i]);
-  for i := flist.count - 1 downto 0 do flist[i] := tmp[i];
-  tmp.destroy;
+  inherited create;
+  setlength(fpolygonal, system.length(apolygonal));
+  for i := 0 to high(apolygonal) do
+  begin
+    fpolygonal[i] := apolygonal[i];
+  end;
 end;
 
-function tvppath.getfirst: pvppoint;
+procedure tvpelementpolygonal.invert;
 begin
-  result := pvppoint(flist[0]);
+  vpmath.invert(fpolygonal);
+  inherited invert;
 end;
 
-function tvppath.getlast: pvppoint;
+procedure tvpelementpolygonal.interpolate(value: single);
 begin
-  result := pvppoint(flist[flist.count-1]);
+  vpmath.interpolate(fpolygonal, fpath, value);
+  inherited interpolate(value);
 end;
 
-function tvppath.get(index: longint): pvppoint;
+procedure tvpelementpolygonal.move(dx, dy: single);
 begin
-   result := pvppoint(flist[index]);
+  vpmath.move(fpolygonal, dx, dy);
+  inherited move(dx, dy);
 end;
 
-function tvppath.getcount: longint;
+procedure tvpelementpolygonal.rotate(angle: single);
 begin
-  result := flist.count;
+  vpmath.rotate(fpolygonal, angle);
+  inherited rotate(angle);
 end;
 
-// tvppaths
+procedure tvpelementpolygonal.scale(value: single);
+begin
+  vpmath.scale(fpolygonal, value);
+  inherited scale(value);
+end;
 
-constructor tvppaths.create;
+procedure tvpelementpolygonal.mirrorx;
+begin
+  vpmath.mirrorx(fpolygonal);
+  inherited mirrorx;
+end;
+
+procedure tvpelementpolygonal.mirrory;
+begin
+  vpmath.mirrory(fpolygonal);
+  inherited mirrory;
+end;
+
+procedure tvpelementpolygonal.read(stream: tstream);
+var
+  i, j: longint;
+begin
+  inherited read(stream);
+
+  setlength(fpolygonal, 0);
+  if stream.read(j, sizeof(longint)) = sizeof(longint) then
+  begin
+    setlength(fpolygonal, j);
+    for i := 0 to high(fpolygonal) do
+    begin
+      stream.read(fpolygonal[i], sizeof(tvppoint));
+    end;
+  end;
+end;
+
+procedure tvpelementpolygonal.write(stream: tstream);
+var
+  i, j: longint;
+begin
+  inherited write(stream);
+
+  j := system.length(fpolygonal);
+  stream.write(j, sizeof(longint));
+  for i := 0 to high(fpolygonal) do
+  begin
+    stream.write(fpolygonal[i], sizeof(tvppoint));
+  end;
+end;
+
+// tvpelementslist
+
+constructor tvpelementlist.create;
 begin
   inherited create;
   flist := tfplist.create;
 end;
 
-destructor tvppaths.destroy;
+destructor tvpelementlist.destroy;
 begin
   clear;
   flist.destroy;
   inherited destroy;
 end;
 
-procedure tvppaths.delete(index: longint);
-begin
-  tvppath(flist[index]).destroy;
-  flist.delete(index);
-end;
-
-procedure tvppaths.clear;
+procedure tvpelementlist.clear;
 var
   i: longint;
 begin
-  for i := 0 to flist.count - 1 do
-    tvppath(flist[i]).destroy;
+  for i := 0 to flist.count -1 do
+  begin
+    tvpelement(flist[i]).destroy;
+  end;
   flist.clear;
 end;
 
-procedure tvppaths.clean;
+function tvpelementlist.getcount: longint;
 begin
-  //...
+  result := flist.count;
 end;
 
-procedure tvppaths.addline(entity: pvpline);
+function tvpelementlist.getitem(index: longint): tvpelement;
 begin
-  flist.add(interpolate_line(entity));
+  result := tvpelement(flist[index]);
 end;
 
-procedure tvppaths.addcircle(entity: pvpcircle);
+procedure tvpelementlist.add(const line: tvpline);
 begin
-  flist.add(interpolate_circle(entity));
+   flist.add(tvpelementline.create(line));
 end;
 
-procedure tvppaths.addcirclearc(entity: pvpcirclearc);
+procedure tvpelementlist.add(const circle: tvpcircle);
 begin
-  flist.add(interpolate_circlearc(entity));
+  flist.add(tvpelementcircle.create(circle));
 end;
 
-procedure tvppaths.addellipse(entity: pvpellipse);
+procedure tvpelementlist.add(const circlearc: tvpcirclearc);
 begin
-  // ...
+  flist.add(tvpelementcirclearc.create(circlearc));
 end;
 
-procedure tvppaths.addpath(entity: tvppath);
+procedure tvpelementlist.add(const polygonal: tvppolygonal);
 begin
-  flist.add(entity);
+  flist.add(tvpelementpolygonal.create(polygonal));
 end;
 
-procedure tvppaths.zerocenter;
+procedure tvpelementlist.add(element: tvpelement);
+begin
+  flist.add(element);
+end;
+
+procedure tvpelementlist.add(elements: tvpelementlist);
+var
+  i: longint;
+begin
+  for i := 0 to elements.count -1 do
+  begin
+    flist.add(elements.items[i]);
+  end;
+  elements.flist.clear;
+end;
+
+procedure tvpelementlist.insert(index: longint; element: tvpelement);
+begin
+  flist.Insert(index, element);
+
+end;
+
+function tvpelementlist.extract(index: longint): tvpelement;
+begin
+  result := tvpelement(flist[index]);
+  flist.delete(index);
+end;
+
+procedure tvpelementlist.delete(index: longint);
+begin
+  tvpelement(flist[index]).destroy;
+  flist.delete(index);
+end;
+
+//---
+
+procedure tvpelementlist.interpolate(value: single);
+var
+  i: longint;
+begin
+  for i := 0 to flist.count -1 do
+  begin
+    tvpelement(flist[i]).interpolate(value);
+  end;
+end;
+
+procedure tvpelementlist.offset(var x, y: single);
 var
      i, j: longint;
      xmin: double;
      xmax: double;
      ymin: double;
      ymax: double;
-  offsetx: double;
-  offsety: double;
-     path: tvppath;
-    point: pvppoint;
+  element: tvpelement;
+    point: tvppoint;
 begin
   xmin  := + maxint;
   xmax  := - maxint;
@@ -449,311 +779,304 @@ begin
   ymax  := - maxint;
   for i := 0 to flist.count -1 do
   begin
-    path := tvppath(flist[i]);
-    for j := 0 to path.count -1 do
+    element := tvpelement(flist[i]);
+    for j := 0 to high(element.fpath) do
     begin
-      point := path.items[j];
-       xmin := min(xmin, point^.x);
-       xmax := max(xmax, point^.x);
-       ymin := min(ymin, point^.y);
-       ymax := max(ymax, point^.y);
+      point := element.fpath[j];
+       xmin := min(xmin, point.x);
+       xmax := max(xmax, point.x);
+       ymin := min(ymin, point.y);
+       ymax := max(ymax, point.y);
     end;
   end;
-  offsetx := - (xmin + xmax) / 2;
-  offsety := - (ymin + ymax) / 2;
-
-  for i := 0 to flist.count -1 do
-  begin
-    path := tvppath(flist[i]);
-    for j := 0 to path.count -1 do
-    begin
-      point    := path.items[j];
-      point^.x := point^.x + offsetx;
-      point^.y := point^.y + offsety;
-    end;
-  end;
+  x := -(xmin + xmax)/2;
+  y := -(ymin + ymax)/2;
 end;
 
-procedure tvppaths.mirror(xaxis: boolean);
+procedure tvpelementlist.move(dx, dy: single);
 var
-   i, j: longint;
-   path: tvppath;
-  point: pvppoint;
+  i: longint;
 begin
   for i := 0 to flist.count -1 do
   begin
-    path := tvppath(flist[i]);
-    for j := 0 to path.count -1 do
-      if xaxis then
-      begin
-        point    := path.items[j];
-        point^.y := -point^.y;
-      end else
-      begin
-        point    := path.items[j];
-        point^.x := -point^.x;
-      end;
+    tvpelement(flist[i]).move(dx, dy);
   end;
 end;
 
-procedure tvppaths.rotate(const alpha: single);
+procedure tvpelementlist.rotate(angle: single);
 var
-   i, j: longint;
-   path: tvppath;
-  point: pvppoint;
+  i: longint;
 begin
   for i := 0 to flist.count -1 do
   begin
-    path := tvppath(flist[i]);
-    for j := 0 to path.count -1 do
+    tvpelement(flist[i]).rotate(angle);
+  end;
+end;
+
+procedure tvpelementlist.scale(value: single);
+var
+  i: longint;
+begin
+  for i := 0 to flist.count -1 do
+  begin
+    tvpelement(flist[i]).scale(value);
+  end;
+end;
+
+procedure tvpelementlist.mirrorx;
+var
+  i: longint;
+begin
+  for i := 0 to flist.count -1 do
+  begin
+    tvpelement(flist[i]).mirrorx;
+  end;
+end;
+
+procedure tvpelementlist.mirrory;
+var
+  i: longint;
+begin
+  for i := 0 to flist.count -1 do
+  begin
+    tvpelement(flist[i]).mirrory;
+  end;
+end;
+
+procedure tvpelementlist.invert;
+var
+  i: longint;
+begin
+  for i := 0 to flist.count -1 do
+  begin
+    tvpelement(flist[i]).invert;
+  end;
+end;
+
+procedure tvpelementlist.invert(index: longint);
+begin
+  tvpelement(flist[index]).invert;
+end;
+
+procedure tvpelementlist.movetoorigin;
+var
+  dx, dy: single;
+begin
+  offset(dx, dy);
+  move(dx, dy);
+end;
+
+//---
+
+procedure tvpelementlist.hide(value: boolean);
+var
+  i: longint;
+begin
+  for i := 0 to flist.count -1 do
+  begin
+    tvpelement(flist[i]).fhidden := value;;
+  end;
+end;
+
+procedure tvpelementlist.hide(value: boolean; layer: longint);
+var
+  i: longint;
+begin
+  for i := 0 to flist.count -1 do
+    if tvpelement(flist[i]).flayer = layer then
     begin
-      point  := path.items[j];
-      point^ := rotate_point(point^, alpha);
+      tvpelement(flist[i]).fhidden := value;
+    end;
+end;
+
+procedure tvpelementlist.hideselected;
+var
+  i: longint;
+begin
+  for i := 0 to flist.count -1 do
+    if tvpelement(flist[i]).fselected then
+    begin
+      tvpelement(flist[i]).fhidden := true;
+    end;
+end;
+
+procedure tvpelementlist.inverthidden;
+var
+  i: longint;
+begin
+  for i := 0 to flist.count -1 do
+  begin
+    tvpelement(flist[i]).fhidden :=
+      not tvpelement(flist[i]).fhidden;
+  end;
+end;
+
+procedure tvpelementlist.select(value: boolean);
+var
+  i: longint;
+begin
+  for i := 0 to flist.count -1 do
+  begin
+    tvpelement(flist[i]).fselected := value;
+  end;
+end;
+
+procedure tvpelementlist.select(value: boolean; layer: longint);
+var
+  i: longint;
+begin
+  for i := 0 to flist.count -1 do
+    if tvpelement(flist[i]).flayer = layer then
+    begin
+      tvpelement(flist[i]).fselected := value;
+    end;
+end;
+
+procedure tvpelementlist.selectattached;
+var
+     i, j: longint;
+  element: tvpelement;
+begin
+  for i := 0 to flist.count -1 do
+  begin
+    element := tvpelement(flist[i]);
+
+    if element.fselected then
+    begin
+      repeat
+        j := getfirst(element.getlast^, flist);
+        if j <> -1 then
+        begin
+          element := tvpelement(flist[j]);
+          if element.fselected then
+            break;
+          element.fselected := true;
+        end;
+      until (j = -1) or (j = i);
+
+      element := tvpelement(flist[i]);
+      repeat
+        j := getlast(element.getfirst^, flist);
+        if j <> -1 then
+        begin
+          element := tvpelement(flist[j]);
+          if element.fselected then
+            break;
+          element.fselected := true;
+        end;
+      until (j = -1) or (j = i);
+
     end;
   end;
 end;
 
-procedure tvppaths.offset(const x, y: single);
+procedure tvpelementlist.invertselected;
 var
-   i, j: longint;
-   path: tvppath;
-  point: pvppoint;
+  i: longint;
 begin
   for i := 0 to flist.count -1 do
   begin
-    path := tvppath(flist[i]);
-    for j := 0 to path.count -1 do
-    begin
-      point    := path.items[j];
-      point^.x := point^.x + x;
-      point^.y := point^.y + y;
-    end;
+    tvpelement(flist[i]).fselected :=
+      not tvpelement(flist[i]).fselected;
   end;
 end;
 
-procedure tvppaths.scale(const factor: single);
+procedure tvpelementlist.mergeselected;
 var
-   i, j: longint;
-   path: tvppath;
-  point: pvppoint;
-begin
-  for i := 0 to flist.count -1 do
-  begin
-    path := tvppath(flist[i]);
-    for j := 0 to path.count -1 do
-    begin
-      point    := path.items[j];
-      point^.x := point^.x * factor;
-      point^.y := point^.y * factor;
-    end;
-  end;
-end;
-
-procedure tvppaths.mergeselected;
-var
-  i, j: longint;
-  path: tvppath;
+     i, j: longint;
+  element: tvpelement;
 begin
   randomize;
   repeat
     j := random($FFFFFFF);
     for i := 0 to flist.count -1 do
-      if j = tvppath(flist[i]).layer then j := 0;
+      if j = tvpelement(flist[i]).flayer then
+      begin
+        j := 0;
+      end;
   until j <> 0;
 
   for i := 0 to flist.count -1 do
   begin
-    path := tvppath(flist[i]);
-    if path.selected then
-      path.layer := j;
+    element := tvpelement(flist[i]);
+    if element.fselected then
+      element.flayer := j;
   end;
 end;
 
-procedure tvppaths.unmergeselected;
+procedure tvpelementlist.unmergeselected;
 var
-     i: longint;
-  path: tvppath;
+        i: longint;
+  element: tvpelement;
 begin
   for i := 0 to flist.count -1 do
   begin
-    path := tvppath(flist[i]);
-    if path.selected then
+    element := tvpelement(flist[i]);
+    if element.fselected then
     begin
-      path.layer := 0;
+      element.flayer := 0;
     end;
   end;
 end;
 
-//
-
-procedure tvppaths.showall(value: boolean);
+procedure tvpelementlist.save(const filename: string);
 var
-  i: longint;
-begin
-  for i := 0 to flist.count -1 do
-    tvppath(flist[i]).fhidden := not value;
-end;
-
-procedure tvppaths.showlayer(value: longint);
-var
-  i: longint;
-begin
-  for i := 0 to flist.count -1 do
-    if tvppath(flist[i]).flayer = value then
-      tvppath(flist[i]).fhidden := false;
-end;
-
-procedure tvppaths.hidelayer(value: longint);
-var
-  i: longint;
-begin
-  for i := 0 to flist.count -1 do
-    if tvppath(flist[i]).flayer = value then
-      tvppath(flist[i]).fhidden := true;
-end;
-
-procedure tvppaths.hideselected;
-var
-  i: longint;
-begin
-  for i := 0 to flist.count -1 do
-    if tvppath(flist[i]).fselected then
-      tvppath(flist[i]).fhidden := true;
-end;
-
-procedure tvppaths.inverthidden;
-var
-  i: longint;
-begin
-  for i := 0 to flist.count -1 do
-    tvppath(flist[i]).fhidden := not tvppath(flist[i]).fhidden;
-end;
-
-//
-
-procedure tvppaths.selectall(value: boolean);
-var
-  i: longint;
-begin
-  for i := 0 to flist.count -1 do
-    tvppath(flist[i]).fselected := value;
-end;
-
-procedure tvppaths.selectlayer(value: longint);
-var
-  i: longint;
-begin
-  for i := 0 to flist.count -1 do
-    if tvppath(flist[i]).flayer = value then
-      tvppath(flist[i]).fselected := true;
-end;
-
-procedure tvppaths.selectattached;
-var
-  i, j: longint;
-  path: tvppath;
-begin
-  for i := 0 to flist.count -1 do
-  begin
-    path := tvppath(flist[i]);
-
-    if path.selected then
-    begin
-      repeat
-        j := getfirst(path.getlast, flist);
-        if j <> -1 then
-        begin
-          path := tvppath(flist[j]);
-          if path.selected then
-            break;
-          path.selected := true;
-        end;
-      until (j = -1) or (j = i);
-
-      path := tvppath(flist[i]);
-      repeat
-        j := getlast(path.getfirst, flist);
-        if j <> -1 then
-        begin
-          path := tvppath(flist[j]);
-          if path.selected then
-            break;
-          path.selected := true;
-        end;
-      until (j = -1) or (j = i);
-
-    end;
-  end;
-end;
-
-procedure tvppaths.invertselected;
-var
-  i: longint;
-begin
-  for i := 0 to flist.count -1 do
-    tvppath(flist[i]).fselected := not tvppath(flist[i]).fselected;
-end;
-
-//
-
-procedure tvppaths.save(const filename: rawbytestring);
-var
-   i, j: longint;
-   path: tvppath;
-  point: pvppoint;
-      s: tmemorystream;
+        i: longint;
+  element: tvpelement;
+        s: tmemorystream;
 begin
   s := tmemorystream.create;
-  s.writeansistring('vpl3.0');
+  s.writeansistring('vpl3.1');
   s.write(flist.count, sizeof(longint));
   for i := 0 to flist.count -1 do
   begin
-    path := tvppath(flist[i]);
-    s.write(path.layer, sizeof(longint));
-    s.write(path.count, sizeof(longint));
-    for j := 0 to path.count -1 do
-    begin
-      point := path.items[j];
-      s.write(point^.x, sizeof(single));
-      s.write(point^.y, sizeof(single));
-    end;
+    element := tvpelement(flist[i]);
+
+    if element is tvpelementline      then s.writeansistring('line')      else
+    if element is tvpelementcircle    then s.writeansistring('circle')    else
+    if element is tvpelementcirclearc then s.writeansistring('circlearc') else
+    if element is tvpelementpolygonal then s.writeansistring('polygonal') else
+      raise exception.create('tvpelementlist.save');
+
+    element.write(s);
   end;
   s.savetofile(filename);
   s.destroy;
 end;
 
-procedure tvppaths.load(const filename: rawbytestring);
+procedure tvpelementlist.load(const filename: string);
 var
-  count1: longint = 0;
-  count2: longint = 0;
-    i, j: longint;
-    path: tvppath;
-   point: tvppoint;
-       s: tmemorystream;
+     i, j: longint;
+  element: tvpelement;
+     sign: string;
+        s: tmemorystream;
 begin
   clear;
+
   s := tmemorystream.create;
   s.loadfromfile(filename);
-  if s.readansistring = 'vpl3.0' then
+  if s.readansistring = 'vpl3.1' then
   begin
-    s.read(count1, sizeof(longint));
-    for i := 0 to count1 -1 do
-    begin
-      path := tvppath(flist[flist.add(tvppath.create)]);
-      s.read(path.flayer, sizeof(longint));
-      s.read(count2,      sizeof(longint));
-      for j := 0 to count2 -1 do
+
+    if s.read(j, sizeof(longint))= sizeof(longint) then
+      for i := 0 to j -1 do
       begin
-        s.read(point.x, sizeof(single));
-        s.read(point.y, sizeof(single));
-        path.add(@point);
+        sign := s.readansistring;
+
+        if sign = 'line'      then element := tvpelementline.create      else
+        if sign = 'circle'    then element := tvpelementcircle.create    else
+        if sign = 'circlearc' then element := tvpelementcirclearc.create else
+        if sign = 'polygonal' then element := tvpelementpolygonal.create else
+          raise exception.create('tvpelementlist.load');
+
+        element.read(s);
+        add(element);
       end;
-    end;
   end;
   s.destroy;
 end;
 
-procedure tvppaths.createtoolpath;
+procedure tvpelementlist.createtoolpath;
 var
    i, j: longint;
   list1: tfplist;
@@ -761,126 +1084,233 @@ var
 begin
   list1 := tfplist.create;
   list2 := tfplist.create;
-  while flist.count > 0 do
-  begin
-    list1.add(flist[0]);
-    flist.delete(0);
-  end;
+  for i := 0 to flist.count -1 do
+    list1.add(flist[i]);
+  flist.clear;
 
   while list1.count > 0 do
   begin
-    j :=  tvppath(list1[0]).layer;
+    j :=  tvpelement(list1[0]).flayer;
     for i := list1.count -1 downto 0 do
     begin
-      if j = tvppath(list1[i]).layer then
+      if j = tvpelement(list1[i]).flayer then
       begin
-        list2.add(list1[j]);
-        list1.delete(j);
+        list2.add(list1[i]);
+        list1.delete(i);
       end;
     end;
 
     createtoolpath4layer(list2);
-    while list2.count > 0 do
-    begin
-      flist.add(list2[0]);
-      list2.delete(0);
-    end;
+    for i := 0 to list2.count -1 do
+      flist.add(list2[i]);
+    list2.clear;
   end;
   list2.destroy;
   list1.destroy;
 end;
 
-procedure tvppaths.createtoolpath4layer(list: tfplist);
+procedure tvpelementlist.createtoolpath4layer(list: tfplist);
 var
-      i: longint;
-   path: tvppath;
-  point: pvppoint;
-  list1: tfplist;
-  list2: tfplist;
+        i: longint;
+  element: tvpelement;
+    point: pvppoint;
+    list1: tfplist;
+    list2: tfplist;
 begin
   list1 := tfplist.create;
   list2 := tfplist.create;
-  while list.count > 0 do
-  begin
-    list1.add(list[0]);
-    list.delete(0);
-  end;
-  point := nil;
+  for i := 0 to list.count -1 do
+    list1.add(list[i]);
+  list.clear;
 
+  point := nil;
   // create toolpath
   while list1.count > 0 do
   begin
     if point = nil then
       i := 0
     else
-      i := get_near(point, list1);
+      i := getnear(point^, list1);
 
     list2.add(list1[i]);
     list1.delete(i);
 
-    if is_closed(tvppath(list2[0])) = false then
+    if isaloop(tvpelement(list2[0])) = false then
     begin
-      path := tvppath(list2[0]);
-      repeat
-        i := getfirst(path.getlast, list1);
-        if i = -1 then
-        begin
-          i := getlast(path.getlast, list1);
-          if i <> -1 then
-            tvppath(list1[i]).invert;
-        end;
 
+      element := tvpelement(list2[0]);
+      repeat
+        i := getfirst(element.getlast^, list1);
         if i <> -1 then
         begin
-          path := tvppath(list1[i]);
-          list2.add(path);
+          element := tvpelement(list1[i]);
+          list2.add(element);
           list1.delete(i);
         end;
       until i = -1;
 
-      path := tvppath(list2[0]);
+      element := tvpelement(list2[0]);
       repeat
-        i := getlast(path.getfirst, list1);
-        if i = -1 then
-        begin
-          i := getfirst(path.getfirst, list1);
-          if i <> -1 then
-            tvppath(list1[i]).invert;
-        end;
-
+        i := getlast(element.getfirst^, list1);
         if i <> -1 then
         begin
-          path := tvppath(list1[i]);
-          list2.insert(0, path);
+          element := tvpelement(list1[i]);
+          list2.insert(0, element);
           list1.delete(i);
         end;
       until i = -1;
+
     end;
 
     // move toolpath
     i := list.count;
-    point := tvppath(list2[list2.count-1]).getlast;
+    point := tvpelement(list2[list2.count-1]).getlast;
     while list2.count > 0 do
     begin
-      tvppath(list2[0]).layer := i;
-      list.add(tvppath(list2[0]));
+      tvpelement(list2[0]).flayer := i;
+      list.add(tvpelement(list2[0]));
       list2.delete(0);
     end;
-
   end;
   list2.destroy;
   list1.destroy;
 end;
 
-function tvppaths.getcount: longint;
+//  tvppath
+
+constructor tvppath.create;
+begin
+  inherited create;
+  flist := tfplist.create;
+end;
+
+destructor tvppath.destroy;
+begin
+  clear;
+  inherited destroy;
+end;
+
+procedure tvppath.clear;
+var
+  i: longint;
+begin
+  for i := 0 to flist.count -1 do
+  begin
+    dispose(pvppoint(flist[i]));
+  end;
+  flist.clear;
+end;
+
+procedure tvppath.update(elemlist: tvpelementlist; dxmax, dymax: single);
+var
+  i, j: longint;
+  elem: tvpelement;
+    pp: pvppoint;
+     p: tvppoint;
+begin
+  clear;
+  for i := 0 to elemlist.count -1 do
+  begin
+    elem := elemlist.items[i];
+    if elem.hidden = false then
+    begin
+      elem.interpolate(0.1);
+      for j := 0 to elem.count -1 do
+      begin
+        p := wave.update(elem.items[j]^);
+
+        if (abs(p.x) <= (dxmax)) and
+           (abs(p.y) <= (dymax)) then
+        begin
+          new(pp);
+          pp^ := elem.items[j]^;
+          flist.add(pp);
+        end;
+      end;
+      elem.interpolate(0.5);
+    end;
+  end;
+end;
+
+function tvppath.getlength: single;
+var
+       i: longint;
+  p0, p1: tvppoint;
+begin
+  result := 0;
+
+  p0 := setting.layout9;
+  for i := 0 to flist.count -1 do
+  begin
+    p1 := wave.update(pvppoint(flist[i])^);
+    result := result + distance_between_two_points(p0, p1);
+
+    p0 := p1;
+  end;
+end;
+
+
+function tvppath.getraises: longint;
+var
+       i: longint;
+  p0, p1: tvppoint;
+       z: single;
+begin
+  result := 0;
+
+   z := setting.zmax;
+  p0 := setting.layout9;
+  for i := 0 to flist.count -1 do
+  begin
+    p1 := wave.update(pvppoint(flist[i])^);
+
+    if distance_between_two_points(p0, p1) < 0.2 then
+    begin
+      if z <> setting.zmin then
+      begin
+        z := setting.zmin;
+        inc(result);
+      end;
+    end else
+    begin
+      if z <> setting.zmax then
+      begin
+        z := setting.zmax;
+        inc(result);
+      end;
+    end;
+
+    p0 := p1;
+  end;
+end;
+
+
+function tvppath.getcount: longint;
 begin
   result := flist.count;
 end;
 
-function tvppaths.get(index: longint): tvppath;
+function tvppath.getitem(index: longint): pvppoint;
 begin
-  result := tvppath(flist[index]);
+  result := pvppoint(flist[index]);
+end;
+
+//
+
+function info(elements: tvpelementlist): single;
+var
+  i: longint;
+begin
+  result := 0;
+
+  elements.interpolate(0.5);
+  for i := 0 to elements.count -1 do
+  begin
+    result := result + elements.items[i].len;
+  end;
 end;
 
 end.
+
+
 

@@ -26,63 +26,87 @@ unit mainfrm;
 interface
 
 uses
-  classes, forms, controls, graphics, dialogs, extctrls, stdctrls, comctrls,
-  buttons, menus, spin, vppaths, types,
-  bgrabitmap, bgrabitmaptypes, bgravirtualscreen, bgragradientscanner;
+  bgrabitmap, bgrabitmaptypes, bgragradientscanner,  bgravirtualscreen,
+  buttons, classes, comctrls, controls, dialogs, extctrls, forms, graphics,
+  menus, spin, stdctrls, vppaths;
 
 type
   { tmainform }
 
   tmainform = class(tform)
-    clientformbevel: TBevel;
-    zoom800mi: TMenuItem;
-    zoom300mi: TMenuItem;
-    zoom350mi: TMenuItem;
-    zoom400mi: TMenuItem;
-    zoom600mi: TMenuItem;
-    zoom50mi: TMenuItem;
-    zoom75mi: TMenuItem;
-    zoom100mi: TMenuItem;
-    zoom125mi: TMenuItem;
-    zoom150mi: TMenuItem;
-    zoom175mi: TMenuItem;
-    zoom200mi: TMenuItem;
-    zoom250mi: TMenuItem;
-    scalebevelleft: TBevel;
-    offsetbevelleft: TBevel;
-    calibrationbevelleft: TBevel;
-    scalelabel: TLabel;
-    scalebevel: TBevel;
-    mainformbevel: TBevel;
-    offsetbevel: TBevel;
-    calibrationbevel: TBevel;
-    calibrationclosebtn: TBitBtn;
-    xoffsetlabel: TLabel;
-    yoffsetlabel: TLabel;
-    offsetupdatebtn: TBitBtn;
-    scaleupdatebtn: TBitBtn;
-    offsetpanel: TPanel;
-    scaleclosebtn: TBitBtn;
-    scaleedit: TFloatSpinEdit;
-    leftdownbtn: TBitBtn;
-    edit: TSpinEdit;
-    leftupbtn: TBitBtn;
-    calibrationpanel: TPanel;
-    calibrationmi: TMenuItem;
-    scalepanel: TPanel;
-    pendownbtn: TBitBtn;
-    penupbtn: TBitBtn;
-    rightdownbtn: TBitBtn;
-    rightupbtn: TBitBtn;
-    offsetclosebtn: TSpeedButton;
-    yoffsetedit: TSpinEdit;
-    xoffsetedit: TSpinEdit;
-    statuslabel: TLabel;
-    screen: TBGRAVirtualScreen;
+    clientformbevel: tbevel;
+    N10: TMenuItem;
+    pathinfomi: TMenuItem;
+    zoom3000mi: TMenuItem;
+    zoom1000mi: TMenuItem;
+    zoom1500mi: TMenuItem;
+    zoom2000mi: TMenuItem;
+    previewmi: TMenuItem;
+    N8: TMenuItem;
+    sb010mi: TMenuItem;
+    sf025mi: TMenuItem;
+    sf050mi: TMenuItem;
+    sb050mi: TMenuItem;
+    sf100mi: TMenuItem;
+    sb100mi: TMenuItem;
+    mtfsmi: TMenuItem;
+    mtlsmi: TMenuItem;
+    sb025mi: TMenuItem;
+    N5: TMenuItem;
+    sf001mi: TMenuItem;
+    sb001mi: TMenuItem;
+    sf005mi: TMenuItem;
+    sb005mi: TMenuItem;
+    sf010mi: TMenuItem;
+    move2originmi: TMenuItem;
+    zoom50mi: tmenuitem;
+    zoom75mi: tmenuitem;
+    zoom100mi: tmenuitem;
+    zoom125mi: tmenuitem;
+    zoom150mi: tmenuitem;
+    zoom175mi: tmenuitem;
+    zoom200mi: tmenuitem;
+    zoom250mi: tmenuitem;
+    zoom800mi: tmenuitem;
+    zoom300mi: tmenuitem;
+    zoom350mi: tmenuitem;
+    zoom400mi: tmenuitem;
+    zoom600mi: tmenuitem;
+    scalebevelleft: tbevel;
+    offsetbevelleft: tbevel;
+    calibrationbevelleft: tbevel;
+    scalelabel: tlabel;
+    scalebevel: tbevel;
+    mainformbevel: tbevel;
+    offsetbevel: tbevel;
+    calibrationbevel: tbevel;
+    calibrationclosebtn: tbitbtn;
+    xoffsetlabel: tlabel;
+    yoffsetlabel: tlabel;
+    offsetupdatebtn: tbitbtn;
+    scaleupdatebtn: tbitbtn;
+    offsetpanel: tpanel;
+    scaleclosebtn: tbitbtn;
+    scaleedit: tfloatspinedit;
+    leftdownbtn: tbitbtn;
+    edit: tspinedit;
+    leftupbtn: tbitbtn;
+    calibrationpanel: tpanel;
+    calibrationmi: tmenuitem;
+    scalepanel: tpanel;
+    pendownbtn: tbitbtn;
+    penupbtn: tbitbtn;
+    rightdownbtn: tbitbtn;
+    rightupbtn: tbitbtn;
+    offsetclosebtn: tspeedbutton;
+    yoffsetedit: tspinedit;
+    xoffsetedit: tspinedit;
+    statuslabel: tlabel;
+    screen: tbgravirtualscreen;
     divideselpm: tmenuitem;
-    fitmi: TMenuItem;
-    n9: TMenuItem;
-    viewmi: TMenuItem;
+    fitmi: tmenuitem;
+    n9: tmenuitem;
+    viewmi: tmenuitem;
     selattachedpm: tmenuitem;
     selbylayerpm: tmenuitem;
     hidebylayerpm: tmenuitem;
@@ -146,6 +170,8 @@ type
     procedure formclose            (sender: tobject; var closeaction: tcloseaction);
     // MAIN MENU::FILE
     procedure loadmiclick          (sender: tobject);
+    procedure move2originmiclick   (sender: tobject);
+    procedure pathinfomiClick(Sender: TObject);
     procedure savemiclick          (sender: tobject);
     procedure clearmiclick         (sender: tobject);
     procedure importmiclick        (sender: tobject);
@@ -159,8 +185,8 @@ type
     procedure scalemiclick         (sender: tobject);
     procedure a0miclick            (sender: tobject);
     procedure horizontalmiclick    (sender: tobject);
+    procedure sf001miClick(Sender: TObject);
     procedure toolpathmiclick      (sender: tobject);
-    procedure trackbarChange(Sender: TObject);
     // MAIN-MENU::VIEW
     procedure zoommiclick          (sender: tobject);
     procedure fitmiclick           (sender: tobject);
@@ -191,20 +217,23 @@ type
     procedure imagemousedown  (sender: tobject; button: tmousebutton; shift: tshiftstate; x, y: integer);
     procedure imagemousemove  (sender: tobject; shift: tshiftstate; x, y: integer);
     // panels event
-    procedure scaleupdatebtnclick  (sender: tobject);
-    procedure scaleclosebtnclick   (sender: tobject);
-    procedure offsetupdatebtnclick (sender: tobject);
-    procedure leftupbtnclick       (sender: tobject);
-    procedure penupbtnclick        (sender: tobject);
+    procedure previewspinediteditingdone (sender: tobject);
+    procedure scaleupdatebtnclick        (sender: tobject);
+    procedure scaleclosebtnclick         (sender: tobject);
+    procedure offsetupdatebtnclick       (sender: tobject);
+    procedure leftupbtnclick             (sender: tobject);
+    procedure penupbtnclick              (sender: tobject);
   private
          bit: tbgrabitmap;
  mouseisdown: boolean;
           px: longint;
           py: longint;
 
+        page: tvpelementlist;
+   pagecount: longint;
    pagewidth: longint;
   pageheight: longint;
-       paths: tvppaths;
+        path: tvppath;
         zoom: single;
 
    starttime: tdatetime;
@@ -237,7 +266,7 @@ implementation
 {$r *.lfm}
 
 uses
-  math, sysutils, importfrm, aboutfrm,
+  math, sysutils, importfrm, aboutfrm, infofrm,
   vpdriver, vpdriverthread, vpsketcher, vpmath, vpsvgreader,
   vpdxfreader, vpsetting, vpwave;
 
@@ -249,6 +278,10 @@ var
   mx: longint = 0;
   my: longint = 0;
 begin
+  // enable debug functions
+  previewmi .visible := enabledebug;
+  n4        .visible := enabledebug;
+  toolpathmi.visible := enabledebug;
   // load setting
   setting := tvpsetting.create;
   setting.load(changefileext(paramstr(0), '.ini'));
@@ -273,9 +306,10 @@ begin
     wavemesh);
   wave.enabled := setting.waveoff = 1;
   wave.debug;
-  // create preview and empty paths
-  paths := tvppaths.create;
-    bit := tbgrabitmap.create;
+  // create preview and empty path
+   bit := tbgrabitmap.create;
+  page := tvpelementlist.create;
+  path := tvppath.create;
   // update virtual screen
   a0miclick(a3mi);
   // initialize driver
@@ -290,9 +324,11 @@ end;
 procedure tmainform.formdestroy(sender: tobject);
 begin
   movetohomemiclick(sender);
-  // ---
+  //
   bit.destroy;
-  paths.destroy;
+  page.destroy;
+  path.destroy;
+  //
   wave.destroy;
   driver.destroy;
   setting.destroy;
@@ -318,8 +354,10 @@ begin
     caption := 'vPlotter - ' + opendialog.filename;
 
     lock2;
-    paths.clear;
-    paths.load(opendialog.filename);
+    page.clear;
+    page.load(opendialog.filename);
+    page.interpolate(0.5);
+    pagecount := page.count;
     fitmiclick(sender);
     unlock2;
   end;
@@ -333,20 +371,21 @@ begin
     caption := 'vPlotter - ' + changefileext(savedialog.filename, '.vplot');
 
     lock2;
-    paths.save(changefileext(savedialog.filename, '.vplot'));
-    updatescreen;
+    page.save(changefileext(savedialog.filename, '.vplot'));
     unlock2;
   end;
 end;
 
 procedure tmainform.clearmiclick(sender: tobject);
 begin
-  caption := 'vPlotter';
-
   lock2;
-  paths.clear;
+  page.clear;
+  page.interpolate(0.5);
+  pagecount := page.count;
   fitmiclick(sender);
   unlock2;
+
+  caption := 'vPlotter';
 end;
 
 procedure tmainform.importmiclick(sender: tobject);
@@ -359,56 +398,45 @@ begin
     caption := 'vPlotter - ' + opendialog.filename;
 
     lock2;
-    paths.clear;
-    if (lowercase(extractfileext(opendialog.filename)) = '.dxf') or
-       (lowercase(extractfileext(opendialog.filename)) = '.svg') then
+    if (lowercase(extractfileext(opendialog.filename)) = '.dxf') then
+    begin
+      dxf2paths(opendialog.filename, page);
+      page.interpolate(0.5);
+      page.createtoolpath;
+    end else
+    if (lowercase(extractfileext(opendialog.filename)) = '.svg') then
+    begin
+      svg2paths(opendialog.filename, page);
+      page.interpolate(0.5);
+      page.createtoolpath;
+    end else
+    if (lowercase(extractfileext(opendialog.filename)) = '.bmp') or
+       (lowercase(extractfileext(opendialog.filename)) = '.png') then
     begin
       importform.imcb.itemindex := 0;
-      importform.imcb .enabled  := false;
-      importform.ipwse.enabled  := false;
-      importform.iphse.enabled  := false;
-      importform.pwse .enabled  := false;
-      importform.phse .enabled  := false;
-      importform.dsfse.enabled  := false;
-      importform.otpcb.enabled  := true;
-      importform.otpcb.checked  := true;
-      if importform.showmodal = mrok then
-      begin
-        if (lowercase(extractfileext(opendialog.filename)) = '.dxf') then
-          dxf2paths(opendialog.filename, paths)
-        else
-        if (lowercase(extractfileext(opendialog.filename)) = '.svg') then
-          svg2paths(opendialog.filename, paths);
-
-        if importform.otpcb.checked then
-          paths.createtoolpath;
-      end;
-    end else
-    if (lowercase(extractfileext(opendialog.filename)) = '.png') then
-    begin
-      importform.imcb.itemindex := 1;
-      importform.imcb .enabled  := false;
+      importform.imcb .enabled  := true;
       importform.ipwse.enabled  := true;
-      importform.iphse.enabled  := true;
       importform.pwse .enabled  := true;
-      importform.phse .enabled  := true;
       importform.dsfse.enabled  := true;
-      importform.otpcb.enabled  := false;
-      importform.otpcb.checked  := false;
       if importform.showmodal = mrok then
       begin
+        page.clear;
         bit.canvas.clear;
         bit.loadfromfile(opendialog.filename);
-        sk := tvpsketcher.create(bit);
+        case (importform.imcb.itemindex + 1) of
+          1: sk := tvpsketcher1.create(bit);
+          2: sk := tvpsketcher2.create(bit);
+          3: sk := tvpsketcher3.create(bit);
+        else sk := tvpsketcher1.create(bit);
+        end;
         sk.patternbw := importform.ipwse.value;
-        sk.patternbh := importform.iphse.value;
         sk.patternw  := importform. pwse.value;
-        sk.patternh  := importform. phse.value;
         sk.dotsize   := importform.dsfse.value;
-        sk.run(paths);
+        sk.update(page);
         sk.destroy;
       end;
     end;
+    pagecount := page.count;
     fitmiclick(sender);
     unlock2;
   end;
@@ -424,7 +452,7 @@ end;
 procedure tmainform.rotate90miclick(sender: tobject);
 begin
   lock2;
-  paths.rotate(degtorad(90));
+  page.rotate(degtorad(90));
   updatescreen;
   unlock2;
 end;
@@ -432,7 +460,7 @@ end;
 procedure tmainform.rotate180miclick(sender: tobject);
 begin
   lock2;
-  paths.rotate(degtorad(180));
+  page.rotate(degtorad(180));
   updatescreen;
   unlock2;
 end;
@@ -440,7 +468,7 @@ end;
 procedure tmainform.rotate270miclick(sender: tobject);
 begin
   lock2;
-  paths.rotate(degtorad(270));
+  page.rotate(degtorad(270));
   updatescreen;
   unlock2;
 end;
@@ -448,7 +476,7 @@ end;
 procedure tmainform.mirrorxmiclick(sender: tobject);
 begin
   lock2;
-  paths.mirror(true);
+  page.mirrorx;
   updatescreen;
   unlock2;
 end;
@@ -456,7 +484,7 @@ end;
 procedure tmainform.mirrorymiclick(sender: tobject);
 begin
   lock2;
-  paths.mirror(false);
+  page.mirrory;
   updatescreen;
   unlock2;
 end;
@@ -478,7 +506,7 @@ end;
 procedure tmainform.scaleupdatebtnclick(sender: tobject);
 begin
   lock2;
-  paths.scale(scaleedit.value);
+  page.scale(scaleedit.value);
   updatescreen;
   unlock2;
 end;
@@ -486,9 +514,34 @@ end;
 procedure tmainform.offsetupdatebtnclick(sender: tobject);
 begin
   lock2;
-  paths.offset(xoffsetedit.value,
-               yoffsetedit.value);
+  page.move(
+    xoffsetedit.value,
+    yoffsetedit.value);
   updatescreen;
+  unlock2;
+end;
+
+procedure tmainform.move2originmiclick(sender: tobject);
+begin
+  lock2;
+  page.movetoorigin;
+  updatescreen;
+  unlock2;
+end;
+
+procedure tmainform.pathinfomiClick(Sender: TObject);
+begin
+  lock2;
+  path.update(page,
+    pagewidth /2+1,
+    pageheight/2+1);
+
+  infoform.listb.clear;
+  infoform.listb.additem('Points : '+  inttostr(path.count),     nil);
+  infoform.listb.additem('Lenght : '+floattostr(path.getlength), nil);
+  infoform.listb.additem('Raises :' +  inttostr(path.getraises), nil);
+
+  infoform.showmodal;
   unlock2;
 end;
 
@@ -497,6 +550,7 @@ var
   amin: longint = 297;
   amax: longint = 420;
 begin
+  lock2;
   a0mi.checked := (sender = a0mi);
   a1mi.checked := (sender = a1mi);
   a2mi.checked := (sender = a2mi);
@@ -519,11 +573,8 @@ begin
   begin
     pageheight := amin;
     pagewidth  := amax;
-  end;         
+  end;
   fitmiclick(nil);
-
-  lock2;
-  updatescreen;
   unlock2;
 end;
 
@@ -532,6 +583,7 @@ var
   amin: longint;
   amax: longint;
 begin
+  lock2;
   verticalmi  .checked := sender = verticalmi;
   horizontalmi.checked := sender = horizontalmi;
 
@@ -546,8 +598,6 @@ begin
     pageheight := amin;
     pagewidth  := amax;
   end;
-
-  lock2;
   updatescreen;
   unlock2;
 end;
@@ -555,57 +605,74 @@ end;
 procedure tmainform.toolpathmiclick(sender: tobject);
 begin
   lock2;
-  paths.selectall(false);
-  paths.createtoolpath;
+  page.select(false);
+  page.createtoolpath;
   updatescreen;
   unlock2;
-end;
-
-procedure tmainform.trackbarchange(sender: tobject);
-begin
-  updatescreen;
 end;
 
 // MAIN MENU::VIEW
 
 procedure tmainform.zoommiclick(sender: tobject);
 var
-      i: longint;
-  value: single;
+  i: longint;
 begin
-  value := 1.00;
-
-  if sender = zoom50mi  then value := 0.50;
-  if sender = zoom75mi  then value := 0.75;
-  if sender = zoom100mi then value := 1.00;
-  if sender = zoom125mi then value := 1.25;
-  if sender = zoom150mi then value := 1.50;
-  if sender = zoom175mi then value := 1.75;
-  if sender = zoom200mi then value := 2.00;
-  if sender = zoom250mi then value := 2.50;
-  if sender = zoom300mi then value := 3.00;
-  if sender = zoom350mi then value := 3.50;
-  if sender = zoom400mi then value := 4.00;
-  if sender = zoom600mi then value := 6.00;
-  if sender = zoom800mi then value := 8.00;
+  if sender = zoom50mi   then zoom :=  0.50;
+  if sender = zoom75mi   then zoom :=  0.75;
+  if sender = zoom100mi  then zoom :=  1.00;
+  if sender = zoom125mi  then zoom :=  1.25;
+  if sender = zoom150mi  then zoom :=  1.50;
+  if sender = zoom175mi  then zoom :=  1.75;
+  if sender = zoom200mi  then zoom :=  2.00;
+  if sender = zoom250mi  then zoom :=  2.50;
+  if sender = zoom300mi  then zoom :=  3.00;
+  if sender = zoom350mi  then zoom :=  3.50;
+  if sender = zoom400mi  then zoom :=  4.00;
+  if sender = zoom600mi  then zoom :=  6.00;
+  if sender = zoom800mi  then zoom :=  8.00;
+  if sender = zoom1000mi then zoom := 10.00;
+  if sender = zoom1500mi then zoom := 15.00;
+  if sender = zoom2000mi then zoom := 20.00;
+  if sender = zoom3000mi then zoom := 30.00;
 
   for i := 0 to viewmi.count - 1 do
   begin
     viewmi.items[i].checked := viewmi.items[i] = sender;
   end;
 
-  if value <> zoom then
-  begin
-    zoom  := value;
-    movex := (screen.width  - round(pagewidth *zoom)) div 2;
-    movey := (screen.height - round(pageheight*zoom)) div 2;
-    updatescreen;
-  end;
+  movex := (screen.width  - round(pagewidth *zoom)) div 2;
+  movey := (screen.height - round(pageheight*zoom)) div 2;
+  updatescreen;
 end;
 
 procedure tmainform.fitmiclick(sender: tobject);
 begin
   zoommiclick(zoom100mi);
+end;
+
+// MAIN MENU::PREVIEW
+
+procedure tmainform.sf001miClick(sender: tobject);
+begin
+  lock2;
+  if sender = sf001mi then inc(pagecount,   1) else
+  if sender = sb001mi then dec(pagecount,   1) else
+  if sender = sf005mi then inc(pagecount,   5) else
+  if sender = sb005mi then dec(pagecount,   5) else
+  if sender = sf010mi then inc(pagecount,  10) else
+  if sender = sb010mi then dec(pagecount,  10) else
+  if sender = sf025mi then inc(pagecount,  25) else
+  if sender = sb025mi then dec(pagecount,  25) else
+  if sender = sf050mi then inc(pagecount,  50) else
+  if sender = sb050mi then dec(pagecount,  50) else
+  if sender = sf100mi then inc(pagecount, 100) else
+  if sender = sb100mi then dec(pagecount, 100) else
+  if sender =  mtfsmi then pagecount := 1      else
+    pagecount := page.count;
+
+  pagecount := max(0, min(pagecount, page.count));
+  updatescreen;
+  unlock2;
 end;
 
 // MAIN MENU::PRINT
@@ -620,14 +687,16 @@ begin
     driverthread.enabled := true;
   end else
   begin
-    driverthread         := tvpdriverthread.create(paths);
+    driverthread         := tvpdriverthread.create(path);
     driverthread.xcenter := setting.layout8.x;
     driverthread.ycenter := setting.layout8.y+pageheight/2;
-    driverthread.dxmax   := pagewidth /2+2;
-    driverthread.dymax   := pageheight/2+2;
     driverthread.onstart := @onplotterstart;
     driverthread.onstop  := @onplotterstop;
     driverthread.ontick  := @onplottertick;
+
+    path.update(page,
+      pagewidth /2+1,
+      pageheight/2+1);
     driverthread.start;
   end;
   starttime := now;
@@ -681,7 +750,7 @@ end;
 procedure tmainform.selallpmclick(sender: tobject);
 begin
   lock2;
-  paths.selectall(true);
+  page.select(true);
   updatescreen;
   unlock2;
 end;
@@ -689,14 +758,14 @@ end;
 procedure tmainform.selbylayerpmclick(sender: tobject);
 var
      i: longint;
-  path: tvppath;
+  elem: tvpelement;
 begin
   lock2;
-  for i := 0 to paths.count -1 do
+  for i := 0 to page.count -1 do
   begin
-    path := paths.items[i];
-    if path.selected then
-      paths.selectlayer(path.layer);
+    elem := page.items[i];
+    if elem.selected then
+      page.select(true, elem.layer);
   end;
   updatescreen;
   unlock2;
@@ -705,7 +774,7 @@ end;
 procedure tmainform.invertselpmclick(sender: tobject);
 begin
   lock2;
-  paths.invertselected;
+  page.invertselected;
   updatescreen;
   unlock2;
 end;
@@ -713,7 +782,7 @@ end;
 procedure tmainform.deselallpmclick(sender: tobject);
 begin
   lock2;
-  paths.selectall(false);
+  page.select(false);
   updatescreen;
   unlock2;
 end;
@@ -721,7 +790,7 @@ end;
 procedure tmainform.showallpmclick(sender: tobject);
 begin
   lock2;
-  paths.showall(true);
+  page.hide(false);
   updatescreen;
   unlock2;
 end;
@@ -729,14 +798,14 @@ end;
 procedure tmainform.showbylayerpmclick(sender: tobject);
 var
      i: longint;
-  path: tvppath;
+  elem: tvpelement;
 begin
   lock2;
-  for i := 0 to paths.count -1 do
+  for i := 0 to page.count -1 do
   begin
-    path := paths.items[i];
-    if path.selected then
-      paths.showlayer(path.layer);
+    elem := page.items[i];
+    if elem.selected then
+      page.hide(false, elem.layer);
   end;
   updatescreen;
   unlock2;
@@ -745,8 +814,8 @@ end;
 procedure tmainform.inverthiddenpmclick(sender: tobject);
 begin
   lock2;
-  paths.inverthidden;
-  paths.selectall(false);
+  page.inverthidden;
+  page.select(false);
   updatescreen;
   unlock2;
 end;
@@ -754,8 +823,8 @@ end;
 procedure tmainform.hideallpmclick(sender: tobject);
 begin
   lock2;
-  paths.showall(false);
-  paths.selectall(false);
+  page.hide(true);
+  page.select(false);
   updatescreen;
   unlock2;
 end;
@@ -763,16 +832,16 @@ end;
 procedure tmainform.hidebylayerpmclick(sender: tobject);
 var
      i: longint;
-  path: tvppath;
+  elem: tvpelement;
 begin
   lock2;
-  for i := 0 to paths.count -1 do
+  for i := 0 to page.count -1 do
   begin
-    path := paths.items[i];
-    if path.selected then
-      paths.hidelayer(path.layer);
+    elem := page.items[i];
+    if elem.selected then
+      page.hide(true, elem.layer);
   end;
-  paths.selectall(false);
+  page.select(false);
   updatescreen;
   unlock2;
 end;
@@ -780,16 +849,16 @@ end;
 procedure tmainform.hideselpmclick(sender: tobject);
 var
      i: longint;
-  path: tvppath;
+  elem: tvpelement;
 begin
   lock2;
-  for i := 0 to paths.count -1 do
+  for i := 0 to page.count -1 do
   begin
-    path := paths.items[i];
-    if path.selected then
-      path.hidden := true;
+    elem := page.items[i];
+    if elem.selected then
+      elem.hidden := true;
   end;
-  paths.selectall(false);
+  page.select(false);
   updatescreen;
   unlock2;
 end;
@@ -797,7 +866,7 @@ end;
 procedure tmainform.mergeselclick(sender: tobject);
 begin
   lock2;
-  paths.mergeselected;
+  page.mergeselected;
   updatescreen;
   unlock2;
 end;
@@ -805,7 +874,7 @@ end;
 procedure tmainform.selattachedpmclick(sender: tobject);
 begin
   lock2;
-  paths.selectattached;
+  page.selectattached;
   updatescreen;
   unlock2;
 end;
@@ -813,7 +882,7 @@ end;
 procedure tmainform.divideselpmclick(sender: tobject);
 begin
   lock2;
-  paths.unmergeselected;
+  page.unmergeselected;
   updatescreen;
   unlock2;
 end;
@@ -824,7 +893,7 @@ procedure tmainform.imagemousedown(sender: tobject;
   button: tmousebutton; shift: tshiftstate; x, y: integer);
 var
    i, j: longint;
-   path: tvppath;
+   elem: tvpelement;
   point: tvppoint;
 begin
   if locked then exit;
@@ -834,20 +903,20 @@ begin
   begin
     popup.autopopup := false;
     // search path ...
-    for i := 0 to paths.count -1 do
+    for i := 0 to page.count -1 do
     begin
-      path := paths.items[i];
-      for j := 0 to path.count -1 do
+      elem := page.items[i];
+      for j := 0 to elem.count -1 do
       begin
-        point   := path.items[j]^;
+        point   := elem.items[j]^;
         point.x := (bit.width  div 2) + point.x*zoom;
         point.y := (bit.height div 2) - point.y*zoom;
 
         if (abs(point.x + movex - x)<2) and
            (abs(point.y + movey - y)<2) then
-          if path.hidden = false then
+          if elem.hidden = false then
           begin
-            path.selected := button = mbleft;
+            elem.selected := button = mbleft;
           end;
       end;
     end;
@@ -880,11 +949,21 @@ end;
 procedure tmainform.imagemouseup(sender: tobject;
   button: tmousebutton; shift: tshiftstate; x, y: integer);
 begin
-  if locked then exit;
+  if locked then
+  begin
+    exit;
+  end;
   mouseisdown := false;
 end;
 
 // PANEL EVENTS
+
+procedure tmainform.previewspinediteditingdone(sender: tobject);
+begin
+  lock2;
+  updatescreen;
+  unlock2;
+end;
 
 procedure tmainform.leftupbtnclick(sender: tobject);
 var
@@ -922,36 +1001,45 @@ end;
 
 procedure tmainform.updatescreen;
 var
- i, j: longint;
-    k: longint = 0;
- path: tvppath;
-   p1: tvppoint;
-   p2: tvppoint;
+  i, j: longint;
+     k: longint = 0;
+  elem: tvpelement;
+    p1: tvppoint;
+    p2: tvppoint;
 begin
-  bit.setsize(round(pagewidth *zoom),
-              round(pageheight*zoom));
-  bit.fillrect(0, 0, bit.width,   bit.height,   bgra(100, 100, 100), dmset);
+  bit.setsize(
+    round(pagewidth *zoom),
+    round(pageheight*zoom));
+  bit.fillrect(0, 0, bit.width,   bit.height,   bgra(255,   0,   0), dmset);
   bit.fillrect(1, 1, bit.width-1, bit.height-1, bgra(255, 255, 255), dmset);
   // updtare preview ...
-  for i := 0 to paths.count -1 do
+  for i := 0 to min(pagecount, page.count) -1 do
   begin
-    path := paths.items[i];
-    if (path.enabled) and (path.count > 1) then
+    elem := page.items[i];
+    if (elem.hidden = false) then
     begin
-      p1    := path.items[0]^;
+
+      p1    := elem.items[0]^;
       p1.x  := (bit.width  div 2) + p1.x*zoom;
       p1.y  := (bit.height div 2) - p1.y*zoom;
 
-      for j := 1 to path.count -1 do
+      for j := 1 to elem.count -1 do
       begin
-        p2   := path.items[j]^;
+        p2   := elem.items[j]^;
         p2.x := (bit.width  div 2) + p2.x*zoom;
         p2.y := (bit.height div 2) - p2.y*zoom;
-        if path.hidden = false then
+        if elem.hidden = false then
         begin
-          if path.selected then
+          if elem.selected then
           begin
             inc(k);
+            bit.drawline(
+              round(p1.x), round(p1.y),
+              round(p2.x), round(p2.y),
+              bgra(57, 255, 20), true, dmset);
+          end else
+          if enabledebug and (j = elem.count - 1) then
+          begin
             bit.drawline(
               round(p1.x), round(p1.y),
               round(p2.x), round(p2.y),
@@ -961,8 +1049,8 @@ begin
             bit.drawline(
               round(p1.x), round(p1.y),
               round(p2.x), round(p2.y),
-              bgra(  0,  0,  0), true, dmset);
-          end;
+              bgra(0, 0, 0), true, dmset);
+          end
         end;
         p1 := p2;
       end;
@@ -985,50 +1073,11 @@ end;
 
 procedure tmainform.lockinternal1(value: boolean);
 begin
-  locked                := not value;
-  // main menu::file
-  loadmi       .enabled := value;
-  savemi       .enabled := value;
-  clearmi      .enabled := value;
-  importmi     .enabled := value;
-  // main menu::editmi
-  rotatemi     .enabled := value;
-  mirrormi     .enabled := value;
-  scalemi      .enabled := value;
-  offsetmi     .enabled := value;
-  pagesizemi   .enabled := value;
-  toolpathmi   .enabled := value;
-  // main menu::view
-  zoom50mi     .enabled := value;
-  zoom75mi     .enabled := value;
-  zoom100mi    .enabled := value;
-  zoom125mi    .enabled := value;
-  zoom150mi    .enabled := value;
-  zoom175mi    .enabled := value;
-  zoom200mi    .enabled := value;
-  zoom250mi    .enabled := value;
-  zoom300mi    .enabled := value;
-  zoom350mi    .enabled := value;
-  zoom400mi    .enabled := value;
-  zoom600mi    .enabled := value;
-  zoom800mi    .enabled := value;
-  fitmi        .enabled := value;
-  // main menu::printer
-  startmi      .enabled := true;
-  stopmi       .enabled := true;
-  killmi       .enabled := true;
-  calibrationmi.enabled := value;
-  movetohomemi .enabled := value;
-  // main menu::help
-  aboutmi      .enabled := value;
-  // virtual screen
-  screen       .enabled := value;
-  // popup menu
-  if value = false then
-    screen.popupmenu := nil
-  else
-    screen.popupmenu := popup;
-  application  .processmessages;
+  lockinternal2(value);
+  // override main menu::printer
+  startmi.enabled := true;
+  stopmi .enabled := true;
+  killmi .enabled := true;
 end;
 
 procedure tmainform.lockinternal2(value: boolean);
@@ -1061,6 +1110,21 @@ begin
   zoom600mi    .enabled := value;
   zoom800mi    .enabled := value;
   fitmi        .enabled := value;
+  // main menu::preview
+  sf001mi      .enabled := value;
+  sb001mi      .enabled := value;
+  sf005mi      .enabled := value;
+  sb005mi      .enabled := value;
+  sf010mi      .enabled := value;
+  sb010mi      .enabled := value;
+  sf025mi      .enabled := value;
+  sb025mi      .enabled := value;
+  sf050mi      .enabled := value;
+  sb050mi      .enabled := value;
+  sf100mi      .enabled := value;
+  sb100mi      .enabled := value;
+   mtfsmi      .enabled := value;
+   mtlsmi      .enabled := value;
   // main menu::printer
   startmi      .enabled := value;
   stopmi       .enabled := value;
@@ -1128,8 +1192,8 @@ begin
   inc(tickcount);
   if (tickcount mod 800) = 0 then
   begin
-    statuslabel.caption := 'Remaining Time ' +
-      formatdatetime('hh:nn:ss', (now-starttime)/tickcount*driverthread.tick);
+    //statuslabel.caption := 'Remaining Time ' +
+    //  formatdatetime('hh:nn:ss', (now-starttime)/tickcount*driverthread.tick);
   end;
   application.processmessages;
 end;

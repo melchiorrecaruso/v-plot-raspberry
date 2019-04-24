@@ -181,11 +181,6 @@ begin
   {$endif}
   fxcount := axcount;
   fycount := aycount;
-  if enabledebug then
-  begin
-    writeln(format('  DRIVER::CNT.X  = %12.5u', [fxcount]));
-    writeln(format('  DRIVER::CNT.Y  = %12.5u', [fycount]));
-  end;
 end;
 
 procedure tvpdriver.setxcount(value: longint);
@@ -226,10 +221,6 @@ begin
     end;
   {$endif}
   fzcount := value;
-  if enabledebug then
-  begin
-    writeln(format('  DRIVER::CNT.Z  = %12.5u', [fzcount]));
-  end;
 end;
 
 end.

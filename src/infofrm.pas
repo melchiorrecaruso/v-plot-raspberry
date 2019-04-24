@@ -1,5 +1,5 @@
 {
-  Description: vPlot import form.
+  Description: vPlot info form.
 
   Copyright (C) 2017-2019 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
@@ -11,7 +11,7 @@
   This code is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
   FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-  details.
+  listb.
 
   A copy of the GNU General Public License is available on the World Wide Web
   at <http://www.gnu.org/copyleft/gpl.html>. You can also obtain it by writing
@@ -19,7 +19,8 @@
   MA 02111-1307, USA.
 }
 
-unit importfrm;
+
+unit infofrm;
 
 {$mode objfpc}
 
@@ -27,35 +28,26 @@ interface
 
 uses
   classes, sysutils, forms, controls, graphics, dialogs,
-  spin, editbtn, buttons, stdctrls, extctrls;
+  extctrls, buttons, stdctrls;
 
 type
 
-  { timportform }
+  { tinfoform }
 
-  timportform = class(tform)
-    bevel1: tbevel;
-    okbtn: tbitbtn;
-    imcb: tcombobox;
-    dsfse: tfloatspinedit;
-    importmethodl: tlabel;
-    imagepatternwidthl: tlabel;
-    patternwidthl: tlabel;
-    dotsizel: tlabel;
-    ipwse: tspinedit;
-    pwse: TFloatSpinEdit;
+  tinfoform = class(tform)
+    listb: tlistbox;
   private
-
   public
-
   end;
 
 var
-  importform: timportform;
+  infoform: tinfoform;
 
 implementation
 
 {$R *.lfm}
+
+{ tinfoform }
 
 end.
 

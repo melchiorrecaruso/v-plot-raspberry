@@ -171,12 +171,10 @@ begin
 
     result.x := p.x + polyeval(lx, p.y);
     result.y := p.y + polyeval(ly, p.x);
-    result.z := p.z;
   end else
   begin
     result.x := p.x;
     result.y := p.y;
-    result.z := p.z;
   end;
 end;
 
@@ -193,15 +191,15 @@ end;
 begin
   if enabledebug then
   begin
-    p0.x := -594.5;  p0.y := +420.5; p1 := wave.update(p0); test_print;
-    p0.x := +0.000;  p0.y := +420.5; p1 := wave.update(p0); test_print;
-    p0.x := +594.5;  p0.y := +420.5; p1 := wave.update(p0); test_print;
-    p0.x := -594.5;  p0.y := +0.000; p1 := wave.update(p0); test_print;
-    p0.x := +0.000;  p0.y := +0.000; p1 := wave.update(p0); test_print;
-    p0.x := +594.5;  p0.y := +0.000; p1 := wave.update(p0); test_print;
-    p0.x := -594.5;  p0.y := -420.5; p1 := wave.update(p0); test_print;
-    p0.x := +0.000;  p0.y := -420.5; p1 := wave.update(p0); test_print;
-    p0.x := +594.5;  p0.y := -420.5; p1 := wave.update(p0); test_print;
+    p0.x := -594.5;  p0.y := +420.5;  p1 := wave.update(p0);  test_print;
+    p0.x := +0.000;  p0.y := +420.5;  p1 := wave.update(p0);  test_print;
+    p0.x := +594.5;  p0.y := +420.5;  p1 := wave.update(p0);  test_print;
+    p0.x := -594.5;  p0.y := +0.000;  p1 := wave.update(p0);  test_print;
+    p0.x := +0.000;  p0.y := +0.000;  p1 := wave.update(p0);  test_print;
+    p0.x := +594.5;  p0.y := +0.000;  p1 := wave.update(p0);  test_print;
+    p0.x := -594.5;  p0.y := -420.5;  p1 := wave.update(p0);  test_print;
+    p0.x := +0.000;  p0.y := -420.5;  p1 := wave.update(p0);  test_print;
+    p0.x := +594.5;  p0.y := -420.5;  p1 := wave.update(p0);  test_print;
   end;
 end;
 

@@ -1,16 +1,17 @@
 object tmainform: tmainform
-  Left = 459
+  Left = 432
   Height = 534
-  Top = 88
-  Width = 763
+  Top = 168
+  Width = 651
   Anchors = []
   Caption = 'vPlotter'
   ClientHeight = 512
-  ClientWidth = 763
+  ClientWidth = 651
   Menu = mainmenu
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  Position = poMainFormCenter
   LCLVersion = '2.1.0.0'
   object screen: TBGRAVirtualScreen
     AnchorSideLeft.Control = Owner
@@ -23,12 +24,12 @@ object tmainform: tmainform
     Left = 0
     Height = 510
     Top = 2
-    Width = 763
+    Width = 651
     OnRedraw = screenredraw
     Alignment = taLeftJustify
     Anchors = [akTop, akLeft, akRight, akBottom]
     ClientHeight = 510
-    ClientWidth = 763
+    ClientWidth = 651
     Color = clForm
     ParentColor = False
     TabOrder = 0
@@ -44,7 +45,7 @@ object tmainform: tmainform
       Left = 0
       Height = 16
       Top = 494
-      Width = 763
+      Width = 651
       Alignment = taCenter
       Anchors = [akLeft, akRight, akBottom]
       Caption = 'Time'
@@ -65,13 +66,13 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 16
-    Width = 763
+    Top = 28
+    Width = 651
     Anchors = [akLeft, akRight]
     AutoSize = True
     BevelOuter = bvNone
     ClientHeight = 80
-    ClientWidth = 763
+    ClientWidth = 651
     Color = clYellow
     ParentColor = False
     TabOrder = 1
@@ -526,7 +527,7 @@ object tmainform: tmainform
       Left = 0
       Height = 2
       Top = 78
-      Width = 763
+      Width = 651
       Anchors = [akLeft, akRight, akBottom]
     end
     object calibrationbevelleft: TBevel
@@ -552,14 +553,14 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 44
-    Top = 112
-    Width = 763
+    Top = 136
+    Width = 651
     Anchors = [akLeft, akRight]
     AutoSize = True
     BevelOuter = bvNone
     ClientHeight = 44
-    ClientWidth = 763
-    Color = clSkyBlue
+    ClientWidth = 651
+    Color = clGradientActiveCaption
     ParentColor = False
     TabOrder = 2
     Visible = False
@@ -624,7 +625,7 @@ object tmainform: tmainform
       Left = 0
       Height = 2
       Top = 42
-      Width = 763
+      Width = 651
       Align = alBottom
     end
     object scalelabel: TLabel
@@ -667,15 +668,15 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 176
-    Width = 763
+    Top = 200
+    Width = 651
     Anchors = [akLeft, akRight]
     AutoSize = True
     BevelColor = clForm
     BevelOuter = bvNone
     ClientHeight = 80
-    ClientWidth = 763
-    Color = clSkyBlue
+    ClientWidth = 651
+    Color = clGradientActiveCaption
     ParentColor = False
     TabOrder = 3
     Visible = False
@@ -795,7 +796,7 @@ object tmainform: tmainform
       Left = 0
       Height = 2
       Top = 78
-      Width = 763
+      Width = 651
       Anchors = [akLeft, akRight, akBottom]
     end
     object offsetbevelleft: TBevel
@@ -820,7 +821,7 @@ object tmainform: tmainform
     Left = 0
     Height = 2
     Top = 0
-    Width = 763
+    Width = 651
     Anchors = [akTop, akLeft, akRight]
   end
   object opendialog: TOpenDialog
@@ -897,6 +898,17 @@ object tmainform: tmainform
         Caption = 'OffSet ...'
         OnClick = scalemiClick
       end
+      object move2originmi: TMenuItem
+        Caption = 'Move to center'
+        OnClick = move2originmiClick
+      end
+      object n4: TMenuItem
+        Caption = '-'
+      end
+      object toolpathmi: TMenuItem
+        Caption = 'Optimize'
+        OnClick = toolpathmiclick
+      end
       object n3: TMenuItem
         Caption = '-'
       end
@@ -948,12 +960,12 @@ object tmainform: tmainform
           OnClick = horizontalmiClick
         end
       end
-      object n4: TMenuItem
+      object N10: TMenuItem
         Caption = '-'
       end
-      object toolpathmi: TMenuItem
-        Caption = 'Optimize ToolPath'
-        OnClick = toolpathmiclick
+      object pathinfomi: TMenuItem
+        Caption = 'Info'
+        OnClick = pathinfomiClick
       end
     end
     object viewmi: TMenuItem
@@ -1024,12 +1036,93 @@ object tmainform: tmainform
         Caption = 'Zoom 800%'
         OnClick = zoommiclick
       end
+      object zoom1000mi: TMenuItem
+        Caption = 'Zoom 1000%'
+        OnClick = zoommiclick
+      end
+      object zoom1500mi: TMenuItem
+        Caption = 'Zoom 1500%'
+        OnClick = zoommiclick
+      end
+      object zoom2000mi: TMenuItem
+        Caption = 'Zoom 2000%'
+        OnClick = zoommiclick
+      end
+      object zoom3000mi: TMenuItem
+        Caption = 'Zoom 3000%'
+        OnClick = zoommiclick
+      end
       object n9: TMenuItem
         Caption = '-'
       end
       object fitmi: TMenuItem
         Caption = 'Fit'
         OnClick = fitmiClick
+      end
+    end
+    object previewmi: TMenuItem
+      Caption = 'Preview'
+      object sf001mi: TMenuItem
+        Caption = '001 Step Forward'
+        OnClick = sf001miClick
+      end
+      object sf005mi: TMenuItem
+        Caption = '005 Step Forward'
+        OnClick = sf001miClick
+      end
+      object sf010mi: TMenuItem
+        Caption = '010 Step Forward'
+        OnClick = sf001miClick
+      end
+      object sf025mi: TMenuItem
+        Caption = '025 Step Forward'
+        OnClick = sf001miClick
+      end
+      object sf050mi: TMenuItem
+        Caption = '050 Step Forward'
+        OnClick = sf001miClick
+      end
+      object sf100mi: TMenuItem
+        Caption = '100 Step Forward'
+        OnClick = sf001miClick
+      end
+      object N5: TMenuItem
+        Caption = '-'
+      end
+      object sb001mi: TMenuItem
+        Caption = '001 Step Back '
+        OnClick = sf001miClick
+      end
+      object sb005mi: TMenuItem
+        Caption = '005 Step Back'
+        OnClick = sf001miClick
+      end
+      object sb010mi: TMenuItem
+        Caption = '010 Step Back'
+        OnClick = sf001miClick
+      end
+      object sb025mi: TMenuItem
+        Caption = '025 Step Back'
+        OnClick = sf001miClick
+      end
+      object sb050mi: TMenuItem
+        Caption = '050 Step Back'
+        OnClick = sf001miClick
+      end
+      object sb100mi: TMenuItem
+        Caption = '100 Step Back'
+        OnClick = sf001miClick
+      end
+      object N8: TMenuItem
+        Caption = '-'
+      end
+      object mtfsmi: TMenuItem
+        Caption = 'Move to First Step'
+        OnClick = sf001miClick
+      end
+      object mtlsmi: TMenuItem
+        Caption = 'Move to Last Step'
+        OnClick = sf001miClick
       end
     end
     object miprinter: TMenuItem
@@ -1076,61 +1169,61 @@ object tmainform: tmainform
     left = 256
     top = 368
     object selallpm: TMenuItem
-      Caption = 'Select All'
+      Caption = 'Select all'
       OnClick = selallpmclick
     end
     object selbylayerpm: TMenuItem
-      Caption = 'Select by Layer'
+      Caption = 'Select by layer'
       OnClick = selbylayerpmclick
     end
     object selattachedpm: TMenuItem
-      Caption = 'Select Attached'
+      Caption = 'Select attached'
       OnClick = selattachedpmclick
     end
     object invertselpm: TMenuItem
-      Caption = 'Invert Selected'
+      Caption = 'Invert selected'
       OnClick = invertselpmclick
     end
     object deselallpm: TMenuItem
-      Caption = 'Deselect All'
+      Caption = 'Unselect all'
       OnClick = deselallpmclick
     end
     object deselbylayerpm: TMenuItem
       Caption = '-'
     end
     object showallpm: TMenuItem
-      Caption = 'Show All'
+      Caption = 'Show all'
       OnClick = showallpmclick
     end
+    object hideallpm: TMenuItem
+      Caption = 'Hide all'
+      OnClick = hideallpmclick
+    end
     object showbylayerpm: TMenuItem
-      Caption = 'Show by Layer'
+      Caption = 'Show by layer'
       OnClick = showbylayerpmclick
+    end
+    object hidebylayerpm: TMenuItem
+      Caption = 'Hide by layer'
+      OnClick = hidebylayerpmclick
     end
     object inverthiddenpm: TMenuItem
       Caption = 'Invert hidden'
       OnClick = inverthiddenpmclick
     end
-    object hideallpm: TMenuItem
-      Caption = 'Hide All'
-      OnClick = hideallpmclick
-    end
-    object hidebylayerpm: TMenuItem
-      Caption = 'Hide by Layer'
-      OnClick = hidebylayerpmclick
-    end
     object hideselpm: TMenuItem
-      Caption = 'Hide Selected'
+      Caption = 'Hide selected'
       OnClick = hideselpmclick
     end
     object n2pm: TMenuItem
       Caption = '-'
     end
     object mergesel: TMenuItem
-      Caption = 'Merge Selected'
+      Caption = 'Merge selected'
       OnClick = mergeselclick
     end
     object divideselpm: TMenuItem
-      Caption = 'Divide Selected'
+      Caption = 'Unmerge selected'
       OnClick = divideselpmclick
     end
   end

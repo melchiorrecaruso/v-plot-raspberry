@@ -98,29 +98,29 @@ type
     isreadingattrib: boolean;
     polyline: array of tpolylineelement;
     //
-    procedure readheader(atokens: tdxftokens; apaths: tvppaths);
-    procedure readtables(atokens: tdxftokens; apaths: tvppaths);
-    procedure readtables_table(atokens: tdxftokens; apaths: tvppaths);
-    procedure readtables_layer(atokens: tdxftokens; apaths: tvppaths);
-    procedure readblocks(atokens: tdxftokens; apaths: tvppaths);
-    procedure readblocks_block(atokens: tdxftokens; apaths: tvppaths);
-    procedure readblocks_endblk(atokens: tdxftokens; apaths: tvppaths);
-    procedure readentities(atokens: tdxftokens; apaths: tvppaths);
-    procedure readentities_line(atokens: tdxftokens; apaths: tvppaths);
-    procedure readentities_circlearc(atokens: tdxftokens; apaths: tvppaths);
-    procedure readentities_circle(atokens: tdxftokens; apaths: tvppaths);
-    procedure readentities_ellipse(atokens: tdxftokens; apaths: tvppaths);
-    procedure internalreadentities(atokenstr: string; atokens: tdxftokens; apaths: tvppaths);
+    procedure readheader(atokens: tdxftokens; elements: tvpelementlist);
+    procedure readtables(atokens: tdxftokens; elements: tvpelementlist);
+    procedure readtables_table(atokens: tdxftokens; elements: tvpelementlist);
+    procedure readtables_layer(atokens: tdxftokens; elements: tvpelementlist);
+    procedure readblocks(atokens: tdxftokens; elements: tvpelementlist);
+    procedure readblocks_block(atokens: tdxftokens; elements: tvpelementlist);
+    procedure readblocks_endblk(atokens: tdxftokens; elements: tvpelementlist);
+    procedure readentities(atokens: tdxftokens; elements: tvpelementlist);
+    procedure readentities_line(atokens: tdxftokens; elements: tvpelementlist);
+    procedure readentities_circlearc(atokens: tdxftokens; elements: tvpelementlist);
+    procedure readentities_circle(atokens: tdxftokens; elements: tvpelementlist);
+    procedure readentities_ellipse(atokens: tdxftokens; elements: tvpelementlist);
+    procedure internalreadentities(atokenstr: string; atokens: tdxftokens; elements: tvpelementlist);
    public
     { general reading methods }
     tokenizer: tdxftokenizer;
     constructor create;
     destructor destroy; override;
-    procedure readfromstrings(astrings: tstrings; apaths: tvppaths);
-    procedure readfromfile(const afilename: string; apaths: tvppaths);
+    procedure readfromstrings(astrings: tstrings; elements: tvpelementlist);
+    procedure readfromfile(const afilename: string; elements: tvpelementlist);
   end;
 
-  procedure dxf2paths(const afilename: string; apaths: tvppaths);
+  procedure dxf2paths(const afilename: string; elements: tvpelementlist);
 
 
 implementation
@@ -404,7 +404,7 @@ end;
 
 { tvdxfvectorialreader }
 
-procedure tvdxfreader.readheader(atokens: tdxftokens; apaths: tvppaths);
+procedure tvdxfreader.readheader(atokens: tdxftokens; elements: tvpelementlist);
 var
       i, j: integer;
   curtoken: tdxftoken;
@@ -476,7 +476,7 @@ begin
   end;
 end;
 
-procedure tvdxfreader.readtables(atokens: tdxftokens; apaths: tvppaths);
+procedure tvdxfreader.readtables(atokens: tdxftokens; elements: tvpelementlist);
 var
   i: integer;
   curtoken: tdxftoken;
@@ -484,15 +484,15 @@ begin
   for i := 0 to atokens.count - 1 do
   begin
     curtoken := tdxftoken(atokens.items[i]);
-    if curtoken.strvalue = 'TABLE' then readtables_table(curtoken.childs, apaths) else
-    if curtoken.strvalue = 'LAYER' then readtables_layer(curtoken.childs, apaths) else
+    if curtoken.strvalue = 'TABLE' then readtables_table(curtoken.childs, elements) else
+    if curtoken.strvalue = 'LAYER' then readtables_layer(curtoken.childs, elements) else
     begin
       // ...
     end;
   end;
 end;
 
-procedure tvdxfreader.readtables_table(atokens: tdxftokens; apaths: tvppaths);
+procedure tvdxfreader.readtables_table(atokens: tdxftokens; elements: tvpelementlist);
 var
   curtoken: tdxftoken;
   i: integer;
@@ -522,7 +522,7 @@ begin
   end;
 end;
 
-procedure tvdxfreader.readtables_layer(atokens: tdxftokens; apaths: tvppaths);
+procedure tvdxfreader.readtables_layer(atokens: tdxftokens; elements: tvpelementlist);
 var
   curtoken: tdxftoken;
   i: integer;
@@ -552,7 +552,7 @@ begin
   end;
 end;
 
-procedure tvdxfreader.readblocks(atokens: tdxftokens; apaths: tvppaths);
+procedure tvdxfreader.readblocks(atokens: tdxftokens; elements: tvpelementlist);
 var
   i: integer;
   curtoken: tdxftoken;
@@ -560,15 +560,15 @@ begin
   for i := 0 to atokens.count - 1 do
   begin
     curtoken := tdxftoken(atokens.items[i]);
-    if curtoken.strvalue = 'BLOCK'  then readblocks_block (curtoken.childs, apaths) else
-    if curtoken.strvalue = 'ENDBLK' then readblocks_endblk(curtoken.childs, apaths) else
+    if curtoken.strvalue = 'BLOCK'  then readblocks_block (curtoken.childs, elements) else
+    if curtoken.strvalue = 'ENDBLK' then readblocks_endblk(curtoken.childs, elements) else
     begin
       // ...
     end;
   end;
 end;
 
-procedure tvdxfreader.readblocks_block(atokens: tdxftokens; apaths: tvppaths);
+procedure tvdxfreader.readblocks_block(atokens: tdxftokens; elements: tvpelementlist);
 var
   curtoken: tdxftoken;
   i: integer;
@@ -598,12 +598,12 @@ begin
   end;
 end;
 
-procedure tvdxfreader.readblocks_endblk(atokens: tdxftokens; apaths: tvppaths);
+procedure tvdxfreader.readblocks_endblk(atokens: tdxftokens; elements: tvpelementlist);
 begin
   // ...
 end;
 
-procedure tvdxfreader.readentities(atokens: tdxftokens; apaths: tvppaths);
+procedure tvdxfreader.readentities(atokens: tdxftokens; elements: tvpelementlist);
 var
   i: integer;
   curtoken: tdxftoken;
@@ -613,11 +613,11 @@ begin
   for i := 0 to atokens.count - 1 do
   begin
     curtoken := tdxftoken(atokens.items[i]);
-    internalreadentities(curtoken.strvalue, curtoken.childs, apaths);
+    internalreadentities(curtoken.strvalue, curtoken.childs, elements);
   end;
 end;
 
-procedure tvdxfreader.readentities_line(atokens: tdxftokens; apaths: tvppaths);
+procedure tvdxfreader.readentities_line(atokens: tdxftokens; elements: tvpelementlist);
 var
   curtoken: tdxftoken;
   i: integer;
@@ -628,10 +628,10 @@ begin
   // initial values
   lline.p0.x := 0.0;
   lline.p0.y := 0.0;
-  lline.p0.z := 0.0;
+  //lline.p0.z := true;
   lline.p1.x := 0.0;
   lline.p1.y := 0.0;
-  lline.p1.z := 0.0;
+  //lline.p1.z := true;
   llayer     :=  '';
 
   for i := 0 to atokens.count - 1 do
@@ -647,28 +647,28 @@ begin
        8: llayer     := curtoken.strvalue;
       10: lline.p0.x := curtoken.floatvalue;
       20: lline.p0.y := curtoken.floatvalue;
-      30: lline.p0.z := curtoken.floatvalue;
+    //30: lline.p0.z := curtoken.floatvalue;
       11: lline.p1.x := curtoken.floatvalue;
       21: lline.p1.y := curtoken.floatvalue;
-      31: lline.p1.z := curtoken.floatvalue;
+    //31: lline.p1.z := curtoken.floatvalue;
     //62: lcolor     := curtoken.floatvalue;
     end;
   end;
 
-  apaths.addline(@lline);
+  elements.add(lline);
 end;
 
-procedure tvdxfreader.readentities_circlearc(atokens: tdxftokens; apaths: tvppaths);
+procedure tvdxfreader.readentities_circlearc(atokens: tdxftokens; elements: tvpelementlist);
 var
   curtoken: tdxftoken;
   i: integer;
   // circlearc
   llayer: string;
-  larc:   tvpcirclearc;
+  larc: tvpcirclearc;
 begin
   larc.center.x   := 0.0;
   larc.center.y   := 0.0;
-  larc.center.z   := 0.0;
+//larc.center.z   := 0.0;
   larc.radius     := 0.0;
   larc.startangle := 0.0;
   larc.endangle   := 0.0;
@@ -687,7 +687,7 @@ begin
        8: llayer          := curtoken.strvalue;
       10: larc.center.x   := curtoken.floatvalue;
       20: larc.center.y   := curtoken.floatvalue;
-      30: larc.center.z   := curtoken.floatvalue;
+    //30: larc.center.z   := curtoken.floatvalue;
       40: larc.radius     := curtoken.floatvalue;
       50: larc.startangle := curtoken.floatvalue;
       51: larc.endangle   := curtoken.floatvalue;
@@ -700,10 +700,10 @@ begin
   if larc.endangle < larc.startangle then
     larc.endangle := larc.endangle + 360;
 
-  apaths.addcirclearc(@larc);
+  elements.add(larc);
 end;
 
-procedure tvdxfreader.readentities_circle(atokens: tdxftokens; apaths: tvppaths);
+procedure tvdxfreader.readentities_circle(atokens: tdxftokens; elements: tvpelementlist);
 var
   curtoken: tdxftoken;
   i: integer;
@@ -713,7 +713,7 @@ var
 begin
   lcircle.center.x := 0.0;
   lcircle.center.y := 0.0;
-  lcircle.center.z := 0.0;
+//lcircle.center.z := 0.0;
   lcircle.radius   := 0.0;
   llayer           :=  '';
 
@@ -730,15 +730,15 @@ begin
        8: llayer           := curtoken.strvalue;
       10: lcircle.center.x := curtoken.floatvalue;
       20: lcircle.center.y := curtoken.floatvalue;
-      30: lcircle.center.z := curtoken.floatvalue;
+    //30: lcircle.center.z := curtoken.floatvalue;
       40: lcircle.radius   := curtoken.floatvalue;
     end;
   end;
 
-  apaths.addcircle(@lcircle);
+  elements.add(lcircle);
 end;
 
-procedure tvdxfreader.readentities_ellipse(atokens: tdxftokens; apaths: tvppaths);
+procedure tvdxfreader.readentities_ellipse(atokens: tdxftokens; elements: tvpelementlist);
 var
   curtoken: tdxftoken;
   i: integer;
@@ -748,7 +748,7 @@ var
 begin
   lellipse.center.x       := 0.0;
   lellipse.center.y       := 0.0;
-  lellipse.center.z       := 0.0;
+//lellipse.center.z       := 0.0;
 //lellipse.majoraxisendx  := 0.0;
 //lellipse.majoraxisendy  := 0.0;
 //lellipse.majoraxisendz  := 0.0;
@@ -770,7 +770,7 @@ begin
        8: llayer                  := curtoken.strvalue;
       10: lellipse.center.x       := curtoken.floatvalue;
       20: lellipse.center.y       := curtoken.floatvalue;
-      30: lellipse.center.z       := curtoken.floatvalue;
+    //30: lellipse.center.z       := curtoken.floatvalue;
     //11: lellipse.majoraxisendx  := curtoken.floatvalue;
     //21: lellipse.majoraxisendy  := curtoken.floatvalue;
     //31: lellipse.majoraxisendz  := curtoken.floatvalue;
@@ -780,7 +780,7 @@ begin
     end;
   end;
 
-  apaths.addellipse(@lellipse);
+  //elements.add(lellipse);
 end;
 
 {.$define FPVECTORIALDEBUG_LWPOLYLINE}
@@ -1153,13 +1153,13 @@ end;
 
 *)
 
-procedure tvdxfreader.internalreadentities(atokenstr: string; atokens: tdxftokens; apaths: tvppaths);
+procedure tvdxfreader.internalreadentities(atokenstr: string; atokens: tdxftokens; elements: tvpelementlist);
 begin
   case atokenstr of
-    'ARC':     readentities_circlearc (atokens, apaths);
-    'CIRCLE':  readentities_circle    (atokens, apaths);
-    'ELLIPSE': readentities_ellipse   (atokens, apaths);
-    'LINE':    readentities_line      (atokens, apaths);
+    'ARC':     readentities_circlearc (atokens, elements);
+    'CIRCLE':  readentities_circle    (atokens, elements);
+    'ELLIPSE': readentities_ellipse   (atokens, elements);
+    'LINE':    readentities_line      (atokens, elements);
   end;
 end;
 
@@ -1179,7 +1179,7 @@ begin
   inherited destroy;
 end;
 
-procedure tvdxfreader.readfromstrings(astrings: tstrings; apaths: tvppaths);
+procedure tvdxfreader.readfromstrings(astrings: tstrings; elements: tvpelementlist);
 var
   i: integer;
   curtoken,
@@ -1200,32 +1200,32 @@ begin
   //if curtokenfirstchild.strvalue = 'HEADER'   then readheader  (curtoken.childs, apaths) else
   //if curtokenfirstchild.strvalue = 'TABLES'   then readtables  (curtoken.childs, apaths) else
   //if curtokenfirstchild.strvalue = 'BLOCKS'   then readblocks  (curtoken.childs, apaths) else
-    if curtokenfirstchild.strvalue = 'ENTITIES' then readentities(curtoken.childs, apaths);
+    if curtokenfirstchild.strvalue = 'ENTITIES' then readentities(curtoken.childs, elements);
   end;
 end;
 
-procedure tvdxfreader.readfromfile(const afilename: string; apaths: tvppaths);
+procedure tvdxfreader.readfromfile(const afilename: string; elements: tvpelementlist);
 var
   s: tstringlist;
 begin
   s := tstringlist.create;
   s.loadfromfile(afilename);
-  readfromstrings(s, apaths);
+  readfromstrings(s, elements);
   s.destroy;
 end;
 
 // dxf2paths
 
-procedure dxf2paths(const afilename: string; apaths: tvppaths);
+procedure dxf2paths(const afilename: string; elements: tvpelementlist);
 var
   reader: tvdxfreader;
 begin
   reader := tvdxfreader.create;
-  reader.readfromfile(afilename, apaths);
+  reader.readfromfile(afilename, elements);
   reader.destroy;
 
-  apaths.clean;
-  apaths.zerocenter;
+  elements.interpolate(0.5);
+  elements.movetoorigin;
 end;
 
 end.

@@ -34,28 +34,22 @@ type
     fenabled:   boolean;
     fxcenter:   double;
     fycenter:   double;
-    fdxmax:     double;
-    fdymax:     double;
-    fpaths:     tvppaths;
-    ftick:      longint;
+    fpath:      tvppath;
     fonstart:   tthreadmethod;
     fonstop:    tthreadmethod;
     fontick:    tthreadmethod;
   protected
     procedure execute; override;
   public
-    constructor create(paths: tvppaths);
+    constructor create(path: tvppath);
     destructor destroy; override;
   public
-    property enabled:   boolean       read fenabled   write fenabled;
-    property xcenter:   double        read fxcenter   write fxcenter;
-    property ycenter:   double        read fycenter   write fycenter;
-    property dxmax:     double        read fdxmax     write fdxmax;
-    property dymax:     double        read fdymax     write fdymax;
-    property tick:      longint       read ftick;
-    property onstart:   tthreadmethod read fonstart   write fonstart;
-    property onstop:    tthreadmethod read fonstop    write fonstop;
-    property ontick:    tthreadmethod read fontick    write fontick;
+    property enabled: boolean       read fenabled write fenabled;
+    property xcenter: double        read fxcenter write fxcenter;
+    property ycenter: double        read fycenter write fycenter;
+    property onstart: tthreadmethod read fonstart write fonstart;
+    property onstop:  tthreadmethod read fonstop  write fonstop;
+    property ontick:  tthreadmethod read fontick  write fontick;
   end;
 
   procedure optimize(const p: tvppoint; out mx, my: longint);
@@ -66,6 +60,8 @@ var
 
 implementation
 
+uses
+  math;
 
 procedure optimize(const p: tvppoint; out mx, my: longint); inline;
 var
@@ -82,14 +78,14 @@ begin
   ct := circle_by_center_and_radius(p, lx);
   if intersection_of_two_circles(cx, ct, sx, st) = 0 then
     raise exception.create('intersection_of_two_circles [c0c2]');
-  lx := lx + get_angle(line_by_two_points(sx, tx))*setting.xradius;
+  lx := lx + angle(line_by_two_points(sx, tx))*setting.xradius;
   //find tangent point ty
   ly := sqrt(sqr(distance_between_two_points(ty, p))-sqr(setting.yradius));
   cy := circle_by_center_and_radius(ty, setting.yradius);
   ct := circle_by_center_and_radius(p, ly);
   if intersection_of_two_circles(cy, ct, sy, st) = 0 then
     raise exception.create('intersection_of_two_circles [c1c2]');
-  ly := ly + (pi-get_angle(line_by_two_points(sy, ty)))*setting.yradius;
+  ly := ly + (pi-angle(line_by_two_points(sy, ty)))*setting.yradius;
   // calculate steps
   mx := round(lx/setting.xratio);
   my := round(ly/setting.yratio);
@@ -97,87 +93,58 @@ end;
 
 // tvpdriverthread
 
-constructor tvpdriverthread.create(paths: tvppaths);
+constructor tvpdriverthread.create(path: tvppath);
 begin
   fenabled := true;
   fxcenter := 0;
   fycenter := 0;
-  fdxmax   := 0;
-  fdymax   := 0;
-  fpaths   := paths;
-  ftick    := 0;
-
+  fpath    := path;
   freeonterminate := true;
   inherited create(true);
 end;
 
 destructor tvpdriverthread.destroy;
 begin
-  fpaths := nil;
+  fpath := nil;
   inherited destroy;
 end;
 
 procedure tvpdriverthread.execute;
 var
-   i, j: longint;
-     mx: longint = 0;
-     my: longint = 0;
-   path: tvppath;
-  point: tvppoint;
-   list: tfplist;
+    i, j: longint;
+      mx: longint = 0;
+      my: longint = 0;
+  p0, p1: tvppoint;
 begin
   if assigned(onstart) then
     synchronize(fonstart);
 
-  list := tfplist.create;
-  for i := 0 to fpaths.count -1 do
+  p0 := setting.layout9;
+  for i := 0 to fpath.count -1 do
   begin
-    path := fpaths.items[i];
-    if path.enabled then
-      if not path.hidden then
-        for j := 0 to path.count -1 do
-        begin
-          point:= path.items[j]^;
-          point:= wave.update(point);
-
-          if (abs(point.x) <= (fdxmax)) and
-             (abs(point.y) <= (fdymax)) then
-            list.add(path.items[j]);
-        end;
-  end;
-
-  if list.count > 0 then
-  begin
-    pvppoint(list[0])^.z := setting.zmax;
-    for i := 1 to list.count -1 do
-      if distance_between_two_points(
-        pvppoint(list[i])^, pvppoint(list[i-1])^) < 0.25 then
-        pvppoint(list[i])^.z := setting.zmin
-      else
-        pvppoint(list[i])^.z := setting.zmax;
-
-    ftick := list.count;
-    for i := 0 to list.count -1 do
+    if not terminated then
     begin
-      point := pvppoint(list[i])^;
-      if not terminated then
+      p1   := wave.update(fpath.items[i]^);
+      p1.x := p1.x + fxcenter;
+      p1.y := p1.y + fycenter;
+
+      if distance_between_two_points(p0, p1) < 0.2 then
+        driver.zcount := setting.zmin
+      else
+        driver.zcount := setting.zmax;
+
+      optimize(p1, mx, my);
+      driver.move(mx, my);
+      if assigned(ontick) then
+        synchronize(ontick);
+
+      while not enabled do
       begin
-        point   := wave.update(point);
-        point.x := point.x + fxcenter;
-        point.y := point.y + fycenter;
-
-        driver.zcount := trunc(point.z);
-        optimize(point, mx, my);
-        driver.move(mx, my);
-        if assigned(ontick) then
-          synchronize(ontick);
-
-        while not enabled do sleep(250);
+        sleep(250);
       end;
-      dec(ftick);
+      p0 := p1;
     end;
   end;
-  list.destroy;
 
   if assigned(fonstop) then
     synchronize(fonstop);
