@@ -32,9 +32,7 @@ type
   tvpelement = class(tobject)
   private
     fhidden: boolean;
-    finverted: boolean;
     flayer: longword;
-    flen: single;
     fpath: tvppolygonal;
     fselected:  boolean;
     function getfirst: pvppoint;
@@ -45,7 +43,7 @@ type
     constructor create;
     destructor destroy; override;
     procedure invert; virtual;
-    procedure interpolate(value: single); virtual;
+    procedure interpolate(value: single); virtual; abstract;
     procedure move(dx, dy: single); virtual;
     procedure rotate(angle: single); virtual;
     procedure scale(value: single); virtual;
@@ -58,7 +56,6 @@ type
     property hidden: boolean read fhidden write fhidden;
     property layer: longword read flayer  write flayer;
     property last: pvppoint read getlast;
-    property len: single read flen;
     property selected: boolean read fselected write fselected;
     property items[index: longint]: pvppoint read getitem;
     property count: longint read getcount;
@@ -187,6 +184,8 @@ type
   tvppath = class
   private
     flist: tfplist;
+    fpathlength: single;
+    fpathraises: longint;
     function getcount: longint;
     function getitem(index: longint): pvppoint;
   public
@@ -194,11 +193,11 @@ type
     destructor destroy; override;
     procedure clear;
     procedure update(elemlist: tvpelementlist; dxmax, dymax: single);
-    function getraises: longint;
-    function getlength: single;
   public
-    property items[index: longint]: pvppoint read getitem;
     property count: longint read getcount;
+    property items[index: longint]: pvppoint read getitem;
+    property pathlength: single  read fpathlength;
+    property pathraises: longint read fpathraises;
   end;
 
 implementation
@@ -275,11 +274,9 @@ constructor tvpelement.create;
 begin
   inherited create;
   fhidden   := false;
-  finverted := false;
   flayer    := 0;
-  flen      := 0;;
-  fselected := false;
   setlength(fpath, 0);
+  fselected := false;
 end;
 
 destructor tvpelement.destroy;
@@ -310,19 +307,7 @@ end;
 
 procedure tvpelement.invert;
 begin
-  finverted := not finverted;
   vpmath.invert(fpath);
-end;
-
-procedure tvpelement.interpolate(value: single);
-var
-  i: longint;
-begin
-  flen := 0;
-  for i := 0 to high(fpath) -1 do
-  begin
-    flen := flen + distance_between_two_points(fpath[i], fpath[i+1]);
-  end;
 end;
 
 procedure tvpelement.move(dx, dy: single);
@@ -353,18 +338,14 @@ end;
 procedure tvpelement.read(stream: tstream);
 begin
   stream.read(fhidden,   sizeof(boolean));
-  stream.read(finverted, sizeof(boolean));
   stream.read(flayer,    sizeof(longint));
-  stream.read(flen,      sizeof(single ));
   stream.read(fselected, sizeof(boolean));
 end;
 
 procedure tvpelement.write(stream: tstream);
 begin
   stream.write(fhidden,   sizeof(boolean));
-  stream.write(finverted, sizeof(boolean));
   stream.write(flayer,    sizeof(longint));
-  stream.write(flen,      sizeof(single ));
   stream.write(fselected, sizeof(boolean));
 end;
 
@@ -390,7 +371,6 @@ end;
 procedure tvpelementline.interpolate(value: single);
 begin
   vpmath.interpolate(fline, fpath, value);
-  inherited interpolate(value);
 end;
 
 procedure tvpelementline.move(dx, dy: single);
@@ -457,7 +437,6 @@ end;
 procedure tvpelementcircle.interpolate(value: single);
 begin
   vpmath.interpolate(fcircle, fpath, value);
-  inherited interpolate(value);
 end;
 
 procedure tvpelementcircle.move(dx, dy: single);
@@ -524,7 +503,6 @@ end;
 procedure tvpelementcirclearc.interpolate(value: single);
 begin
   vpmath.interpolate(fcirclearc, fpath, value);
-  inherited interpolate(value);
 end;
 
 procedure tvpelementcirclearc.move(dx, dy: single);
@@ -597,7 +575,6 @@ end;
 procedure tvpelementpolygonal.interpolate(value: single);
 begin
   vpmath.interpolate(fpolygonal, fpath, value);
-  inherited interpolate(value);
 end;
 
 procedure tvpelementpolygonal.move(dx, dy: single);
@@ -845,11 +822,13 @@ end;
 
 procedure tvpelementlist.invert;
 var
-  i: longint;
+  i, cnt: longint;
 begin
-  for i := 0 to flist.count -1 do
+  cnt := flist.count -1;
+  for i := 0 to cnt do
   begin
-    tvpelement(flist[i]).invert;
+    tvpelement(flist[0]).invert;
+    flist.move(0, cnt-i);
   end;
 end;
 
@@ -1181,12 +1160,15 @@ end;
 constructor tvppath.create;
 begin
   inherited create;
-  flist := tfplist.create;
+  flist       := tfplist.create;
+  fpathlength := 0;
+  fpathraises := 0;
 end;
 
 destructor tvppath.destroy;
 begin
   clear;
+  flist.destroy;
   inherited destroy;
 end;
 
@@ -1199,91 +1181,64 @@ begin
     dispose(pvppoint(flist[i]));
   end;
   flist.clear;
+  fpathlength := 0;
+  fpathraises := 0;
 end;
 
 procedure tvppath.update(elemlist: tvpelementlist; dxmax, dymax: single);
 var
-  i, j: longint;
-  elem: tvpelement;
-    pp: pvppoint;
-     p: tvppoint;
+    i, j: longint;
+    elem: tvpelement;
+      pp: pvppoint;
+  p0, p1: tvppoint;
+       z: single;
 begin
   clear;
+
+   z := setting.zmax;
+  p0 := setting.layout9;
   for i := 0 to elemlist.count -1 do
   begin
     elem := elemlist.items[i];
     if elem.hidden = false then
     begin
       elem.interpolate(0.1);
+
       for j := 0 to elem.count -1 do
       begin
-        p := wave.update(elem.items[j]^);
+        p1 := wave.update(elem.items[j]^);
 
-        if (abs(p.x) <= (dxmax)) and
-           (abs(p.y) <= (dymax)) then
+        if (abs(p1.x) <= (dxmax)) and
+           (abs(p1.y) <= (dymax)) then
         begin
           new(pp);
           pp^ := elem.items[j]^;
           flist.add(pp);
+
+          if distance_between_two_points(p0, p1) < 0.2 then
+          begin
+            fpathlength := fpathlength + distance_between_two_points(p0, p1);
+
+            if z <> setting.zmin then
+            begin
+              z := setting.zmin;
+              inc(fpathraises);
+            end;
+          end else
+          begin
+            if z <> setting.zmax then
+            begin
+              z := setting.zmax;
+              inc(fpathraises);
+            end;
+          end;
         end;
+        p0 := p1;
       end;
       elem.interpolate(0.5);
     end;
   end;
 end;
-
-function tvppath.getlength: single;
-var
-       i: longint;
-  p0, p1: tvppoint;
-begin
-  result := 0;
-
-  p0 := setting.layout9;
-  for i := 0 to flist.count -1 do
-  begin
-    p1 := wave.update(pvppoint(flist[i])^);
-    result := result + distance_between_two_points(p0, p1);
-
-    p0 := p1;
-  end;
-end;
-
-
-function tvppath.getraises: longint;
-var
-       i: longint;
-  p0, p1: tvppoint;
-       z: single;
-begin
-  result := 0;
-
-   z := setting.zmax;
-  p0 := setting.layout9;
-  for i := 0 to flist.count -1 do
-  begin
-    p1 := wave.update(pvppoint(flist[i])^);
-
-    if distance_between_two_points(p0, p1) < 0.2 then
-    begin
-      if z <> setting.zmin then
-      begin
-        z := setting.zmin;
-        inc(result);
-      end;
-    end else
-    begin
-      if z <> setting.zmax then
-      begin
-        z := setting.zmax;
-        inc(result);
-      end;
-    end;
-
-    p0 := p1;
-  end;
-end;
-
 
 function tvppath.getcount: longint;
 begin
@@ -1293,21 +1248,6 @@ end;
 function tvppath.getitem(index: longint): pvppoint;
 begin
   result := pvppoint(flist[index]);
-end;
-
-//
-
-function info(elements: tvpelementlist): single;
-var
-  i: longint;
-begin
-  result := 0;
-
-  elements.interpolate(0.5);
-  for i := 0 to elements.count -1 do
-  begin
-    result := result + elements.items[i].len;
-  end;
 end;
 
 end.

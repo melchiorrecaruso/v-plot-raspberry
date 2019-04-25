@@ -20,34 +20,34 @@
 }
 
 
-unit infofrm;
+unit propertiesfrm;
 
 {$mode objfpc}
 
 interface
 
 uses
-  classes, sysutils, forms, controls, graphics, dialogs,
-  extctrls, buttons, stdctrls;
+  classes, sysutils, forms, controls, graphics,
+  dialogs, extctrls, buttons, stdctrls;
 
 type
 
-  { tinfoform }
+  { tpropertiesform }
 
-  tinfoform = class(tform)
-    listb: tlistbox;
+  tpropertiesform = class(tform)
+    listbox: tlistbox;
   private
   public
   end;
 
 var
-  infoform: tinfoform;
+  propertiesform: tpropertiesform;
 
 implementation
 
 {$R *.lfm}
 
-{ tinfoform }
+{ tpropertiesform }
 
 end.
 

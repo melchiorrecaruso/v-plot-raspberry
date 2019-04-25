@@ -365,11 +365,18 @@ var
   i, j: longint;
      t: tvppolygonal;
 begin
-  j := high(polygonal);
+  setlength(t, system.length(polygonal));
 
-  setlength(t, j + 1);
-  for i := 0 to high(polygonal) do t[i] := polygonal[j - i];
-  for i := 0 to high(polygonal) do t[i] := polygonal[    i];
+  j := high(polygonal);
+  for i := 0 to j do
+  begin
+    t[i] := polygonal[j-i];
+  end;
+
+  for i := 0 to j do
+  begin
+    polygonal[i] := t[i];
+  end;
   setlength(t, 0);
 end;
 
@@ -451,7 +458,6 @@ procedure interpolate(const circle: tvpcircle; var path: tvppolygonal; value: si
 var
   i, j: longint;
     ds: single;
-    dz: boolean;
 begin
    j := max(1, round(length(circle)/value));
   ds := (2*pi)/j;

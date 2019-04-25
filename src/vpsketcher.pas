@@ -105,6 +105,48 @@ end;
 
 // tvpsketcher1
 
+function tvpsketcher1.step1(n, width: single): tvpelementlist;
+var
+  line: tvpline;
+begin
+  result := tvpelementlist.create;
+  if n > 0 then
+  begin
+    line.p0.x := 0;
+    line.p0.y := 0;
+    line.p1.x := width/(n*2);
+    line.p1.y := 0;
+    result.add(line);
+
+    while line.p1.x < width do
+    begin
+      if line.p1.x - line.p0.x > 0  then
+      begin
+        line.p0 := line.p1;
+        if line.p1.y = 0 then
+          line.p1.y := line.p1.y + width
+        else
+          line.p1.y := 0
+      end else
+      begin
+        line.p0   := line.p1;
+        line.p1.x := line.p1.x + width/n;
+        if line.p1.x > width then
+          line.p1.x := width;
+      end;
+      result.add(line);
+    end;
+  end else
+  begin
+    line.p0.x := 0;
+    line.p0.y := 0;
+    line.p1.x := width;
+    line.p1.y := 0;
+    result.add(line);
+  end;
+  result.interpolate(0.5);
+end;
+
 procedure tvpsketcher1.update(elements: tvpelementlist);
 var
   i, j, k: longint;
@@ -153,49 +195,7 @@ begin
   list1.destroy;
   elements.mirrorx;
   elements.movetoorigin;
-  elements.interpolate(0.1);
-end;
-
-function tvpsketcher1.step1(n, width: single): tvpelementlist;
-var
-  line: tvpline;
-begin
-  result := tvpelementlist.create;
-  if n > 0 then
-  begin
-    line.p0.x := 0;
-    line.p0.y := 0;
-    line.p1.x := width/(n*2);
-    line.p1.y := 0;
-    result.add(line);
-
-    while line.p1.x < width do
-    begin
-      if line.p1.x - line.p0.x > 0  then
-      begin
-        line.p0 := line.p1;
-        if line.p1.y = 0 then
-          line.p1.y := line.p1.y + width
-        else
-          line.p1.y := 0
-      end else
-      begin
-        line.p0   := line.p1;
-        line.p1.x := line.p1.x + width/n;
-        if line.p1.x > width then
-          line.p1.x := width;
-      end;
-      result.add(line);
-    end;
-  end else
-  begin
-    line.p0.x := 0;
-    line.p0.y := 0;
-    line.p1.x := width;
-    line.p1.y := 0;
-    result.add(line);
-  end;
-  result.interpolate(0.5);
+  elements.interpolate(0.5);
 end;
 
 // tvpsketcher2

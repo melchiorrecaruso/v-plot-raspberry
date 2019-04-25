@@ -35,8 +35,8 @@ type
 
   tmainform = class(tform)
     clientformbevel: tbevel;
+    propertiesmi: TMenuItem;
     N10: TMenuItem;
-    pathinfomi: TMenuItem;
     zoom3000mi: TMenuItem;
     zoom1000mi: TMenuItem;
     zoom1500mi: TMenuItem;
@@ -171,7 +171,7 @@ type
     // MAIN MENU::FILE
     procedure loadmiclick          (sender: tobject);
     procedure move2originmiclick   (sender: tobject);
-    procedure pathinfomiClick(Sender: TObject);
+    procedure propertiesmiclick(Sender: TObject);
     procedure savemiclick          (sender: tobject);
     procedure clearmiclick         (sender: tobject);
     procedure importmiclick        (sender: tobject);
@@ -266,7 +266,7 @@ implementation
 {$r *.lfm}
 
 uses
-  math, sysutils, importfrm, aboutfrm, infofrm,
+  math, sysutils, importfrm, aboutfrm, propertiesfrm,
   vpdriver, vpdriverthread, vpsketcher, vpmath, vpsvgreader,
   vpdxfreader, vpsetting, vpwave;
 
@@ -379,6 +379,7 @@ end;
 procedure tmainform.clearmiclick(sender: tobject);
 begin
   lock2;
+  path.clear;
   page.clear;
   page.interpolate(0.5);
   pagecount := page.count;
@@ -529,19 +530,20 @@ begin
   unlock2;
 end;
 
-procedure tmainform.pathinfomiClick(Sender: TObject);
+procedure tmainform.propertiesmiclick(sender: tobject);
 begin
   lock2;
   path.update(page,
     pagewidth /2+1,
     pageheight/2+1);
 
-  infoform.listb.clear;
-  infoform.listb.additem('Points : '+  inttostr(path.count),     nil);
-  infoform.listb.additem('Lenght : '+floattostr(path.getlength), nil);
-  infoform.listb.additem('Raises :' +  inttostr(path.getraises), nil);
+  propertiesform.listbox.clear;
+  propertiesform.listbox.additem(format('Points : %12.0u   ', [path.count     ]), nil);
+  propertiesform.listbox.additem(format('Length : %12.0f mm', [path.pathlength]), nil);
+  propertiesform.listbox.additem(format('Raises : %12.0u   ', [path.pathraises]), nil);
+  propertiesform.listbox.clearselection;
 
-  infoform.showmodal;
+  propertiesform.showmodal;
   unlock2;
 end;
 
@@ -1088,11 +1090,13 @@ begin
   savemi       .enabled := value;
   clearmi      .enabled := value;
   importmi     .enabled := value;
+  propertiesmi .enabled := value;
   // main menu::editmi
   rotatemi     .enabled := value;
   mirrormi     .enabled := value;
   scalemi      .enabled := value;
   offsetmi     .enabled := value;
+  move2originmi.enabled := value;
   pagesizemi   .enabled := value;
   toolpathmi   .enabled := value;
   // main menu::view
@@ -1109,6 +1113,10 @@ begin
   zoom400mi    .enabled := value;
   zoom600mi    .enabled := value;
   zoom800mi    .enabled := value;
+  zoom1000mi   .enabled := value;
+  zoom1500mi   .enabled := value;
+  zoom2000mi   .enabled := value;
+  zoom3000mi   .enabled := value;
   fitmi        .enabled := value;
   // main menu::preview
   sf001mi      .enabled := value;
