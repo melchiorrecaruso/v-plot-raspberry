@@ -35,7 +35,7 @@ begin
   application.createform(tmainform, mainform);
   application.createform(taboutform, aboutform);
   application.createform(timportform, importform);
-  Application.CreateForm(Tpropertiesform, propertiesform);
+  application.createform(tpropertiesform, propertiesform);
   application.run;
 end.
 

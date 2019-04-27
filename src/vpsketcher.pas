@@ -32,8 +32,8 @@ type
   tvpsketcher = class
   private
    fbit:       tbgrabitmap;
-   fdotsize:   single;
-   fpatternw:  single;
+   fdotsize:   vpfloat;
+   fpatternw:  vpfloat;
    fpatternbw: longint;
    function getdarkness(x, y, width: longint): longint;
   public
@@ -41,27 +41,27 @@ type
     destructor destroy; override;
     procedure update(elements: tvpelementlist); virtual abstract;
   public
-    property dotsize:   single  read fdotsize   write fdotsize;
-    property patternw:  single  read fpatternw  write fpatternw;
+    property dotsize:   vpfloat  read fdotsize   write fdotsize;
+    property patternw:  vpfloat  read fpatternw  write fpatternw;
     property patternbw: longint read fpatternbw write fpatternbw;
   end;
 
   tvpsketcher1 = class(tvpsketcher)
   private
-    function step1(n, width: single): tvpelementlist; virtual;
+    function step1(n, width: vpfloat): tvpelementlist; virtual;
   public
     procedure update(elements: tvpelementlist); override;
   end;
 
   tvpsketcher2 = class(tvpsketcher1)
   private
-    function step1(n, width: single): tvpelementlist; override;
-    function step2(elements: tvpelementlist; radius: single): tvpelementlist;
+    function step1(n, width: vpfloat): tvpelementlist; override;
+    function step2(elements: tvpelementlist; radius: vpfloat): tvpelementlist;
   end;
 
   tvpsketcher3 = class(tvpsketcher1)
   private
-    function step1(n, width: single): tvpelementlist; override;
+    function step1(n, width: vpfloat): tvpelementlist; override;
   end;
 
 
@@ -105,7 +105,7 @@ end;
 
 // tvpsketcher1
 
-function tvpsketcher1.step1(n, width: single): tvpelementlist;
+function tvpsketcher1.step1(n, width: vpfloat): tvpelementlist;
 var
   line: tvpline;
 begin
@@ -200,12 +200,12 @@ end;
 
 // tvpsketcher2
 
-function tvpsketcher2.step1(n, width: single): tvpelementlist;
+function tvpsketcher2.step1(n, width: vpfloat): tvpelementlist;
 begin
   result := step2(inherited step1(n, width), width/(2*n));
 end;
 
-function tvpsketcher2.step2(elements: tvpelementlist; radius: single): tvpelementlist;
+function tvpsketcher2.step2(elements: tvpelementlist; radius: vpfloat): tvpelementlist;
 var
    i: longint;
   l0: tvpline;
@@ -287,7 +287,7 @@ end;
 
 // tvpsketcher3
 
-function tvpsketcher3.step1(n, width: single): tvpelementlist;
+function tvpsketcher3.step1(n, width: vpfloat): tvpelementlist;
 begin
   result := inherited step1(n, width);
 end;

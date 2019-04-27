@@ -33,20 +33,20 @@ uses
 
 type
   tpolylineelement = record
-    x: double;
-    y: double;
+    x: vpfloat;
+    y: vpfloat;
     color: tfpcolor;
   end;
 
   tsplineelement = record
-    x: double;
-    y: double;
+    x: vpfloat;
+    y: vpfloat;
     knotvalue: integer;
   end;
 
   tlwpolylineelement = record
-    x: double;
-    y: double;
+    x: vpfloat;
+    y: vpfloat;
   end;
 
   { tdxftokens }
@@ -63,7 +63,7 @@ type
   public
     groupcode:  integer;
     strvalue:   string;
-    floatvalue: double;
+    floatvalue: vpfloat;
     intvalue:   integer;
     childs:     tdxftokens;
   public
@@ -90,8 +90,8 @@ type
   private
     fpointseparator: tformatsettings;
     // header data
-    angbase: double;
-    angdir:  double;
+    angbase: vpfloat;
+    angdir:  vpfloat;
     insbase, extmin, extmax, limmin, limmax: pvppoint;
     // for building the polyline objects which is composed of multiple records
     isreadingpolyline: boolean;
@@ -498,7 +498,7 @@ var
   i: integer;
   //block data
   lname: string;
-  posx, posy, posz: double;
+  posx, posy, posz: vpfloat;
 begin
   for i := 0 to atokens.count - 1 do
   begin
@@ -528,7 +528,7 @@ var
   i: integer;
   //layer data
   lname: string;
-  posx, posy, posz: double;
+  posx, posy, posz: vpfloat;
 begin
   for i := 0 to atokens.count - 1 do
   begin
@@ -574,7 +574,7 @@ var
   i: integer;
   //block data
   lname: string;
-  posx, posy, posz: double;
+  posx, posy, posz: vpfloat;
 begin
   for i := 0 to atokens.count - 1 do
   begin
@@ -1014,10 +1014,10 @@ function tvdxfreader.readentities_mtext(atokens: tdxftokens;
 var
   curtoken: tdxftoken;
   i: integer;
-  posx: double = 0.0;
-  posy: double = 0.0;
-  posz: double = 0.0;
-  fontsize: double = 10.0;
+  posx: vpfloat = 0.0;
+  posy: vpfloat = 0.0;
+  posz: vpfloat = 0.0;
+  fontsize: vpfloat = 10.0;
   str: string = '';
 begin
   for i := 0 to ATokens.Count - 1 do
@@ -1054,7 +1054,7 @@ function tvdxfreader.readentities_leader(atokens: tdxftokens;
 var
   curtoken: tdxftoken;
   i, curpoint: integer;
-  lvaluex, lvaluey: double;
+  lvaluex, lvaluey: vpfloat;
   larrow: tvarrow;
   lelementcolor: tfpcolor;
 begin
@@ -1120,7 +1120,7 @@ function tvdxfreader.readentities_point(atokens: tdxftokens;
 var
   curtoken: tdxftoken;
   i: integer;
-  circlecenterx, circlecentery, circlecenterz, circleradius: double;
+  circlecenterx, circlecentery, circlecenterz, circleradius: vpfloat;
 begin
   circlecenterx := 0.0;
   circlecentery := 0.0;

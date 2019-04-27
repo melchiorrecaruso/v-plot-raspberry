@@ -29,10 +29,12 @@ uses
   classes, sysutils, math;
 
 type
+  vpfloat   = double;
+
   pvppoint = ^tvppoint;
   tvppoint = packed record
-    x: single;
-    y: single;
+    x: double;
+    y: double;
   end;
 
   pvpline = ^tvpline;
@@ -43,63 +45,64 @@ type
 
   pvplineimp = ^tvplineimp;
   tvplineimp = packed record
-    a: single;
-    b: single;
-    c: single;
+    a: vpfloat;
+    b: vpfloat;
+    c: vpfloat;
   end;
 
   pvpcircle = ^tvpcircle;
   tvpcircle = packed record
     center: tvppoint;
-    radius: single;
+    radius: vpfloat;
   end;
 
   pvpcircleimp = ^tvpcircleimp;
   tvpcircleimp = packed record
-    a: single;
-    b: single;
-    c: single;
+    a: vpfloat;
+    b: vpfloat;
+    c: vpfloat;
   end;
 
   pvpcirclearc = ^tvpcirclearc;
   tvpcirclearc = packed record
     center:     tvppoint;
-    startangle: single;
-    endangle:   single;
-    radius:     single;
+    startangle: vpfloat;
+    endangle:   vpfloat;
+    radius:     vpfloat;
   end;
 
   pvpellipse = ^tvpellipse;
   tvpellipse = packed record
     center:  tvppoint;
-    radiusx: single;
-    radiusy: single;
-      angle: single;
+    radiusx: vpfloat;
+    radiusy: vpfloat;
+      angle: vpfloat;
   end;
 
   pvppolygonal = ^tvppolygonal;
   tvppolygonal = array of tvppoint;
 
 // MOVE
-procedure move(var point:     tvppoint;     dx, dy: single);
-procedure move(var line:      tvpline;      dx, dy: single);
-procedure move(var circle:    tvpcircle;    dx, dy: single);
-procedure move(var circlearc: tvpcirclearc; dx, dy: single);
-procedure move(var polygonal: tvppolygonal; dx, dy: single);
+procedure move(var point:     tvppoint; const cc: tvppoint);
+procedure move(var point:     tvppoint;     dx, dy: vpfloat);
+procedure move(var line:      tvpline;      dx, dy: vpfloat);
+procedure move(var circle:    tvpcircle;    dx, dy: vpfloat);
+procedure move(var circlearc: tvpcirclearc; dx, dy: vpfloat);
+procedure move(var polygonal: tvppolygonal; dx, dy: vpfloat);
 
 // ROTATE
-procedure rotate(var point:     tvppoint;     angle: single);
-procedure rotate(var line:      tvpline;      angle: single);
-procedure rotate(var circle:    tvpcircle;    angle: single);
-procedure rotate(var circlearc: tvpcirclearc; angle: single);
-procedure rotate(var polygonal: tvppolygonal; angle: single);
+procedure rotate(var point:     tvppoint;     angle: vpfloat);
+procedure rotate(var line:      tvpline;      angle: vpfloat);
+procedure rotate(var circle:    tvpcircle;    angle: vpfloat);
+procedure rotate(var circlearc: tvpcirclearc; angle: vpfloat);
+procedure rotate(var polygonal: tvppolygonal; angle: vpfloat);
 
 // SCALE
-procedure scale(var point:     tvppoint;     factor: single);
-procedure scale(var line:      tvpline;      factor: single);
-procedure scale(var circle:    tvpcircle;    factor: single);
-procedure scale(var circlearc: tvpcirclearc; factor: single);
-procedure scale(var polygonal: tvppolygonal; factor: single);
+procedure scale(var point:     tvppoint;     factor: vpfloat);
+procedure scale(var line:      tvpline;      factor: vpfloat);
+procedure scale(var circle:    tvpcircle;    factor: vpfloat);
+procedure scale(var circlearc: tvpcirclearc; factor: vpfloat);
+procedure scale(var polygonal: tvppolygonal; factor: vpfloat);
 
 // MIRROR X
 procedure mirrorx(var point:     tvppoint    );
@@ -121,32 +124,41 @@ procedure invert(var circle:    tvpcircle   );
 procedure invert(var circlearc: tvpcirclearc);
 procedure invert(var polygonal: tvppolygonal);
 
-// TRANSLATE
-procedure translate(var point: tvppoint; const cc: tvppoint);
-
 // LENGTH
-function length(const line:      tvpline     ): single;
-function length(const circle:    tvpcircle   ): single;
-function length(const circlearc: tvpcirclearc): single;
-function length(const path:      tvppolygonal     ): single;
+function length(const line:      tvpline     ): vpfloat;
+function length(const circle:    tvpcircle   ): vpfloat;
+function length(const circlearc: tvpcirclearc): vpfloat;
+function length(const path:      tvppolygonal): vpfloat;
 
 // ANGLE
-function angle(const line: tvplineimp): single;
+function angle(const line: tvplineimp): vpfloat;
 
 // INTERPOLATE
-procedure interpolate(const line:      tvpline;      var path: tvppolygonal; value: single);
-procedure interpolate(const circle:    tvpcircle;    var path: tvppolygonal; value: single);
-procedure interpolate(const circlearc: tvpcirclearc; var path: tvppolygonal; value: single);
-procedure interpolate(const polygonal: tvppolygonal; var path: tvppolygonal; value: single);
+procedure interpolate(const line:      tvpline;      var path: tvppolygonal; value: vpfloat);
+procedure interpolate(const circle:    tvpcircle;    var path: tvppolygonal; value: vpfloat);
+procedure interpolate(const circlearc: tvpcirclearc; var path: tvppolygonal; value: vpfloat);
+procedure interpolate(const polygonal: tvppolygonal; var path: tvppolygonal; value: vpfloat);
 
 // ---
 function line_by_two_points(const p0, p1: tvppoint): tvplineimp;
-function distance_between_two_points(const p0, p1: tvppoint): single;
+function distance_between_two_points(const p0, p1: tvppoint): vpfloat;
+function distance_from_point_and_line(const p0: tvppoint; const l0: tvplineimp): vpfloat;
 function intersection_of_two_lines(const l0, l1: tvplineimp): tvppoint;
+
+function intersection_of_line_and_circle(const a0, b0, c0, a1, b1, c1: vpfloat; var p0, p1: tvppoint): longint;
+function intersection_of_line_and_circle(const l0: tvplineimp; const c1: tvpcircleimp; var p0, p1: tvppoint): longint;
+
+
+
+
 function circle_by_three_points(const p0, p1, p2: tvppoint): tvpcircleimp;
-function circle_by_center_and_radius(const cc: tvppoint; radius: double): tvpcircleimp;
+function circle_by_center_and_radius(const cc: tvppoint; radius: vpfloat): tvpcircleimp;
 function circlearc_by_three_points(cc, p0, p1: tvppoint): tvpcirclearc;
 function intersection_of_two_circles(const c0, c1: tvpcircleimp; var p1, p2: tvppoint): longint;
+
+function itsavertex(const p0, p1, p2: tvppoint): boolean;
+function itsthesame(const p0, p1: tvppoint): boolean;
+procedure smooth(var l0, l1: tvpline; var a0: tvpcirclearc);
 
 var
   enabledebug: boolean = false;
@@ -155,29 +167,35 @@ implementation
 
 // MOVE
 
-procedure move(var point: tvppoint; dx, dy: single);
+procedure move(var point: tvppoint; const cc: tvppoint);
+begin
+  point.x := point.x + cc.x;
+  point.y := point.y + cc.y;
+end;
+
+procedure move(var point: tvppoint; dx, dy: vpfloat);
 begin
   point.x := point.x + dx;
   point.y := point.y + dy;
 end;
 
-procedure move(var line: tvpline; dx, dy: single);
+procedure move(var line: tvpline; dx, dy: vpfloat);
 begin
   move(line.p0, dx, dy);
   move(line.p1, dx, dy);
 end;
 
-procedure move(var circle: tvpcircle; dx, dy: single);
+procedure move(var circle: tvpcircle; dx, dy: vpfloat);
 begin
   move(circle.center, dx, dy);
 end;
 
-procedure move(var circlearc: tvpcirclearc; dx, dy: single);
+procedure move(var circlearc: tvpcirclearc; dx, dy: vpfloat);
 begin
   move(circlearc.center, dx, dy);
 end;
 
-procedure move(var polygonal: tvppolygonal; dx, dy: single);
+procedure move(var polygonal: tvppolygonal; dx, dy: vpfloat);
 var
   i: longint;
 begin
@@ -189,10 +207,10 @@ end;
 
 // ROTATE
 
-procedure rotate(var point: tvppoint; angle: single);
+procedure rotate(var point: tvppoint; angle: vpfloat);
 var
-  px, py: single;
-  sn, cs: single;
+  px, py: vpfloat;
+  sn, cs: vpfloat;
 begin
   sincos(angle, sn, cs);
   begin
@@ -203,25 +221,25 @@ begin
   point.y := py;;
 end;
 
-procedure rotate(var line: tvpline; angle: single);
+procedure rotate(var line: tvpline; angle: vpfloat);
 begin
   rotate(line.p0, angle);
   rotate(line.p1, angle);
 end;
 
-procedure rotate(var circle: tvpcircle; angle: single);
+procedure rotate(var circle: tvpcircle; angle: vpfloat);
 begin
   rotate(circle.center, angle);
 end;
 
-procedure rotate(var circlearc: tvpcirclearc; angle: single);
+procedure rotate(var circlearc: tvpcirclearc; angle: vpfloat);
 begin
   rotate(circlearc.center, angle);
   circlearc.startangle := circlearc.startangle + angle;
   circlearc.endangle   := circlearc.endangle   + angle;
 end;
 
-procedure rotate(var polygonal: tvppolygonal; angle: single);
+procedure rotate(var polygonal: tvppolygonal; angle: vpfloat);
 var
   i: longint;
 begin
@@ -233,31 +251,31 @@ end;
 
 // SCALE
 
-procedure scale(var point: tvppoint; factor: single);
+procedure scale(var point: tvppoint; factor: vpfloat);
 begin
   point.x := point.x * factor;
   point.y := point.y * factor;
 end;
 
-procedure scale(var line: tvpline; factor: single);
+procedure scale(var line: tvpline; factor: vpfloat);
 begin
   scale(line.p0, factor);
   scale(line.p1, factor);
 end;
 
-procedure scale(var circle: tvpcircle; factor: single);
+procedure scale(var circle: tvpcircle; factor: vpfloat);
 begin
   scale(circle.center, factor);
   circle.radius := circle.radius * factor;
 end;
 
-procedure scale(var circlearc: tvpcirclearc; factor: single);
+procedure scale(var circlearc: tvpcirclearc; factor: vpfloat);
 begin
   scale(circlearc.center, factor);
   circlearc.radius := circlearc.radius * factor;
 end;
 
-procedure scale(var polygonal: tvppolygonal; factor: single);
+procedure scale(var polygonal: tvppolygonal; factor: vpfloat);
 var
   i: longint;
 begin
@@ -353,7 +371,7 @@ end;
 
 procedure invert(var circlearc: tvpcirclearc);
 var
-  t: single;
+  t: vpfloat;
 begin
   t                    := circlearc.startangle;
   circlearc.startangle := circlearc.endangle;
@@ -380,37 +398,29 @@ begin
   setlength(t, 0);
 end;
 
-// TRANSLATE
-
-procedure translate(var point: tvppoint; const cc: tvppoint);
-begin
-  point.x := point.x + cc.x;
-  point.y := point.y + cc.y;
-end;
-
 // LENGTH
 
-function length(const line: tvpline): single;
+function length(const line: tvpline): vpfloat;
 begin
   result := distance_between_two_points(line.p0, line.p1);
 end;
 
-function length(const circle: tvpcircle): single;
+function length(const circle: tvpcircle): vpfloat;
 const
   sweep = 2*pi;
 begin
   result := sweep*circle.radius;
 end;
 
-function length(const circlearc: tvpcirclearc): single;
+function length(const circlearc: tvpcirclearc): vpfloat;
 var
-  sweep: single;
+  sweep: vpfloat;
 begin
   sweep  := degtorad(abs(circlearc.endangle-circlearc.startangle));
   result := sweep*circlearc.radius;
 end;
 
-function length(const path: tvppolygonal): single;
+function length(const path: tvppolygonal): vpfloat;
 var
   i: longint;
 begin
@@ -423,23 +433,23 @@ end;
 
 // ANGLE
 
-function angle(const line: tvplineimp): single;
+function angle(const line: tvplineimp): vpfloat;
 begin
   if line.b = 0 then
   begin
     if line.a > 0 then
-      result := +pi / 2
+      result := +pi/2
     else
-      result := -pi / 2;
+      result := -pi/2;
   end else
     result := arctan2(line.a, -line.b);
 end;
 
 // INTERPOLATE
 
-procedure interpolate(const line: tvpline; var path: tvppolygonal; value: single);
+procedure interpolate(const line: tvpline; var path: tvppolygonal; value: vpfloat);
 var
-  dx, dy: double;
+  dx, dy: vpfloat;
    i,  j: longint;
 begin
    j := max(1, round(distance_between_two_points(line.p0, line.p1)/value));
@@ -450,14 +460,14 @@ begin
   begin
     path[i].x := i*dx;
     path[i].y := i*dy;
-    translate(path[i], line.p0);
+    move(path[i], line.p0);
   end;
 end;
 
-procedure interpolate(const circle: tvpcircle; var path: tvppolygonal; value: single);
+procedure interpolate(const circle: tvpcircle; var path: tvppolygonal; value: vpfloat);
 var
   i, j: longint;
-    ds: single;
+    ds: vpfloat;
 begin
    j := max(1, round(length(circle)/value));
   ds := (2*pi)/j;
@@ -468,14 +478,14 @@ begin
     path[i].x := circle.radius;
     path[i].y := 0.0;
     rotate(path[i], i*ds);
-    translate(path[i], circle.center);
+    move(path[i], circle.center);
   end;
 end;
 
-procedure interpolate(const circlearc: tvpcirclearc; var path: tvppolygonal; value: single);
+procedure interpolate(const circlearc: tvpcirclearc; var path: tvppolygonal; value: vpfloat);
 var
   i, j: longint;
-    ds: single;
+    ds: vpfloat;
 begin
    j := max(1, round(length(circlearc)/value));
   ds := (circlearc.endangle-circlearc.startangle)/j;
@@ -486,11 +496,11 @@ begin
     path[i].x := circlearc.radius;
     path[i].y := 0.0;
     rotate(path[i], degtorad(circlearc.startangle+(i*ds)));
-    translate(path[i], circlearc.center);
+    move(path[i], circlearc.center);
   end;
 end;
 
-procedure interpolate(const polygonal: tvppolygonal; var path: tvppolygonal; value: single);
+procedure interpolate(const polygonal: tvppolygonal; var path: tvppolygonal; value: vpfloat);
 var
    i, j: longint;
   aline: tvpline;
@@ -536,9 +546,14 @@ begin
   result.c := (p1.x - p0.x) * p0.y -(p1.y - p0.y) * p0.x;
 end;
 
-function distance_between_two_points(const p0, p1: tvppoint): single;
+function distance_between_two_points(const p0, p1: tvppoint): vpfloat;
 begin
   result := sqrt(sqr(p1.x - p0.x) + sqr(p1.y - p0.y));
+end;
+
+function distance_from_point_and_line(const p0: tvppoint; const l0: tvplineimp): vpfloat;
+begin
+  result := abs(l0.a*p0.x+l0.b*p0.y+l0.c)/sqrt(sqr(l0.a)+sqr(l0.b));
 end;
 
 function intersection_of_two_lines(const l0, l1: tvplineimp): tvppoint;
@@ -553,10 +568,10 @@ end;
 
 function circle_by_three_points(const p0, p1, p2: tvppoint): tvpcircleimp;
 begin
-   raise exception.create('circle_by_three_points exception');
+  raise exception.create('circle_by_three_points exception');
 end;
 
-function circle_by_center_and_radius(const cc: tvppoint; radius: double): tvpcircleimp;
+function circle_by_center_and_radius(const cc: tvppoint; radius: vpfloat): tvpcircleimp;
 begin
   result.a :=  -2*cc.x;
   result.b :=  -2*cc.y;
@@ -567,15 +582,15 @@ end;
 
 function circlearc_by_three_points(cc, p0, p1: tvppoint): tvpcirclearc;
 begin
-
-
-
-
+  result.center     := cc;
+  result.radius     := distance_between_two_points(cc, p1);
+  result.startangle := radtodeg(angle(line_by_two_points(cc, p0)));
+  result.endangle   := radtodeg(angle(line_by_two_points(cc, p1)));
 end;
 
 function intersection_of_two_circles(const c0, c1: tvpcircleimp; var p1, p2: tvppoint): longint;
 var
-  aa, bb, cc, dd: double;
+  aa, bb, cc, dd: vpfloat;
 begin
   aa := 1+sqr((c0.b-c1.b)/(c1.a-c0.a));
   bb := 2*(c0.b-c1.b)/(c1.a-c0.a)*(c0.c-c1.c)/(c1.a-c0.a)+c1.a*(c0.b-c1.b)/(c1.a-c0.a)+c1.b;
@@ -600,31 +615,119 @@ begin
       result := 0;
 end;
 
-function intersection_of_line_and_circles(const l0: tvplineimp; const c1: tvpcircleimp; var p1, p2: tvppoint): longint;
+function intersection_of_line_and_circle(const a0, b0, c0, a1, b1, c1: vpfloat; var p0, p1: tvppoint): longint; inline;
 var
-  aa, bb, cc, dd: double;
+  a, b, c, d: vpfloat;
 begin
-  aa := 1+sqr((l0.b-c1.b)/(c1.a-l0.a));
-  bb := 2*(l0.b-c1.b)/(c1.a-l0.a)*(l0.c-c1.c)/(c1.a-l0.a)+c1.a*(l0.b-c1.b)/(c1.a-l0.a)+c1.b;
-  cc := c1.a*(l0.c-c1.c)/(c1.a-l0.a)+sqr((l0.c-c1.c)/(c1.a-l0.a))+c1.c;
-  dd := sqr(bb)-4*aa*cc;
+  a := 1 + sqr(b0/a0);
+  b := 2*(b0/a0)*(c0/a0) -(b0/a0)*a1 + b1;
+  c := sqr(c0/a0) -(c0/a0)*a1 + c1;
+  d := sqr(b) -4*a*c;
 
-  if dd > 0 then
+  writeln('determinante=', d);
+
+  if d > 0 then
   begin
     result := 2;
-    p1.y   := (-bb-sqrt(dd))/(2*aa);
-    p2.y   := (-bb+sqrt(dd))/(2*aa);
-    p1.x   := ((l0.c-c1.c)+(l0.b-c1.b)*p1.y)/(c1.a-l0.a);
-    p2.x   := ((l0.c-c1.c)+(l0.b-c1.b)*p2.y)/(c1.a-l0.a);
+      p0.y := (-b+sqrt(d))/(2*a);
+      p0.x := -(b0/a0)*p0.y -(c0/a0);
+      p1.y := (-b-sqrt(d))/(2*a);
+      p1.x := -(b0/a0)*p1.y -(c0/a0);
   end else
-    if dd = 0 then
-    begin
-      result := 1;
-      p1.y   := -bb;
-      p1.x   := ((l0.c-c1.c)+(l0.b-c1.b)*p1.y)/(c1.a-l0.a);
-      p2     := p1;
-    end else
-      result := 0;
+  if d = 0 then
+  begin
+    result := 1;
+      p0.y := (-b+sqrt(d))/(2*a);
+      p0.x := -(b0/a0)*p0.y -(c0/a0);
+        p1 := p0;
+  end else
+    result := 0;
+end;
+
+function intersection_of_line_and_circle(const l0: tvplineimp; const c1: tvpcircleimp; var p0, p1: tvppoint): longint; inline;
+begin
+  result := intersection_of_line_and_circle(l0.a, l0.b, l0.c, c1.a, c1.b, c1.c, p0, p1);
+end;
+
+function itsavertex(const p0, p1, p2: tvppoint): boolean;
+begin
+  result :=  abs(angle(line_by_two_points(p1, p2))  -
+                 angle(line_by_two_points(p0, p1))) > 1.50;
+end;
+
+function itsthesame(const p0, p1: tvppoint): boolean;
+begin
+  result:= distance_between_two_points(p0, p1) < 0.01;
+end;
+
+function incenter(const a, b, c: tvppoint): tvppoint;
+var
+  aa: vpfloat;
+  bb: vpfloat;
+  cc: vpfloat;
+begin
+  aa := distance_between_two_points(b, c);
+  bb := distance_between_two_points(a, c);
+  cc := distance_between_two_points(a, b);
+  result.x := (aa*a.x+bb*b.x+cc*c.x)/(aa+bb+cc);
+  result.y := (aa*a.y+bb*b.y+cc*c.y)/(aa+bb+cc);
+end;
+
+procedure smooth(var l0, l1: tvpline; var a0: tvpcirclearc);
+var
+    j: longint;
+  l00: tvplineimp;
+  l11: tvplineimp;
+   p0: tvppoint;
+   p1: tvppoint;
+   xx: tvppoint;
+  cxx: tvpcircleimp;
+  rxx: vpfloat;
+begin
+  if not itsthesame(l0.p1, l1.p0) then exit;
+
+  writeln('---smoothing---');
+  writeln('l0.p0.x=', l0.p0.x:5:2);
+  writeln('l0.p0.y=', l0.p0.y:5:2);
+  writeln('l0.p1.x=', l0.p1.x:5:2);
+  writeln('l0.p1.y=', l0.p1.y:5:2);
+  writeln('l1.p0.x=', l1.p0.x:5:2);
+  writeln('l1.p0.y=', l1.p0.y:5:2);
+  writeln('l1.p1.x=', l1.p1.x:5:2);
+  writeln('l1.p1.y=', l1.p1.y:5:2);
+
+   xx := incenter(l0.p0, l0.p1, l1.p1);
+  l00 := line_by_two_points(l0.p0, l0.p1);
+  l11 := line_by_two_points(l1.p0, l1.p1);
+  rxx := distance_from_point_and_line(xx, l00);
+  cxx := circle_by_center_and_radius (xx, rxx);
+
+  writeln('incenter.x      = ', xx.x:5:4);
+  writeln('incenter.y      = ', xx.y:5:4);
+  writeln('incenter.radius = ',  rxx:5:4);
+
+  j := intersection_of_line_and_circle(l00, cxx, p0, p1);
+  if j <> 1 then raise exception.create('smooth exception (det<0)');
+
+  writeln('solution-1');
+  writeln('p0.x=', p0.x:5:2);
+  writeln('p0.y=', p0.y:5:2);
+  writeln('p1.x=', p1.x:5:2);
+  writeln('p1.y=', p1.y:5:2);
+  l0.p1 := p1;
+
+  j := intersection_of_line_and_circle(l11, cxx, p0, p1);
+  if j <> 1 then raise exception.create('smooth exception (det<0)');
+
+  writeln('solution-2');
+  writeln('p0.x=', p0.x:5:2);
+  writeln('p0.y=', p0.y:5:2);
+  writeln('p1.x=', p1.x:5:2);
+  writeln('p1.y=', p1.y:5:2);
+  l1.p0 := p0;
+     a0 := circlearc_by_three_points(xx, l0.p1, l1.p0);
+
+  writeln('len.arc=', length(a0):5:2);
 end;
 
 // init unit

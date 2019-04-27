@@ -43,10 +43,10 @@ type
     constructor create;
     destructor destroy; override;
     procedure invert; virtual;
-    procedure interpolate(value: single); virtual; abstract;
-    procedure move(dx, dy: single); virtual;
-    procedure rotate(angle: single); virtual;
-    procedure scale(value: single); virtual;
+    procedure interpolate(value: vpfloat); virtual; abstract;
+    procedure move(dx, dy: vpfloat); virtual;
+    procedure rotate(angle: vpfloat); virtual;
+    procedure scale(value: vpfloat); virtual;
     procedure mirrorx; virtual;
     procedure mirrory; virtual;
     procedure read(stream: tstream); virtual;
@@ -68,10 +68,10 @@ type
     constructor create;
     constructor create(const aline: tvpline);
     procedure invert; override;
-    procedure interpolate(value: single); override;
-    procedure move(dx, dy: single); override;
-    procedure rotate(angle: single); override;
-    procedure scale(value: single); override;
+    procedure interpolate(value: vpfloat); override;
+    procedure move(dx, dy: vpfloat); override;
+    procedure rotate(angle: vpfloat); override;
+    procedure scale(value: vpfloat); override;
     procedure mirrorx; override;
     procedure mirrory; override;
     procedure read(stream: tstream); override;
@@ -85,10 +85,10 @@ type
     constructor create;
     constructor create(const acircle: tvpcircle);
     procedure invert; override;
-    procedure interpolate(value: single); override;
-    procedure move(dx, dy: single); override;
-    procedure rotate(angle: single); override;
-    procedure scale(value: single); override;
+    procedure interpolate(value: vpfloat); override;
+    procedure move(dx, dy: vpfloat); override;
+    procedure rotate(angle: vpfloat); override;
+    procedure scale(value: vpfloat); override;
     procedure mirrorx; override;
     procedure mirrory; override;
     procedure read(stream: tstream); override;
@@ -102,10 +102,10 @@ type
     constructor create;
     constructor create(const acirclearc: tvpcirclearc);
     procedure invert; override;
-    procedure interpolate(value: single); override;
-    procedure move(dx, dy: single); override;
-    procedure rotate(angle: single); override;
-    procedure scale(value: single); override;
+    procedure interpolate(value: vpfloat); override;
+    procedure move(dx, dy: vpfloat); override;
+    procedure rotate(angle: vpfloat); override;
+    procedure scale(value: vpfloat); override;
     procedure mirrorx; override;
     procedure mirrory; override;
     procedure read(stream: tstream); override;
@@ -119,10 +119,10 @@ type
     constructor create;
     constructor create(const apolygonal: tvppolygonal);
     procedure invert; override;
-    procedure interpolate(value: single); override;
-    procedure move(dx, dy: single); override;
-    procedure rotate(angle: single); override;
-    procedure scale(value: single); override;
+    procedure interpolate(value: vpfloat); override;
+    procedure move(dx, dy: vpfloat); override;
+    procedure rotate(angle: vpfloat); override;
+    procedure scale(value: vpfloat); override;
     procedure mirrorx; override;
     procedure mirrory; override;
     procedure read(stream: tstream); override;
@@ -149,17 +149,19 @@ type
     procedure delete(index: longint);
     procedure clear;
     //
-    procedure interpolate(value: single);
-    procedure offset(var x, y: single);
-    procedure move(dx, dy: single);
-    procedure rotate(angle: single);
-    procedure scale(value: single);
+    procedure interpolate(value: vpfloat);
+    procedure offset(var x, y: vpfloat);
+    procedure move(dx, dy: vpfloat);
+    procedure rotate(angle: vpfloat);
+    procedure scale(value: vpfloat);
     procedure mirrorx;
     procedure mirrory;
     procedure invert;
     procedure invert(index: longint);
-    procedure movetoorigin;
     procedure createtoolpath;
+    procedure movetoorigin;
+    procedure smooth;
+
     //
     procedure hide(value: boolean);
     procedure hide(value: boolean; layer: longint);
@@ -184,20 +186,23 @@ type
   tvppath = class
   private
     flist: tfplist;
-    fpathlength: single;
+    fpathlength: vpfloat;
     fpathraises: longint;
+    fpathvertex: longint;
     function getcount: longint;
     function getitem(index: longint): pvppoint;
+    procedure add(const p: tvppoint);
   public
     constructor create;
     destructor destroy; override;
     procedure clear;
-    procedure update(elemlist: tvpelementlist; dxmax, dymax: single);
+    procedure update(elemlist: tvpelementlist; dxmax, dymax: vpfloat);
   public
     property count: longint read getcount;
     property items[index: longint]: pvppoint read getitem;
-    property pathlength: single  read fpathlength;
+    property pathlength: vpfloat  read fpathlength;
     property pathraises: longint read fpathraises;
+    property pathvertex: longint read fpathvertex;
   end;
 
 implementation
@@ -213,11 +218,13 @@ var
 begin
   result := -1;
   for i := 0 to list.count -1 do
-    if distance_between_two_points(p, tvpelement(list[i]).getfirst^) < 0.05 then
+  begin
+    if distance_between_two_points(p, tvpelement(list[i]).getfirst^) < 0.02 then
     begin
       result := i;
       exit;
-    end;
+    end
+  end;
 end;
 
 function getlast(const p: tvppoint; list: tfplist): longint;
@@ -226,36 +233,38 @@ var
 begin
   result := -1;
   for i := 0 to list.count -1 do
-    if distance_between_two_points(p, tvpelement(list[i]).getlast^) < 0.05 then
+  begin
+    if distance_between_two_points(p, tvpelement(list[i]).getlast^) < 0.02 then
     begin
       result := i;
       exit;
-    end;
+    end
+  end;
 end;
 
 function getnear(const p: tvppoint; list: tfplist): longint;
 var
-        i: longint;
-     len1: double = $FFFFFFF;
-     len2: double = $FFFFFFF;
-  element: tvpelement;
+     i: longint;
+  len1: vpfloat = $FFFFFFF;
+  len2: vpfloat = $FFFFFFF;
+  elem: tvpelement;
 begin
   result := -1;
   for i := 0 to list.count -1 do
   begin
-    element := tvpelement(list[i]);
+    elem := tvpelement(list[i]);
 
-    len2 := distance_between_two_points(p, element.getfirst^);
+    len2 := distance_between_two_points(p, elem.getfirst^);
     if len1 > len2 then
     begin
       len1   := len2;
       result := i;
     end;
 
-    len2 := distance_between_two_points(p, element.getlast^);
+    len2 := distance_between_two_points(p, elem.getlast^);
     if len1 > len2 then
     begin
-      element.invert;
+      elem.invert;
       len1   := len2;
       result := i;
     end;
@@ -265,7 +274,7 @@ end;
 
 function isaloop(const element: tvpelement): boolean;
 begin
-  result := distance_between_two_points(element.getfirst^, element.getlast^) < 0.05;
+  result := distance_between_two_points(element.getfirst^, element.getlast^) < 0.02;
 end;
 
 // tvpelement
@@ -310,17 +319,17 @@ begin
   vpmath.invert(fpath);
 end;
 
-procedure tvpelement.move(dx, dy: single);
+procedure tvpelement.move(dx, dy: vpfloat);
 begin
   vpmath.move(fpath, dx, dy);
 end;
 
-procedure tvpelement.rotate(angle: single);
+procedure tvpelement.rotate(angle: vpfloat);
 begin
   vpmath.rotate(fpath, angle);
 end;
 
-procedure tvpelement.scale(value: single);
+procedure tvpelement.scale(value: vpfloat);
 begin
   vpmath.scale(fpath, value);
 end;
@@ -368,24 +377,24 @@ begin
   inherited invert;
 end;
 
-procedure tvpelementline.interpolate(value: single);
+procedure tvpelementline.interpolate(value: vpfloat);
 begin
   vpmath.interpolate(fline, fpath, value);
 end;
 
-procedure tvpelementline.move(dx, dy: single);
+procedure tvpelementline.move(dx, dy: vpfloat);
 begin
   vpmath.move(fline, dx, dy);
   inherited move(dx, dy);
 end;
 
-procedure tvpelementline.rotate(angle: single);
+procedure tvpelementline.rotate(angle: vpfloat);
 begin
   vpmath.rotate(fline, angle);
   inherited rotate(angle);
 end;
 
-procedure tvpelementline.scale(value: single);
+procedure tvpelementline.scale(value: vpfloat);
 begin
   vpmath.scale(fline, value);
   inherited scale(value);
@@ -434,24 +443,24 @@ begin
   inherited invert;
 end;
 
-procedure tvpelementcircle.interpolate(value: single);
+procedure tvpelementcircle.interpolate(value: vpfloat);
 begin
   vpmath.interpolate(fcircle, fpath, value);
 end;
 
-procedure tvpelementcircle.move(dx, dy: single);
+procedure tvpelementcircle.move(dx, dy: vpfloat);
 begin
   vpmath.move(fcircle, dx, dy);
   inherited move(dx, dy);
 end;
 
-procedure tvpelementcircle.rotate(angle: single);
+procedure tvpelementcircle.rotate(angle: vpfloat);
 begin
   vpmath.rotate(fcircle, angle);
   inherited rotate(angle);
 end;
 
-procedure tvpelementcircle.scale(value: single);
+procedure tvpelementcircle.scale(value: vpfloat);
 begin
   vpmath.scale(fcircle, value);
   inherited scale(value);
@@ -500,24 +509,24 @@ begin
   inherited invert;
 end;
 
-procedure tvpelementcirclearc.interpolate(value: single);
+procedure tvpelementcirclearc.interpolate(value: vpfloat);
 begin
   vpmath.interpolate(fcirclearc, fpath, value);
 end;
 
-procedure tvpelementcirclearc.move(dx, dy: single);
+procedure tvpelementcirclearc.move(dx, dy: vpfloat);
 begin
   vpmath.move(fcirclearc, dx, dy);
   inherited move(dx, dy);
 end;
 
-procedure tvpelementcirclearc.rotate(angle: single);
+procedure tvpelementcirclearc.rotate(angle: vpfloat);
 begin
   vpmath.rotate(fcirclearc, angle);
   inherited rotate(angle);
 end;
 
-procedure tvpelementcirclearc.scale(value: single);
+procedure tvpelementcirclearc.scale(value: vpfloat);
 begin
   vpmath.scale(fcirclearc, value);
   inherited scale(value);
@@ -572,24 +581,24 @@ begin
   inherited invert;
 end;
 
-procedure tvpelementpolygonal.interpolate(value: single);
+procedure tvpelementpolygonal.interpolate(value: vpfloat);
 begin
   vpmath.interpolate(fpolygonal, fpath, value);
 end;
 
-procedure tvpelementpolygonal.move(dx, dy: single);
+procedure tvpelementpolygonal.move(dx, dy: vpfloat);
 begin
   vpmath.move(fpolygonal, dx, dy);
   inherited move(dx, dy);
 end;
 
-procedure tvpelementpolygonal.rotate(angle: single);
+procedure tvpelementpolygonal.rotate(angle: vpfloat);
 begin
   vpmath.rotate(fpolygonal, angle);
   inherited rotate(angle);
 end;
 
-procedure tvpelementpolygonal.scale(value: single);
+procedure tvpelementpolygonal.scale(value: vpfloat);
 begin
   vpmath.scale(fpolygonal, value);
   inherited scale(value);
@@ -730,7 +739,7 @@ end;
 
 //---
 
-procedure tvpelementlist.interpolate(value: single);
+procedure tvpelementlist.interpolate(value: vpfloat);
 var
   i: longint;
 begin
@@ -740,13 +749,13 @@ begin
   end;
 end;
 
-procedure tvpelementlist.offset(var x, y: single);
+procedure tvpelementlist.offset(var x, y: vpfloat);
 var
      i, j: longint;
-     xmin: double;
-     xmax: double;
-     ymin: double;
-     ymax: double;
+     xmin: vpfloat;
+     xmax: vpfloat;
+     ymin: vpfloat;
+     ymax: vpfloat;
   element: tvpelement;
     point: tvppoint;
 begin
@@ -770,7 +779,7 @@ begin
   y := -(ymin + ymax)/2;
 end;
 
-procedure tvpelementlist.move(dx, dy: single);
+procedure tvpelementlist.move(dx, dy: vpfloat);
 var
   i: longint;
 begin
@@ -780,7 +789,7 @@ begin
   end;
 end;
 
-procedure tvpelementlist.rotate(angle: single);
+procedure tvpelementlist.rotate(angle: vpfloat);
 var
   i: longint;
 begin
@@ -790,7 +799,7 @@ begin
   end;
 end;
 
-procedure tvpelementlist.scale(value: single);
+procedure tvpelementlist.scale(value: vpfloat);
 var
   i: longint;
 begin
@@ -835,14 +844,6 @@ end;
 procedure tvpelementlist.invert(index: longint);
 begin
   tvpelement(flist[index]).invert;
-end;
-
-procedure tvpelementlist.movetoorigin;
-var
-  dx, dy: single;
-begin
-  offset(dx, dy);
-  move(dx, dy);
 end;
 
 //---
@@ -1090,11 +1091,11 @@ end;
 
 procedure tvpelementlist.createtoolpath4layer(list: tfplist);
 var
-        i: longint;
-  element: tvpelement;
-    point: pvppoint;
-    list1: tfplist;
-    list2: tfplist;
+      i: longint;
+   elem: tvpelement;
+  point: pvppoint;
+  list1: tfplist;
+  list2: tfplist;
 begin
   list1 := tfplist.create;
   list2 := tfplist.create;
@@ -1117,24 +1118,36 @@ begin
     if isaloop(tvpelement(list2[0])) = false then
     begin
 
-      element := tvpelement(list2[0]);
+      elem := tvpelement(list2[0]);
       repeat
-        i := getfirst(element.getlast^, list1);
+        i := getfirst(elem.getlast^, list1);
+        if i = -1 then
+        begin
+          i := getlast(elem.getlast^, list1);
+          if i <> -1 then tvpelement(list1[i]).invert;
+        end;
+
         if i <> -1 then
         begin
-          element := tvpelement(list1[i]);
-          list2.add(element);
+          elem := tvpelement(list1[i]);
+          list2.add(elem);
           list1.delete(i);
         end;
       until i = -1;
 
-      element := tvpelement(list2[0]);
+      elem := tvpelement(list2[0]);
       repeat
-        i := getlast(element.getfirst^, list1);
+        i := getlast(elem.getfirst^, list1);
+        if i = -1 then
+        begin
+          i := getfirst(elem.getfirst^, list1);
+          if i <> -1 then tvpelement(list1[i]).invert;
+        end;
+
         if i <> -1 then
         begin
-          element := tvpelement(list1[i]);
-          list2.insert(0, element);
+          elem := tvpelement(list1[i]);
+          list2.insert(0, elem);
           list1.delete(i);
         end;
       until i = -1;
@@ -1155,6 +1168,68 @@ begin
   list1.destroy;
 end;
 
+procedure tvpelementlist.movetoorigin;
+var
+  dx: vpfloat = 0;
+  dy: vpfloat = 0;
+begin
+  offset(dx, dy);
+  move(dx, dy);
+end;
+
+procedure tvpelementlist.smooth;
+var
+      i: longint;
+  elem0: tvpelement;
+  elem1: tvpelement;
+  elem2: tvpelement;
+     p0: tvppoint;
+     p1: tvppoint;
+     p2: tvppoint;
+     p3: tvppoint;
+     a0: tvpcirclearc;
+  list1: tfplist;
+begin
+  list1 := tfplist.create;
+  if flist.count > 0 then
+  begin
+
+    elem0 := tvpelement(flist[0]);
+    for i := 1 to flist.count -1 do
+    begin
+      elem1 := tvpelement(flist[i]);
+
+      list1.add(elem0);
+      if (elem0 is tvpelementline) and
+         (elem1 is tvpelementline) then
+      begin
+        if itsavertex(
+          tvpelementline(elem0).getfirst^,
+          tvpelementline(elem0).getlast^,
+          tvpelementline(elem1).getlast^) then
+        begin
+          vpmath.smooth(
+            tvpelementline(elem0).fline,
+            tvpelementline(elem1).fline, a0);
+          elem0.interpolate(0.5);
+          elem1.interpolate(0.5);
+
+          elem2        := tvpelementcirclearc.create(a0);
+          elem2.flayer := elem0.flayer;
+          list1.add(elem2);
+        end;
+      end;
+      elem0:= elem1;
+    end;
+
+    //clear;
+    for i := 0 to list1.count -1 do
+      flist.add(list1[i]);
+    list1.destroy;
+    interpolate(0.5);
+  end;
+end;
+
 //  tvppath
 
 constructor tvppath.create;
@@ -1163,6 +1238,7 @@ begin
   flist       := tfplist.create;
   fpathlength := 0;
   fpathraises := 0;
+  fpathvertex := 0;
 end;
 
 destructor tvppath.destroy;
@@ -1183,19 +1259,30 @@ begin
   flist.clear;
   fpathlength := 0;
   fpathraises := 0;
+  fpathvertex := 0;
 end;
 
-procedure tvppath.update(elemlist: tvpelementlist; dxmax, dymax: single);
+procedure tvppath.add(const p: tvppoint);
 var
-    i, j: longint;
-    elem: tvpelement;
-      pp: pvppoint;
-  p0, p1: tvppoint;
-       z: single;
+  pp: pvppoint;
+begin
+  new(pp);
+  pp^ := p;
+  flist.add(pp);
+end;
+
+procedure tvppath.update(elemlist: tvpelementlist; dxmax, dymax: vpfloat);
+var
+  i, j: longint;
+  elem: tvpelement;
+    p0,
+    p1,
+    p2: tvppoint;
+    pz: vpfloat;
 begin
   clear;
 
-   z := setting.zmax;
+  pz := setting.zmax;
   p0 := setting.layout9;
   for i := 0 to elemlist.count -1 do
   begin
@@ -1207,35 +1294,52 @@ begin
       for j := 0 to elem.count -1 do
       begin
         p1 := wave.update(elem.items[j]^);
-
-        if (abs(p1.x) <= (dxmax)) and
-           (abs(p1.y) <= (dymax)) then
-        begin
-          new(pp);
-          pp^ := elem.items[j]^;
-          flist.add(pp);
-
-          if distance_between_two_points(p0, p1) < 0.2 then
+        if not itsthesame(p0, p1) then
+          if (abs(p1.x) <= (dxmax)) and
+             (abs(p1.y) <= (dymax)) then
           begin
-            fpathlength := fpathlength + distance_between_two_points(p0, p1);
+            if distance_between_two_points(p0, p1) < 0.2 then
+            begin
+              fpathlength := fpathlength
+                + distance_between_two_points(p0, p1);
 
-            if z <> setting.zmin then
+              if pz <> setting.zmin then
+              begin
+                pz := setting.zmin;
+                inc(fpathraises);
+              end;
+            end else
             begin
-              z := setting.zmin;
-              inc(fpathraises);
+              if pz <> setting.zmax then
+              begin
+                pz := setting.zmax;
+                inc(fpathraises);
+              end;
             end;
-          end else
-          begin
-            if z <> setting.zmax then
-            begin
-              z := setting.zmax;
-              inc(fpathraises);
-            end;
+            add(elem.items[j]^);
+            p0 := p1;
           end;
-        end;
-        p0 := p1;
       end;
+
       elem.interpolate(0.5);
+    end;
+  end;
+  inc(fpathraises);
+
+  if flist.count > 2 then
+  begin
+    p0 := wave.update(pvppoint(flist[0])^);
+    p1 := wave.update(pvppoint(flist[1])^);
+    for i := 2 to flist.count -1 do
+    begin
+      p2 := wave.update(pvppoint(flist[i])^);
+
+      if itsavertex(p0, p1, p2) then
+      begin
+        inc(fpathvertex);
+      end;
+      p0 := p1;
+      p1 := p2;
     end;
   end;
 end;

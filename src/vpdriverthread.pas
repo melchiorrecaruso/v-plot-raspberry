@@ -111,29 +111,32 @@ end;
 
 procedure tvpdriverthread.execute;
 var
-    i, j: longint;
-      mx: longint = 0;
-      my: longint = 0;
-  p0, p1: tvppoint;
+   i: longint;
+  mx: longint = 0;
+  my: longint = 0;
+  p0,
+  p1,
+  p2: tvppoint;
 begin
   if assigned(onstart) then
     synchronize(fonstart);
 
   p0 := setting.layout9;
+  p1 := setting.layout8;
   for i := 0 to fpath.count -1 do
   begin
     if not terminated then
     begin
-      p1   := wave.update(fpath.items[i]^);
-      p1.x := p1.x + fxcenter;
-      p1.y := p1.y + fycenter;
+      p2   := wave.update(fpath.items[i]^);
+      p2.x := p2.x + fxcenter;
+      p2.y := p2.y + fycenter;
 
-      if distance_between_two_points(p0, p1) < 0.2 then
+      if distance_between_two_points(p1, p2) < 0.2 then
         driver.zcount := setting.zmin
       else
         driver.zcount := setting.zmax;
 
-      optimize(p1, mx, my);
+      optimize(p2, mx, my);
       driver.move(mx, my);
       if assigned(ontick) then
         synchronize(ontick);
@@ -143,6 +146,7 @@ begin
         sleep(250);
       end;
       p0 := p1;
+      p1 := p2;
     end;
   end;
 

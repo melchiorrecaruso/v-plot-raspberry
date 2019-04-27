@@ -32,7 +32,7 @@ type
   tdegres = 0..10;
 
   tpolynome = packed record
-    coefs: array[tdegres] of double;
+    coefs: array[tdegres] of vpfloat;
     deg:   tdegres;
   end;
 
@@ -45,7 +45,7 @@ type
     lcx, lcy: tpolynome;
     fenabled: boolean;
   public
-    constructor create(xmax, ymax: double; const mesh: twavemesh);
+    constructor create(xmax, ymax: vpfloat; const mesh: twavemesh);
     destructor destroy; override;
     function update(const p: tvppoint): tvppoint;
     procedure debug;
@@ -53,7 +53,7 @@ type
     property enabled: boolean read fenabled write fenabled;
   end;
 
-  function polyeval(const apoly: tpolynome; x: double): double;
+  function polyeval(const apoly: tpolynome; x: vpfloat): vpfloat;
 
 var
   wave: twave = nil;
@@ -65,7 +65,7 @@ uses
 
 // polynomial evaluation
 
-function polyeval(const apoly: tpolynome; x: double): double;
+function polyeval(const apoly: tpolynome; x: vpfloat): vpfloat;
 var
   i: tdegres;
 begin
@@ -79,7 +79,7 @@ end;
 
 // twave
 
-constructor twave.create(xmax, ymax: double; const mesh: twavemesh);
+constructor twave.create(xmax, ymax: vpfloat; const mesh: twavemesh);
 var
   a, aa: tvector3_double;
   b, bb: tvector3_double;

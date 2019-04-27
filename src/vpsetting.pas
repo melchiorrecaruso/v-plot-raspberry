@@ -42,24 +42,24 @@ type
     fxinc:      longint;
     fxdelay:    longint;
     fxdir:      longint;
-    fxradius:   single;
-    fxratio:    single;
+    fxradius:   vpfloat;
+    fxratio:    vpfloat;
     // y-axis
     fymin:      longint;
     fymax:      longint;
     fyinc:      longint;
     fydelay:    longint;
     fydir:      longint;
-    fyradius:   single;
-    fyratio:    single;
+    fyradius:   vpfloat;
+    fyratio:    vpfloat;
     // z-axis
     fzmin:      longint;
     fzmax:      longint;
     fzinc:      longint;
     fzdelay:    longint;
     fzdir:      longint;
-    fzradius:   single;
-    fzratio:    single;
+    fzradius:   vpfloat;
+    fzratio:    vpfloat;
     // wave
     fwave0:     tvppoint;
     fwave1:     tvppoint;
@@ -70,8 +70,8 @@ type
     fwave6:     tvppoint;
     fwave7:     tvppoint;
     fwave8:     tvppoint;
-    fwavedxmax: single;
-    fwavedymax: single;
+    fwavedxmax: vpfloat;
+    fwavedymax: vpfloat;
     fwaveoff:   longint;
  public
     constructor create;
@@ -88,24 +88,24 @@ type
     property xinc:      longint  read fxinc;
     property xdelay:    longint  read fxdelay;
     property xdir:      longint  read fxdir;
-    property xradius:   single   read fxradius;
-    property xratio:    single   read fxratio;
+    property xradius:   vpfloat   read fxradius;
+    property xratio:    vpfloat   read fxratio;
 
     property ymin:      longint  read fymin;
     property ymax:      longint  read fymax;
     property yinc:      longint  read fyinc;
     property ydelay:    longint  read fydelay;
     property ydir:      longint  read fydir;
-    property yradius:   single   read fyradius;
-    property yratio:    single   read fyratio;
+    property yradius:   vpfloat   read fyradius;
+    property yratio:    vpfloat   read fyratio;
 
     property zmin:      longint  read fzmin;
     property zmax:      longint  read fzmax;
     property zinc:      longint  read fzinc;
     property zdelay:    longint  read fzdelay;
     property zdir:      longint  read fzdir;
-    property zradius:   single   read fzradius;
-    property zratio:    single   read fzratio;
+    property zradius:   vpfloat   read fzradius;
+    property zratio:    vpfloat   read fzratio;
 
     property wave0:     tvppoint read fwave0;
     property wave1:     tvppoint read fwave1;
@@ -116,8 +116,8 @@ type
     property wave6:     tvppoint read fwave6;
     property wave7:     tvppoint read fwave7;
     property wave8:     tvppoint read fwave8;
-    property wavedxmax: single   read fwavedxmax;
-    property wavedymax: single   read fwavedymax;
+    property wavedxmax: vpfloat   read fwavedxmax;
+    property wavedymax: vpfloat   read fwavedymax;
     property waveoff:   longint  read fwaveoff;
  end;
 

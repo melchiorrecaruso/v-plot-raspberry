@@ -28,7 +28,7 @@ interface
 uses
   bgrabitmap, bgrabitmaptypes, bgragradientscanner,  bgravirtualscreen,
   buttons, classes, comctrls, controls, dialogs, extctrls, forms, graphics,
-  menus, spin, stdctrls, vppaths;
+  menus, spin, stdctrls, vppaths, vpmath;
 
 type
   { tmainform }
@@ -234,7 +234,7 @@ type
    pagewidth: longint;
   pageheight: longint;
         path: tvppath;
-        zoom: single;
+        zoom: vpfloat;
 
    starttime: tdatetime;
    tickcount: longint;
@@ -267,7 +267,7 @@ implementation
 
 uses
   math, sysutils, importfrm, aboutfrm, propertiesfrm,
-  vpdriver, vpdriverthread, vpsketcher, vpmath, vpsvgreader,
+  vpdriver, vpdriverthread, vpsketcher, vpsvgreader,
   vpdxfreader, vpsetting, vpwave;
 
 // FORM EVENTS
@@ -541,9 +541,11 @@ begin
   propertiesform.listbox.additem(format('Points : %12.0u   ', [path.count     ]), nil);
   propertiesform.listbox.additem(format('Length : %12.0f mm', [path.pathlength]), nil);
   propertiesform.listbox.additem(format('Raises : %12.0u   ', [path.pathraises]), nil);
+  propertiesform.listbox.additem(format('Vertex : %12.0u   ', [path.pathvertex]), nil);
   propertiesform.listbox.clearselection;
 
   propertiesform.showmodal;
+  page.smooth;
   unlock2;
 end;
 
