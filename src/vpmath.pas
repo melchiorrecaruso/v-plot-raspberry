@@ -33,8 +33,8 @@ type
 
   pvppoint = ^tvppoint;
   tvppoint = packed record
-    x: double;
-    y: double;
+    x: vpfloat;
+    y: vpfloat;
   end;
 
   pvpline = ^tvpline;
@@ -615,33 +615,86 @@ begin
       result := 0;
 end;
 
+function equation_grade_2_solver(const a, b, c: vpfloat; var t1, t2: vpfloat): longint;
+const
+  err = 0.0001;
+var
+  d: vpfloat;
+begin
+  d := sqr(b)-4*a*c;
+  if d > +err then
+  begin
+    result := 2;
+        t1 := (-b+sqrt(d))/(2*a);
+        t2 := (-b-sqrt(d))/(2*a);
+  end else
+  if d > -err then
+  begin
+    result := 1;
+        t1 := (-b)/(2*a);
+        t2 := t1;
+  end else
+    result := 0;
+end;
+
+
 function intersection_of_line_and_circle(const a0, b0, c0, a1, b1, c1: vpfloat; var p0, p1: tvppoint): longint; inline;
 var
   a, b, c, d: vpfloat;
 begin
-  a := 1 + sqr(b0/a0);
-  b := 2*(b0/a0)*(c0/a0) -(b0/a0)*a1 + b1;
-  c := sqr(c0/a0) -(c0/a0)*a1 + c1;
-  d := sqr(b) -4*a*c;
+  result := 0;
 
-  writeln('determinante=', d);
+  if a0 <> 0 then
+  begin
+    a := 1 + sqr(b0/a0);
+    b := 2*(b0/a0)*(c0/a0) -(b0/a0)*a1 + b1;
+    c := sqr(c0/a0) -(c0/a0)*a1 + c1;
+    d := sqr(b) -4*a*c;
 
-  if d > 0 then
-  begin
-    result := 2;
-      p0.y := (-b+sqrt(d))/(2*a);
-      p0.x := -(b0/a0)*p0.y -(c0/a0);
-      p1.y := (-b-sqrt(d))/(2*a);
-      p1.x := -(b0/a0)*p1.y -(c0/a0);
+    writeln('determinante=', d);
+
+    if d > +0.0001 then
+    begin
+      result := 2;
+        p0.y := (-b+sqrt(d))/(2*a);
+        p0.x := -(b0/a0)*p0.y -(c0/a0);
+        p1.y := (-b-sqrt(d))/(2*a);
+        p1.x := -(b0/a0)*p1.y -(c0/a0);
+    end else
+    if d > -0.0001 then
+    begin
+      result := 1;
+        p0.y := (-b)/(2*a);
+        p0.x := -(b0/a0)*p0.y -(c0/a0);
+          p1 := p0;
+    end;
+
   end else
-  if d = 0 then
+  if b0 <> 0 then
   begin
-    result := 1;
-      p0.y := (-b+sqrt(d))/(2*a);
-      p0.x := -(b0/a0)*p0.y -(c0/a0);
-        p1 := p0;
-  end else
-    result := 0;
+    a := 1;
+    b := a1;
+    c := (c0/b0) -(c0/b0)*b1 +c1;
+    d := sqr(b) -4*a*c;
+
+    writeln('determinante=', d);
+
+    if d > +0.0001 then
+    begin
+      result := 2;
+        p0.x := (-b+sqrt(d))/(2*a);
+        p0.y := -(c0/b0);
+        p1.x := (-b-sqrt(d))/(2*a);
+        p1.x := -(c0/b0);
+    end else
+    if d > -0.0001 then
+    begin
+      result := 1;
+        p0.x := (-b)/(2*a);
+        p0.y := -(c0/b0);
+          p1 := p0;
+    end;
+  end;
 end;
 
 function intersection_of_line_and_circle(const l0: tvplineimp; const c1: tvpcircleimp; var p0, p1: tvppoint): longint; inline;
@@ -707,9 +760,9 @@ begin
   writeln('incenter.radius = ',  rxx:5:4);
 
   j := intersection_of_line_and_circle(l00, cxx, p0, p1);
-  if j <> 1 then raise exception.create('smooth exception (det<0)');
+  if j = 0 then raise exception.create('smooth exception (det<0)');
 
-  writeln('solution-1');
+  writeln('solution-1/',j);
   writeln('p0.x=', p0.x:5:2);
   writeln('p0.y=', p0.y:5:2);
   writeln('p1.x=', p1.x:5:2);
@@ -717,7 +770,7 @@ begin
   l0.p1 := p1;
 
   j := intersection_of_line_and_circle(l11, cxx, p0, p1);
-  if j <> 1 then raise exception.create('smooth exception (det<0)');
+  if j = 0 then raise exception.create('smooth exception (det<0)');
 
   writeln('solution-2');
   writeln('p0.x=', p0.x:5:2);
