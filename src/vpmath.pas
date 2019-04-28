@@ -158,7 +158,7 @@ function intersection_of_two_circles(const c0, c1: tvpcircleimp; var p1, p2: tvp
 
 function itsavertex(const p0, p1, p2: tvppoint): boolean;
 function itsthesame(const p0, p1: tvppoint): boolean;
-procedure smooth(var l0, l1: tvpline; var a0: tvpcirclearc);
+procedure smooth(var l0, l1: tvpline; var a0: tvpcirclearc; const radius: vpfloat);
 
 var
   enabledebug: boolean = false;
@@ -438,11 +438,21 @@ begin
   if line.b = 0 then
   begin
     if line.a > 0 then
-      result := +pi/2
+      result := +1/2*pi
     else
-      result := -pi/2;
+    if line.a < 0 then
+      result := -1/2*pi
+    else
+      result := 0;
   end else
+  begin
     result := arctan2(line.a, -line.b);
+  end;
+
+  if (result < 0) then
+  begin
+    result := result + (2*pi);
+  end;
 end;
 
 // INTERPOLATE
@@ -583,7 +593,7 @@ end;
 function circlearc_by_three_points(cc, p0, p1: tvppoint): tvpcirclearc;
 begin
   result.center     := cc;
-  result.radius     := distance_between_two_points(cc, p1);
+  result.radius     := distance_between_two_points(cc, p0);
   result.startangle := radtodeg(angle(line_by_two_points(cc, p0)));
   result.endangle   := radtodeg(angle(line_by_two_points(cc, p1)));
 end;
@@ -637,64 +647,41 @@ begin
     result := 0;
 end;
 
-
 function intersection_of_line_and_circle(const a0, b0, c0, a1, b1, c1: vpfloat; var p0, p1: tvppoint): longint; inline;
 var
-  a, b, c, d: vpfloat;
+  a, b, c: vpfloat;
 begin
-  result := 0;
-
-  if a0 <> 0 then
+  if (a0 <> 0) and (b0 <> 0) then
   begin
     a := 1 + sqr(b0/a0);
     b := 2*(b0/a0)*(c0/a0) -(b0/a0)*a1 + b1;
     c := sqr(c0/a0) -(c0/a0)*a1 + c1;
-    d := sqr(b) -4*a*c;
 
-    writeln('determinante=', d);
-
-    if d > +0.0001 then
-    begin
-      result := 2;
-        p0.y := (-b+sqrt(d))/(2*a);
-        p0.x := -(b0/a0)*p0.y -(c0/a0);
-        p1.y := (-b-sqrt(d))/(2*a);
-        p1.x := -(b0/a0)*p1.y -(c0/a0);
-    end else
-    if d > -0.0001 then
-    begin
-      result := 1;
-        p0.y := (-b)/(2*a);
-        p0.x := -(b0/a0)*p0.y -(c0/a0);
-          p1 := p0;
-    end;
-
+    result := equation_grade_2_solver(a, b, c, p0.y, p1.y);
+    p0.x := -(b0/a0)*p0.y -(c0/a0);
+    p1.x := -(b0/a0)*p1.y -(c0/a0);
   end else
-  if b0 <> 0 then
+  if (b0 <> 0) then
   begin
     a := 1;
     b := a1;
-    c := (c0/b0) -(c0/b0)*b1 +c1;
-    d := sqr(b) -4*a*c;
+    c := sqr(c0/b0) -(c0/b0)*b1 +c1;
 
-    writeln('determinante=', d);
+    result := equation_grade_2_solver(a, b, c, p0.x, p1.x);
+    p0.y := -(c0/b0);
+    p1.y := -(c0/b0);
+  end else
+  if (a0 <> 0) then
+  begin
+    a := 1;
+    b := b1;
+    c := sqr(c0/a0) -(c0/a0)*a1 +c1;
 
-    if d > +0.0001 then
-    begin
-      result := 2;
-        p0.x := (-b+sqrt(d))/(2*a);
-        p0.y := -(c0/b0);
-        p1.x := (-b-sqrt(d))/(2*a);
-        p1.x := -(c0/b0);
-    end else
-    if d > -0.0001 then
-    begin
-      result := 1;
-        p0.x := (-b)/(2*a);
-        p0.y := -(c0/b0);
-          p1 := p0;
-    end;
-  end;
+    result := equation_grade_2_solver(a, b, c, p0.y, p1.y);
+    p0.x := -(c0/a0);
+    p1.x := -(c0/a0);
+  end else
+    result := 0;
 end;
 
 function intersection_of_line_and_circle(const l0: tvplineimp; const c1: tvpcircleimp; var p0, p1: tvppoint): longint; inline;
@@ -726,16 +713,21 @@ begin
   result.y := (aa*a.y+bb*b.y+cc*c.y)/(aa+bb+cc);
 end;
 
-procedure smooth(var l0, l1: tvpline; var a0: tvpcirclearc);
+procedure smooth(var l0, l1: tvpline; var a0: tvpcirclearc; const radius: vpfloat);
 var
     j: longint;
   l00: tvplineimp;
   l11: tvplineimp;
    p0: tvppoint;
    p1: tvppoint;
+   t0: tvppoint;
+   t1: tvppoint;
    xx: tvppoint;
   cxx: tvpcircleimp;
-  rxx: vpfloat;
+  c00: tvpcircleimp;
+  c11: tvpcircleimp;
+
+  sweep: vpfloat;
 begin
   if not itsthesame(l0.p1, l1.p0) then exit;
 
@@ -748,39 +740,69 @@ begin
   writeln('l1.p0.y=', l1.p0.y:5:2);
   writeln('l1.p1.x=', l1.p1.x:5:2);
   writeln('l1.p1.y=', l1.p1.y:5:2);
+  writeln(' radius=',  radius:5:2);
 
-   xx := incenter(l0.p0, l0.p1, l1.p1);
   l00 := line_by_two_points(l0.p0, l0.p1);
   l11 := line_by_two_points(l1.p0, l1.p1);
-  rxx := distance_from_point_and_line(xx, l00);
-  cxx := circle_by_center_and_radius (xx, rxx);
+  cxx := circle_by_center_and_radius (l0.p1, radius);
 
-  writeln('incenter.x      = ', xx.x:5:4);
-  writeln('incenter.y      = ', xx.y:5:4);
-  writeln('incenter.radius = ',  rxx:5:4);
+  j := intersection_of_line_and_circle(l00, cxx, t0, t1);
+  if j = 0 then raise exception.create('smooth exception 1 (det<0)');
+  if distance_between_two_points(l0.p0, t0) <
+     distance_between_two_points(l0.p0, t1) then
+    p0 := t0
+  else
+    p0 := t1;
 
-  j := intersection_of_line_and_circle(l00, cxx, p0, p1);
-  if j = 0 then raise exception.create('smooth exception (det<0)');
-
-  writeln('solution-1/',j);
+  c00 := circle_by_center_and_radius(p0, radius);
+  writeln('punto intersezione l0, num sol=', j);
   writeln('p0.x=', p0.x:5:2);
   writeln('p0.y=', p0.y:5:2);
+
+  j := intersection_of_line_and_circle(l11, cxx, t0, t1);
+  if j = 0 then raise exception.create('smooth exception 2 (det<0)');
+  if distance_between_two_points(l1.p1, t0) <
+     distance_between_two_points(l1.p1, t1) then
+    p1 := t0
+  else
+    p1 := t1;
+
+  c11 := circle_by_center_and_radius(p1, radius);
+  writeln('punto intersezione l1, num sol=', j);
   writeln('p1.x=', p1.x:5:2);
   writeln('p1.y=', p1.y:5:2);
-  l0.p1 := p1;
 
-  j := intersection_of_line_and_circle(l11, cxx, p0, p1);
-  if j = 0 then raise exception.create('smooth exception (det<0)');
+  j := intersection_of_two_circles(c00, c11, t0, t1);
+  if j = 0 then raise exception.create('smooth exception 3 (det<0)');
+  if itsthesame(l0.p1, t1) then
+    xx := t0
+  else
+    xx := t1;
 
-  writeln('solution-2');
-  writeln('p0.x=', p0.x:5:2);
-  writeln('p0.y=', p0.y:5:2);
-  writeln('p1.x=', p1.x:5:2);
-  writeln('p1.y=', p1.y:5:2);
-  l1.p0 := p0;
-     a0 := circlearc_by_three_points(xx, l0.p1, l1.p0);
+  a0 := circlearc_by_three_points(xx, p0, p1);
 
-  writeln('len.arc=', length(a0):5:2);
+  writeln('arc.start1= ', a0.startangle:5:4);
+  writeln('arc.end1  = ', a0.endangle  :5:4);
+
+
+  if abs(a0.endangle-a0.startangle) > 180 then
+  begin
+    sweep := 360 - abs(a0.endangle-a0.startangle);
+
+    if (a0.endangle-a0.startangle) > 0 then
+    begin
+      a0.endangle   := a0.startangle - sweep;
+    end else
+    begin
+      a0.endangle   := a0.startangle + sweep;
+    end;
+  end;
+
+  writeln('arc.x      = ',          xx.x:5:4);
+  writeln('arc.y      = ',          xx.y:5:4);
+  writeln('arc.radius = ',     a0.radius:5:4);
+  writeln('arc.start  = ', a0.startangle:5:4);
+  writeln('arc.end    = ', a0.endangle  :5:4);
 end;
 
 // init unit

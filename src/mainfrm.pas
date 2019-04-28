@@ -545,7 +545,6 @@ begin
   propertiesform.listbox.clearselection;
 
   propertiesform.showmodal;
-  page.smooth;
   unlock2;
 end;
 

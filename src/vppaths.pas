@@ -1183,23 +1183,22 @@ var
   elem0: tvpelement;
   elem1: tvpelement;
   elem2: tvpelement;
-     p0: tvppoint;
-     p1: tvppoint;
-     p2: tvppoint;
-     p3: tvppoint;
      a0: tvpcirclearc;
   list1: tfplist;
+
 begin
   list1 := tfplist.create;
+
+
   if flist.count > 0 then
   begin
-
     elem0 := tvpelement(flist[0]);
-    for i := 1 to flist.count -1 do
+
+    i := 0;
+    while i < flist.count do
     begin
       elem1 := tvpelement(flist[i]);
 
-      list1.add(elem0);
       if (elem0 is tvpelementline) and
          (elem1 is tvpelementline) then
       begin
@@ -1210,24 +1209,46 @@ begin
         begin
           vpmath.smooth(
             tvpelementline(elem0).fline,
-            tvpelementline(elem1).fline, a0);
-          elem0.interpolate(0.5);
-          elem1.interpolate(0.5);
+            tvpelementline(elem1).fline, a0, 0.4);
 
           elem2        := tvpelementcirclearc.create(a0);
           elem2.flayer := elem0.flayer;
+          elem2.interpolate(0.5);
+
           list1.add(elem2);
         end;
       end;
       elem0:= elem1;
+      inc(i);
     end;
 
-    //clear;
+    elem1 := tvpelement(flist[0]);
+    if (elem0 is tvpelementline) and
+       (elem1 is tvpelementline) then
+    begin
+      if itsavertex(
+        tvpelementline(elem0).getfirst^,
+        tvpelementline(elem0).getlast^,
+        tvpelementline(elem1).getlast^) then
+      begin
+        vpmath.smooth(
+          tvpelementline(elem0).fline,
+          tvpelementline(elem1).fline, a0, 0.4);
+
+        elem2        := tvpelementcirclearc.create(a0);
+        elem2.flayer := elem0.flayer;
+
+        list1.add(elem2);
+      end;
+    end;
+
     for i := 0 to list1.count -1 do
       flist.add(list1[i]);
-    list1.destroy;
-    interpolate(0.5);
+    list1.clear;
+    interpolate(0.1);
   end;
+
+  list1.destroy;
 end;
 
 //  tvppath
