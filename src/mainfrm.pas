@@ -290,22 +290,28 @@ begin
   driver.xdelay := setting.xdelay;
   driver.ydelay := setting.ydelay;
   driver.zdelay := setting.zdelay;
-  // init wave
-  wavemesh[0] := setting.wave0;
-  wavemesh[1] := setting.wave1;
-  wavemesh[2] := setting.wave2;
-  wavemesh[3] := setting.wave3;
-  wavemesh[4] := setting.wave4;
-  wavemesh[5] := setting.wave5;
-  wavemesh[6] := setting.wave6;
-  wavemesh[7] := setting.wave7;
-  wavemesh[8] := setting.wave8;
-  wave := twave.create(
-    setting.wavedxmax,
-    setting.wavedymax,
+  // init space wave
+  wavemesh[0] := setting.spacewave0;
+  wavemesh[1] := setting.spacewave1;
+  wavemesh[2] := setting.spacewave2;
+  wavemesh[3] := setting.spacewave3;
+  wavemesh[4] := setting.spacewave4;
+  wavemesh[5] := setting.spacewave5;
+  wavemesh[6] := setting.spacewave6;
+  wavemesh[7] := setting.spacewave7;
+  wavemesh[8] := setting.spacewave8;
+  spacewave := tspacewave.create(
+    setting.spacewavedxmax,
+    setting.spacewavedymax,
     wavemesh);
-  wave.enabled := setting.waveoff = 1;
-  wave.debug;
+  spacewave.enabled := setting.spacewaveoff = 1;
+  spacewave.debug;
+  // init time wave
+  timewave := ttimewave.create(
+    setting.timewavefactor,
+    setting.xdelay,
+    setting.ydelay);
+  timewave.enabled := setting.timewaveoff = 1;
   // create preview and empty path
    bit := tbgrabitmap.create;
   page := tvpelementlist.create;
@@ -329,7 +335,8 @@ begin
   page.destroy;
   path.destroy;
   //
-  wave.destroy;
+  timewave.destroy;
+  spacewave.destroy;
   driver.destroy;
   setting.destroy;
 end;

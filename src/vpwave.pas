@@ -38,7 +38,7 @@ type
 
   twavemesh = array[0..8] of tvppoint;
 
-  twave = class
+  tspacewave = class
   private
     lax, lay: tpolynome;
     lbx, lby: tpolynome;
@@ -53,10 +53,26 @@ type
     property enabled: boolean read fenabled write fenabled;
   end;
 
+  ttimewave = class
+  private
+    fdxdelay: longint;
+    fdydelay: longint;
+    ffactor:  vpfloat;
+    fenabled: boolean;
+  public
+    constructor create(factor: vpfloat; dxdelay, dydelay: longint);
+    destructor destroy; override;
+    function getdxdelay(const p: tvppoint): longint;
+    function getdydelay(const p: tvppoint): longint;
+  published
+    property enabled: boolean read fenabled write fenabled;
+  end;
+
   function polyeval(const apoly: tpolynome; x: vpfloat): vpfloat;
 
 var
-  wave: twave = nil;
+  spacewave: tspacewave = nil;
+   timewave:  ttimewave = nil;
 
 implementation
 
@@ -77,9 +93,9 @@ begin
   end;
 end;
 
-// twave
+// tspacewave
 
-constructor twave.create(xmax, ymax: vpfloat; const mesh: twavemesh);
+constructor tspacewave.create(xmax, ymax: vpfloat; const mesh: twavemesh);
 var
   a, aa: tvector3_double;
   b, bb: tvector3_double;
@@ -148,12 +164,12 @@ begin
   fenabled     := true;
 end;
 
-destructor twave.destroy;
+destructor tspacewave.destroy;
 begin
   inherited destroy;
 end;
 
-function twave.update(const p: tvppoint): tvppoint;
+function tspacewave.update(const p: tvppoint): tvppoint;
 var
   ly, lx: tpolynome;
 begin
@@ -178,7 +194,7 @@ begin
   end;
 end;
 
-procedure twave.debug;
+procedure tspacewave.debug;
 var
   p0,p1: tvppoint;
 
@@ -191,16 +207,42 @@ end;
 begin
   if enabledebug then
   begin
-    p0.x := -594.5;  p0.y := +420.5;  p1 := wave.update(p0);  test_print;
-    p0.x := +0.000;  p0.y := +420.5;  p1 := wave.update(p0);  test_print;
-    p0.x := +594.5;  p0.y := +420.5;  p1 := wave.update(p0);  test_print;
-    p0.x := -594.5;  p0.y := +0.000;  p1 := wave.update(p0);  test_print;
-    p0.x := +0.000;  p0.y := +0.000;  p1 := wave.update(p0);  test_print;
-    p0.x := +594.5;  p0.y := +0.000;  p1 := wave.update(p0);  test_print;
-    p0.x := -594.5;  p0.y := -420.5;  p1 := wave.update(p0);  test_print;
-    p0.x := +0.000;  p0.y := -420.5;  p1 := wave.update(p0);  test_print;
-    p0.x := +594.5;  p0.y := -420.5;  p1 := wave.update(p0);  test_print;
+    p0.x := -594.5;  p0.y := +420.5;  p1 := update(p0);  test_print;
+    p0.x := +0.000;  p0.y := +420.5;  p1 := update(p0);  test_print;
+    p0.x := +594.5;  p0.y := +420.5;  p1 := update(p0);  test_print;
+    p0.x := -594.5;  p0.y := +0.000;  p1 := update(p0);  test_print;
+    p0.x := +0.000;  p0.y := +0.000;  p1 := update(p0);  test_print;
+    p0.x := +594.5;  p0.y := +0.000;  p1 := update(p0);  test_print;
+    p0.x := -594.5;  p0.y := -420.5;  p1 := update(p0);  test_print;
+    p0.x := +0.000;  p0.y := -420.5;  p1 := update(p0);  test_print;
+    p0.x := +594.5;  p0.y := -420.5;  p1 := update(p0);  test_print;
   end;
+end;
+
+// ttimewave
+
+constructor ttimewave.create(factor: vpfloat; dxdelay, dydelay: longint);
+begin
+  inherited create;
+  fdxdelay := dxdelay;
+  fdydelay := dydelay;
+  ffactor  := factor;
+  fenabled := false;
+end;
+
+destructor ttimewave.destroy;
+begin
+  inherited destroy;
+end;
+
+function ttimewave.getdxdelay(const p: tvppoint): longint;
+begin
+  result := fdxdelay + round(p.x*ffactor);
+end;
+
+function ttimewave.getdydelay(const p: tvppoint): longint;
+begin
+  result := fdydelay + round(p.y*ffactor);
 end;
 
 end.

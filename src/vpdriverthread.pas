@@ -127,7 +127,10 @@ begin
   begin
     if not terminated then
     begin
-      p2   := wave.update(fpath.items[i]^);
+      p2 := spacewave.update(fpath.items[i]^);
+      driver.xdelay := timewave.getdxdelay(p2);
+      driver.ydelay := timewave.getdydelay(p2);
+
       p2.x := p2.x + fxcenter;
       p2.y := p2.y + fycenter;
 

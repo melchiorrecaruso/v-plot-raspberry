@@ -60,65 +60,71 @@ type
     fzdir:      longint;
     fzradius:   vpfloat;
     fzratio:    vpfloat;
-    // wave
-    fwave0:     tvppoint;
-    fwave1:     tvppoint;
-    fwave2:     tvppoint;
-    fwave3:     tvppoint;
-    fwave4:     tvppoint;
-    fwave5:     tvppoint;
-    fwave6:     tvppoint;
-    fwave7:     tvppoint;
-    fwave8:     tvppoint;
-    fwavedxmax: vpfloat;
-    fwavedymax: vpfloat;
-    fwaveoff:   longint;
+    // time wave
+    ftimewavefactor: vpfloat;
+    ftimewaveoff:    longint;
+    // space wave
+    fspacewave0:     tvppoint;
+    fspacewave1:     tvppoint;
+    fspacewave2:     tvppoint;
+    fspacewave3:     tvppoint;
+    fspacewave4:     tvppoint;
+    fspacewave5:     tvppoint;
+    fspacewave6:     tvppoint;
+    fspacewave7:     tvppoint;
+    fspacewave8:     tvppoint;
+    fspacewavedxmax: vpfloat;
+    fspacewavedymax: vpfloat;
+    fspacewaveoff:   longint;
  public
     constructor create;
     destructor  destroy; override;
     procedure   load(const filename: rawbytestring);
  public
-    property layout0:   tvppoint read flayout0;
-    property layout1:   tvppoint read flayout1;
-    property layout8:   tvppoint read flayout8;
-    property layout9:   tvppoint read flayout9;
+    property layout0:        tvppoint read flayout0;
+    property layout1:        tvppoint read flayout1;
+    property layout8:        tvppoint read flayout8;
+    property layout9:        tvppoint read flayout9;
 
-    property xmin:      longint  read fxmin;
-    property xmax:      longint  read fxmax;
-    property xinc:      longint  read fxinc;
-    property xdelay:    longint  read fxdelay;
-    property xdir:      longint  read fxdir;
-    property xradius:   vpfloat   read fxradius;
-    property xratio:    vpfloat   read fxratio;
+    property xmin:           longint  read fxmin;
+    property xmax:           longint  read fxmax;
+    property xinc:           longint  read fxinc;
+    property xdelay:         longint  read fxdelay;
+    property xdir:           longint  read fxdir;
+    property xradius:        vpfloat  read fxradius;
+    property xratio:         vpfloat  read fxratio;
 
-    property ymin:      longint  read fymin;
-    property ymax:      longint  read fymax;
-    property yinc:      longint  read fyinc;
-    property ydelay:    longint  read fydelay;
-    property ydir:      longint  read fydir;
-    property yradius:   vpfloat   read fyradius;
-    property yratio:    vpfloat   read fyratio;
+    property ymin:           longint  read fymin;
+    property ymax:           longint  read fymax;
+    property yinc:           longint  read fyinc;
+    property ydelay:         longint  read fydelay;
+    property ydir:           longint  read fydir;
+    property yradius:        vpfloat  read fyradius;
+    property yratio:         vpfloat  read fyratio;
 
-    property zmin:      longint  read fzmin;
-    property zmax:      longint  read fzmax;
-    property zinc:      longint  read fzinc;
-    property zdelay:    longint  read fzdelay;
-    property zdir:      longint  read fzdir;
-    property zradius:   vpfloat   read fzradius;
-    property zratio:    vpfloat   read fzratio;
+    property zmin:           longint  read fzmin;
+    property zmax:           longint  read fzmax;
+    property zinc:           longint  read fzinc;
+    property zdelay:         longint  read fzdelay;
+    property zdir:           longint  read fzdir;
+    property zradius:        vpfloat  read fzradius;
+    property zratio:         vpfloat  read fzratio;
 
-    property wave0:     tvppoint read fwave0;
-    property wave1:     tvppoint read fwave1;
-    property wave2:     tvppoint read fwave2;
-    property wave3:     tvppoint read fwave3;
-    property wave4:     tvppoint read fwave4;
-    property wave5:     tvppoint read fwave5;
-    property wave6:     tvppoint read fwave6;
-    property wave7:     tvppoint read fwave7;
-    property wave8:     tvppoint read fwave8;
-    property wavedxmax: vpfloat   read fwavedxmax;
-    property wavedymax: vpfloat   read fwavedymax;
-    property waveoff:   longint  read fwaveoff;
+    property timewavefactor: vpfloat  read ftimewavefactor;
+    property timewaveoff:    longint  read ftimewaveoff;
+
+    property spacewave0:     tvppoint read fspacewave0;
+    property spacewave1:     tvppoint read fspacewave1;
+    property spacewave2:     tvppoint read fspacewave2;
+    property spacewave3:     tvppoint read fspacewave3;
+    property spacewave4:     tvppoint read fspacewave4;
+    property spacewave5:     tvppoint read fspacewave5;
+    property spacewave6:     tvppoint read fspacewave6;
+    property spacewave7:     tvppoint read fspacewave7;
+    property spacewave8:     tvppoint read fspacewave8;
+    property spacewavedxmax: vpfloat  read fspacewavedxmax;
+    property spacewavedymax: vpfloat  read fspacewavedymax;
+    property spacewaveoff:   longint  read fspacewaveoff;
  end;
 
 var
@@ -175,27 +181,30 @@ begin
   fzdir        := ini.readinteger('Z-AXIS',  'DIR',    0);
   fzradius     := ini.readfloat  ('Z-AXIS',  'RADIUS', 0);
 
-  fwave0.x     := ini.readfloat  ('WAVE',    'W0.X',   0);
-  fwave0.y     := ini.readfloat  ('WAVE',    'W0.Y',   0);
-  fwave1.x     := ini.readfloat  ('WAVE',    'W1.X',   0);
-  fwave1.y     := ini.readfloat  ('WAVE',    'W1.Y',   0);
-  fwave2.x     := ini.readfloat  ('WAVE',    'W2.X',   0);
-  fwave2.y     := ini.readfloat  ('WAVE',    'W2.Y',   0);
-  fwave3.x     := ini.readfloat  ('WAVE',    'W3.X',   0);
-  fwave3.y     := ini.readfloat  ('WAVE',    'W3.Y',   0);
-  fwave4.x     := ini.readfloat  ('WAVE',    'W4.X',   0);
-  fwave4.y     := ini.readfloat  ('WAVE',    'W4.Y',   0);
-  fwave5.x     := ini.readfloat  ('WAVE',    'W5.X',   0);
-  fwave5.y     := ini.readfloat  ('WAVE',    'W5.Y',   0);
-  fwave6.x     := ini.readfloat  ('WAVE',    'W6.X',   0);
-  fwave6.y     := ini.readfloat  ('WAVE',    'W6.Y',   0);
-  fwave7.x     := ini.readfloat  ('WAVE',    'W7.X',   0);
-  fwave7.y     := ini.readfloat  ('WAVE',    'W7.Y',   0);
-  fwave8.x     := ini.readfloat  ('WAVE',    'W8.X',   0);
-  fwave8.y     := ini.readfloat  ('WAVE',    'W8.Y',   0);
-  fwavedxmax   := ini.readfloat  ('WAVE',    'DXMAX',  0);
-  fwavedymax   := ini.readfloat  ('WAVE',    'DYMAX',  0);
-  fwaveoff     := ini.readinteger('WAVE',    'OFF',    0);
+  fspacewave0.x     := ini.readfloat  ('SPACE-WAVE',   '00.X',   0);
+  fspacewave0.y     := ini.readfloat  ('SPACE-WAVE',   '00.Y',   0);
+  fspacewave1.x     := ini.readfloat  ('SPACE-WAVE',   '01.X',   0);
+  fspacewave1.y     := ini.readfloat  ('SPACE-WAVE',   '01.Y',   0);
+  fspacewave2.x     := ini.readfloat  ('SPACE-WAVE',   '02.X',   0);
+  fspacewave2.y     := ini.readfloat  ('SPACE-WAVE',   '02.Y',   0);
+  fspacewave3.x     := ini.readfloat  ('SPACE-WAVE',   '03.X',   0);
+  fspacewave3.y     := ini.readfloat  ('SPACE-WAVE',   '03.Y',   0);
+  fspacewave4.x     := ini.readfloat  ('SPACE-WAVE',   '04.X',   0);
+  fspacewave4.y     := ini.readfloat  ('SPACE-WAVE',   '04.Y',   0);
+  fspacewave5.x     := ini.readfloat  ('SPACE-WAVE',   '05.X',   0);
+  fspacewave5.y     := ini.readfloat  ('SPACE-WAVE',   '05.Y',   0);
+  fspacewave6.x     := ini.readfloat  ('SPACE-WAVE',   '06.X',   0);
+  fspacewave6.y     := ini.readfloat  ('SPACE-WAVE',   '06.Y',   0);
+  fspacewave7.x     := ini.readfloat  ('SPACE-WAVE',   '07.X',   0);
+  fspacewave7.y     := ini.readfloat  ('SPACE-WAVE',   '07.Y',   0);
+  fspacewave8.x     := ini.readfloat  ('SPACE-WAVE',   '08.X',   0);
+  fspacewave8.y     := ini.readfloat  ('SPACE-WAVE',   '08.Y',   0);
+  fspacewavedxmax   := ini.readfloat  ('SPACE-WAVE',   'DXMAX',  0);
+  fspacewavedymax   := ini.readfloat  ('SPACE-WAVE',   'DYMAX',  0);
+  fspacewaveoff     := ini.readinteger('SPACE-WAVE',   'OFF',    0);
+
+  ftimewavefactor   := ini.readfloat  ('TIME-WAVE',    'FACTOR', 0);
+  ftimewaveoff      := ini.readinteger('TIME-WAVE',    'OFF',    0);
 
   if enabledebug then
   begin
@@ -228,18 +237,21 @@ begin
     writeln(format('  Z-AXIS::RADIUS = %12.5f', [fzradius ]));
     writeln(format('  Z-AXIS::RATIO  = %12.5f', [fzratio  ]));
 
-    writeln(format('    WAVE::W0.X   = %12.5f  0.Y = %12.5f', [fwave0.x, fwave0.y]));
-    writeln(format('    WAVE::W1.X   = %12.5f  1.Y = %12.5f', [fwave1.x, fwave1.y]));
-    writeln(format('    WAVE::W2.X   = %12.5f  2.Y = %12.5f', [fwave2.x, fwave2.y]));
-    writeln(format('    WAVE::W3.X   = %12.5f  3.Y = %12.5f', [fwave3.x, fwave3.y]));
-    writeln(format('    WAVE::W4.X   = %12.5f  4.Y = %12.5f', [fwave4.x, fwave4.y]));
-    writeln(format('    WAVE::W5.X   = %12.5f  5.Y = %12.5f', [fwave5.x, fwave5.y]));
-    writeln(format('    WAVE::W6.X   = %12.5f  6.Y = %12.5f', [fwave6.x, fwave6.y]));
-    writeln(format('    WAVE::W7.X   = %12.5f  7.Y = %12.5f', [fwave7.x, fwave7.y]));
-    writeln(format('    WAVE::W8.X   = %12.5f  8.Y = %12.5f', [fwave8.x, fwave8.y]));
-    writeln(format('    WAVE::DXMAX  = %12.5f', [fwavedxmax]));
-    writeln(format('    WAVE::DYMAX  = %12.5f', [fwavedymax]));
-    writeln(format('    WAVE::OFF    = %12.5u', [fwaveoff  ]));
+    writeln(format(' SPACE-W::00.X   = %12.5f  00.Y = %12.5f', [fspacewave0.x, fspacewave0.y]));
+    writeln(format(' SPACE-W::01.X   = %12.5f  01.Y = %12.5f', [fspacewave1.x, fspacewave1.y]));
+    writeln(format(' SPACE-W::02.X   = %12.5f  02.Y = %12.5f', [fspacewave2.x, fspacewave2.y]));
+    writeln(format(' SPACE-W::03.X   = %12.5f  03.Y = %12.5f', [fspacewave3.x, fspacewave3.y]));
+    writeln(format(' SPACE-W::04.X   = %12.5f  04.Y = %12.5f', [fspacewave4.x, fspacewave4.y]));
+    writeln(format(' SPACE-W::05.X   = %12.5f  05.Y = %12.5f', [fspacewave5.x, fspacewave5.y]));
+    writeln(format(' SPACE-W::06.X   = %12.5f  06.Y = %12.5f', [fspacewave6.x, fspacewave6.y]));
+    writeln(format(' SPACE-W::07.X   = %12.5f  07.Y = %12.5f', [fspacewave7.x, fspacewave7.y]));
+    writeln(format(' SPACE-W::08.X   = %12.5f  08.Y = %12.5f', [fspacewave8.x, fspacewave8.y]));
+    writeln(format(' SPACE-W::DXMAX  = %12.5f',                [fspacewavedxmax]));
+    writeln(format(' SPACE-W::DYMAX  = %12.5f',                [fspacewavedymax]));
+    writeln(format(' SPACE-W::OFF    = %12.5u',                [fspacewaveoff  ]));
+
+    writeln(format('  TIME-W::FACTOR = %12.5f',                [ftimewavefactor]));
+    writeln(format('  TIME-W::OFF    = %12.5u',                [ftimewaveoff   ]));
   end;
   ini.destroy;
 end;

@@ -1314,7 +1314,7 @@ begin
 
       for j := 0 to elem.count -1 do
       begin
-        p1 := wave.update(elem.items[j]^);
+        p1 := spacewave.update(elem.items[j]^);
         if not itsthesame(p0, p1) then
           if (abs(p1.x) <= (dxmax)) and
              (abs(p1.y) <= (dymax)) then
@@ -1349,11 +1349,11 @@ begin
 
   if flist.count > 2 then
   begin
-    p0 := wave.update(pvppoint(flist[0])^);
-    p1 := wave.update(pvppoint(flist[1])^);
+    p0 := spacewave.update(pvppoint(flist[0])^);
+    p1 := spacewave.update(pvppoint(flist[1])^);
     for i := 2 to flist.count -1 do
     begin
-      p2 := wave.update(pvppoint(flist[i])^);
+      p2 := spacewave.update(pvppoint(flist[i])^);
 
       if itsavertex(p0, p1, p2) then
       begin
