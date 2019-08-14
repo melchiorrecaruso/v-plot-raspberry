@@ -31,13 +31,13 @@ uses
 type
   tvpdriverthread = class(tthread)
   private
-    fenabled:   boolean;
-    fxcenter:   double;
-    fycenter:   double;
-    fpath:      tvppath;
-    fonstart:   tthreadmethod;
-    fonstop:    tthreadmethod;
-    fontick:    tthreadmethod;
+    fenabled: boolean;
+    fonstart: tthreadmethod;
+    fonstop:  tthreadmethod;
+    fontick:  tthreadmethod;
+    fxcenter: double;
+    fycenter: double;
+    fpath:    tvppath;
   protected
     procedure execute; override;
   public
@@ -45,28 +45,25 @@ type
     destructor destroy; override;
   public
     property enabled: boolean       read fenabled write fenabled;
-    property xcenter: double        read fxcenter write fxcenter;
-    property ycenter: double        read fycenter write fycenter;
     property onstart: tthreadmethod read fonstart write fonstart;
     property onstop:  tthreadmethod read fonstop  write fonstop;
     property ontick:  tthreadmethod read fontick  write fontick;
+    property xcenter: double        read fxcenter write fxcenter;
+    property ycenter: double        read fycenter write fycenter;
   end;
 
-  procedure optimize(const p: tvppoint; out mx, my: longint);
+  procedure optimize (const p: tvppoint; out mx, my: longint);
 
 var
   driverthread: tvpdriverthread = nil;
 
-
 implementation
-
-uses
-  math;
 
 procedure optimize(const p: tvppoint; out mx, my: longint); inline;
 var
+      a0, a1: vpfloat;
   cx, cy, ct: tvpcircleimp;
-      lx, ly: double;
+      lx, ly: vpfloat;
   sx, sy, st: tvppoint;
       tx, ty: tvppoint;
 begin
@@ -78,14 +75,16 @@ begin
   ct := circle_by_center_and_radius(p, lx);
   if intersection_of_two_circles(cx, ct, sx, st) = 0 then
     raise exception.create('intersection_of_two_circles [c0c2]');
-  lx := lx + angle(line_by_two_points(sx, tx))*setting.xradius;
+  a0 := angle(line_by_two_points(sx, tx));
+  lx := lx + a0*setting.xradius;
   //find tangent point ty
   ly := sqrt(sqr(distance_between_two_points(ty, p))-sqr(setting.yradius));
   cy := circle_by_center_and_radius(ty, setting.yradius);
   ct := circle_by_center_and_radius(p, ly);
   if intersection_of_two_circles(cy, ct, sy, st) = 0 then
     raise exception.create('intersection_of_two_circles [c1c2]');
-  ly := ly + (pi-angle(line_by_two_points(sy, ty)))*setting.yradius;
+  a1 := pi-angle(line_by_two_points(sy, ty));
+  ly := ly + a1*setting.yradius;
   // calculate steps
   mx := round(lx/setting.xratio);
   my := round(ly/setting.yratio);

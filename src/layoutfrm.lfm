@@ -1,0 +1,99 @@
+object layoutform: Tlayoutform
+  Left = 379
+  Height = 410
+  Top = 125
+  Width = 734
+  Caption = 'VPlot - Layout'
+  ClientHeight = 410
+  ClientWidth = 734
+  LCLVersion = '2.1.0.0'
+  object distancese: TSpinEdit
+    AnchorSideLeft.Control = distancelb
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = Owner
+    Left = 190
+    Height = 23
+    Top = 6
+    Width = 115
+    Alignment = taRightJustify
+    BorderSpacing.Left = 10
+    BorderSpacing.Top = 6
+    MaxValue = 10000
+    MinValue = 1000
+    TabOrder = 0
+    Value = 2500
+  end
+  object BitBtn1: TBitBtn
+    AnchorSideLeft.Control = distancese
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = distancese
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = distancese
+    AnchorSideBottom.Side = asrBottom
+    Left = 315
+    Height = 23
+    Top = 6
+    Width = 409
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Left = 10
+    BorderSpacing.Right = 10
+    Caption = 'Draw'
+    OnClick = drawbtnClick
+    TabOrder = 1
+  end
+  object distancelb: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = distancese
+    AnchorSideBottom.Control = distancese
+    AnchorSideBottom.Side = asrBottom
+    Left = 10
+    Height = 23
+    Top = 6
+    Width = 170
+    Anchors = [akTop, akLeft, akBottom]
+    BorderSpacing.Left = 10
+    Caption = 'Distance between motors (mm):'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object Bevel1: TBevel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = distancese
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Side = asrCenter
+    Left = 10
+    Height = 2
+    Top = 35
+    Width = 714
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Left = 10
+    BorderSpacing.Top = 6
+    BorderSpacing.Right = 10
+  end
+  object Image: TImage
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = Bevel1
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 2
+    Height = 365
+    Top = 43
+    Width = 730
+    AntialiasingMode = amOn
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Left = 2
+    BorderSpacing.Top = 6
+    BorderSpacing.Right = 2
+    BorderSpacing.Bottom = 2
+    Center = True
+    Proportional = True
+    Stretch = True
+    StretchOutEnabled = False
+  end
+end

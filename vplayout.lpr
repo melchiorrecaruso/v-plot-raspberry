@@ -1,7 +1,7 @@
 {
-  Description: vPlot info form.
+  Description: vPlot layout app.
 
-  Copyright (C) 2017-2019 Melchiorre Caruso <melchiorrecaruso@gmail.com>
+  Copyright (C) 2019 Melchiorre Caruso <melchiorrecaruso@gmail.com>
 
   This source is free software; you can redistribute it and/or modify it under
   the terms of the GNU General Public License as published by the Free
@@ -11,7 +11,7 @@
   This code is distributed in the hope that it will be useful, but WITHOUT ANY
   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
   FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-  listb.
+  details.
 
   A copy of the GNU General Public License is available on the World Wide Web
   at <http://www.gnu.org/copyleft/gpl.html>. You can also obtain it by writing
@@ -19,33 +19,20 @@
   MA 02111-1307, USA.
 }
 
-
-unit propertiesfrm;
+program vplayout;
 
 {$mode objfpc}
 
-interface
-
 uses
-  classes, sysutils, forms, controls, graphics, dialogs, extctrls, buttons, stdctrls;
+  {$ifdef unix} cthreads, {$endif} interfaces, forms, layoutfrm;
 
-type
-  { tpropertiesform }
+{$R *.res}
 
-  tpropertiesform = class(tform)
-    listbox: tlistbox;
-  private
-  public
-  end;
-
-var
-  propertiesform: tpropertiesform;
-
-implementation
-
-{$R *.lfm}
-
-{ tpropertiesform }
-
+begin
+  requirederivedformresource := true;
+  application.scaled := true;
+  application.initialize;
+  application.createform(tlayoutform, layoutform);
+  application.run;
 end.
 

@@ -29,7 +29,7 @@ uses
   classes, sysutils, math;
 
 type
-  vpfloat   = double;
+  vpfloat  = double;
 
   pvppoint = ^tvppoint;
   tvppoint = packed record
@@ -83,7 +83,7 @@ type
   tvppolygonal = array of tvppoint;
 
 // MOVE
-procedure move(var point:     tvppoint; const cc: tvppoint);
+procedure move(var point:     tvppoint;  const cc: tvppoint);
 procedure move(var point:     tvppoint;     dx, dy: vpfloat);
 procedure move(var line:      tvpline;      dx, dy: vpfloat);
 procedure move(var circle:    tvpcircle;    dx, dy: vpfloat);
@@ -140,16 +140,14 @@ procedure interpolate(const circlearc: tvpcirclearc; var path: tvppolygonal; val
 procedure interpolate(const polygonal: tvppolygonal; var path: tvppolygonal; value: vpfloat);
 
 // ---
+
 function line_by_two_points(const p0, p1: tvppoint): tvplineimp;
 function distance_between_two_points(const p0, p1: tvppoint): vpfloat;
 function distance_from_point_and_line(const p0: tvppoint; const l0: tvplineimp): vpfloat;
-function intersection_of_two_lines(const l0, l1: tvplineimp): tvppoint;
 
+function intersection_of_two_lines(const l0, l1: tvplineimp): tvppoint;
 function intersection_of_line_and_circle(const a0, b0, c0, a1, b1, c1: vpfloat; var p0, p1: tvppoint): longint;
 function intersection_of_line_and_circle(const l0: tvplineimp; const c1: tvpcircleimp; var p0, p1: tvppoint): longint;
-
-
-
 
 function circle_by_three_points(const p0, p1, p2: tvppoint): tvpcircleimp;
 function circle_by_center_and_radius(const cc: tvppoint; radius: vpfloat): tvpcircleimp;
@@ -159,6 +157,9 @@ function intersection_of_two_circles(const c0, c1: tvpcircleimp; var p1, p2: tvp
 function itsavertex(const p0, p1, p2: tvppoint): boolean;
 function itsthesame(const p0, p1: tvppoint): boolean;
 procedure smooth(var l0, l1: tvpline; var a0: tvpcirclearc; const radius: vpfloat);
+
+
+
 
 var
   enabledebug: boolean = false;

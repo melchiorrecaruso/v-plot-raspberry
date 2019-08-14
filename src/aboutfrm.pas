@@ -26,8 +26,8 @@ unit aboutfrm;
 interface
 
 uses
-  classes, sysutils, fileutil, lresources, forms, controls,
-  graphics, dialogs, extctrls, stdctrls;
+  classes, sysutils, fileutil, lresources, forms, controls, graphics,
+  dialogs, extctrls, stdctrls;
 
 type
   { taboutform }

@@ -24,13 +24,14 @@ program vplot;
 {$mode objfpc}
 
 uses
- cthreads, interfaces, forms, aboutfrm, importfrm, propertiesfrm, mainfrm;
+ {$ifdef unix} cthreads, {$endif}  interfaces, forms,
+ aboutfrm, importfrm, propertiesfrm, mainfrm;
 
 {$R *.res}
 
 begin
   requirederivedformresource := true;
-  Application.Title:='VPlot Driver';
+  application.title := 'VPlot Driver';
   application.initialize;
   application.createform(tmainform, mainform);
   application.createform(taboutform, aboutform);

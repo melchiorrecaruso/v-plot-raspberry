@@ -266,9 +266,8 @@ implementation
 {$r *.lfm}
 
 uses
-  math, sysutils, importfrm, aboutfrm, propertiesfrm,
-  vpdriver, vpdriverthread, vpsketcher, vpsvgreader,
-  vpdxfreader, vpsetting, vpwave;
+  math, sysutils, importfrm, aboutfrm, propertiesfrm, vpdriver,
+  vpdriverthread, vpsketcher, vpsvgreader, vpdxfreader, vpsetting, vpwave;
 
 // FORM EVENTS
 

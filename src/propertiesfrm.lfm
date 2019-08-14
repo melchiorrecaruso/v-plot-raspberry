@@ -3,7 +3,7 @@ object propertiesform: Tpropertiesform
   Height = 159
   Top = 193
   Width = 282
-  BorderIcons = []
+  BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Page properties'
   ClientHeight = 159
@@ -29,6 +29,5 @@ object propertiesform: Tpropertiesform
     ScrollWidth = 272
     Style = lbOwnerDrawFixed
     TabOrder = 0
-    TopIndex = -1
   end
 end
