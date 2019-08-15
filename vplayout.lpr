@@ -24,7 +24,8 @@ program vplayout;
 {$mode objfpc}
 
 uses
-  {$ifdef unix} cthreads, {$endif} interfaces, forms, layoutfrm;
+  {$ifdef unix} cthreads, {$endif} interfaces, forms, printer4lazarus,
+  layoutfrm;
 
 {$R *.res}
 

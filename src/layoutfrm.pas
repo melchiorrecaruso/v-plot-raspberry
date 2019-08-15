@@ -27,40 +27,64 @@ interface
 
 uses
   buttons, classes, sysutils, forms, controls, graphics, dialogs, extctrls,
-  math, spin, stdctrls, vpmath;
+  math, bcradialprogressbar, spin, stdctrls, printersdlgs, printers, vpmath;
 
 type
   { tlayoutform }
 
   tlayoutform = class(tform)
-    bevel1:     tbevel;
-    bitbtn1:    tbitbtn;
+    printbtn: tbitbtn;
+    printdialog: tprintdialog;
+    sheetmodelb: tlabel;
+    sheetsizecb: tcombobox;
+    sheetsize: tlabel;
+    resetbtn: tbitbtn;
+    image: timage;
+    notebook: tnotebook;
+    progressbar: tbcradialprogressbar;
+    progresspage: tpage;
+    previewpage: tpage;
+    bevel: tbevel;
+    drawbtn:    tbitbtn;
     distancelb: tlabel;
     distancese: tspinedit;
-    Image: TImage;
+    sheetoffsetlb: tlabel;
+    minloadse: tfloatspinedit;
+    maxloadse: tfloatspinedit;
+    minloadlb: tlabel;
+    macloadlb: tlabel;
+    minresolutionse: tfloatspinedit;
+    minresolutiolb: tlabel;
+    sheetoffsetse: tspinedit;
+    sheetmodecb: tcombobox;
+
+    procedure formcreate(sender: tobject);
+    procedure maxloadsechange(sender: tobject);
+    procedure minloadsechange(sender: tobject);
+    procedure resetbtnclick(sender: tobject);
+    procedure printbtnclick(sender: tobject);
     procedure drawbtnclick(sender: tobject);
   private
      m0: tvppoint;
      m1: tvppoint;
   public
-
+    procedure lock(value: boolean);
   end;
 
 var
-     layoutform: tlayoutform;
-        minload: vpfloat = 0.5;
-        maxload: vpfloat = 1.5;
-  minresolution: vpfloat = 1.4;
-        offsety: longint = 0;
+  layoutform: tlayoutform;
 
 implementation
 
 {$R *.lfm}
 
 const
-  gap1 = 1;
-  gap2 = 2;
-  gap6 = 6;
+  gap0  = 0;
+  gap1  = 1;
+  gap2  = 2;
+  gap6  = 6;
+  gap8  = 8;
+  gap15 = 15;
 
 var
   bit: tbitmap;
@@ -89,12 +113,12 @@ begin
   l1 := cos(a0)/d;
 end;
 
-procedure draw(top, h, w: longint; const s: string; b: tbitmap);
+procedure draw_sheet(top, w, h: longint; const s: string; b: tbitmap);
 var
   rect: trect;
 begin
-  rect.left   := (b.width div 2) - (w div 2);
-  rect.right  := (b.width div 2) + (w div 2);
+  rect.left   := (b.width - w) div 2;
+  rect.right  := (b.width + w) div 2;
   rect.top    := top;
   rect.bottom := rect.top + h;
 
@@ -107,11 +131,64 @@ begin
   rect.top    := rect.top    + 1;
   rect.bottom := rect.bottom - 1;
 
+  b.canvas.pen.color   := clblack;
   b.canvas.brush.color := clltgray;
   b.canvas.rectangle(rect);
 
   b.canvas.brush.color := clltgray;
-  b.canvas.textout(rect.left +15, rect.bottom - b.canvas.textheight(s)-2, s);
+  b.canvas.textout(rect.left +gap15, rect.bottom -b.canvas.textheight(s)-2, s);
+end;
+
+procedure tlayoutform.formcreate(sender: tobject);
+begin
+  resetbtnclick(sender);
+  lock(true);
+end;
+
+procedure tlayoutform.printbtnclick(sender: tobject);
+var
+    scale: longint;
+  offsetx: longint;
+  offsety: longint;
+begin
+  if printdialog.execute then
+    with printer do
+    begin
+      begindoc;
+      scale := min(
+        printer.pagewidth  div image.picture.bitmap.width,
+        printer.pageheight div image.picture.bitmap.height);
+
+      offsetx := (printer.pagewidth -image.picture.bitmap.width *scale)div 2;
+      offsety := (printer.pageheight-image.picture.bitmap.height*scale)div 2;
+
+      printer.canvas.stretchdraw(rect(offsetx, offsety,
+        image.picture.bitmap.width *scale +offsetx,
+        image.picture.bitmap.height*scale+ offsety),
+        image.picture.bitmap);
+      enddoc;
+    end;
+end;
+
+procedure tlayoutform.lock(value: boolean);
+begin
+       distancese.enabled := value;
+        minloadse.enabled := value;
+        maxloadse.enabled := value;
+  minresolutionse.enabled := value;
+    sheetoffsetse.enabled := value;
+      sheetsizecb.enabled := value;
+      sheetmodecb.enabled := value;
+
+          drawbtn.enabled := value;
+         resetbtn.enabled := value;
+         printbtn.enabled := value;
+
+  if value then
+    notebook.pageindex := 1
+  else
+    notebook.pageindex := 0;
+  application.processmessages;
 end;
 
 procedure tlayoutform.drawbtnclick(sender: tobject);
@@ -123,15 +200,15 @@ var
        x,  y: longint;
       dx, dy: longint;
            s: string;
-      sx, sy: longint;
-
+  sx, sy, sz: longint;
 
     ld0, ld1: vpfloat;
        p, pp: tvppoint;
         clrs: array[0..9] of tcolor;
         clr : tcolor;
 begin
-  distancese.enabled := false;
+  image.picture.clear;
+  lock(false);
   // init colors array
   clrs[0] := rgbtocolor(175, 194, 250);
   clrs[1] := rgbtocolor(146, 171, 248);
@@ -145,7 +222,7 @@ begin
   clrs[9] := rgbtocolor(  9,  39, 130);
   // init motors position
   dx   :=       distancese.value;
-  dy   := round(distancese.value*0.7);
+  dy   := round(distancese.value*0.75);
   m0.x := 0;
   m0.y := dy;
   m1.x := dx+m0.x;
@@ -161,7 +238,11 @@ begin
   bit.canvas.rectangle(0, 0, dx, dy);
 
   for x := round(m0.x+1) to (dx -1) do
-    for y := (bit.canvas.textheight('X=')) to dy -(bit.canvas.textheight('X=')+gap2) do
+  begin
+    progressbar.value := round(100*x/(dx-1));
+    application.processmessages;
+
+    for y := (bit.canvas.textheight('X=')+gap6) to dy -(bit.canvas.textheight('X=')+gap6) do
     begin
       p.x := x;
       p.y := y;
@@ -172,16 +253,16 @@ begin
       end;
       clr := clwhite;
 
-      if                          (ld0 <  minload-0.4) then clr := clrs[0] else
-      if (ld0 >= minload-0.4) and (ld0 <  minload-0.3) then clr := clrs[1] else
-      if (ld0 >= minload-0.3) and (ld0 <  minload-0.2) then clr := clrs[2] else
-      if (ld0 >= minload-0.2) and (ld0 <  minload-0.1) then clr := clrs[3] else
-      if (ld0 >= minload-0.1) and (ld0 <  minload    ) then clr := clrs[4] else
-      if (ld0 >  maxload    ) and (ld0 <= maxload+0.1) then clr := clrs[5] else
-      if (ld0 >  maxload+0.1) and (ld0 <= maxload+0.2) then clr := clrs[6] else
-      if (ld0 >  maxload+0.2) and (ld0 <= maxload+0.3) then clr := clrs[7] else
-      if (ld0 >  maxload+0.3) and (ld0 <= maxload+0.4) then clr := clrs[8] else
-      if (ld0 >  maxload+0.4)                          then clr := clrs[9];
+      if                                  (ld0 <  minloadse.Value-0.4) then clr := clrs[0] else
+      if (ld0 >= minloadse.Value-0.4) and (ld0 <  minloadse.Value-0.3) then clr := clrs[1] else
+      if (ld0 >= minloadse.Value-0.3) and (ld0 <  minloadse.Value-0.2) then clr := clrs[2] else
+      if (ld0 >= minloadse.Value-0.2) and (ld0 <  minloadse.Value-0.1) then clr := clrs[3] else
+      if (ld0 >= minloadse.Value-0.1) and (ld0 <  minloadse.Value    ) then clr := clrs[4] else
+      if (ld0 >  maxloadse.value    ) and (ld0 <= maxloadse.value+0.1) then clr := clrs[5] else
+      if (ld0 >  maxloadse.value+0.1) and (ld0 <= maxloadse.value+0.2) then clr := clrs[6] else
+      if (ld0 >  maxloadse.value+0.2) and (ld0 <= maxloadse.value+0.3) then clr := clrs[7] else
+      if (ld0 >  maxloadse.value+0.3) and (ld0 <= maxloadse.value+0.4) then clr := clrs[8] else
+      if (ld0 >  maxloadse.value+0.4)                                  then clr := clrs[9];
 
       if clr = clwhite then
       begin
@@ -199,16 +280,20 @@ begin
         pp.y := pp.y + m0.y;
         d1   := distance_between_two_points(p, pp);
 
-        if ((d0 > minresolution)      and (d0 <= minresolution +0.1)) and
-           ((d1 > minresolution)      and (d1 <= minresolution +0.1)) then clr := rgbtocolor(223, 255, 0) else
+        if ((d0 > minresolutionse.value) and (d0 <= minresolutionse.value +0.1)) and
+           ((d1 > minresolutionse.value) and (d1 <= minresolutionse.value +0.1)) then
+           clr := rgbtocolor(223, 255, 0) else
 
-        if ((d0 > minresolution +0.1) and (d0 <= minresolution +0.2)) and
-           ((d1 > minresolution +0.1) and (d1 <= minresolution +0.2)) then clr := rgbtocolor(255, 159, 0) else
+        if ((d0 > minresolutionse.value +0.1) and (d0 <= minresolutionse.value +0.2)) and
+           ((d1 > minresolutionse.value +0.1) and (d1 <= minresolutionse.value +0.2)) then
+           clr := rgbtocolor(255, 159, 0) else
 
-        if  (d0 > minresolution +0.2) and (d1 >  minresolution +0.2)  then clr := rgbtocolor(255, 159, 0);
+        if  (d0 > minresolutionse.value +0.2) and (d1 >  minresolutionse.value +0.2)  then
+        clr := rgbtocolor(255, 159, 0);
       end;
       bit.canvas.pixels[x, dy -y] := clr;
     end;
+  end;
 
   x := bit.width div 2;
   y := 1;
@@ -220,45 +305,82 @@ begin
     end;
     inc(y);
   end;
-  inc(y, offsety);
-  // draw sheets
+  inc(y, sheetoffsetse.value);
+  // draw sheet
   bit.canvas.font.size := 42;
   bit.canvas.font.bold := true;
-  draw(y, 841, 1189, 'A0',bit);
-  draw(y, 594,  841, 'A1',bit);
-  draw(y, 420,  594, 'A2',bit);
-  draw(y, 297,  420, 'A3',bit);
+  case sheetsizecb.itemindex of
+    4: begin sx :=  297; sy := 210; s := 'A4'; end;
+    3: begin sx :=  420; sy := 297; s := 'A3'; end;
+    2: begin sx :=  594; sy := 420; s := 'A2'; end;
+    1: begin sx :=  841; sy := 594; s := 'A1'; end;
+  else begin sx := 1189; sy := 841; s := 'A0'; end;
+  end;
+
+  if sheetmodecb.itemindex = 0 then
+  begin
+    sz := sx;
+    sx := sy;
+    sy := sz;
+  end;
+  draw_sheet(y, sx, sy, s, bit);
+
   // draw texts
   bit.canvas.brush.color := clrs[0];
-  s  :=       ('X=0, Y=0'        ); sx := gap6;            sy := 0;     bit.canvas.textout(sx, sy, s);
-  s  := format('Y=%d', [ y      ]); sx := gap6;            sy := y;     bit.canvas.textout(sx, sy, s);
-  s  := format('Y=%d', [ y + 297]); sx := gap6;            sy := y+295; bit.canvas.textout(sx, sy, s);
-  s  := format('Y=%d', [ y + 420]); sx := gap6;            sy := y+418; bit.canvas.textout(sx, sy, s);
-  s  := format('Y=%d', [ y + 594]); sx := gap6;            sy := y+592; bit.canvas.textout(sx, sy, s);
-  s  := format('Y=%d', [ y + 841]); sx := gap6;            sy := y+839; bit.canvas.textout(sx, sy, s);
-  s  := format('X=%d', [dx div 2]); sx := gap6+(dx div 2); sy := 0;     bit.canvas.textout(sx, sy, s);
+
+  s  := ('X=0, Y=0');
+  bit.canvas.textout(gap6, 0, s);
+
+  s  := format('Y=%d', [y]);
+  bit.canvas.textout  (gap6, y, s);
+  bit.canvas.rectangle(gap0, y, dx, y+gap2);
+
+  s  := format('Y=%d', [y+sy]);
+  bit.canvas.textout  (gap6, y+sy, s);
+  bit.canvas.rectangle(gap0, y+sy, dx, y+sy-gap2);
+
+  s  := format('min-load=%f   max-load=%f   min-resolution=%f   offset=%d',
+    [minloadse.value, maxloadse.value, minresolutionse.value, sheetoffsetse.value]);
+  bit.canvas.textout((dx-bit.canvas.textwidth(s)) div 2, dy-bit.canvas.textheight(s), s);
 
   s  := format('X=%d', [dx]);
-  sx := dx-bit.canvas.textwidth(s)-gap6;
-  sy := 0;
-  bit.canvas.textout(sx, sy, s);
+  bit.canvas.textout(dx-bit.canvas.textwidth(s)-gap6, 0, s);
 
-  s  := format('min-load=%f   max-load=%f   min-resolution=%f', [minload, maxload, minresolution]);
-  sx := (dx-canvas.textwidth(s)) div 4;
-  sy := dy-bit.canvas.textheight(s);
-  bit.canvas.textout(sx, sy, s);
-  // draw lines
-  bit.canvas.pen.color := clblack;
-  bit.canvas.rectangle(0, 0, dx,   gap2);
-  bit.canvas.rectangle(0, y, dx, y+gap2);
-  bit.canvas.rectangle(0, y+295, dx, y+297);
-  bit.canvas.rectangle(0, y+418, dx, y+420);
-  bit.canvas.rectangle(0, y+592, dx, y+594);
-  bit.canvas.rectangle(0, y+839, dx, y+841);
-  bit.canvas.rectangle((dx div 2)-gap1, 0, (dx div 2)+gap1, dy-(bit.canvas.textheight('X=')));
+  s  := format('X=%d', [(dx-sx)div 2]);
+  bit.canvas.textout  (((dx-sx)div 2)+gap8, 0, s);
+  bit.canvas.rectangle(((dx-sx)div 2)+gap2, 0, ((dx-sx)div 2), dy-(bit.canvas.textheight('X=')+gap2));
+
+  s  := format('X=%d', [(dx+sx)div 2]);
+  bit.canvas.textout  (((dx+sx)div 2)+gap8, 0, s);
+  bit.canvas.rectangle(((dx+sx)div 2)-gap2, 0, ((dx+sx)div 2), dy-(bit.canvas.textheight('X=')+gap2));
+
   bit.endupdate(false);
+  bit.savetofile('vplayout.bmp');
   //---
-  distancese.enabled := true;
+  lock(true);
+end;
+
+procedure tlayoutform.maxloadsechange(sender: tobject);
+begin
+  if maxloadse.value <= minloadse.value then
+    maxloadse.value := minloadse.value + 0.05;
+end;
+
+procedure tlayoutform.minloadsechange(sender: tobject);
+begin
+  if minloadse.value >= maxloadse.value then
+    minloadse.value := maxloadse.value - 0.05;
+end;
+
+procedure tlayoutform.resetbtnclick(sender: tobject);
+begin
+       distancese.value := 2850;
+        minloadse.value :=  0.5;
+        maxloadse.value :=  1.5;
+  minresolutionse.value :=  1.4;
+    sheetoffsetse.value := 0;
+      sheetsizecb.itemindex := 0;
+      sheetmodecb.itemindex := 1;
 end;
 
 end.
