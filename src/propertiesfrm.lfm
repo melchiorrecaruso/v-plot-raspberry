@@ -22,7 +22,7 @@ object propertiesform: Tpropertiesform
     BorderStyle = bsNone
     Enabled = False
     Font.Height = -13
-    Font.Name = 'Monospace'
+    Font.Name = 'Courier New'
     ItemHeight = 0
     ParentColor = True
     ParentFont = False

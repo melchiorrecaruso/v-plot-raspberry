@@ -21,7 +21,7 @@
 
 unit vpsketcher;
 
-{$mode objfpc}{$H+}
+{$mode objfpc}
 
 interface
 
@@ -100,7 +100,7 @@ begin
       k := k + c.red;
     end;
 
-  result := round((patternw/dotsize)-(patternw/dotsize)*(k/((3*$FFFF)*width*width)));
+  result := round((patternw/dotsize)-(patternw/dotsize)*(k/((3*$FFFF)*sqr(width))));
 end;
 
 // tvpsketcher1
@@ -202,7 +202,10 @@ end;
 
 function tvpsketcher2.step1(n, width: vpfloat): tvpelementlist;
 begin
-  result := step2(inherited step1(n, width), width/(2*n));
+  if n > 0 then
+    result := step2(inherited step1(n, width), width/(2*n))
+  else
+    result :=       inherited step1(n, width)
 end;
 
 function tvpsketcher2.step2(elements: tvpelementlist; radius: vpfloat): tvpelementlist;

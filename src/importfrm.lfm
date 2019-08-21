@@ -20,8 +20,8 @@ object importform: Timportform
     AnchorSideRight.Control = imcb
     AnchorSideRight.Side = asrBottom
     Left = 176
-    Height = 28
-    Top = 51
+    Height = 23
+    Top = 48
     Width = 154
     Alignment = taRightJustify
     Anchors = [akTop, akRight]
@@ -36,8 +36,8 @@ object importform: Timportform
     AnchorSideRight.Control = imcb
     AnchorSideRight.Side = asrBottom
     Left = 176
-    Height = 28
-    Top = 127
+    Height = 23
+    Top = 114
     Width = 154
     Alignment = taRightJustify
     Anchors = [akTop, akLeft, akRight]
@@ -68,13 +68,13 @@ object importform: Timportform
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 120
-    Height = 26
+    Height = 23
     Top = 15
     Width = 210
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 15
     BorderSpacing.Right = 15
-    ItemHeight = 0
+    ItemHeight = 15
     Items.Strings = (
       'Raster graphics - Square wave'
       'Raster graphics - Rounded square wave'
@@ -83,72 +83,72 @@ object importform: Timportform
     Style = csDropDownList
     TabOrder = 3
   end
-  object importmethodl: TLabel
+  object importmethodlb: TLabel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = imcb
     AnchorSideRight.Control = imcb
     AnchorSideBottom.Control = imcb
     AnchorSideBottom.Side = asrBottom
     Left = 15
-    Height = 26
+    Height = 23
     Top = 15
     Width = 95
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Left = 15
     BorderSpacing.Right = 10
-    Caption = 'Import Method:'
+    Caption = 'Import method:'
     Layout = tlCenter
     ParentColor = False
   end
-  object imagepatternwidthl: TLabel
-    AnchorSideLeft.Control = importmethodl
+  object imagepatternwidthlb: TLabel
+    AnchorSideLeft.Control = importmethodlb
     AnchorSideTop.Control = ipwse
     AnchorSideRight.Control = ipwse
     AnchorSideBottom.Control = ipwse
     AnchorSideBottom.Side = asrBottom
     Left = 15
-    Height = 28
-    Top = 51
+    Height = 23
+    Top = 48
     Width = 151
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Right = 10
-    Caption = 'Image Pattern Width:'
+    Caption = 'Image pattern width (px):'
     Layout = tlCenter
     ParentColor = False
   end
-  object patternwidthl: TLabel
-    AnchorSideLeft.Control = importmethodl
+  object patternwidthlb: TLabel
+    AnchorSideLeft.Control = importmethodlb
     AnchorSideTop.Control = pwse
     AnchorSideRight.Control = dsfse
     AnchorSideBottom.Control = pwse
     AnchorSideBottom.Side = asrBottom
     Left = 15
-    Height = 28
-    Top = 89
+    Height = 23
+    Top = 81
     Width = 151
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Right = 10
-    Caption = 'Pattern Width:'
+    Caption = 'Pattern width (mm):'
     Layout = tlCenter
     ParentColor = False
   end
-  object dotsizel: TLabel
-    AnchorSideLeft.Control = importmethodl
+  object dotsizelb: TLabel
+    AnchorSideLeft.Control = importmethodlb
     AnchorSideTop.Control = dsfse
     AnchorSideRight.Control = dsfse
     AnchorSideBottom.Control = dsfse
     AnchorSideBottom.Side = asrBottom
     Left = 15
-    Height = 28
-    Top = 127
+    Height = 23
+    Top = 114
     Width = 151
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Right = 10
-    Caption = 'Dot Size:'
+    Caption = 'Dot size(mm):'
     Layout = tlCenter
     ParentColor = False
   end
-  object Bevel1: TBevel
+  object bevel: TBevel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
@@ -170,8 +170,8 @@ object importform: Timportform
     AnchorSideRight.Control = imcb
     AnchorSideRight.Side = asrBottom
     Left = 176
-    Height = 28
-    Top = 89
+    Height = 23
+    Top = 81
     Width = 154
     Alignment = taRightJustify
     Anchors = [akTop, akLeft, akRight]

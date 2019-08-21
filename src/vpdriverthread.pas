@@ -52,14 +52,14 @@ type
     property ycenter: double        read fycenter write fycenter;
   end;
 
-  procedure optimize (const p: tvppoint; out mx, my: longint);
+  procedure calc_(const p: tvppoint; out mx, my: longint);
 
 var
   driverthread: tvpdriverthread = nil;
 
 implementation
 
-procedure optimize(const p: tvppoint; out mx, my: longint); inline;
+procedure calc_(const p: tvppoint; out mx, my: longint); inline;
 var
       a0, a1: vpfloat;
   cx, cy, ct: tvpcircleimp;
@@ -114,31 +114,26 @@ var
   mx: longint = 0;
   my: longint = 0;
   p0,
-  p1,
-  p2: tvppoint;
+  p1: tvppoint;
 begin
   if assigned(onstart) then
     synchronize(fonstart);
 
   p0 := setting.layout9;
-  p1 := setting.layout8;
   for i := 0 to fpath.count -1 do
   begin
     if not terminated then
     begin
-      p2 := spacewave.update(fpath.items[i]^);
-      driver.xdelay := timewave.getdxdelay(p2);
-      driver.ydelay := timewave.getdydelay(p2);
+      p1   := spacewave.update(fpath.items[i]^);
+      p1.x := p1.x + fxcenter;
+      p1.y := p1.y + fycenter;
 
-      p2.x := p2.x + fxcenter;
-      p2.y := p2.y + fycenter;
-
-      if distance_between_two_points(p1, p2) < 0.2 then
+      if distance_between_two_points(p0, p1) < 0.2 then
         driver.zcount := setting.zmin
       else
         driver.zcount := setting.zmax;
 
-      optimize(p2, mx, my);
+      calc_(p1, mx, my);
       driver.move(mx, my);
       if assigned(ontick) then
         synchronize(ontick);
@@ -148,7 +143,6 @@ begin
         sleep(250);
       end;
       p0 := p1;
-      p1 := p2;
     end;
   end;
 

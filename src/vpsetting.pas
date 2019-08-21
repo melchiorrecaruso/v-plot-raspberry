@@ -60,9 +60,6 @@ type
     fzdir:      longint;
     fzradius:   vpfloat;
     fzratio:    vpfloat;
-    // time wave
-    ftimewavefactor: vpfloat;
-    ftimewaveoff:    longint;
     // space wave
     fspacewave0:     tvppoint;
     fspacewave1:     tvppoint;
@@ -109,9 +106,6 @@ type
     property zdir:           longint  read fzdir;
     property zradius:        vpfloat  read fzradius;
     property zratio:         vpfloat  read fzratio;
-
-    property timewavefactor: vpfloat  read ftimewavefactor;
-    property timewaveoff:    longint  read ftimewaveoff;
 
     property spacewave0:     tvppoint read fspacewave0;
     property spacewave1:     tvppoint read fspacewave1;
@@ -203,9 +197,6 @@ begin
   fspacewavedymax   := ini.readfloat  ('SPACE-WAVE',   'DYMAX',  0);
   fspacewaveoff     := ini.readinteger('SPACE-WAVE',   'OFF',    0);
 
-  ftimewavefactor   := ini.readfloat  ('TIME-WAVE',    'FACTOR', 0);
-  ftimewaveoff      := ini.readinteger('TIME-WAVE',    'OFF',    0);
-
   if enabledebug then
   begin
     writeln(format('  LAYOUT::L0.X   = %12.5f  L0.Y = %12.5f', [flayout0.x, flayout0.y]));
@@ -249,9 +240,6 @@ begin
     writeln(format(' SPACE-W::DXMAX  = %12.5f',                [fspacewavedxmax]));
     writeln(format(' SPACE-W::DYMAX  = %12.5f',                [fspacewavedymax]));
     writeln(format(' SPACE-W::OFF    = %12.5u',                [fspacewaveoff  ]));
-
-    writeln(format('  TIME-W::FACTOR = %12.5f',                [ftimewavefactor]));
-    writeln(format('  TIME-W::OFF    = %12.5u',                [ftimewaveoff   ]));
   end;
   ini.destroy;
 end;

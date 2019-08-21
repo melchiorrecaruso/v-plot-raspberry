@@ -45,7 +45,5 @@ implementation
 
 {$R *.lfm}
 
-{ tpropertiesform }
-
 end.
 

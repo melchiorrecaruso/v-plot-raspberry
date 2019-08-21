@@ -158,9 +158,6 @@ function itsavertex(const p0, p1, p2: tvppoint): boolean;
 function itsthesame(const p0, p1: tvppoint): boolean;
 procedure smooth(var l0, l1: tvpline; var a0: tvpcirclearc; const radius: vpfloat);
 
-
-
-
 var
   enabledebug: boolean = false;
 
@@ -824,7 +821,6 @@ begin
   if enabledebug then
     writeln('VPLOTTER::END-DEBUGGER');
 end;
-
 
 initialization
 

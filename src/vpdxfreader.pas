@@ -1,5 +1,5 @@
 {
-  Description: vPlot dfx reader class.
+  Description: vPlot DXF file reader class.
 
   This unit derives from LAZARUS/FREEPASCAL dxfvectorialreader unit.
 
@@ -121,7 +121,6 @@ type
   end;
 
   procedure dxf2paths(const afilename: string; elements: tvpelementlist);
-
 
 implementation
 

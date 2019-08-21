@@ -27,19 +27,22 @@ interface
 
 uses
   classes, sysutils, fileutil, lresources, forms, controls, graphics,
-  dialogs, extctrls, stdctrls;
+  dialogs, extctrls, stdctrls, lclintf;
 
 type
   { taboutform }
 
   taboutform = class(tform)
-    aboutcopyrigth: tlabel;
-    aboutdescription: tlabel;
+    aboutcopyrigthlb: tlabel;
+    aboutdescriptionlb: tlabel;
     aboutimage: timage;
-    aboutlicense: tlabel;
-    aboutlink: tlabel;
-    aboutname: tlabel;
-    aboutversion: tlabel;
+    aboutlicenselb: tlabel;
+    aboutlinklb: tlabel;
+    aboutnamelb: tlabel;
+    aboutversionlb: tlabel;
+    procedure aboutlinklbclick(sender: tobject);
+    procedure aboutlinklbmouseleave(sender: tobject);
+    procedure aboutlinklbmousemove(sender: tobject; shift: tshiftstate; x, y: integer);
   private
   public
   end;
@@ -49,7 +52,24 @@ var
 
 implementation
 
-{$r *.lfm}
+{$R *.lfm}
+
+{ taboutform }
+
+procedure taboutform.aboutlinklbclick(sender: tobject);
+begin
+  openurl('https://github.com/melchiorrecaruso/vplot');
+end;
+
+procedure taboutform.aboutlinklbmouseleave(sender: tobject);
+begin
+  aboutlinklb.font.color := clblack;
+end;
+
+procedure taboutform.aboutlinklbmousemove(sender: tobject; shift: tshiftstate; x, y: integer);
+begin
+  aboutlinklb.font.color := clblue;
+end;
 
 end.
 

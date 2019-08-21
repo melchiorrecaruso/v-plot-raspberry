@@ -26,28 +26,25 @@ unit importfrm;
 interface
 
 uses
-  classes, sysutils, forms, controls, graphics, dialogs,
-  spin, editbtn, buttons, stdctrls, extctrls;
+  classes, sysutils, forms, controls, graphics, dialogs, spin,
+  editbtn, buttons, stdctrls, extctrls;
 
 type
-
   { timportform }
 
   timportform = class(tform)
-    bevel1: tbevel;
+    bevel: tbevel;
     okbtn: tbitbtn;
     imcb: tcombobox;
     dsfse: tfloatspinedit;
-    importmethodl: tlabel;
-    imagepatternwidthl: tlabel;
-    patternwidthl: tlabel;
-    dotsizel: tlabel;
+    importmethodlb: tlabel;
+    imagepatternwidthlb: tlabel;
+    patternwidthlb: tlabel;
+    dotsizelb: tlabel;
     ipwse: tspinedit;
-    pwse: TFloatSpinEdit;
+    pwse: tfloatspinedit;
   private
-
   public
-
   end;
 
 var

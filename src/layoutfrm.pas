@@ -82,6 +82,7 @@ const
   gap0  = 0;
   gap1  = 1;
   gap2  = 2;
+  gap3  = 3;
   gap6  = 6;
   gap8  = 8;
   gap15 = 15;
@@ -196,7 +197,6 @@ var
        a,b,c: vpfloat;
 
       d0, d1: vpfloat;
-
        x,  y: longint;
       dx, dy: longint;
            s: string;
@@ -209,17 +209,9 @@ var
 begin
   image.picture.clear;
   lock(false);
-  // init colors array
-  clrs[0] := rgbtocolor(175, 194, 250);
-  clrs[1] := rgbtocolor(146, 171, 248);
-  clrs[2] := rgbtocolor(116, 149, 245);
-  clrs[3] := rgbtocolor( 86, 125, 243);
-  clrs[4] := rgbtocolor( 56, 103, 241);
-  clrs[5] := rgbtocolor( 26,  80, 240);
-  clrs[6] := rgbtocolor( 15,  66, 219);
-  clrs[7] := rgbtocolor( 13,  57, 189);
-  clrs[8] := rgbtocolor( 11,  48, 159);
-  clrs[9] := rgbtocolor(  9,  39, 130);
+  // init colors array, blu and red scale
+  for x := 0 to 4 do clrs[x+0] := rgbtocolor(175-x*30, 175-x*30, 255);
+  for x := 0 to 4 do clrs[x+5] := rgbtocolor(255, 150-x*35, 150-x*35);
   // init motors position
   dx   :=       distancese.value;
   dy   := round(distancese.value*0.75);
@@ -233,8 +225,8 @@ begin
   bit.setsize(dx, dy);
   bit.canvas.font.bold   := true;
   bit.canvas.font.size   := 40;
-  bit.canvas.pen.color   := clrs[0];
-  bit.canvas.brush.color := clrs[0];
+  bit.canvas.pen.color   := clwhite;
+  bit.canvas.brush.color := clwhite;
   bit.canvas.rectangle(0, 0, dx, dy);
 
   for x := round(m0.x+1) to (dx -1) do
@@ -253,11 +245,11 @@ begin
       end;
       clr := clwhite;
 
-      if                                  (ld0 <  minloadse.Value-0.4) then clr := clrs[0] else
-      if (ld0 >= minloadse.Value-0.4) and (ld0 <  minloadse.Value-0.3) then clr := clrs[1] else
-      if (ld0 >= minloadse.Value-0.3) and (ld0 <  minloadse.Value-0.2) then clr := clrs[2] else
-      if (ld0 >= minloadse.Value-0.2) and (ld0 <  minloadse.Value-0.1) then clr := clrs[3] else
-      if (ld0 >= minloadse.Value-0.1) and (ld0 <  minloadse.Value    ) then clr := clrs[4] else
+      if                                  (ld0 <  minloadse.value-0.4) then clr := clrs[0] else
+      if (ld0 >= minloadse.value-0.4) and (ld0 <  minloadse.value-0.3) then clr := clrs[1] else
+      if (ld0 >= minloadse.value-0.3) and (ld0 <  minloadse.value-0.2) then clr := clrs[2] else
+      if (ld0 >= minloadse.value-0.2) and (ld0 <  minloadse.value-0.1) then clr := clrs[3] else
+      if (ld0 >= minloadse.value-0.1) and (ld0 <  minloadse.value    ) then clr := clrs[4] else
       if (ld0 >  maxloadse.value    ) and (ld0 <= maxloadse.value+0.1) then clr := clrs[5] else
       if (ld0 >  maxloadse.value+0.1) and (ld0 <= maxloadse.value+0.2) then clr := clrs[6] else
       if (ld0 >  maxloadse.value+0.2) and (ld0 <= maxloadse.value+0.3) then clr := clrs[7] else
@@ -280,23 +272,15 @@ begin
         pp.y := pp.y + m0.y;
         d1   := distance_between_two_points(p, pp);
 
-        if ((d0 > minresolutionse.value) and (d0 <= minresolutionse.value +0.1)) and
-           ((d1 > minresolutionse.value) and (d1 <= minresolutionse.value +0.1)) then
-           clr := rgbtocolor(223, 255, 0) else
-
-        if ((d0 > minresolutionse.value +0.1) and (d0 <= minresolutionse.value +0.2)) and
-           ((d1 > minresolutionse.value +0.1) and (d1 <= minresolutionse.value +0.2)) then
-           clr := rgbtocolor(255, 159, 0) else
-
-        if  (d0 > minresolutionse.value +0.2) and (d1 >  minresolutionse.value +0.2)  then
-        clr := rgbtocolor(255, 159, 0);
+        if d0 > minresolutionse.value then clr := rgbtocolor(255, 255,  55) else
+        if d1 > minresolutionse.value then clr := rgbtocolor(255, 255,  55);
       end;
       bit.canvas.pixels[x, dy -y] := clr;
     end;
   end;
 
   x := bit.width div 2;
-  y := 1;
+  y := bit.canvas.textheight('X=')*2;
   while y < bit.height -1 do
   begin
     if bit.canvas.pixels[x, y] = clwhite then
@@ -326,12 +310,8 @@ begin
   draw_sheet(y, sx, sy, s, bit);
 
   // draw texts
-  bit.canvas.brush.color := clrs[0];
-
-  s  := ('X=0, Y=0');
-  bit.canvas.textout(gap6, 0, s);
-
   s  := format('Y=%d', [y]);
+  bit.canvas.brush.color := clrs[0];
   bit.canvas.textout  (gap6, y, s);
   bit.canvas.rectangle(gap0, y, dx, y+gap2);
 
@@ -339,23 +319,27 @@ begin
   bit.canvas.textout  (gap6, y+sy, s);
   bit.canvas.rectangle(gap0, y+sy, dx, y+sy-gap2);
 
-  s  := format('min-load=%f   max-load=%f   min-resolution=%f   offset=%d',
-    [minloadse.value, maxloadse.value, minresolutionse.value, sheetoffsetse.value]);
-  bit.canvas.textout((dx-bit.canvas.textwidth(s)) div 2, dy-bit.canvas.textheight(s), s);
+  s  := ('X=0, Y=0');
+  bit.canvas.brush.color := clwhite;
+  bit.canvas.textout(gap6, 0, s);
 
   s  := format('X=%d', [dx]);
   bit.canvas.textout(dx-bit.canvas.textwidth(s)-gap6, 0, s);
 
   s  := format('X=%d', [(dx-sx)div 2]);
   bit.canvas.textout  (((dx-sx)div 2)+gap8, 0, s);
-  bit.canvas.rectangle(((dx-sx)div 2)+gap2, 0, ((dx-sx)div 2), dy-(bit.canvas.textheight('X=')+gap2));
+  bit.canvas.rectangle(((dx-sx)div 2)+gap2, bit.canvas.textheight('X=')+gap3, ((dx-sx)div 2), dy-(bit.canvas.textheight('X=')+gap2));
 
   s  := format('X=%d', [(dx+sx)div 2]);
   bit.canvas.textout  (((dx+sx)div 2)+gap8, 0, s);
-  bit.canvas.rectangle(((dx+sx)div 2)-gap2, 0, ((dx+sx)div 2), dy-(bit.canvas.textheight('X=')+gap2));
+  bit.canvas.rectangle(((dx+sx)div 2)-gap2, bit.canvas.textheight('X=')+gap3, ((dx+sx)div 2), dy-(bit.canvas.textheight('X=')+gap2));
+
+  s  := format('min-load=%f   max-load=%f   min-resolution=%f   offset=%d',
+    [minloadse.value, maxloadse.value, minresolutionse.value, sheetoffsetse.value]);
+  bit.canvas.textout((dx-bit.canvas.textwidth(s)) div 2, dy-bit.canvas.textheight(s), s);
 
   bit.endupdate(false);
-  bit.savetofile('vplayout.bmp');
+  bit.savetofile('loads.bmp');
   //---
   lock(true);
 end;
@@ -374,7 +358,7 @@ end;
 
 procedure tlayoutform.resetbtnclick(sender: tobject);
 begin
-       distancese.value := 2850;
+       distancese.value := 3000;
         minloadse.value :=  0.5;
         maxloadse.value :=  1.5;
   minresolutionse.value :=  1.4;

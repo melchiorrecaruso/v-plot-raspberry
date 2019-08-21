@@ -14,15 +14,15 @@ object aboutform: Taboutform
   Constraints.MinWidth = 400
   Position = poOwnerFormCenter
   LCLVersion = '2.1.0.0'
-  object aboutlicense: TLabel
+  object aboutlicenselb: TLabel
     AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = aboutcopyrigth
+    AnchorSideTop.Control = aboutcopyrigthlb
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 18
-    Top = 260
+    Height = 15
+    Top = 245
     Width = 400
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
@@ -31,20 +31,20 @@ object aboutform: Taboutform
     Layout = tlCenter
     ParentColor = False
   end
-  object aboutname: TLabel
+  object aboutnamelb: TLabel
     AnchorSideLeft.Control = Owner
     AnchorSideTop.Control = aboutimage
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 18
+    Height = 15
     Top = 126
     Width = 400
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 12
-    Caption = 'vPlotter 3.2'
+    Caption = 'vPlot 3.2'
     Font.Style = [fsBold]
     Layout = tlCenter
     ParentColor = False
@@ -125,15 +125,15 @@ object aboutform: Taboutform
     }
     Transparent = True
   end
-  object aboutdescription: TLabel
+  object aboutdescriptionlb: TLabel
     AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = aboutversion
+    AnchorSideTop.Control = aboutversionlb
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 18
-    Top = 180
+    Height = 15
+    Top = 174
     Width = 400
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
@@ -142,34 +142,38 @@ object aboutform: Taboutform
     Layout = tlCenter
     ParentColor = False
   end
-  object aboutlink: TLabel
+  object aboutlinklb: TLabel
     AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = aboutdescription
+    AnchorSideTop.Control = aboutdescriptionlb
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
+    Cursor = crHandPoint
     Left = 0
-    Height = 18
-    Top = 208
+    Height = 15
+    Top = 199
     Width = 400
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 10
-    Caption = 'Visita il sito di vPlotter'
+    Caption = 'Visita il sito di vPlot'
     Font.Style = [fsUnderline]
     Layout = tlCenter
     ParentColor = False
     ParentFont = False
+    OnClick = aboutlinklbClick
+    OnMouseLeave = aboutlinklbMouseLeave
+    OnMouseMove = aboutlinklbMouseMove
   end
-  object aboutcopyrigth: TLabel
+  object aboutcopyrigthlb: TLabel
     AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = aboutlink
+    AnchorSideTop.Control = aboutlinklb
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 18
-    Top = 236
+    Height = 15
+    Top = 224
     Width = 400
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
@@ -178,20 +182,20 @@ object aboutform: Taboutform
     Layout = tlCenter
     ParentColor = False
   end
-  object aboutversion: TLabel
+  object aboutversionlb: TLabel
     AnchorSideLeft.Control = Owner
-    AnchorSideTop.Control = aboutname
+    AnchorSideTop.Control = aboutnamelb
     AnchorSideTop.Side = asrBottom
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 18
-    Top = 156
+    Height = 15
+    Top = 153
     Width = 400
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 12
-    Caption = 'Build 20190425'
+    Caption = 'Build 20190821'
     Layout = tlCenter
     ParentColor = False
   end

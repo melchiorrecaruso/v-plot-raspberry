@@ -53,26 +53,10 @@ type
     property enabled: boolean read fenabled write fenabled;
   end;
 
-  ttimewave = class
-  private
-    fdxdelay: longint;
-    fdydelay: longint;
-    ffactor:  vpfloat;
-    fenabled: boolean;
-  public
-    constructor create(factor: vpfloat; dxdelay, dydelay: longint);
-    destructor destroy; override;
-    function getdxdelay(const p: tvppoint): longint;
-    function getdydelay(const p: tvppoint): longint;
-  published
-    property enabled: boolean read fenabled write fenabled;
-  end;
-
   function polyeval(const apoly: tpolynome; x: vpfloat): vpfloat;
 
 var
   spacewave: tspacewave = nil;
-   timewave:  ttimewave = nil;
 
 implementation
 
@@ -217,32 +201,6 @@ begin
     p0.x := +0.000;  p0.y := -420.5;  p1 := update(p0);  test_print;
     p0.x := +594.5;  p0.y := -420.5;  p1 := update(p0);  test_print;
   end;
-end;
-
-// ttimewave
-
-constructor ttimewave.create(factor: vpfloat; dxdelay, dydelay: longint);
-begin
-  inherited create;
-  fdxdelay := dxdelay;
-  fdydelay := dydelay;
-  ffactor  := factor;
-  fenabled := false;
-end;
-
-destructor ttimewave.destroy;
-begin
-  inherited destroy;
-end;
-
-function ttimewave.getdxdelay(const p: tvppoint): longint;
-begin
-  result := fdxdelay + round(p.x*ffactor);
-end;
-
-function ttimewave.getdydelay(const p: tvppoint): longint;
-begin
-  result := fdydelay + round(p.y*ffactor);
 end;
 
 end.

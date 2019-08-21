@@ -31,7 +31,7 @@ uses
 
 begin
   requirederivedformresource := true;
-  application.title := 'VPlot Driver';
+  Application.Title:='vPlot Driver';
   application.initialize;
   application.createform(tmainform, mainform);
   application.createform(taboutform, aboutform);

@@ -263,7 +263,7 @@ var
 
 implementation
 
-{$r *.lfm}
+{$R *.lfm}
 
 uses
   math, sysutils, importfrm, aboutfrm, propertiesfrm, vpdriver,
@@ -305,12 +305,6 @@ begin
     wavemesh);
   spacewave.enabled := setting.spacewaveoff = 1;
   spacewave.debug;
-  // init time wave
-  timewave := ttimewave.create(
-    setting.timewavefactor,
-    setting.xdelay,
-    setting.ydelay);
-  timewave.enabled := setting.timewaveoff = 1;
   // create preview and empty path
    bit := tbgrabitmap.create;
   page := tvpelementlist.create;
@@ -318,7 +312,7 @@ begin
   // update virtual screen
   a0miclick(a3mi);
   // initialize driver
-  optimize(setting.layout9, mx, my);
+  calc_(setting.layout9, mx, my);
   driver.init(mx, my);
   // update panels
   scalepanel      .anchors := [akleft, akright, aktop];
@@ -334,10 +328,9 @@ begin
   page.destroy;
   path.destroy;
   //
-  timewave.destroy;
   spacewave.destroy;
-  driver.destroy;
   setting.destroy;
+  driver.destroy;
 end;
 
 procedure tmainform.formclose(sender: tobject; var closeaction: tcloseaction);
@@ -743,7 +736,7 @@ begin
   driver.yoff   := false;
   driver.zoff   := false;
 
-  optimize(setting.layout9, mx, my);
+  calc_(setting.layout9, mx, my);
   driver.move(mx, my);
 end;
 
@@ -990,7 +983,7 @@ begin
   if sender = rightupbtn   then driver.ycount := driver.ycount - edit.value;
   if sender = rightdownbtn then driver.ycount := driver.ycount + edit.value;
 
-  optimize(setting.layout9, mx, my);
+  calc_(setting.layout9, mx, my);
   driver.init(mx, my);
   unlock2;
 end;

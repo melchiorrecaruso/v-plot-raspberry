@@ -1,17 +1,18 @@
 object tmainform: tmainform
-  Left = 377
-  Height = 534
-  Top = 129
-  Width = 651
+  Left = 398
+  Height = 400
+  Top = 120
+  Width = 614
   Anchors = []
-  Caption = 'vPlotter'
-  ClientHeight = 514
-  ClientWidth = 651
+  AutoSize = True
+  Caption = 'vPlot Driver'
+  ClientHeight = 380
+  ClientWidth = 614
   Menu = mainmenu
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  Position = poMainFormCenter
+  Position = poDefault
   LCLVersion = '2.1.0.0'
   object screen: TBGRAVirtualScreen
     AnchorSideLeft.Control = Owner
@@ -22,14 +23,14 @@ object tmainform: tmainform
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 512
+    Height = 378
     Top = 2
-    Width = 651
+    Width = 614
     OnRedraw = screenredraw
     Alignment = taLeftJustify
     Anchors = [akTop, akLeft, akRight, akBottom]
-    ClientHeight = 512
-    ClientWidth = 651
+    ClientHeight = 378
+    ClientWidth = 614
     Color = clForm
     ParentColor = False
     TabOrder = 0
@@ -44,8 +45,8 @@ object tmainform: tmainform
       AnchorSideBottom.Side = asrBottom
       Left = 0
       Height = 15
-      Top = 497
-      Width = 651
+      Top = 363
+      Width = 614
       Alignment = taCenter
       Anchors = [akLeft, akRight, akBottom]
       Caption = 'Time'
@@ -66,13 +67,13 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 13
-    Width = 651
+    Top = 24
+    Width = 614
     Anchors = [akLeft, akRight]
     AutoSize = True
     BevelOuter = bvNone
     ClientHeight = 80
-    ClientWidth = 651
+    ClientWidth = 614
     Color = clYellow
     ParentColor = False
     TabOrder = 1
@@ -527,7 +528,7 @@ object tmainform: tmainform
       Left = 0
       Height = 2
       Top = 78
-      Width = 651
+      Width = 614
       Anchors = [akLeft, akRight, akBottom]
     end
     object calibrationbevelleft: TBevel
@@ -553,13 +554,13 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 44
-    Top = 137
-    Width = 651
+    Top = 128
+    Width = 614
     Anchors = [akLeft, akRight]
     AutoSize = True
     BevelOuter = bvNone
     ClientHeight = 44
-    ClientWidth = 651
+    ClientWidth = 614
     Color = clGradientActiveCaption
     ParentColor = False
     TabOrder = 2
@@ -625,7 +626,7 @@ object tmainform: tmainform
       Left = 0
       Height = 2
       Top = 42
-      Width = 651
+      Width = 614
       Align = alBottom
     end
     object scalelabel: TLabel
@@ -668,14 +669,14 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 201
-    Width = 651
+    Top = 200
+    Width = 614
     Anchors = [akLeft, akRight]
     AutoSize = True
     BevelColor = clForm
     BevelOuter = bvNone
     ClientHeight = 80
-    ClientWidth = 651
+    ClientWidth = 614
     Color = clGradientActiveCaption
     ParentColor = False
     TabOrder = 3
@@ -796,7 +797,7 @@ object tmainform: tmainform
       Left = 0
       Height = 2
       Top = 78
-      Width = 651
+      Width = 614
       Anchors = [akLeft, akRight, akBottom]
     end
     object offsetbevelleft: TBevel
@@ -821,7 +822,7 @@ object tmainform: tmainform
     Left = 0
     Height = 2
     Top = 0
-    Width = 651
+    Width = 614
     Anchors = [akTop, akLeft, akRight]
   end
   object opendialog: TOpenDialog
