@@ -25,16 +25,16 @@ unit layoutfrm;
 
 interface
 
-uses
+uses                     
   buttons, classes, sysutils, forms, controls, graphics, dialogs, extctrls,
-  math, bcradialprogressbar, spin, stdctrls, printersdlgs, printers, vpmath;
+  math, bcradialprogressbar, spin, stdctrls, extdlgs, vpmath;
 
 type
   { tlayoutform }
 
   tlayoutform = class(tform)
-    printbtn: tbitbtn;
-    printdialog: tprintdialog;
+    savebtn: tbitbtn;
+    savedialog: tsavepicturedialog;
     sheetmodelb: tlabel;
     sheetsizecb: tcombobox;
     sheetsize: tlabel;
@@ -57,13 +57,13 @@ type
     minresolutiolb: tlabel;
     sheetoffsetse: tspinedit;
     sheetmodecb: tcombobox;
-
+ 
     procedure formcreate(sender: tobject);
     procedure maxloadsechange(sender: tobject);
     procedure minloadsechange(sender: tobject);
     procedure resetbtnclick(sender: tobject);
-    procedure printbtnclick(sender: tobject);
     procedure drawbtnclick(sender: tobject);
+    procedure savebtnclick(sender: tobject);
   private
      m0: tvppoint;
      m1: tvppoint;
@@ -146,29 +146,12 @@ begin
   lock(true);
 end;
 
-procedure tlayoutform.printbtnclick(sender: tobject);
-var
-    scale: longint;
-  offsetx: longint;
-  offsety: longint;
+procedure tlayoutform.savebtnclick(sender: tobject);
 begin
-  if printdialog.execute then
-    with printer do
-    begin
-      begindoc;
-      scale := min(
-        printer.pagewidth  div image.picture.bitmap.width,
-        printer.pageheight div image.picture.bitmap.height);
-
-      offsetx := (printer.pagewidth -image.picture.bitmap.width *scale)div 2;
-      offsety := (printer.pageheight-image.picture.bitmap.height*scale)div 2;
-
-      printer.canvas.stretchdraw(rect(offsetx, offsety,
-        image.picture.bitmap.width *scale +offsetx,
-        image.picture.bitmap.height*scale+ offsety),
-        image.picture.bitmap);
-      enddoc;
-    end;
+  if savedialog.execute then
+  begin
+    image.picture.savetofile(savedialog.filename);
+  end;
 end;
 
 procedure tlayoutform.lock(value: boolean);
@@ -183,7 +166,7 @@ begin
 
           drawbtn.enabled := value;
          resetbtn.enabled := value;
-         printbtn.enabled := value;
+         savebtn.enabled := value;
 
   if value then
     notebook.pageindex := 1
@@ -334,15 +317,17 @@ begin
   bit.canvas.textout  (((dx+sx)div 2)+gap8, 0, s);
   bit.canvas.rectangle(((dx+sx)div 2)-gap2, bit.canvas.textheight('X=')+gap3, ((dx+sx)div 2), dy-(bit.canvas.textheight('X=')+gap2));
 
-  s  := format('min-load=%f   max-load=%f   min-resolution=%f   offset=%d',
-    [minloadse.value, maxloadse.value, minresolutionse.value, sheetoffsetse.value]);
+  s  := format('min-load=%f  max-load=%f  avg-load=%f  min-resolution=%f  offset=%d',
+    [minloadse.value,  maxloadse.value,
+    (minloadse.value + maxloadse.value)/2,
+     minresolutionse.value, sheetoffsetse.value]);
   bit.canvas.textout((dx-bit.canvas.textwidth(s)) div 2, dy-bit.canvas.textheight(s), s);
 
   bit.endupdate(false);
-  bit.savetofile('loads.bmp');
   //---
   lock(true);
 end;
+
 
 procedure tlayoutform.maxloadsechange(sender: tobject);
 begin

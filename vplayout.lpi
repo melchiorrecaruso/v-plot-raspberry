@@ -24,16 +24,13 @@
       <FormatVersion Value="2"/>
       <Modes Count="0"/>
     </RunParams>
-    <RequiredPackages Count="3">
+    <RequiredPackages Count="2">
       <Item1>
-        <PackageName Value="Printer4Lazarus"/>
+        <PackageName Value="bgracontrols"/>
       </Item1>
       <Item2>
-        <PackageName Value="bgracontrols"/>
-      </Item2>
-      <Item3>
         <PackageName Value="LCL"/>
-      </Item3>
+      </Item2>
     </RequiredPackages>
     <Units>
       <Unit>
@@ -41,7 +38,7 @@
         <IsPartOfProject Value="True"/>
         <TopLine Value="3"/>
         <CursorPos Y="38"/>
-        <UsageCount Value="55"/>
+        <UsageCount Value="56"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -52,9 +49,9 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="321"/>
-        <CursorPos X="77" Y="335"/>
-        <UsageCount Value="55"/>
+        <TopLine Value="127"/>
+        <CursorPos X="28" Y="154"/>
+        <UsageCount Value="56"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -76,7 +73,6 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="46"/>
         <UsageCount Value="9"/>
-        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\..\AppData\Local\lazarus\onlinepackagemanager\packages\bgrabitmap-master\bgrabitmap\bgrasvg.pas"/>
@@ -100,7 +96,6 @@
         <TopLine Value="72"/>
         <CursorPos X="33" Y="88"/>
         <UsageCount Value="8"/>
-        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
         <Filename Value="C:\FPC\3.0.4\source\packages\fcl-image\src\fpcanvas.pp"/>
@@ -174,138 +169,135 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="22"/>
         <UsageCount Value="8"/>
-        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
         <Filename Value="..\lazarus\lcl\graphics.pp"/>
         <UnitName Value="Graphics"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1894"/>
-        <CursorPos X="10" Y="1911"/>
-        <UsageCount Value="8"/>
+        <TopLine Value="886"/>
+        <CursorPos X="38" Y="906"/>
+        <UsageCount Value="10"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\lazarus\lcl\include\graphic.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="124"/>
+        <CursorPos X="3" Y="128"/>
+        <UsageCount Value="10"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\lazarus\lcl\include\picture.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="625"/>
+        <CursorPos X="3" Y="632"/>
+        <UsageCount Value="10"/>
       </Unit>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="26" HistoryIndex="25">
       <Position1>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="329" Column="46" TopLine="302"/>
+        <Caret Line="161" Column="32" TopLine="143"/>
       </Position1>
       <Position2>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="267" Column="71" TopLine="255"/>
+        <Caret Line="326" Column="107" TopLine="322"/>
       </Position2>
       <Position3>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="269" Column="71" TopLine="257"/>
+        <Caret Line="168" Column="62" TopLine="147"/>
       </Position3>
       <Position4>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="270" Column="71" TopLine="258"/>
+        <Caret Line="163" Column="78" TopLine="150"/>
       </Position4>
       <Position5>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="269" Column="71" TopLine="257"/>
+        <Caret Line="222" Column="55" TopLine="210"/>
       </Position5>
       <Position6>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="148" Column="7" TopLine="131"/>
+        <Caret Line="217" Column="41" TopLine="207"/>
       </Position6>
       <Position7>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="149" Column="7" TopLine="132"/>
+        <Caret Line="202" Column="67" TopLine="197"/>
       </Position7>
       <Position8>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="148" Column="7" TopLine="131"/>
+        <Caret Line="330" Column="77" TopLine="316"/>
       </Position8>
       <Position9>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="142" Column="85" TopLine="133"/>
+        <Caret Line="343" Column="84" TopLine="318"/>
       </Position9>
       <Position10>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="278" Column="32" TopLine="273"/>
+        <Caret Line="344" Column="84" TopLine="319"/>
       </Position10>
       <Position11>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="171" Column="7" TopLine="148"/>
+        <Caret Line="347" Column="84" TopLine="322"/>
       </Position11>
       <Position12>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="293" Column="22" TopLine="274"/>
+        <Caret Line="177" Column="43" TopLine="166"/>
       </Position12>
       <Position13>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="110" Column="20" TopLine="106"/>
+        <Caret Line="176" Column="43" TopLine="165"/>
       </Position13>
       <Position14>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="307" Column="60" TopLine="288"/>
+        <Caret Line="175" Column="43" TopLine="164"/>
       </Position14>
       <Position15>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="305" Column="95" TopLine="287"/>
+        <Caret Line="65" Column="46" TopLine="49"/>
       </Position15>
       <Position16>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="312" Column="67" TopLine="298"/>
+        <Caret Line="154" Column="15" TopLine="137"/>
       </Position16>
       <Position17>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="112" Column="16" TopLine="85"/>
+        <Caret Line="153" Column="15" TopLine="136"/>
       </Position17>
       <Position18>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="307" Column="62" TopLine="307"/>
+        <Caret Line="30" Column="44" TopLine="7"/>
       </Position18>
       <Position19>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="147" Column="6" TopLine="144"/>
+        <Caret Line="151" Column="6" TopLine="131"/>
       </Position19>
       <Position20>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="148" Column="6" TopLine="145"/>
+        <Caret Line="152" Column="6" TopLine="132"/>
       </Position20>
       <Position21>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="153" TopLine="139"/>
+        <Caret Line="153" Column="6" TopLine="133"/>
       </Position21>
       <Position22>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="154" Column="20" TopLine="143"/>
+        <Caret Line="152" Column="6" TopLine="132"/>
       </Position22>
       <Position23>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="161" Column="32" TopLine="143"/>
+        <Caret Line="151" Column="6" TopLine="131"/>
       </Position23>
       <Position24>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="326" Column="107" TopLine="322"/>
+        <Caret Line="152" Column="6" TopLine="132"/>
       </Position24>
       <Position25>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="168" Column="62" TopLine="147"/>
+        <Caret Line="153" Column="8" TopLine="127"/>
       </Position25>
       <Position26>
         <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="163" Column="78" TopLine="150"/>
+        <Caret Line="155" TopLine="127"/>
       </Position26>
-      <Position27>
-        <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="222" Column="55" TopLine="210"/>
-      </Position27>
-      <Position28>
-        <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="217" Column="41" TopLine="207"/>
-      </Position28>
-      <Position29>
-        <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="202" Column="67" TopLine="197"/>
-      </Position29>
-      <Position30>
-        <Filename Value="src\layoutfrm.pas"/>
-        <Caret Line="330" Column="77" TopLine="316"/>
-      </Position30>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
@@ -329,7 +321,7 @@
     <CodeGeneration>
       <SmartLinkUnit Value="True"/>
       <Optimizations>
-        <OptimizationLevel Value="4"/>
+        <OptimizationLevel Value="3"/>
       </Optimizations>
     </CodeGeneration>
     <Linking>

@@ -5,6 +5,7 @@
     <General>
       <AutoCreateForms Value="False"/>
       <Title Value="VPlot Driver"/>
+      <Scaled Value="True"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
       <XPManifest>
@@ -87,7 +88,7 @@
         <EditorIndex Value="2"/>
         <TopLine Value="21"/>
         <CursorPos X="82" Y="25"/>
-        <UsageCount Value="119"/>
+        <UsageCount Value="120"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -568,6 +569,7 @@
         <TopLine Value="27"/>
         <CursorPos X="14" Y="49"/>
         <UsageCount Value="5"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
         <Filename Value="../../.lazarus/onlinepackagemanager/packages/bgrabitmap-master/bgrabitmap/bgracanvas2d.pas"/>
@@ -1609,7 +1611,7 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="819"/>
+        <TopLine Value="946"/>
         <CursorPos X="10" Y="985"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
@@ -1631,6 +1633,7 @@
         <EditorIndex Value="-1"/>
         <CursorPos X="73" Y="19"/>
         <UsageCount Value="1"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
         <Filename Value="/usr/share/fpcsrc/3.0.4/rtl/objpas/fgl.pp"/>
@@ -1674,7 +1677,7 @@
         <UsageCount Value="9"/>
       </Unit>
       <Unit>
-        <Filename Value="../../../../../FPC/3.0.4/source/rtl/inc/mathh.inc"/>
+        <Filename Value="/FPC/3.0.4/source/rtl/inc/mathh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="78"/>
         <CursorPos X="14" Y="91"/>
@@ -1697,28 +1700,20 @@
         <UsageCount Value="33"/>
       </Unit>
       <Unit>
-        <Filename Value="../../../../../FPC/3.0.4/source/rtl/objpas/math.pp"/>
+        <Filename Value="/FPC/3.0.4/source/rtl/objpas/math.pp"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="308"/>
         <CursorPos X="10" Y="326"/>
         <UsageCount Value="10"/>
       </Unit>
       <Unit>
-        <Filename Value="../../../../../FPC/3.0.4/source/rtl/objpas/classes/classesh.inc"/>
+        <Filename Value="/FPC/3.0.4/source/rtl/objpas/classes/classesh.inc"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="4" Y="28"/>
         <UsageCount Value="10"/>
       </Unit>
       <Unit>
-        <Filename Value="../../../../../FPC/3.0.4/source/rtl/objpas/types.pp"/>
-        <UnitName Value="Types"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="65"/>
-        <CursorPos X="3" Y="83"/>
-        <UsageCount Value="10"/>
-      </Unit>
-      <Unit>
-        <Filename Value="../../../../../FPC/3.0.4/source/rtl/inc/typshrdh.inc"/>
+        <Filename Value="/FPC/3.0.4/source/rtl/inc/typshrdh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="129"/>
         <CursorPos X="19" Y="158"/>
