@@ -163,7 +163,8 @@ begin
 
   dx := abs(dx);
   dy := abs(dy);
-  repeat
+  while (dx > 0) or (dy > 0) do
+  begin
     if dx > 0 then
     begin
       digitalwrite(motx_step, HIGH); delaymicroseconds(fxdelay);
@@ -177,7 +178,7 @@ begin
       digitalwrite(moty_step,  LOW); delaymicroseconds(fydelay);
       dec(dy);
     end;
-  until (dx = 0) and (dy = 0);
+  end;
   {$endif}
   fxcount := axcount;
   fycount := aycount;
