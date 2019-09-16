@@ -35,7 +35,7 @@ type
     flayout0:   tvppoint;
     flayout1:   tvppoint;
     flayout8:   tvppoint;
-    flayout9:   tvppoint;
+    flayoutx:   vpfloat;
     // x-axis
     fxmin:      longint;
     fxmax:      longint;
@@ -81,7 +81,7 @@ type
     property layout0:        tvppoint read flayout0;
     property layout1:        tvppoint read flayout1;
     property layout8:        tvppoint read flayout8;
-    property layout9:        tvppoint read flayout9;
+    property layoutx:        vpfloat  read flayoutx;
 
     property xmin:           longint  read fxmin;
     property xmax:           longint  read fxmax;
@@ -149,8 +149,7 @@ begin
   flayout1.y   := ini.readfloat   ('LAYOUT',  'L1.Y',  0);
   flayout8.x   := ini.readfloat   ('LAYOUT',  'L8.X',  0);
   flayout8.y   := ini.readfloat   ('LAYOUT',  'L8.Y',  0);
-  flayout9.x   := ini.readfloat   ('LAYOUT',  'L9.X',  0);
-  flayout9.y   := ini.readfloat   ('LAYOUT',  'L9.Y',  0);
+  flayoutx     := ini.readfloat   ('LAYOUT',  'LX',    0);
 
   fxmin        := ini.readinteger('X-AXIS',  'MIN',    0);
   fxmax        := ini.readinteger('X-AXIS',  'MAX',    0);
@@ -202,7 +201,7 @@ begin
     writeln(format('  LAYOUT::L0.X   = %12.5f  L0.Y = %12.5f', [flayout0.x, flayout0.y]));
     writeln(format('  LAYOUT::L1.X   = %12.5f  L1.Y = %12.5f', [flayout1.x, flayout1.y]));
     writeln(format('  LAYOUT::L8.X   = %12.5f  L8.Y = %12.5f', [flayout8.x, flayout8.y]));
-    writeln(format('  LAYOUT::L9.X   = %12.5f  L9.Y = %12.5f', [flayout9.x, flayout9.y]));
+    writeln(format('  LAYOUT::LX     = %12.5f', [flayoutx ]));
 
     writeln(format('  X-AXIS::MIN    = %12.5u', [fxmin    ]));
     writeln(format('  X-AXIS::MAX    = %12.5u', [fxmax    ]));

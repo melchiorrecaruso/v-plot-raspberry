@@ -1304,7 +1304,7 @@ begin
   clear;
 
   pz := setting.zmax;
-  p0 := setting.layout9;
+  p0 := setting.layout8;
   for i := 0 to elemlist.count -1 do
   begin
     elem := elemlist.items[i];

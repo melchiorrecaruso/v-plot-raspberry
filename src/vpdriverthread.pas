@@ -119,7 +119,7 @@ begin
   if assigned(onstart) then
     synchronize(fonstart);
 
-  p0 := setting.layout9;
+  p0 := setting.layout8;
   for i := 0 to fpath.count -1 do
   begin
     if not terminated then

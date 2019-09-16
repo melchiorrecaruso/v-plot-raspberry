@@ -1,11 +1,11 @@
 object tmainform: tmainform
   Left = 350
-  Height = 400
+  Height = 477
   Top = 152
   Width = 600
   Anchors = []
   Caption = 'vPlot Driver'
-  ClientHeight = 376
+  ClientHeight = 455
   ClientWidth = 600
   Menu = mainmenu
   OnClose = FormClose
@@ -22,13 +22,13 @@ object tmainform: tmainform
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 374
+    Height = 453
     Top = 2
     Width = 600
     OnRedraw = screenredraw
     Alignment = taLeftJustify
     Anchors = [akTop, akLeft, akRight, akBottom]
-    ClientHeight = 374
+    ClientHeight = 453
     ClientWidth = 600
     Color = clForm
     ParentColor = False
@@ -43,8 +43,8 @@ object tmainform: tmainform
       AnchorSideBottom.Control = screen
       AnchorSideBottom.Side = asrBottom
       Left = 0
-      Height = 18
-      Top = 356
+      Height = 16
+      Top = 437
       Width = 600
       Alignment = taCenter
       Anchors = [akLeft, akRight, akBottom]
@@ -66,7 +66,7 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 21
+    Top = 32
     Width = 600
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -553,7 +553,7 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 44
-    Top = 126
+    Top = 157
     Width = 600
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -668,7 +668,7 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 197
+    Top = 272
     Width = 600
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -826,13 +826,13 @@ object tmainform: tmainform
   end
   object opendialog: TOpenDialog
     Options = [ofPathMustExist, ofFileMustExist, ofEnableSizing, ofViewDetail]
-    left = 128
-    top = 368
+    left = 168
+    top = 216
   end
   object mainmenu: TMainMenu
     OwnerDraw = True
-    left = 64
-    top = 368
+    left = 80
+    top = 216
     object filemi: TMenuItem
       Caption = 'File'
       object loadmi: TMenuItem
@@ -1161,13 +1161,13 @@ object tmainform: tmainform
   end
   object savedialog: TSaveDialog
     Options = [ofOverwritePrompt, ofPathMustExist, ofEnableSizing, ofViewDetail]
-    left = 192
-    top = 368
+    left = 240
+    top = 216
   end
   object popup: TPopupMenu
     AutoPopup = False
-    left = 256
-    top = 368
+    left = 304
+    top = 216
     object selallpm: TMenuItem
       Caption = 'Select all'
       OnClick = selallpmclick

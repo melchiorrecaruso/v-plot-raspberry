@@ -312,7 +312,7 @@ begin
   // update virtual screen
   a0miclick(a3mi);
   // initialize driver
-  calc_(setting.layout9, mx, my);
+  calc_(setting.layout8, mx, my);
   driver.init(mx, my);
   // update panels
   scalepanel      .anchors := [akleft, akright, aktop];
@@ -691,7 +691,7 @@ begin
   begin
     driverthread         := tvpdriverthread.create(path);
     driverthread.xcenter := setting.layout8.x;
-    driverthread.ycenter := setting.layout8.y+pageheight/2;
+    driverthread.ycenter := setting.layout8.y+setting.layoutx*(pageheight);
     driverthread.onstart := @onplotterstart;
     driverthread.onstop  := @onplotterstop;
     driverthread.ontick  := @onplottertick;
@@ -736,7 +736,7 @@ begin
   driver.yoff   := false;
   driver.zoff   := false;
 
-  calc_(setting.layout9, mx, my);
+  calc_(setting.layout8, mx, my);
   driver.move(mx, my);
 end;
 
@@ -983,7 +983,7 @@ begin
   if sender = rightupbtn   then driver.ycount := driver.ycount - edit.value;
   if sender = rightdownbtn then driver.ycount := driver.ycount + edit.value;
 
-  calc_(setting.layout9, mx, my);
+  calc_(setting.layout8, mx, my);
   driver.init(mx, my);
   unlock2;
 end;
