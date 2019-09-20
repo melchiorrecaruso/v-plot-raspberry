@@ -90,7 +90,6 @@
         <CursorPos X="71" Y="21"/>
         <UsageCount Value="122"/>
         <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="src/vpcoder.pas"/>
@@ -372,7 +371,7 @@
         <ResourceBaseClass Value="Form"/>
         <EditorIndex Value="3"/>
         <TopLine Value="35"/>
-        <CursorPos X="43" Y="41"/>
+        <CursorPos X="44" Y="40"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1513,9 +1512,10 @@
       </Unit>
       <Unit>
         <Filename Value="src/vpdriverthread.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="4"/>
-        <CursorPos X="46" Y="17"/>
+        <TopLine Value="121"/>
+        <CursorPos X="46" Y="140"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
       </Unit>
@@ -1615,10 +1615,9 @@
         <ComponentName Value="tmainform"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="682"/>
-        <CursorPos X="18" Y="694"/>
+        <TopLine Value="715"/>
+        <CursorPos X="34" Y="719"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -1739,7 +1738,7 @@
         <UsageCount Value="10"/>
       </Unit>
     </Units>
-    <JumpHistory Count="28" HistoryIndex="27">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="src/mainfrm.pas"/>
         <Caret Line="332" TopLine="317"/>
@@ -1852,6 +1851,10 @@
         <Filename Value="src/mainfrm.pas"/>
         <Caret Line="694" Column="18" TopLine="682"/>
       </Position28>
+      <Position29>
+        <Filename Value="src/mainfrm.pas"/>
+        <Caret Line="699" Column="31" TopLine="715"/>
+      </Position29>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
