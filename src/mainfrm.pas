@@ -691,7 +691,10 @@ begin
   begin
     driverthread         := tvpdriverthread.create(path);
     driverthread.xcenter := setting.layout8.x;
-    driverthread.ycenter := setting.layout8.y+setting.layoutx*(pageheight);
+    driverthread.ycenter := setting.layout8.y+
+                            setting.layouty1*(pageheight)+
+                            setting.layouty2;
+
     driverthread.onstart := @onplotterstart;
     driverthread.onstop  := @onplotterstop;
     driverthread.ontick  := @onplottertick;

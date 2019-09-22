@@ -5,7 +5,7 @@ object tmainform: tmainform
   Width = 600
   Anchors = []
   Caption = 'vPlot Driver'
-  ClientHeight = 455
+  ClientHeight = 453
   ClientWidth = 600
   Menu = mainmenu
   OnClose = FormClose
@@ -22,13 +22,13 @@ object tmainform: tmainform
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 453
+    Height = 451
     Top = 2
     Width = 600
     OnRedraw = screenredraw
     Alignment = taLeftJustify
     Anchors = [akTop, akLeft, akRight, akBottom]
-    ClientHeight = 453
+    ClientHeight = 451
     ClientWidth = 600
     Color = clForm
     ParentColor = False
@@ -43,8 +43,8 @@ object tmainform: tmainform
       AnchorSideBottom.Control = screen
       AnchorSideBottom.Side = asrBottom
       Left = 0
-      Height = 16
-      Top = 437
+      Height = 18
+      Top = 433
       Width = 600
       Alignment = taCenter
       Anchors = [akLeft, akRight, akBottom]
@@ -66,7 +66,7 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 32
+    Top = 29
     Width = 600
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -553,7 +553,7 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 44
-    Top = 157
+    Top = 156
     Width = 600
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -668,7 +668,7 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 272
+    Top = 271
     Width = 600
     Anchors = [akLeft, akRight]
     AutoSize = True
