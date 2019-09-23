@@ -26,7 +26,7 @@ unit vpsketcher;
 interface
 
 uses
-  bgrabitmap, classes, fpimage, sysutils, vpmath, vppaths;
+  bgrabitmap, classes, fpimage, sysutils, vpdriver, vpmath, vppaths;
 
 type
   tvpsketcher = class
@@ -41,8 +41,8 @@ type
     destructor destroy; override;
     procedure update(elements: tvpelementlist); virtual abstract;
   public
-    property dotsize:   vpfloat  read fdotsize   write fdotsize;
-    property patternw:  vpfloat  read fpatternw  write fpatternw;
+    property dotsize:   vpfloat read fdotsize   write fdotsize;
+    property patternw:  vpfloat read fpatternw  write fpatternw;
     property patternbw: longint read fpatternbw write fpatternbw;
   end;
 
@@ -144,7 +144,7 @@ begin
     line.p1.y := 0;
     result.add(line);
   end;
-  result.interpolate(0.5);
+  result.interpolate(driver_resolution);
 end;
 
 procedure tvpsketcher1.update(elements: tvpelementlist);
@@ -195,7 +195,7 @@ begin
   list1.destroy;
   elements.mirrorx;
   elements.movetoorigin;
-  elements.interpolate(0.5);
+  elements.interpolate(driver_resolution);
 end;
 
 // tvpsketcher2
@@ -285,7 +285,7 @@ begin
     end;
   end;
   elements.destroy;
-  result.interpolate(0.5);
+  result.interpolate(driver_resolution);
 end;
 
 // tvpsketcher3

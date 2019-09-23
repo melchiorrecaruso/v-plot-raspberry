@@ -29,7 +29,7 @@ unit vpdxfreader;
 interface
 
 uses
-  classes, fpimage, sysutils, vppaths, vpmath;
+  classes, fpimage, sysutils, vpdriver, vpmath, vppaths;
 
 type
   tpolylineelement = record
@@ -1223,7 +1223,7 @@ begin
   reader.readfromfile(afilename, elements);
   reader.destroy;
 
-  elements.interpolate(0.5);
+  elements.interpolate(driver_resolution);
   elements.movetoorigin;
 end;
 

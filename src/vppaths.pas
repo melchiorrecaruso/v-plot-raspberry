@@ -208,7 +208,7 @@ type
 implementation
 
 uses
-  math, vpsetting;
+  math, vpsetting, vpdriver;
 
 // tvpelement routines
 
@@ -1189,7 +1189,6 @@ var
 begin
   list1 := tfplist.create;
 
-
   if flist.count > 0 then
   begin
     elem0 := tvpelement(flist[0]);
@@ -1213,7 +1212,7 @@ begin
 
           elem2        := tvpelementcirclearc.create(a0);
           elem2.flayer := elem0.flayer;
-          elem2.interpolate(0.5);
+          elem2.interpolate(driver_resolution);
 
           list1.add(elem2);
         end;
@@ -1245,7 +1244,7 @@ begin
     for i := 0 to list1.count -1 do
       flist.add(list1[i]);
     list1.clear;
-    interpolate(0.1);
+    interpolate(driver_resolution);
   end;
 
   list1.destroy;
@@ -1310,7 +1309,7 @@ begin
     elem := elemlist.items[i];
     if elem.hidden = false then
     begin
-      elem.interpolate(0.1);
+      elem.interpolate(driver_resolution);
 
       for j := 0 to elem.count -1 do
       begin
@@ -1342,7 +1341,7 @@ begin
           end;
       end;
 
-      elem.interpolate(0.5);
+      elem.interpolate(driver_resolution);
     end;
   end;
   inc(fpathraises);
