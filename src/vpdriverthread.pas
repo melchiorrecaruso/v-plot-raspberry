@@ -146,11 +146,6 @@ begin
     end;
   end;
 
-  // move to home
-  driver.zcount := setting.zmax;
-  calc_(setting.layout8, mx, my);
-  driver.move(mx, my);
-
   if assigned(fonstop) then
     synchronize(fonstop);
 end;

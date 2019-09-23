@@ -63,9 +63,25 @@ type
 var
   driver:  tvpdriver = nil;
 
+  drivermatrix : array [0..10, 0..18] of longint = (
+     (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),  //  0
+     (0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0),  //  1
+     (0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0),  //  2
+     (0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0),  //  3
+     (1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1),  //  4
+     (1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1),  //  5
+     (0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0),  //  6
+     (1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1),  //  7
+     (1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1),  //  8
+     (0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0),  //  9
+     (1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1)); // 10
+
 implementation
 
 {$ifdef cpuarm}
+uses
+  math;
+
 const
   motx_on   = P37;
   moty_on   = P37;
@@ -124,10 +140,9 @@ end;
 procedure tvpdriver.move(axcount, aycount: longint);
 {$ifdef cpuarm}
 var
-  dx: longint;
-  dy: longint;
-  bx: boolean;
-  by: boolean;
+  dx, ddx: longint;
+  dy, ddy: longint;
+        i: longint;
 {$endif}
 begin
   {$ifdef cpuarm}
@@ -165,19 +180,24 @@ begin
   dy := abs(dy);
   while (dx > 0) or (dy > 0) do
   begin
-    if dx > 0 then
+    ddx := min(10, dx);
+    ddy := min(10, dy);
+    for i := 0 to 18 do
     begin
-      digitalwrite(motx_step, HIGH); delaymicroseconds(fxdelay);
-      digitalwrite(motx_step,  LOW); delaymicroseconds(fxdelay);
-      dec(dx);
-    end;
+      if drivermatrix[ddx, i] = 1 then
+      begin
+        digitalwrite(motx_step, HIGH); delaymicroseconds(fxdelay);
+        digitalwrite(motx_step,  LOW); delaymicroseconds(fxdelay);
+      end;
 
-    if dy > 0 then
-    begin
-      digitalwrite(moty_step, HIGH); delaymicroseconds(fydelay);
-      digitalwrite(moty_step,  LOW); delaymicroseconds(fydelay);
-      dec(dy);
+      if drivermatrix[ddy, i] = 1 then
+      begin
+        digitalwrite(moty_step, HIGH); delaymicroseconds(fydelay);
+        digitalwrite(moty_step,  LOW); delaymicroseconds(fydelay);
+      end;
     end;
+    dec(dx, ddx);
+    dec(dy, ddy);
   end;
   {$endif}
   fxcount := axcount;

@@ -195,7 +195,7 @@ object aboutform: Taboutform
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 12
-    Caption = 'Build 20190922'
+    Caption = 'Build 20190923'
     Layout = tlCenter
     ParentColor = False
   end
