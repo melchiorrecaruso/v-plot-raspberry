@@ -46,22 +46,17 @@ type
     property patternbw: longint read fpatternbw write fpatternbw;
   end;
 
-  tvpsketcher1 = class(tvpsketcher)
+  tvpsketchersquare = class(tvpsketcher)
   private
     function step1(n, width: vpfloat): tvpelementlist; virtual;
   public
     procedure update(elements: tvpelementlist); override;
   end;
 
-  tvpsketcher2 = class(tvpsketcher1)
+  tvpsketcherrounded = class(tvpsketchersquare)
   private
     function step1(n, width: vpfloat): tvpelementlist; override;
     function step2(elements: tvpelementlist; radius: vpfloat): tvpelementlist;
-  end;
-
-  tvpsketcher3 = class(tvpsketcher1)
-  private
-    function step1(n, width: vpfloat): tvpelementlist; override;
   end;
 
 
@@ -103,9 +98,9 @@ begin
   result := round((patternw/dotsize)-(patternw/dotsize)*(k/((3*$FFFF)*sqr(width))));
 end;
 
-// tvpsketcher1
+// tvpsketchersquare
 
-function tvpsketcher1.step1(n, width: vpfloat): tvpelementlist;
+function tvpsketchersquare.step1(n, width: vpfloat): tvpelementlist;
 var
   line: tvpline;
 begin
@@ -147,7 +142,7 @@ begin
   result.interpolate(0.5);
 end;
 
-procedure tvpsketcher1.update(elements: tvpelementlist);
+procedure tvpsketchersquare.update(elements: tvpelementlist);
 var
   i, j, k: longint;
    aw, ah: longint;
@@ -198,9 +193,9 @@ begin
   elements.interpolate(0.5);
 end;
 
-// tvpsketcher2
+// tvpsketcherrounded
 
-function tvpsketcher2.step1(n, width: vpfloat): tvpelementlist;
+function tvpsketcherrounded.step1(n, width: vpfloat): tvpelementlist;
 begin
   if n > 0 then
     result := step2(inherited step1(n, width), width/(2*n))
@@ -208,7 +203,7 @@ begin
     result :=       inherited step1(n, width)
 end;
 
-function tvpsketcher2.step2(elements: tvpelementlist; radius: vpfloat): tvpelementlist;
+function tvpsketcherrounded.step2(elements: tvpelementlist; radius: vpfloat): tvpelementlist;
 var
    i: longint;
   l0: tvpline;
@@ -288,12 +283,6 @@ begin
   result.interpolate(0.5);
 end;
 
-// tvpsketcher3
-
-function tvpsketcher3.step1(n, width: vpfloat): tvpelementlist;
-begin
-  result := inherited step1(n, width);
-end;
 
 end.
 

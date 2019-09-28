@@ -424,10 +424,9 @@ begin
         bit.canvas.clear;
         bit.loadfromfile(opendialog.filename);
         case (importform.imcb.itemindex + 1) of
-          1: sk := tvpsketcher1.create(bit);
-          2: sk := tvpsketcher2.create(bit);
-          3: sk := tvpsketcher3.create(bit);
-        else sk := tvpsketcher1.create(bit);
+          1: sk := tvpsketchersquare.create(bit);
+          2: sk := tvpsketcherrounded.create(bit);
+        else sk := tvpsketchersquare.create(bit);
         end;
         sk.patternbw := importform.ipwse.value;
         sk.patternw  := importform. pwse.value;
