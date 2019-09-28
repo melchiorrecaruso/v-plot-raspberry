@@ -1006,7 +1006,7 @@ var
         s: tmemorystream;
 begin
   s := tmemorystream.create;
-  s.writeansistring('vpl3.1');
+  s.writeansistring('vpl3.0');
   s.write(flist.count, sizeof(longint));
   for i := 0 to flist.count -1 do
   begin
@@ -1035,7 +1035,7 @@ begin
 
   s := tmemorystream.create;
   s.loadfromfile(filename);
-  if s.readansistring = 'vpl3.1' then
+  if s.readansistring = 'vpl3.0' then
   begin
 
     if s.read(j, sizeof(longint))= sizeof(longint) then
@@ -1212,7 +1212,7 @@ begin
 
           elem2        := tvpelementcirclearc.create(a0);
           elem2.flayer := elem0.flayer;
-          elem2.interpolate(driver_resolution);
+          elem2.interpolate(0.5);
 
           list1.add(elem2);
         end;
@@ -1244,7 +1244,7 @@ begin
     for i := 0 to list1.count -1 do
       flist.add(list1[i]);
     list1.clear;
-    interpolate(driver_resolution);
+    interpolate(0.5);
   end;
 
   list1.destroy;
@@ -1341,7 +1341,7 @@ begin
           end;
       end;
 
-      elem.interpolate(driver_resolution);
+      elem.interpolate(0.5);
     end;
   end;
   inc(fpathraises);

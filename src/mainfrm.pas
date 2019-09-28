@@ -355,7 +355,7 @@ begin
     lock2;
     page.clear;
     page.load(opendialog.filename);
-    page.interpolate(driver_resolution);
+    page.interpolate(0.5);
     pagecount := page.count;
     fitmiclick(sender);
     unlock2;
@@ -380,7 +380,7 @@ begin
   lock2;
   path.clear;
   page.clear;
-  page.interpolate(driver_resolution);
+  page.interpolate(0.5);
   pagecount := page.count;
   fitmiclick(sender);
   unlock2;
@@ -401,13 +401,13 @@ begin
     if (lowercase(extractfileext(opendialog.filename)) = '.dxf') then
     begin
       dxf2paths(opendialog.filename, page);
-      page.interpolate(driver_resolution);
+      page.interpolate(0.5);
       page.createtoolpath;
     end else
     if (lowercase(extractfileext(opendialog.filename)) = '.svg') then
     begin
       svg2paths(opendialog.filename, page);
-      page.interpolate(driver_resolution);
+      page.interpolate(0.5);
       page.createtoolpath;
     end else
     if (lowercase(extractfileext(opendialog.filename)) = '.bmp') or

@@ -144,7 +144,7 @@ begin
     line.p1.y := 0;
     result.add(line);
   end;
-  result.interpolate(driver_resolution);
+  result.interpolate(0.5);
 end;
 
 procedure tvpsketcher1.update(elements: tvpelementlist);
@@ -195,7 +195,7 @@ begin
   list1.destroy;
   elements.mirrorx;
   elements.movetoorigin;
-  elements.interpolate(driver_resolution);
+  elements.interpolate(0.5);
 end;
 
 // tvpsketcher2
@@ -285,7 +285,7 @@ begin
     end;
   end;
   elements.destroy;
-  result.interpolate(driver_resolution);
+  result.interpolate(0.5);
 end;
 
 // tvpsketcher3

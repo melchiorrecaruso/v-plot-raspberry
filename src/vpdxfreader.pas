@@ -1223,7 +1223,7 @@ begin
   reader.readfromfile(afilename, elements);
   reader.destroy;
 
-  elements.interpolate(driver_resolution);
+  elements.interpolate(0.5);
   elements.movetoorigin;
 end;
 
