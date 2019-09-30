@@ -1,7 +1,7 @@
 object importform: Timportform
-  Left = 413
+  Left = 374
   Height = 220
-  Top = 263
+  Top = 249
   Width = 345
   BorderStyle = bsDialog
   Caption = 'Import ...'
@@ -78,6 +78,7 @@ object importform: Timportform
     Items.Strings = (
       'Raster graphics - Square wave'
       'Raster graphics - Rounded square wave'
+      'Raster graphics - Triangular wave'
     )
     Style = csDropDownList
     TabOrder = 3

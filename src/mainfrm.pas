@@ -425,11 +425,14 @@ begin
         bit.loadfromfile(opendialog.filename);
         case (importform.imcb.itemindex + 1) of
           1: sk := tvpsketchersquare.create(bit);
-          2: sk := tvpsketcherrounded.create(bit);
+          2: sk := tvpsketcherroundedsquare.create(bit);
+          3: sk := tvpsketchertriangular.create(bit);
         else sk := tvpsketchersquare.create(bit);
         end;
         sk.patternbw := importform.ipwse.value;
+        sk.patternbh := importform.ipwse.value;
         sk.patternw  := importform. pwse.value;
+        sk.patternh  := importform. pwse.value;
         sk.dotsize   := importform.dsfse.value;
         sk.update(page);
         sk.destroy;

@@ -26,37 +26,48 @@ unit vpsketcher;
 interface
 
 uses
-  bgrabitmap, classes, fpimage, sysutils, vpdriver, vpmath, vppaths;
+  bgrabitmap, classes, math, fpimage, sysutils, vpdriver, vpmath, vppaths;
 
 type
   tvpsketcher = class
   private
-   fbit:       tbgrabitmap;
-   fdotsize:   vpfloat;
-   fpatternw:  vpfloat;
-   fpatternbw: longint;
-   function getdarkness(x, y, width: longint): longint;
+    fbit: tbgrabitmap;
+    fdotsize: vpfloat;
+    fpatternh: vpfloat;
+    fpatternw: vpfloat;
+    fpatternbh: longint;
+    fpatternbw: longint;
+    function getdarkness(x, y, heigth, width: longint): vpfloat;
   public
     constructor create(bit: tbgrabitmap);
     destructor destroy; override;
     procedure update(elements: tvpelementlist); virtual abstract;
   public
     property dotsize:   vpfloat read fdotsize   write fdotsize;
+    property patternh:  vpfloat read fpatternh  write fpatternh;
     property patternw:  vpfloat read fpatternw  write fpatternw;
+    property patternbh: longint read fpatternbh write fpatternbh;
     property patternbw: longint read fpatternbw write fpatternbw;
   end;
 
   tvpsketchersquare = class(tvpsketcher)
   private
-    function step1(n, width: vpfloat): tvpelementlist; virtual;
+    function step1(n, heigth, width: vpfloat): tvpelementlist; virtual;
   public
     procedure update(elements: tvpelementlist); override;
   end;
 
-  tvpsketcherrounded = class(tvpsketchersquare)
+  tvpsketcherroundedsquare = class(tvpsketchersquare)
   private
-    function step1(n, width: vpfloat): tvpelementlist; override;
+    function step1(n, heigth, width: vpfloat): tvpelementlist; override;
     function step2(elements: tvpelementlist; radius: vpfloat): tvpelementlist;
+  end;
+
+  tvpsketchertriangular = class(tvpsketcher)
+  private
+    function step1(n, heigth, width: vpfloat): tvpelementlist; virtual;
+  public
+    procedure update(elements: tvpelementlist); override;
   end;
 
 
@@ -69,7 +80,9 @@ begin
   inherited create;
   fbit       := bit;
   fdotsize   := 0.5;
+  fpatternh  := 10;
   fpatternw  := 10;
+  fpatternbh := 10;
   fpatternbw := 10;
 end;
 
@@ -78,29 +91,28 @@ begin
   inherited destroy;
 end;
 
-function tvpsketcher.getdarkness(x, y, width: longint): longint;
+function tvpsketcher.getdarkness(x, y, heigth, width: longint): vpfloat;
 var
   i: longint;
   j: longint;
-  k: longint;
   c: tfpcolor;
 begin
-  k := 0;
-  for j := 0 to width -1 do
+  result := 0;
+  for j := 0 to heigth -1 do
     for i := 0 to width -1 do
     begin
       c := fbit.colors[x+i, y+j];
-      k := k + c.blue;
-      k := k + c.green;
-      k := k + c.red;
+      result := result + c.blue;
+      result := result + c.green;
+      result := result + c.red;
     end;
 
-  result := round((patternw/dotsize)-(patternw/dotsize)*(k/((3*$FFFF)*sqr(width))));
+  result := 1 - result/(3*$FFFF*(heigth*width));
 end;
 
 // tvpsketchersquare
 
-function tvpsketchersquare.step1(n, width: vpfloat): tvpelementlist;
+function tvpsketchersquare.step1(n, heigth, width: vpfloat): tvpelementlist;
 var
   line: tvpline;
 begin
@@ -119,7 +131,7 @@ begin
       begin
         line.p0 := line.p1;
         if line.p1.y = 0 then
-          line.p1.y := line.p1.y + width
+          line.p1.y := line.p1.y + heigth
         else
           line.p1.y := 0
       end else
@@ -144,15 +156,16 @@ end;
 
 procedure tvpsketchersquare.update(elements: tvpelementlist);
 var
-  i, j, k: longint;
-   aw, ah: longint;
-    list1: tvpelementlist;
-    list2: tvpelementlist;
-       mx: boolean;
+   i, j, k: longint;
+    aw, ah: longint;
+      dark: vpfloat;
+     list1: tvpelementlist;
+     list2: tvpelementlist;
+        mx: boolean;
 begin
   list1 := tvpelementlist.create;
      aw := (fbit.width  div fpatternbw);
-     ah := (fbit.height div fpatternbw);
+     ah := (fbit.height div fpatternbh);
      mx := false;
 
   j := 0;
@@ -161,9 +174,8 @@ begin
     i := 0;
     while i < aw do
     begin
-      list2 := step1(getdarkness(
-        fpatternbw*i, fpatternbw*j,
-        fpatternbw),  fpatternw);
+      dark  := getdarkness(fpatternbw*i, fpatternbh*j, fpatternbw, fpatternbh);
+      list2 := step1(round((fpatternw/dotsize)*dark), fpatternh, fpatternw);
 
       if mx then
       begin
@@ -193,17 +205,17 @@ begin
   elements.interpolate(0.5);
 end;
 
-// tvpsketcherrounded
+// tvpsketcherroundedsquare
 
-function tvpsketcherrounded.step1(n, width: vpfloat): tvpelementlist;
+function tvpsketcherroundedsquare.step1(n, heigth, width: vpfloat): tvpelementlist;
 begin
   if n > 0 then
-    result := step2(inherited step1(n, width), width/(2*n))
+    result := step2(inherited step1(n, heigth, width), width/(2*n))
   else
-    result :=       inherited step1(n, width)
+    result :=       inherited step1(n, heigth, width)
 end;
 
-function tvpsketcherrounded.step2(elements: tvpelementlist; radius: vpfloat): tvpelementlist;
+function tvpsketcherroundedsquare.step2(elements: tvpelementlist; radius: vpfloat): tvpelementlist;
 var
    i: longint;
   l0: tvpline;
@@ -281,6 +293,98 @@ begin
   end;
   elements.destroy;
   result.interpolate(0.5);
+end;
+
+// tvpsketchertriangular
+
+function tvpsketchertriangular.step1(n, heigth, width: vpfloat): tvpelementlist;
+var
+  line: tvpline;
+begin
+  result := tvpelementlist.create;
+  if n > 0 then
+  begin
+    line.p0.x := 0;
+    line.p0.y := 0;
+    line.p1.x := width/(n*2);
+    line.p1.y := heigth;
+    result.add(line);
+
+    while line.p1.x < width do
+    begin
+      if line.p1.y > line.p0.y then
+      begin
+        line.p0   := line.p1;
+        line.p1.x := min(line.p1.x + width/(n), width);
+        line.p1.y := 0;
+      end else
+      begin
+        line.p0   := line.p1;
+        line.p1.x := min(line.p1.x + width/(n), width);
+        line.p1.y := heigth;
+      end;
+      result.add(line);
+    end;
+  end else
+  begin
+    line.p0.x := 0;
+    line.p0.y := 0;
+    line.p1.x := width;
+    line.p1.y := 0;
+    result.add(line);
+  end;
+  result.interpolate(0.5);
+end;
+
+procedure tvpsketchertriangular.update(elements: tvpelementlist);
+var
+  i, j, k: longint;
+   aw, ah: longint;
+     dark: vpfloat;
+    list1: tvpelementlist;
+    list2: tvpelementlist;
+       mx: boolean;
+begin
+  list1 := tvpelementlist.create;
+     aw := (fbit.width  div fpatternbw);
+     ah := (fbit.height div fpatternbw);
+     mx := false;
+
+  j := 0;
+  while j < ah do
+  begin
+    i := 0;
+    while i < aw do
+    begin
+      dark  := getdarkness(fpatternbw*i, fpatternbh*j, fpatternbw, fpatternbh);
+      list2 := step1(round((fpatternw/dotsize)*dark), fpatternh, fpatternw);
+
+      if mx then
+      begin
+        list2.mirrorx;
+        list2.move(0, patternw);
+      end;
+      mx := list2.items[list2.count -1].last^.y > 0;
+
+      for k := 0 to list2.count -1 do
+      begin
+        list2.items[k].move(patternw*i, patternw*j);
+        list2.items[k].layer := j;
+      end;
+      list1.add(list2);
+      list2.destroy;
+      inc(i, 1);
+    end;
+
+    if j mod 2 = 1 then
+      list1.invert;
+    elements.add(list1);
+    inc(j, 1);
+  end;
+  list1.destroy;
+  elements.mirrorx;
+  elements.movetoorigin;
+  elements.interpolate(0.5);
 end;
 
 
