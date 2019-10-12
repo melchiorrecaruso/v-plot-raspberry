@@ -1,0 +1,552 @@
+object setupform: Tsetupform
+  Left = 531
+  Height = 435
+  Top = 171
+  Width = 415
+  BorderStyle = bsDialog
+  Caption = 'Check setting'
+  ClientHeight = 435
+  ClientWidth = 415
+  LCLVersion = '2.1.0.0'
+  object calculatebtn: TBitBtn
+    AnchorSideLeft.Control = clearbtn
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 106
+    Height = 42
+    Top = 373
+    Width = 289
+    Anchors = [akLeft, akRight, akBottom]
+    BorderSpacing.Left = 6
+    BorderSpacing.Right = 20
+    BorderSpacing.Bottom = 20
+    Caption = 'Calculate'
+    OnClick = calculatebtnClick
+    TabOrder = 0
+  end
+  object homexse: TFloatSpinEdit
+    AnchorSideLeft.Control = pnt0xse
+    AnchorSideTop.Control = homelb
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = pnt0xse
+    AnchorSideRight.Side = asrBottom
+    Left = 80
+    Height = 28
+    Top = 198
+    Width = 96
+    Alignment = taRightJustify
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 5
+    MaxValue = 0
+    MinValue = 0
+    TabOrder = 1
+    Value = 0
+  end
+  object homeyse: TFloatSpinEdit
+    AnchorSideLeft.Control = homexse
+    AnchorSideTop.Control = homexse
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = homexse
+    AnchorSideRight.Side = asrBottom
+    Left = 80
+    Height = 28
+    Top = 232
+    Width = 96
+    Alignment = taRightJustify
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 6
+    MaxValue = 0
+    MinValue = 0
+    TabOrder = 2
+    Value = 0
+  end
+  object homexlb: TLabel
+    AnchorSideTop.Control = homexse
+    AnchorSideRight.Control = homexse
+    AnchorSideBottom.Control = homexse
+    AnchorSideBottom.Side = asrBottom
+    Left = 40
+    Height = 28
+    Top = 198
+    Width = 35
+    Anchors = [akTop, akRight, akBottom]
+    BorderSpacing.Right = 5
+    Caption = 'X (mm)'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object homeylb: TLabel
+    AnchorSideTop.Control = homeyse
+    AnchorSideRight.Control = homeyse
+    AnchorSideBottom.Control = homeyse
+    AnchorSideBottom.Side = asrBottom
+    Left = 40
+    Height = 28
+    Top = 232
+    Width = 35
+    Anchors = [akTop, akRight, akBottom]
+    BorderSpacing.Right = 5
+    Caption = 'Y (mm)'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object pnt0xse: TFloatSpinEdit
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = moto0lb
+    AnchorSideTop.Side = asrBottom
+    Left = 80
+    Height = 28
+    Top = 32
+    Width = 96
+    Alignment = taRightJustify
+    BorderSpacing.Left = 80
+    BorderSpacing.Top = 6
+    BorderSpacing.Right = 3
+    MaxValue = 0
+    MinValue = 0
+    TabOrder = 3
+    Value = 0
+  end
+  object pnt0ylb: TLabel
+    AnchorSideTop.Control = pnt0yse
+    AnchorSideRight.Control = pnt0yse
+    AnchorSideBottom.Control = pnt0yse
+    AnchorSideBottom.Side = asrBottom
+    Left = 40
+    Height = 28
+    Top = 66
+    Width = 35
+    Alignment = taRightJustify
+    Anchors = [akTop, akRight, akBottom]
+    BorderSpacing.Right = 5
+    Caption = 'Y (mm)'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object pnt0yse: TFloatSpinEdit
+    AnchorSideLeft.Control = pnt0xse
+    AnchorSideTop.Control = pnt0xse
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = pnt0xse
+    AnchorSideRight.Side = asrBottom
+    Left = 80
+    Height = 28
+    Top = 66
+    Width = 96
+    Alignment = taRightJustify
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 6
+    MaxValue = 0
+    MinValue = 0
+    TabOrder = 4
+    Value = 0
+  end
+  object radius0lb: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = radius0se
+    AnchorSideRight.Control = radius0se
+    AnchorSideBottom.Control = radius0se
+    AnchorSideBottom.Side = asrBottom
+    Left = 14
+    Height = 28
+    Top = 100
+    Width = 61
+    Anchors = [akTop, akRight, akBottom]
+    BorderSpacing.Right = 5
+    Caption = 'Radius(mm)'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object radius0se: TFloatSpinEdit
+    AnchorSideLeft.Control = pnt0yse
+    AnchorSideTop.Control = pnt0yse
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = pnt0yse
+    AnchorSideRight.Side = asrBottom
+    Left = 80
+    Height = 28
+    Top = 100
+    Width = 96
+    Alignment = taRightJustify
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 6
+    DecimalPlaces = 5
+    MaxValue = 0
+    MinValue = 0
+    TabOrder = 5
+    Value = 0
+  end
+  object ratio0lb: TLabel
+    AnchorSideTop.Control = ratio0se
+    AnchorSideRight.Control = ratio0se
+    AnchorSideBottom.Control = ratio0se
+    AnchorSideBottom.Side = asrBottom
+    Left = 49
+    Height = 28
+    Top = 134
+    Width = 26
+    Anchors = [akTop, akRight, akBottom]
+    BorderSpacing.Right = 5
+    Caption = 'Ratio'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object ratio0se: TFloatSpinEdit
+    AnchorSideLeft.Control = radius0se
+    AnchorSideTop.Control = radius0se
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = radius0se
+    AnchorSideRight.Side = asrBottom
+    Left = 80
+    Height = 28
+    Top = 134
+    Width = 96
+    Alignment = taRightJustify
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 6
+    DecimalPlaces = 8
+    MaxValue = 0
+    MinValue = 0
+    TabOrder = 6
+    Value = 0
+  end
+  object moto0lb: TLabel
+    AnchorSideLeft.Control = pnt0xse
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = pnt0yse
+    AnchorSideRight.Side = asrBottom
+    Left = 80
+    Height = 16
+    Top = 10
+    Width = 96
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 10
+    BorderSpacing.Bottom = 5
+    Caption = 'MOTOR-0  ERROR'
+    Font.Style = [fsBold]
+    Layout = tlCenter
+    ParentColor = False
+    ParentFont = False
+  end
+  object pnt1xse: TFloatSpinEdit
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = moto0lb1
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 299
+    Height = 28
+    Top = 32
+    Width = 96
+    Alignment = taRightJustify
+    Anchors = [akTop, akRight]
+    BorderSpacing.Left = 300
+    BorderSpacing.Top = 6
+    BorderSpacing.Right = 20
+    MaxValue = 0
+    MinValue = 0
+    TabOrder = 7
+    Value = 0
+  end
+  object pnt1ylb: TLabel
+    AnchorSideTop.Control = pnt1yse
+    AnchorSideRight.Control = pnt1yse
+    AnchorSideBottom.Control = pnt1yse
+    AnchorSideBottom.Side = asrBottom
+    Left = 259
+    Height = 28
+    Top = 66
+    Width = 35
+    Alignment = taRightJustify
+    Anchors = [akTop, akRight, akBottom]
+    BorderSpacing.Right = 5
+    Caption = 'Y (mm)'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object pnt1yse: TFloatSpinEdit
+    AnchorSideLeft.Control = pnt1xse
+    AnchorSideTop.Control = pnt1xse
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = pnt1xse
+    AnchorSideRight.Side = asrBottom
+    Left = 299
+    Height = 28
+    Top = 66
+    Width = 96
+    Alignment = taRightJustify
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 6
+    MaxValue = 0
+    MinValue = 0
+    TabOrder = 8
+    Value = 0
+  end
+  object radius1lb: TLabel
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = radius1se
+    AnchorSideRight.Control = radius1se
+    AnchorSideBottom.Control = radius1se
+    AnchorSideBottom.Side = asrBottom
+    Left = 230
+    Height = 28
+    Top = 100
+    Width = 64
+    Anchors = [akTop, akRight, akBottom]
+    BorderSpacing.Right = 5
+    Caption = 'Radius (mm)'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object radius1se: TFloatSpinEdit
+    AnchorSideLeft.Control = pnt1yse
+    AnchorSideTop.Control = pnt1yse
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = pnt1yse
+    AnchorSideRight.Side = asrBottom
+    Left = 299
+    Height = 28
+    Top = 100
+    Width = 96
+    Alignment = taRightJustify
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 6
+    DecimalPlaces = 5
+    MaxValue = 0
+    MinValue = 0
+    TabOrder = 9
+    Value = 0
+  end
+  object ratio1lb: TLabel
+    AnchorSideTop.Control = ratio1se
+    AnchorSideRight.Control = ratio1se
+    AnchorSideBottom.Control = ratio1se
+    AnchorSideBottom.Side = asrBottom
+    Left = 268
+    Height = 28
+    Top = 134
+    Width = 26
+    Anchors = [akTop, akRight, akBottom]
+    BorderSpacing.Right = 5
+    Caption = 'Ratio'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object ratio1se: TFloatSpinEdit
+    AnchorSideLeft.Control = radius1se
+    AnchorSideTop.Control = radius1se
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = radius1se
+    AnchorSideRight.Side = asrBottom
+    Left = 299
+    Height = 28
+    Top = 134
+    Width = 96
+    Alignment = taRightJustify
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 6
+    DecimalPlaces = 8
+    MaxValue = 0
+    MinValue = 0
+    TabOrder = 10
+    Value = 0
+  end
+  object moto0lb1: TLabel
+    AnchorSideLeft.Control = pnt1xse
+    AnchorSideTop.Control = Owner
+    AnchorSideRight.Control = pnt1yse
+    AnchorSideRight.Side = asrBottom
+    Left = 299
+    Height = 16
+    Top = 10
+    Width = 96
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 10
+    BorderSpacing.Bottom = 5
+    Caption = 'MOTOR-1  ERROR'
+    Font.Style = [fsBold]
+    Layout = tlCenter
+    ParentColor = False
+    ParentFont = False
+  end
+  object pnt0xlb: TLabel
+    AnchorSideTop.Control = pnt0xse
+    AnchorSideRight.Control = pnt0yse
+    AnchorSideBottom.Control = pnt0xse
+    AnchorSideBottom.Side = asrBottom
+    Left = 40
+    Height = 28
+    Top = 32
+    Width = 35
+    Alignment = taRightJustify
+    Anchors = [akTop, akRight, akBottom]
+    BorderSpacing.Right = 5
+    Caption = 'X (mm)'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object pnt1xlb: TLabel
+    AnchorSideTop.Control = pnt1xse
+    AnchorSideRight.Control = pnt1yse
+    AnchorSideBottom.Control = pnt1xse
+    AnchorSideBottom.Side = asrBottom
+    Left = 259
+    Height = 28
+    Top = 32
+    Width = 35
+    Alignment = taRightJustify
+    Anchors = [akTop, akRight, akBottom]
+    BorderSpacing.Right = 5
+    Caption = 'X (mm)'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object homelb: TLabel
+    AnchorSideLeft.Control = homexse
+    AnchorSideTop.Control = ratio0se
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = homexse
+    AnchorSideRight.Side = asrBottom
+    Left = 80
+    Height = 16
+    Top = 177
+    Width = 96
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 15
+    Caption = 'HOME  ERROR'
+    Font.Style = [fsBold]
+    Layout = tlCenter
+    ParentColor = False
+    ParentFont = False
+  end
+  object Label1: TLabel
+    AnchorSideTop.Control = widthse
+    AnchorSideRight.Control = widthse
+    AnchorSideBottom.Control = widthse
+    AnchorSideBottom.Side = asrBottom
+    Left = 234
+    Height = 28
+    Top = 198
+    Width = 60
+    Alignment = taRightJustify
+    Anchors = [akTop, akRight, akBottom]
+    BorderSpacing.Right = 5
+    Caption = 'Width (mm)'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object widthse: TFloatSpinEdit
+    AnchorSideLeft.Control = pagelb
+    AnchorSideTop.Control = pagelb
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = pagelb
+    AnchorSideRight.Side = asrBottom
+    Left = 299
+    Height = 28
+    Top = 198
+    Width = 96
+    Alignment = taRightJustify
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 5
+    MaxValue = 0
+    MinValue = 0
+    TabOrder = 11
+    Value = 1189
+  end
+  object Label2: TLabel
+    AnchorSideTop.Control = heigthse
+    AnchorSideRight.Control = heigthse
+    AnchorSideBottom.Control = heigthse
+    AnchorSideBottom.Side = asrBottom
+    Left = 231
+    Height = 28
+    Top = 232
+    Width = 63
+    Alignment = taRightJustify
+    Anchors = [akTop, akRight, akBottom]
+    BorderSpacing.Right = 5
+    Caption = 'Heigth (mm)'
+    Layout = tlCenter
+    ParentColor = False
+  end
+  object heigthse: TFloatSpinEdit
+    AnchorSideLeft.Control = widthse
+    AnchorSideTop.Control = widthse
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = widthse
+    AnchorSideRight.Side = asrBottom
+    Left = 299
+    Height = 28
+    Top = 232
+    Width = 96
+    Alignment = taRightJustify
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 6
+    MaxValue = 0
+    MinValue = 0
+    TabOrder = 12
+    Value = 841
+  end
+  object pagelb: TLabel
+    AnchorSideLeft.Control = ratio1se
+    AnchorSideTop.Control = ratio1se
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = ratio1se
+    AnchorSideRight.Side = asrBottom
+    Left = 299
+    Height = 16
+    Top = 177
+    Width = 96
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 15
+    Caption = 'PAGE SIZE'
+    Font.Style = [fsBold]
+    Layout = tlCenter
+    ParentColor = False
+    ParentFont = False
+  end
+  object clearbtn: TBitBtn
+    AnchorSideLeft.Control = Owner
+    AnchorSideTop.Control = calculatebtn
+    AnchorSideBottom.Control = calculatebtn
+    AnchorSideBottom.Side = asrBottom
+    Left = 20
+    Height = 42
+    Top = 373
+    Width = 80
+    Anchors = [akTop, akLeft, akBottom]
+    BorderSpacing.Left = 20
+    Caption = 'Clear'
+    OnClick = clearbtnClick
+    TabOrder = 13
+  end
+  object Memo1: TMemo
+    AnchorSideLeft.Control = clearbtn
+    AnchorSideTop.Control = clearbtn
+    AnchorSideTop.Side = asrBottom
+    AnchorSideRight.Control = calculatebtn
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = calculatebtn
+    Left = 20
+    Height = 88
+    Top = 279
+    Width = 375
+    Anchors = [akLeft, akRight, akBottom]
+    BorderSpacing.Top = 12
+    BorderSpacing.Bottom = 6
+    ReadOnly = True
+    TabOrder = 14
+  end
+  object opendialog: TOpenDialog
+    left = 136
+    top = 288
+  end
+  object savedialog: TSaveDialog
+    left = 224
+    top = 288
+  end
+end

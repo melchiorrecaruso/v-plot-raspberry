@@ -35,6 +35,8 @@ type
 
   tmainform = class(tform)
     clientformbevel: tbevel;
+    MenuItem1: TMenuItem;
+    N11: TMenuItem;
     propertiesmi: TMenuItem;
     N10: TMenuItem;
     zoom3000mi: TMenuItem;
@@ -170,8 +172,9 @@ type
     procedure formclose            (sender: tobject; var closeaction: tcloseaction);
     // MAIN MENU::FILE
     procedure loadmiclick          (sender: tobject);
+    procedure MenuItem1Click(Sender: TObject);
     procedure move2originmiclick   (sender: tobject);
-    procedure propertiesmiclick(Sender: TObject);
+    procedure propertiesmiclick    (sender: tobject);
     procedure savemiclick          (sender: tobject);
     procedure clearmiclick         (sender: tobject);
     procedure importmiclick        (sender: tobject);
@@ -185,7 +188,7 @@ type
     procedure scalemiclick         (sender: tobject);
     procedure a0miclick            (sender: tobject);
     procedure horizontalmiclick    (sender: tobject);
-    procedure sf001miClick(Sender: TObject);
+    procedure sf001miclick         (sender: tobject);
     procedure toolpathmiclick      (sender: tobject);
     // MAIN-MENU::VIEW
     procedure zoommiclick          (sender: tobject);
@@ -266,7 +269,7 @@ implementation
 {$R *.lfm}
 
 uses
-  math, sysutils, importfrm, aboutfrm, propertiesfrm, vpdriver,
+  math, sysutils, importfrm, aboutfrm, propertiesfrm, setupfrm, vpdriver,
   vpdriverthread, vpsketcher, vpsvgreader, vpdxfreader, vpsetting, vpwave;
 
 // FORM EVENTS
@@ -286,9 +289,9 @@ begin
   setting.load(changefileext(paramstr(0), '.ini'));
   // create plotter driver
   driver        := tvpdriver.create;
-  driver.xdelay := setting.xdelay;
-  driver.ydelay := setting.ydelay;
-  driver.zdelay := setting.zdelay;
+  driver.xdelay := setting.m0delay;
+  driver.ydelay := setting.m1delay;
+  driver.zdelay := setting.mzdelay;
   // init space wave
   wavemesh[0] := setting.spacewave0;
   wavemesh[1] := setting.spacewave1;
@@ -312,7 +315,7 @@ begin
   // update virtual screen
   a0miclick(a3mi);
   // initialize driver
-  calc_(setting.layout8, mx, my);
+  calc_(setting.point8, mx, my);
   driver.init(mx, my);
   // update panels
   scalepanel      .anchors := [akleft, akright, aktop];
@@ -692,15 +695,14 @@ begin
   end else
   begin
     driverthread         := tvpdriverthread.create(path);
-    driverthread.xcenter := setting.layout8.x;
-    driverthread.ycenter := setting.layout8.y+
-                            setting.layouty1*(pageheight)+
-                            setting.layouty2;
+    driverthread.xcenter := setting.point8.x;
+    driverthread.ycenter := setting.point8.y+
+                            setting.yfactor*(pageheight)+
+                            setting.yoffset;
 
     driverthread.onstart := @onplotterstart;
     driverthread.onstop  := @onplotterstop;
     driverthread.ontick  := @onplottertick;
-
     path.update(page,
       pagewidth /2+1,
       pageheight/2+1);
@@ -716,7 +718,7 @@ begin
   begin
     driverthread.enabled := false;
   end;
-  driver.zcount := setting.zmax;
+  driver.zcount := setting.mzmax;
   driver.xoff   := false;
   driver.yoff   := false;
   driver.zoff   := false;
@@ -736,16 +738,21 @@ var
   mx: longint = 0;
   my: longint = 0;
 begin
-  driver.zcount := setting.zmax;
+  driver.zcount := setting.mzmax;
   driver.xoff   := false;
   driver.yoff   := false;
   driver.zoff   := false;
 
-  calc_(setting.layout8, mx, my);
+  calc_(setting.point8, mx, my);
   driver.move(mx, my);
 end;
 
 // MAIN-MENU::HELP
+
+procedure tmainform.menuitem1click(sender: tobject);
+begin
+  setupform.showmodal;
+end;
 
 procedure tmainform.aboutmiclick(sender: tobject);
 begin
@@ -981,14 +988,14 @@ begin
   driver.xoff   := false;
   driver.yoff   := false;
   driver.zoff   := false;
-  driver.zcount := setting.zmax;
+  driver.zcount := setting.mzmax;
 
   if sender = leftupbtn    then driver.xcount := driver.xcount - edit.value;
   if sender = leftdownbtn  then driver.xcount := driver.xcount + edit.value;
   if sender = rightupbtn   then driver.ycount := driver.ycount - edit.value;
   if sender = rightdownbtn then driver.ycount := driver.ycount + edit.value;
 
-  calc_(setting.layout8, mx, my);
+  calc_(setting.point8, mx, my);
   driver.init(mx, my);
   unlock2;
 end;
@@ -997,10 +1004,10 @@ procedure tmainform.penupbtnclick(sender: tobject);
 begin
   lock2;
   if sender = penupbtn then
-    driver.zcount := setting.zmax
+    driver.zcount := setting.mzmax
   else
   if sender = pendownbtn then
-    driver.zcount := setting.zmin;
+    driver.zcount := setting.mzmin;
   unlock2;
 end;
 
@@ -1193,7 +1200,7 @@ begin
   driver.xoff   := false;
   driver.yoff   := false;
   driver.zoff   := false;
-  driver.zcount := setting.zmax;
+  driver.zcount := setting.mzmax;
 
   unlock1;
   statuslabel.caption := '';

@@ -97,12 +97,12 @@ const
 constructor tvpdriver.create;
 begin
   inherited create;
-  fxcount  := setting.xmin;
-  fycount  := setting.ymin;
-  fzcount  := setting.zmin;
-  fxdelay  := setting.xdelay;
-  fydelay  := setting.ydelay;
-  fzdelay  := setting.zdelay;
+  fxcount  := setting.m0min;
+  fycount  := setting.m1min;
+  fzcount  := setting.mzmin;
+  fxdelay  := setting.m0delay;
+  fydelay  := setting.m1delay;
+  fzdelay  := setting.mzdelay;
   fxoff    := false;
   fyoff    := false;
   fzoff    := false;
@@ -125,9 +125,9 @@ begin
   digitalwrite(moty_dir,  LOW);
   digitalwrite(moty_step, LOW);
   {$endif}
-  setzcount(setting.zmax);
+  setzcount(setting.mzmax);
   // init driver resolution
-  driver_resolution := ((setting.xratio+setting.yratio)/2)*6;
+  driver_resolution := ((setting.m0ratio+setting.m1ratio)/2)*6;
 end;
 
 destructor tvpdriver.destroy;

@@ -1302,8 +1302,8 @@ var
 begin
   clear;
 
-  pz := setting.zmax;
-  p0 := setting.layout8;
+  pz := setting.mzmax;
+  p0 := setting.point8;
   for i := 0 to elemlist.count -1 do
   begin
     elem := elemlist.items[i];
@@ -1323,16 +1323,16 @@ begin
               fpathlength := fpathlength
                 + distance_between_two_points(p0, p1);
 
-              if pz <> setting.zmin then
+              if pz <> setting.mzmin then
               begin
-                pz := setting.zmin;
+                pz := setting.mzmin;
                 inc(fpathraises);
               end;
             end else
             begin
-              if pz <> setting.zmax then
+              if pz <> setting.mzmax then
               begin
-                pz := setting.zmax;
+                pz := setting.mzmax;
                 inc(fpathraises);
               end;
             end;

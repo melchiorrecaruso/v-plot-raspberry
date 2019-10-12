@@ -52,42 +52,84 @@ type
     property ycenter: double        read fycenter write fycenter;
   end;
 
-  procedure calc_(const p: tvppoint; out mx, my: longint);
+  procedure calc_(const p: tvppoint; out l0, l1: vpfloat); overload;
+  procedure calc_(const p: tvppoint; out m0, m1: longint); overload;
+
+  function calc_l0(const p, t0: tvppoint; r0: vpfloat): vpfloat;
+  function calc_l1(const p, t1: tvppoint; r1: vpfloat): vpfloat;
 
 var
   driverthread: tvpdriverthread = nil;
 
 implementation
 
-procedure calc_(const p: tvppoint; out mx, my: longint); inline;
+function calc_l0(const p, t0: tvppoint; r0: vpfloat): vpfloat;
+var
+      a0: vpfloat;
+  c0, cx: tvpcircleimp;
+  s0, sx: tvppoint;
+begin
+  //find tangent point t0
+  result := sqrt(sqr(distance_between_two_points(t0, p))-sqr(r0));
+  c0 := circle_by_center_and_radius(t0, r0);
+  cx := circle_by_center_and_radius(p, result);
+  if intersection_of_two_circles(c0, cx, s0, sx) = 0 then
+    raise exception.create('intersection_of_two_circles [c0c2]');
+  a0 := angle(line_by_two_points(s0, t0));
+  result := result + a0*r0;
+end;
+
+function calc_l1(const p, t1: tvppoint; r1: vpfloat): vpfloat;
+var
+      a1: vpfloat;
+  c1, cx: tvpcircleimp;
+  s1, sx: tvppoint;
+begin
+  //find tangent point t1
+  result := sqrt(sqr(distance_between_two_points(t1, p))-sqr(r1));
+  c1 := circle_by_center_and_radius(t1, r1);
+  cx := circle_by_center_and_radius(p, result);
+  if intersection_of_two_circles(c1, cx, s1, sx) = 0 then
+    raise exception.create('intersection_of_two_circles [c1c2]');
+  a1 := pi-angle(line_by_two_points(s1, t1));
+  result := result + a1*r1;
+end;
+
+procedure calc_(const p: tvppoint; out l0, l1: vpfloat);
 var
       a0, a1: vpfloat;
-  cx, cy, ct: tvpcircleimp;
-      lx, ly: vpfloat;
-  sx, sy, st: tvppoint;
-      tx, ty: tvppoint;
+  c0, c1, cx: tvpcircleimp;
+  s0, s1, sx: tvppoint;
+      t0, t1: tvppoint;
 begin
-  tx := setting.layout0;
-  ty := setting.layout1;
-  //find tangent point tx
-  lx := sqrt(sqr(distance_between_two_points(tx, p))-sqr(setting.xradius));
-  cx := circle_by_center_and_radius(tx, setting.xradius);
-  ct := circle_by_center_and_radius(p, lx);
-  if intersection_of_two_circles(cx, ct, sx, st) = 0 then
+  //find tangent point t0
+  t0 := setting.point0;
+  l0 := sqrt(sqr(distance_between_two_points(t0, p))-sqr(setting.m0radius));
+  c0 := circle_by_center_and_radius(t0, setting.m0radius);
+  cx := circle_by_center_and_radius(p, l0);
+  if intersection_of_two_circles(c0, cx, s0, sx) = 0 then
     raise exception.create('intersection_of_two_circles [c0c2]');
-  a0 := angle(line_by_two_points(sx, tx));
-  lx := lx + a0*setting.xradius;
-  //find tangent point ty
-  ly := sqrt(sqr(distance_between_two_points(ty, p))-sqr(setting.yradius));
-  cy := circle_by_center_and_radius(ty, setting.yradius);
-  ct := circle_by_center_and_radius(p, ly);
-  if intersection_of_two_circles(cy, ct, sy, st) = 0 then
+  a0 := angle(line_by_two_points(s0, t0));
+  l0 := l0 + a0*setting.m0radius;
+  //find tangent point t1
+  t1 := setting.point1;
+  l1 := sqrt(sqr(distance_between_two_points(t1, p))-sqr(setting.m1radius));
+  c1 := circle_by_center_and_radius(t1, setting.m1radius);
+  cx := circle_by_center_and_radius(p, l1);
+  if intersection_of_two_circles(c1, cx, s1, sx) = 0 then
     raise exception.create('intersection_of_two_circles [c1c2]');
-  a1 := pi-angle(line_by_two_points(sy, ty));
-  ly := ly + a1*setting.yradius;
+  a1 := pi-angle(line_by_two_points(s1, t1));
+  l1 := l1 + a1*setting.m1radius;
+end;
+
+procedure calc_(const p: tvppoint; out m0, m1: longint);
+var
+  l0, l1: vpfloat;
+begin
+  calc_(p, l0, l1);
   // calculate steps
-  mx := round(lx/setting.xratio);
-  my := round(ly/setting.yratio);
+  m0 := round(l0/setting.m0ratio);
+  m1 := round(l1/setting.m1ratio);
 end;
 
 // tvpdriverthread
@@ -119,7 +161,7 @@ begin
   if assigned(onstart) then
     synchronize(fonstart);
 
-  p0 := setting.layout8;
+  p0 := setting.point8;
   for i := 0 to fpath.count -1 do
   begin
     if not terminated then
@@ -129,9 +171,9 @@ begin
       p1.y := p1.y + fycenter;
 
       if distance_between_two_points(p0, p1) < 0.2 then
-        driver.zcount := setting.zmin
+        driver.zcount := setting.mzmin
       else
-        driver.zcount := setting.zmax;
+        driver.zcount := setting.mzmax;
 
       calc_(p1, mx, my);
       driver.move(mx, my);

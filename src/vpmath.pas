@@ -148,6 +148,7 @@ function distance_from_point_and_line(const p0: tvppoint; const l0: tvplineimp):
 function intersection_of_two_lines(const l0, l1: tvplineimp): tvppoint;
 function intersection_of_line_and_circle(const a0, b0, c0, a1, b1, c1: vpfloat; var p0, p1: tvppoint): longint;
 function intersection_of_line_and_circle(const l0: tvplineimp; const c1: tvpcircleimp; var p0, p1: tvppoint): longint;
+function intersection_of_circle_and_circle(const c0: tvpcircleimp; const c1: tvpcircleimp; var p0, p1: tvppoint): longint;
 
 function circle_by_three_points(const p0, p1, p2: tvppoint): tvpcircleimp;
 function circle_by_center_and_radius(const cc: tvppoint; radius: vpfloat): tvpcircleimp;
@@ -284,6 +285,7 @@ begin
 end;
 
 // MIRROR X
+
 procedure mirrorx(var point: tvppoint);
 begin
   point.y := -point.y;
@@ -318,6 +320,7 @@ begin
 end;
 
 // MIRROR Y
+
 procedure mirrory(var point: tvppoint);
 begin
   point.x := -point.x;
@@ -685,6 +688,17 @@ end;
 function intersection_of_line_and_circle(const l0: tvplineimp; const c1: tvpcircleimp; var p0, p1: tvppoint): longint; inline;
 begin
   result := intersection_of_line_and_circle(l0.a, l0.b, l0.c, c1.a, c1.b, c1.c, p0, p1);
+end;
+
+function intersection_of_circle_and_circle(const c0: tvpcircleimp; const c1: tvpcircleimp; var p0, p1: tvppoint): longint;
+var
+  l0: tvplineimp;
+begin
+  l0.a := c0.a-c1.a;
+  l0.b := c0.b-c1.b;
+  l0.c := c0.c-c1.c;
+
+  result := intersection_of_line_and_circle(l0, c1, p0, p1);
 end;
 
 function itsavertex(const p0, p1, p2: tvppoint): boolean;
