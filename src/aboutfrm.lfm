@@ -21,8 +21,8 @@ object aboutform: Taboutform
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 16
-    Top = 250
+    Height = 18
+    Top = 260
     Width = 400
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
@@ -38,13 +38,13 @@ object aboutform: Taboutform
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 16
+    Height = 18
     Top = 126
     Width = 400
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 12
-    Caption = 'vPlot 3.3'
+    Caption = 'vPlot 3.4'
     Font.Style = [fsBold]
     Layout = tlCenter
     ParentColor = False
@@ -132,8 +132,8 @@ object aboutform: Taboutform
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 16
-    Top = 176
+    Height = 18
+    Top = 180
     Width = 400
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
@@ -150,8 +150,8 @@ object aboutform: Taboutform
     AnchorSideRight.Side = asrBottom
     Cursor = crHandPoint
     Left = 0
-    Height = 16
-    Top = 202
+    Height = 18
+    Top = 208
     Width = 400
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
@@ -172,8 +172,8 @@ object aboutform: Taboutform
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 16
-    Top = 228
+    Height = 18
+    Top = 236
     Width = 400
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
@@ -189,13 +189,13 @@ object aboutform: Taboutform
     AnchorSideRight.Control = Owner
     AnchorSideRight.Side = asrBottom
     Left = 0
-    Height = 16
-    Top = 154
+    Height = 18
+    Top = 156
     Width = 400
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 12
-    Caption = 'Build 20191003'
+    Caption = 'Build 20191012'
     Layout = tlCenter
     ParentColor = False
   end

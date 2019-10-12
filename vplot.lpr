@@ -32,7 +32,7 @@ uses
 begin
   requirederivedformresource := true;
   Application.Scaled:=True;
-  Application.Title:='VPlot Driver';
+  Application.Title:='vPlot Driver';
   application.initialize;
   application.createform(tmainform, mainform);
   application.createform(taboutform, aboutform);

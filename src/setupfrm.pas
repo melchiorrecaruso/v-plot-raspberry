@@ -37,7 +37,8 @@ type
   tsetupform = class(tform)
     clearbtn: TBitBtn;
     calculatebtn: tbitbtn;
-    Memo1: TMemo;
+    resultlb: TLabel;
+    resultmemo: TMemo;
     pagelb: tlabel;
     widthse: TFloatSpinEdit;
     heigthse: TFloatSpinEdit;
@@ -70,6 +71,7 @@ type
     savedialog: tsavedialog;
     procedure calculatebtnclick(sender: tobject);
     procedure clearbtnclick(sender: tobject);
+    procedure clearmemo(Sender: TObject);
   private
   public
   end;
@@ -100,6 +102,13 @@ begin
 
   homexse.value   := 0;
   homeyse.value   := 0;
+
+  resultmemo.clear;
+end;
+
+procedure tsetupform.clearmemo(sender: tobject);
+begin
+  resultmemo.clear;
 end;
 
 procedure tsetupform.calculatebtnclick(sender: tobject);
@@ -205,19 +214,19 @@ begin
     end;
   end;
 
-  memo1.clear;
-  memo1.append('');
-  memo1.append(format('    ( X%1.1f ,  Y%1.1f )  ( X%1.1f ,  Y%1.1f )  ( X%1.1f ,  Y%1.1f )',
+  resultmemo.clear;
+  resultmemo.append('');
+  resultmemo.append(format('    ( X%1.1f ,  Y%1.1f )  ( X%1.1f ,  Y%1.1f )  ( X%1.1f ,  Y%1.1f )',
     [arrpr[1].x-arrp[1].x, arrpr[1].y-arrp[1].y,
      arrpr[2].x-arrp[2].x, arrpr[2].y-arrp[2].y,
      arrpr[3].x-arrp[3].x, arrpr[3].y-arrp[3].y]));
 
-  memo1.append(format('    ( X%1.1f ,  Y%1.1f )  ( X%1.1f ,  Y%1.1f )  ( X%1.1f ,  Y%1.1f )',
+  resultmemo.append(format('    ( X%1.1f ,  Y%1.1f )  ( X%1.1f ,  Y%1.1f )  ( X%1.1f ,  Y%1.1f )',
     [arrpr[4].x-arrp[4].x, arrpr[4].y-arrp[4].y,
      arrpr[5].x-arrp[5].x, arrpr[5].y-arrp[5].y,
      arrpr[6].x-arrp[6].x, arrpr[6].y-arrp[6].y]));
 
-  memo1.append(format('    ( X%1.1f ,  Y%1.1f )  ( X%1.1f ,  Y%1.1f )  ( X%1.1f ,  Y%1.1f )',
+  resultmemo.append(format('    ( X%1.1f ,  Y%1.1f )  ( X%1.1f ,  Y%1.1f )  ( X%1.1f ,  Y%1.1f )',
     [arrpr[7].x-arrp[7].x, arrpr[7].y-arrp[7].y,
      arrpr[8].x-arrp[8].x, arrpr[8].y-arrp[8].y,
      arrpr[9].x-arrp[9].x, arrpr[9].y-arrp[9].y]));

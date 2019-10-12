@@ -36,8 +36,7 @@
       <Unit>
         <Filename Value="vplayout.lpr"/>
         <IsPartOfProject Value="True"/>
-        <TopLine Value="3"/>
-        <CursorPos Y="38"/>
+        <CursorPos X="12" Y="7"/>
         <UsageCount Value="56"/>
         <Loaded Value="True"/>
       </Unit>
