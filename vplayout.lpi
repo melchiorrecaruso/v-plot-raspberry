@@ -192,7 +192,7 @@
         <UsageCount Value="10"/>
       </Unit>
     </Units>
-    <JumpHistory Count="26" HistoryIndex="25">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="src\layoutfrm.pas"/>
         <Caret Line="161" Column="32" TopLine="143"/>
@@ -297,6 +297,18 @@
         <Filename Value="src\layoutfrm.pas"/>
         <Caret Line="155" TopLine="127"/>
       </Position26>
+      <Position27>
+        <Filename Value="src\layoutfrm.pas"/>
+        <Caret Line="154" Column="28" TopLine="127"/>
+      </Position27>
+      <Position28>
+        <Filename Value="src\layoutfrm.pas"/>
+        <Caret Line="155" Column="28" TopLine="128"/>
+      </Position28>
+      <Position29>
+        <Filename Value="src\layoutfrm.pas"/>
+        <Caret Line="154" Column="28" TopLine="127"/>
+      </Position29>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
