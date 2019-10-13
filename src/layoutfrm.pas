@@ -27,12 +27,13 @@ interface
 
 uses                     
   buttons, classes, sysutils, forms, controls, graphics, dialogs, extctrls,
-  math, bcradialprogressbar, spin, stdctrls, extdlgs, vpmath;
+  math, bcradialprogressbar, spin, stdctrls, extdlgs, setupfrm, vpsetting, vpmath;
 
 type
   { tlayoutform }
 
   tlayoutform = class(tform)
+    finebtn: TBitBtn;
     savebtn: tbitbtn;
     savedialog: tsavepicturedialog;
     sheetmodelb: tlabel;
@@ -58,6 +59,7 @@ type
     sheetoffsetse: tspinedit;
     sheetmodecb: tcombobox;
  
+    procedure finebtnClick(Sender: TObject);
     procedure formcreate(sender: tobject);
     procedure maxloadsechange(sender: tobject);
     procedure minloadsechange(sender: tobject);
@@ -144,6 +146,15 @@ procedure tlayoutform.formcreate(sender: tobject);
 begin
   resetbtnclick(sender);
   lock(true);
+end;
+
+procedure tlayoutform.finebtnClick(Sender: TObject);
+begin
+  setting := tvpsetting.create;
+  setting.load(extractfilepath(paramstr(0)) + 'vplot.ini');
+
+  setupform.showmodal;
+  setting.destroy;
 end;
 
 procedure tlayoutform.savebtnclick(sender: tobject);

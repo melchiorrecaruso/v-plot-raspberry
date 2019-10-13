@@ -1,10 +1,10 @@
 object setupform: Tsetupform
-  Left = 485
+  Left = 458
   Height = 470
-  Top = 65
+  Top = 173
   Width = 456
   BorderStyle = bsDialog
-  Caption = 'Check setting'
+  Caption = 'Fine tuning'
   ClientHeight = 470
   ClientWidth = 456
   LCLVersion = '2.1.0.0'
@@ -238,7 +238,7 @@ object setupform: Tsetupform
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 10
     BorderSpacing.Bottom = 5
-    Caption = 'MOTOR-0  ERROR'
+    Caption = 'Motor-0  Error'
     Font.Style = [fsBold]
     Layout = tlCenter
     ParentColor = False
@@ -387,7 +387,7 @@ object setupform: Tsetupform
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 10
     BorderSpacing.Bottom = 5
-    Caption = 'MOTOR-1  ERROR'
+    Caption = 'Motor-1  Error'
     Font.Style = [fsBold]
     Layout = tlCenter
     ParentColor = False
@@ -438,7 +438,7 @@ object setupform: Tsetupform
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 15
-    Caption = 'HOME  ERROR'
+    Caption = 'Home  Error'
     Font.Style = [fsBold]
     Layout = tlCenter
     ParentColor = False
@@ -527,7 +527,7 @@ object setupform: Tsetupform
     Alignment = taCenter
     Anchors = [akTop, akLeft, akRight]
     BorderSpacing.Top = 15
-    Caption = 'PAGE SIZE'
+    Caption = 'Page Size'
     Font.Style = [fsBold]
     Layout = tlCenter
     ParentColor = False
@@ -596,13 +596,5 @@ object setupform: Tsetupform
       138
       139
     )
-  end
-  object opendialog: TOpenDialog
-    left = 224
-    top = 16
-  end
-  object savedialog: TSaveDialog
-    left = 224
-    top = 152
   end
 end

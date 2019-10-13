@@ -5,7 +5,7 @@ object tmainform: tmainform
   Width = 600
   Anchors = []
   Caption = 'vPlot Driver'
-  ClientHeight = 453
+  ClientHeight = 455
   ClientWidth = 600
   Menu = mainmenu
   OnClose = FormClose
@@ -22,13 +22,13 @@ object tmainform: tmainform
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrBottom
     Left = 0
-    Height = 451
+    Height = 453
     Top = 2
     Width = 600
     OnRedraw = screenredraw
     Alignment = taLeftJustify
     Anchors = [akTop, akLeft, akRight, akBottom]
-    ClientHeight = 451
+    ClientHeight = 453
     ClientWidth = 600
     Color = clForm
     ParentColor = False
@@ -43,8 +43,8 @@ object tmainform: tmainform
       AnchorSideBottom.Control = screen
       AnchorSideBottom.Side = asrBottom
       Left = 0
-      Height = 18
-      Top = 433
+      Height = 16
+      Top = 437
       Width = 600
       Alignment = taCenter
       Anchors = [akLeft, akRight, akBottom]
@@ -66,7 +66,7 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 7
+    Top = 5
     Width = 600
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -553,7 +553,7 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 44
-    Top = 156
+    Top = 157
     Width = 600
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -668,7 +668,7 @@ object tmainform: tmainform
     AnchorSideBottom.Side = asrBottom
     Left = 0
     Height = 80
-    Top = 271
+    Top = 272
     Width = 600
     Anchors = [akLeft, akRight]
     AutoSize = True
@@ -1153,13 +1153,6 @@ object tmainform: tmainform
     end
     object helpmi: TMenuItem
       Caption = 'Help'
-      object MenuItem1: TMenuItem
-        Caption = 'Check setting ...'
-        OnClick = MenuItem1Click
-      end
-      object N11: TMenuItem
-        Caption = '-'
-      end
       object aboutmi: TMenuItem
         Caption = 'About ...'
         OnClick = aboutmiclick

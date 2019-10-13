@@ -35,8 +35,6 @@ type
 
   tmainform = class(tform)
     clientformbevel: tbevel;
-    MenuItem1: TMenuItem;
-    N11: TMenuItem;
     propertiesmi: TMenuItem;
     N10: TMenuItem;
     zoom3000mi: TMenuItem;
@@ -172,7 +170,6 @@ type
     procedure formclose            (sender: tobject; var closeaction: tcloseaction);
     // MAIN MENU::FILE
     procedure loadmiclick          (sender: tobject);
-    procedure MenuItem1Click(Sender: TObject);
     procedure move2originmiclick   (sender: tobject);
     procedure propertiesmiclick    (sender: tobject);
     procedure savemiclick          (sender: tobject);
@@ -748,11 +745,6 @@ begin
 end;
 
 // MAIN-MENU::HELP
-
-procedure tmainform.menuitem1click(sender: tobject);
-begin
-  setupform.showmodal;
-end;
 
 procedure tmainform.aboutmiclick(sender: tobject);
 begin

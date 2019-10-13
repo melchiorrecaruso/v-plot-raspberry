@@ -27,7 +27,7 @@ unit setupfrm;
 interface
 
 uses
-  classes, sysutils, forms, controls, graphics, dialogs, extctrls, buttons,
+  classes, sysutils, forms, controls, graphics, extctrls, buttons,
   spin, stdctrls, grids, comctrls;
 
 type
@@ -44,7 +44,6 @@ type
     heigthse: TFloatSpinEdit;
     Label1: TLabel;
     Label2: TLabel;
-    opendialog: topendialog;
     moto0lb: tlabel;
     moto0lb1: tlabel;
     homelb: tlabel;
@@ -68,7 +67,6 @@ type
     ratio1lb: tlabel;
     ratio0se: tfloatspinedit;
     ratio1se: tfloatspinedit;
-    savedialog: tsavedialog;
     procedure calculatebtnclick(sender: tobject);
     procedure clearbtnclick(sender: tobject);
     procedure clearmemo(Sender: TObject);
@@ -84,7 +82,7 @@ implementation
 {$R *.lfm}
 
 uses
-  vpmath, vpdriverthread, vpsetting;
+  vpdriverthread, vpmath, vpsetting;
 
 { tsetupform }
 

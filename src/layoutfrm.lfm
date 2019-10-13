@@ -1,9 +1,9 @@
 object layoutform: Tlayoutform
-  Left = 116
+  Left = 115
   Height = 449
-  Top = 142
+  Top = 141
   Width = 738
-  Caption = 'vPlotter - Layout Designer'
+  Caption = 'vPlot - Layout Designer'
   ClientHeight = 449
   ClientWidth = 738
   OnCreate = FormCreate
@@ -8676,9 +8676,25 @@ object layoutform: Tlayoutform
     OnClick = savebtnClick
     TabOrder = 10
   end
+  object finebtn: TBitBtn
+    AnchorSideLeft.Control = savebtn
+    AnchorSideRight.Control = savebtn
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = Owner
+    AnchorSideBottom.Side = asrBottom
+    Left = 465
+    Height = 31
+    Top = 412
+    Width = 267
+    Anchors = [akLeft, akRight, akBottom]
+    BorderSpacing.Bottom = 6
+    Caption = 'Fine tuning ...'
+    OnClick = finebtnClick
+    TabOrder = 11
+  end
   object savedialog: TSavePictureDialog
     FilterIndex = 4
-    left = 464
-    top = 128
+    left = 488
+    top = 352
   end
 end

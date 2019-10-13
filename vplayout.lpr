@@ -24,8 +24,7 @@ program vplayout;
 {$mode objfpc}
 
 uses
-  {$ifdef unix} cthreads, {$endif} interfaces, forms,
-  layoutfrm;
+  {$ifdef unix} cthreads, {$endif} interfaces, forms, layoutfrm, setupfrm;
 
 {$R *.res}
 
@@ -34,6 +33,7 @@ begin
   application.scaled := true;
   application.initialize;
   application.createform(tlayoutform, layoutform);
+  application.createform(tsetupform, setupform);
   application.run;
 end.
 
