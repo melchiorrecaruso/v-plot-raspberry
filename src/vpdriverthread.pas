@@ -52,8 +52,8 @@ type
     property ycenter: double        read fycenter write fycenter;
   end;
 
-  procedure calc_(const p: tvppoint; out l0, l1: vpfloat); overload;
-  procedure calc_(const p: tvppoint; out m0, m1: longint); overload;
+  procedure calc_ (const p: tvppoint; out l0, l1: vpfloat); overload;
+  procedure calc_ (const p: tvppoint; out m0, m1: longint); overload;
 
   function calc_l0(const p, t0: tvppoint; r0: vpfloat): vpfloat;
   function calc_l1(const p, t1: tvppoint; r1: vpfloat): vpfloat;
@@ -95,7 +95,7 @@ begin
   result := result + a1*r1;
 end;
 
-procedure calc_(const p: tvppoint; out l0, l1: vpfloat);
+procedure calc_ (const p: tvppoint; out l0, l1: vpfloat);
 var
       a0, a1: vpfloat;
   c0, c1, cx: tvpcircleimp;
@@ -122,7 +122,7 @@ begin
   l1 := l1 + a1*setting.m1radius;
 end;
 
-procedure calc_(const p: tvppoint; out m0, m1: longint);
+procedure calc_ (const p: tvppoint; out m0, m1: longint);
 var
   l0, l1: vpfloat;
 begin
@@ -170,7 +170,7 @@ begin
       p1.x := p1.x + fxcenter;
       p1.y := p1.y + fycenter;
 
-      if distance_between_two_points(p0, p1) < 0.2 then
+      if distance_between_two_points(p0, p1) < 0.25 then
         driver.zcount := setting.mzmin
       else
         driver.zcount := setting.mzmax;

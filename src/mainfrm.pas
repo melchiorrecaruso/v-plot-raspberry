@@ -35,30 +35,30 @@ type
 
   tmainform = class(tform)
     clientformbevel: tbevel;
-    propertiesmi: TMenuItem;
-    N10: TMenuItem;
-    zoom3000mi: TMenuItem;
-    zoom1000mi: TMenuItem;
-    zoom1500mi: TMenuItem;
-    zoom2000mi: TMenuItem;
-    previewmi: TMenuItem;
-    N8: TMenuItem;
-    sb010mi: TMenuItem;
-    sf025mi: TMenuItem;
-    sf050mi: TMenuItem;
-    sb050mi: TMenuItem;
-    sf100mi: TMenuItem;
-    sb100mi: TMenuItem;
-    mtfsmi: TMenuItem;
-    mtlsmi: TMenuItem;
-    sb025mi: TMenuItem;
-    N5: TMenuItem;
-    sf001mi: TMenuItem;
-    sb001mi: TMenuItem;
-    sf005mi: TMenuItem;
-    sb005mi: TMenuItem;
-    sf010mi: TMenuItem;
-    move2originmi: TMenuItem;
+    propertiesmi: tmenuitem;
+    n10: tmenuitem;
+    zoom3000mi: tmenuitem;
+    zoom1000mi: tmenuitem;
+    zoom1500mi: tmenuitem;
+    zoom2000mi: tmenuitem;
+    previewmi: tmenuitem;
+    n8: tmenuitem;
+    sb010mi: tmenuitem;
+    sf025mi: tmenuitem;
+    sf050mi: tmenuitem;
+    sb050mi: tmenuitem;
+    sf100mi: tmenuitem;
+    sb100mi: tmenuitem;
+    mtfsmi: tmenuitem;
+    mtlsmi: tmenuitem;
+    sb025mi: tmenuitem;
+    n5: tmenuitem;
+    sf001mi: tmenuitem;
+    sb001mi: tmenuitem;
+    sf005mi: tmenuitem;
+    sb005mi: tmenuitem;
+    sf010mi: tmenuitem;
+    move2originmi: tmenuitem;
     zoom50mi: tmenuitem;
     zoom75mi: tmenuitem;
     zoom100mi: tmenuitem;
@@ -302,6 +302,7 @@ begin
   spacewave := tspacewave.create(
     setting.spacewavedxmax,
     setting.spacewavedymax,
+    setting.spacewavescale,
     wavemesh);
   spacewave.enabled := setting.spacewaveoff = 1;
   spacewave.debug;
@@ -438,6 +439,7 @@ begin
         sk.destroy;
       end;
     end;
+
     pagecount := page.count;
     fitmiclick(sender);
     unlock2;

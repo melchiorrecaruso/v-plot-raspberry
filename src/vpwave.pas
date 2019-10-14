@@ -44,8 +44,9 @@ type
     lbx, lby: tpolynome;
     lcx, lcy: tpolynome;
     fenabled: boolean;
+    fscale:   vpfloat;
   public
-    constructor create(xmax, ymax: vpfloat; const mesh: twavemesh);
+    constructor create(xmax, ymax, scale: vpfloat; const mesh: twavemesh);
     destructor destroy; override;
     function update(const p: tvppoint): tvppoint;
     procedure debug;
@@ -79,7 +80,7 @@ end;
 
 // tspacewave
 
-constructor tspacewave.create(xmax, ymax: vpfloat; const mesh: twavemesh);
+constructor tspacewave.create(xmax, ymax, scale: vpfloat; const mesh: twavemesh);
 var
   a, aa: tvector3_double;
   b, bb: tvector3_double;
@@ -145,7 +146,9 @@ begin
   lcx.coefs[2] := cc.data[2];
   lcx.coefs[1] := cc.data[1];
   lcx.coefs[0] := cc.data[0];
-  fenabled     := true;
+
+  fscale       := scale;
+  fenabled     := false;
 end;
 
 destructor tspacewave.destroy;
@@ -169,8 +172,8 @@ begin
     lx.coefs[1] := polyeval(lbx, p.x);
     lx.coefs[0] := polyeval(lcx, p.x);
 
-    result.x := p.x + polyeval(lx, p.y);
-    result.y := p.y + polyeval(ly, p.x);
+    result.x := (p.x + polyeval(lx, p.y)) * fscale;
+    result.y := (p.y + polyeval(ly, p.x)) * fscale;
   end else
   begin
     result.x := p.x;

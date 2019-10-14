@@ -40,9 +40,9 @@ type
     aboutlinklb: tlabel;
     aboutnamelb: tlabel;
     aboutversionlb: tlabel;
-    procedure aboutlinklbclick(sender: tobject);
+    procedure aboutlinklbclick     (sender: tobject);
     procedure aboutlinklbmouseleave(sender: tobject);
-    procedure aboutlinklbmousemove(sender: tobject; shift: tshiftstate; x, y: integer);
+    procedure aboutlinklbmousemove (sender: tobject; shift: tshiftstate; x, y: integer);
   private
   public
   end;
