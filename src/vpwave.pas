@@ -158,22 +158,27 @@ end;
 
 function tspacewave.update(const p: tvppoint): tvppoint;
 var
-  ly, lx: tpolynome;
+  ly,
+  lx: tpolynome;
+  pp: tvppoint;
 begin
   if enabled then
   begin
+    pp.x := p.x * fscale;
+    pp.y := p.y * fscale;
+
     ly.deg :=2;
-    ly.coefs[2] := polyeval(lay, p.y);
-    ly.coefs[1] := polyeval(lby, p.y);
-    ly.coefs[0] := polyeval(lcy, p.y);
+    ly.coefs[2] := polyeval(lay, pp.y);
+    ly.coefs[1] := polyeval(lby, pp.y);
+    ly.coefs[0] := polyeval(lcy, pp.y);
 
     lx.deg :=2;
-    lx.coefs[2] := polyeval(lax, p.x);
-    lx.coefs[1] := polyeval(lbx, p.x);
-    lx.coefs[0] := polyeval(lcx, p.x);
+    lx.coefs[2] := polyeval(lax, pp.x);
+    lx.coefs[1] := polyeval(lbx, pp.x);
+    lx.coefs[0] := polyeval(lcx, pp.x);
 
-    result.x := (p.x + polyeval(lx, p.y)) * fscale;
-    result.y := (p.y + polyeval(ly, p.x)) * fscale;
+    result.x := pp.x + polyeval(lx, pp.y);
+    result.y := pp.y + polyeval(ly, pp.x);
   end else
   begin
     result.x := p.x;
