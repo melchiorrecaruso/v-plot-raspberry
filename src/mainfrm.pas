@@ -304,7 +304,7 @@ begin
     setting.spacewavedymax,
     setting.spacewavescale,
     wavemesh);
-  spacewave.enabled := setting.spacewaveoff = 1;
+  spacewave.enabled := setting.spacewaveon = 1;
   spacewave.debug;
   // create preview and empty path
    bit := tbgrabitmap.create;

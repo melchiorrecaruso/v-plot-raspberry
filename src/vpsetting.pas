@@ -74,7 +74,7 @@ type
     fspacewavedxmax: vpfloat;
     fspacewavedymax: vpfloat;
     fspacewavescale: vpfloat;
-    fspacewaveoff:   longint;
+    fspacewaveon:    longint;
  public
     constructor create;
     destructor destroy; override;
@@ -122,7 +122,7 @@ type
     property spacewavedxmax: vpfloat  read fspacewavedxmax;
     property spacewavedymax: vpfloat  read fspacewavedymax;
     property spacewavescale: vpfloat  read fspacewavescale;
-    property spacewaveoff:   longint  read fspacewaveoff;
+    property spacewaveon:    longint  read fspacewaveon;
  end;
 
 var
@@ -200,7 +200,7 @@ begin
   fspacewavedxmax   := ini.readfloat  ('SPACE-WAVE',   'DXMAX',  0);
   fspacewavedymax   := ini.readfloat  ('SPACE-WAVE',   'DYMAX',  0);
   fspacewavescale   := ini.readfloat  ('SPACE-WAVE',   'SCALE',  0);
-  fspacewaveoff     := ini.readinteger('SPACE-WAVE',   'OFF',    0);
+  fspacewaveon      := ini.readinteger('SPACE-WAVE',   'ON',     0);
 
   if enabledebug then
   begin
@@ -246,7 +246,7 @@ begin
     writeln(format(' SPACE-W::DXMAX  = %12.5f',                [fspacewavedxmax]));
     writeln(format(' SPACE-W::DYMAX  = %12.5f',                [fspacewavedymax]));
     writeln(format(' SPACE-W::SCALE  = %12.5f',                [fspacewavescale]));
-    writeln(format(' SPACE-W::OFF    = %12.5u',                [fspacewaveoff  ]));
+    writeln(format(' SPACE-W::ON     = %12.5u',                [fspacewaveon   ]));
   end;
   ini.destroy;
 end;
