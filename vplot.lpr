@@ -24,7 +24,7 @@ program vplot;
 {$mode objfpc}
 
 uses
- {$ifdef unix} cthreads, {$endif}  interfaces, forms,
+ {$ifdef unix} cthreads, {$endif} interfaces, forms,
  mainfrm, aboutfrm, importfrm, propertiesfrm;
 
 {$R *.res}

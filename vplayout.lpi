@@ -4,7 +4,7 @@
     <Version Value="12"/>
     <PathDelim Value="\"/>
     <General>
-      <Title Value="vplayout"/>
+      <Title Value="vPlot Layout"/>
       <Scaled Value="True"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
@@ -36,7 +36,8 @@
       <Unit>
         <Filename Value="vplayout.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="17" Y="10"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="20" Y="33"/>
         <UsageCount Value="56"/>
         <Loaded Value="True"/>
       </Unit>
@@ -197,16 +198,15 @@
         <ComponentName Value="setupform"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="193"/>
-        <CursorPos X="30" Y="82"/>
+        <TopLine Value="37"/>
+        <CursorPos X="53" Y="98"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
         <Filename Value="src\layoutfrm.pas"/>
         <Caret Line="344" Column="84" TopLine="319"/>
@@ -317,16 +317,12 @@
       </Position27>
       <Position28>
         <Filename Value="src\setupfrm.pas"/>
-        <Caret Line="80" Column="12" TopLine="94"/>
+        <Caret Line="79" Column="12" TopLine="79"/>
       </Position28>
       <Position29>
         <Filename Value="src\setupfrm.pas"/>
-        <Caret Line="79" Column="12" TopLine="79"/>
-      </Position29>
-      <Position30>
-        <Filename Value="src\setupfrm.pas"/>
         <Caret Line="78" Column="12" TopLine="78"/>
-      </Position30>
+      </Position29>
     </JumpHistory>
   </ProjectOptions>
   <CompilerOptions>
@@ -350,7 +346,7 @@
     <CodeGeneration>
       <SmartLinkUnit Value="True"/>
       <Optimizations>
-        <OptimizationLevel Value="3"/>
+        <OptimizationLevel Value="4"/>
       </Optimizations>
     </CodeGeneration>
     <Linking>

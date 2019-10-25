@@ -1,4 +1,4 @@
-object aboutform: Taboutform
+object aboutform: taboutform
   Left = 491
   Height = 320
   Top = 255

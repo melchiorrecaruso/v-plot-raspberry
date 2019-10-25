@@ -30,6 +30,7 @@ uses
 
 begin
   requirederivedformresource := true;
+  application.title:='vPlot Layout';
   application.scaled := true;
   application.initialize;
   application.createform(tlayoutform, layoutform);

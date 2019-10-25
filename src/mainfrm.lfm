@@ -1,4 +1,4 @@
-object tmainform: tmainform
+object mainform: tmainform
   Left = 354
   Height = 477
   Top = 159
