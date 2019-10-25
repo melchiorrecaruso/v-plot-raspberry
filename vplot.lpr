@@ -25,7 +25,7 @@ program vplot;
 
 uses
  {$ifdef unix} cthreads, {$endif}  interfaces, forms,
- aboutfrm, importfrm, propertiesfrm, mainfrm, setupfrm;
+ mainfrm, aboutfrm, importfrm, propertiesfrm;
 
 {$R *.res}
 
@@ -38,7 +38,6 @@ begin
   application.createform(taboutform, aboutform);
   application.createform(timportform, importform);
   application.createform(tpropertiesform, propertiesform);
-  application.createform(tsetupform, setupform);
   application.run;
 end.
 
