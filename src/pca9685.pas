@@ -21,7 +21,6 @@
 unit pca9685;
 
 {$mode objfpc}
-{$H+}
 
 interface
 

@@ -25,7 +25,7 @@ program vplot;
 
 uses
  {$ifdef unix} cthreads, {$endif} interfaces, forms,
- mainfrm, aboutfrm, importfrm, propertiesfrm;
+ mainfrm, aboutfrm, importfrm, propertiesfrm, adxl345;
 
 {$R *.res}
 

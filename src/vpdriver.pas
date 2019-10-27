@@ -26,7 +26,8 @@ unit vpdriver;
 interface
 
 uses
-  classes, math, sysutils, {$ifdef cpuarm} pca9685, wiringpi, {$endif} vpmath, vpsetting;
+  classes, math, sysutils, {$ifdef cpuarm} pca9685,
+  adxl345, wiringpi, {$endif} vpmath, vpsetting;
 
 type
   tvpdriver = class
@@ -111,6 +112,8 @@ begin
   wiringpisetup;
   // setup pca9685 library
   pca9685setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, motz_freq);
+  // setup adxl345 library
+  adxl345setup;
   // enable motors
   pinmode(motx_on,     OUTPUT);
   digitalwrite(motx_on,   LOW);

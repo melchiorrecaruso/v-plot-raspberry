@@ -135,6 +135,7 @@ type
     procedure createtoolpath4layer(list: tfplist);
     function getitem(index: longint): tvpelement;
     function getcount: longint;
+    function getmid: tvppoint;
   public
     constructor create;
     destructor destroy; override;
@@ -143,14 +144,13 @@ type
     procedure add(const circlearc: tvpcirclearc);
     procedure add(const polygonal: tvppolygonal);
     procedure add(element: tvpelement);
-    procedure add(elements: tvpelementlist);
+    procedure merge(elements: tvpelementlist);
     procedure insert(index: longint; element: tvpelement);
     function  extract(index: longint): tvpelement;
     procedure delete(index: longint);
     procedure clear;
     //
     procedure interpolate(value: vpfloat);
-    procedure offset(var x, y: vpfloat);
     procedure move(dx, dy: vpfloat);
     procedure rotate(angle: vpfloat);
     procedure scale(value: vpfloat);
@@ -161,7 +161,6 @@ type
     procedure createtoolpath;
     procedure movetoorigin;
     procedure smooth;
-
     //
     procedure hide(value: boolean);
     procedure hide(value: boolean; layer: longint);
@@ -683,73 +682,7 @@ begin
   result := tvpelement(flist[index]);
 end;
 
-procedure tvpelementlist.add(const line: tvpline);
-begin
-   flist.add(tvpelementline.create(line));
-end;
-
-procedure tvpelementlist.add(const circle: tvpcircle);
-begin
-  flist.add(tvpelementcircle.create(circle));
-end;
-
-procedure tvpelementlist.add(const circlearc: tvpcirclearc);
-begin
-  flist.add(tvpelementcirclearc.create(circlearc));
-end;
-
-procedure tvpelementlist.add(const polygonal: tvppolygonal);
-begin
-  flist.add(tvpelementpolygonal.create(polygonal));
-end;
-
-procedure tvpelementlist.add(element: tvpelement);
-begin
-  flist.add(element);
-end;
-
-procedure tvpelementlist.add(elements: tvpelementlist);
-var
-  i: longint;
-begin
-  for i := 0 to elements.count -1 do
-  begin
-    flist.add(elements.items[i]);
-  end;
-  elements.flist.clear;
-end;
-
-procedure tvpelementlist.insert(index: longint; element: tvpelement);
-begin
-  flist.Insert(index, element);
-
-end;
-
-function tvpelementlist.extract(index: longint): tvpelement;
-begin
-  result := tvpelement(flist[index]);
-  flist.delete(index);
-end;
-
-procedure tvpelementlist.delete(index: longint);
-begin
-  tvpelement(flist[index]).destroy;
-  flist.delete(index);
-end;
-
-//---
-
-procedure tvpelementlist.interpolate(value: vpfloat);
-var
-  i: longint;
-begin
-  for i := 0 to flist.count -1 do
-  begin
-    tvpelement(flist[i]).interpolate(value);
-  end;
-end;
-
-procedure tvpelementlist.offset(var x, y: vpfloat);
+function tvpelementlist.getmid: tvppoint;
 var
      i, j: longint;
      xmin: vpfloat;
@@ -775,8 +708,71 @@ begin
        ymax := max(ymax, point.y);
     end;
   end;
-  x := -(xmin + xmax)/2;
-  y := -(ymin + ymax)/2;
+  result.x := -(xmin + xmax)/2;
+  result.y := -(ymin + ymax)/2;
+end;
+
+procedure tvpelementlist.add(const line: tvpline);
+begin
+   flist.add(tvpelementline.create(line));
+end;
+
+procedure tvpelementlist.add(const circle: tvpcircle);
+begin
+  flist.add(tvpelementcircle.create(circle));
+end;
+
+procedure tvpelementlist.add(const circlearc: tvpcirclearc);
+begin
+  flist.add(tvpelementcirclearc.create(circlearc));
+end;
+
+procedure tvpelementlist.add(const polygonal: tvppolygonal);
+begin
+  flist.add(tvpelementpolygonal.create(polygonal));
+end;
+
+procedure tvpelementlist.add(element: tvpelement);
+begin
+  flist.add(element);
+end;
+
+procedure tvpelementlist.merge(elements: tvpelementlist);
+var
+  i: longint;
+begin
+  for i := 0 to elements.count -1 do
+  begin
+    flist.add(elements.items[i]);
+  end;
+  elements.flist.clear;
+end;
+
+procedure tvpelementlist.insert(index: longint; element: tvpelement);
+begin
+  flist.insert(index, element);
+end;
+
+function tvpelementlist.extract(index: longint): tvpelement;
+begin
+  result := tvpelement(flist[index]);
+  flist.delete(index);
+end;
+
+procedure tvpelementlist.delete(index: longint);
+begin
+  tvpelement(flist[index]).destroy;
+  flist.delete(index);
+end;
+
+procedure tvpelementlist.interpolate(value: vpfloat);
+var
+  i: longint;
+begin
+  for i := 0 to flist.count -1 do
+  begin
+    tvpelement(flist[i]).interpolate(value);
+  end;
 end;
 
 procedure tvpelementlist.move(dx, dy: vpfloat);
@@ -846,8 +842,6 @@ begin
   tvpelement(flist[index]).invert;
 end;
 
-//---
-
 procedure tvpelementlist.hide(value: boolean);
 var
   i: longint;
@@ -886,8 +880,7 @@ var
 begin
   for i := 0 to flist.count -1 do
   begin
-    tvpelement(flist[i]).fhidden :=
-      not tvpelement(flist[i]).fhidden;
+    tvpelement(flist[i]).fhidden := not tvpelement(flist[i]).fhidden;
   end;
 end;
 
@@ -956,8 +949,7 @@ var
 begin
   for i := 0 to flist.count -1 do
   begin
-    tvpelement(flist[i]).fselected :=
-      not tvpelement(flist[i]).fselected;
+    tvpelement(flist[i]).fselected := not tvpelement(flist[i]).fselected;
   end;
 end;
 
@@ -1037,7 +1029,6 @@ begin
   s.loadfromfile(filename);
   if s.readansistring = 'vpl3.0' then
   begin
-
     if s.read(j, sizeof(longint))= sizeof(longint) then
       for i := 0 to j -1 do
       begin
@@ -1170,11 +1161,10 @@ end;
 
 procedure tvpelementlist.movetoorigin;
 var
-  dx: vpfloat = 0;
-  dy: vpfloat = 0;
+  p: tvppoint;
 begin
-  offset(dx, dy);
-  move(dx, dy);
+  p := getmid;
+  move(p.x, p.y);
 end;
 
 procedure tvpelementlist.smooth;
@@ -1337,7 +1327,7 @@ begin
                 inc(fpathraises);
               end;
             end;
-            add(elem.items[j]^);
+            add(p1);
             p0 := p1;
           end;
       end;

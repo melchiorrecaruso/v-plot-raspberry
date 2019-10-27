@@ -189,14 +189,14 @@ begin
         list2.items[k].move(patternw*i, patternw*j);
         list2.items[k].layer := j;
       end;
-      list1.add(list2);
+      list1.merge(list2);
       list2.destroy;
       inc(i, 1);
     end;
 
     if j mod 2 = 1 then
       list1.invert;
-    elements.add(list1);
+    elements.merge(list1);
     inc(j, 1);
   end;
   list1.destroy;
@@ -371,14 +371,14 @@ begin
         list2.items[k].move(patternw*i, patternw*j);
         list2.items[k].layer := j;
       end;
-      list1.add(list2);
+      list1.merge(list2);
       list2.destroy;
       inc(i, 1);
     end;
 
     if j mod 2 = 1 then
       list1.invert;
-    elements.add(list1);
+    elements.merge(list1);
     inc(j, 1);
   end;
   list1.destroy;
