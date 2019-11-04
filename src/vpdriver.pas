@@ -26,8 +26,8 @@ unit vpdriver;
 interface
 
 uses
-  classes, math, sysutils, {$ifdef cpuarm} pca9685,
-  adxl345, wiringpi, {$endif} vpmath, vpsetting;
+  classes, math, sysutils, {$ifdef cpuarm}
+  pca9685, wiringpi, {$endif} vpmath, vpsetting;
 
 type
   tvpdriver = class
@@ -71,6 +71,7 @@ implementation
 {$ifdef cpuarm}
 
 const
+  vbr_on    = P7;
   motx_on   = P37;
   moty_on   = P37;
   motx_step = P38;
@@ -112,8 +113,8 @@ begin
   wiringpisetup;
   // setup pca9685 library
   pca9685setup(PCA9685_PIN_BASE, PCA9685_ADDRESS, motz_freq);
-  // setup adxl345 library
-  adxl345setup;
+  // enable sw420 vibration sensor
+  pinmode      (vbr_on, INPUT);
   // enable motors
   pinmode(motx_on,     OUTPUT);
   digitalwrite(motx_on,   LOW);
@@ -183,6 +184,22 @@ begin
       digitalwrite(moty_dir,  LOW);
   end;
 
+  if enabledebug then
+  begin
+    if fzcount = setting.mzmin then
+      if (digitalread(vbr_on) > 0) then
+      begin
+        fxdelay := 10*setting.m0delay;
+        fydelay := 10*setting.m1delay;
+      end else
+      begin
+        fxdelay := fxdelay-setting.m0delay;
+        fydelay := fydelay-setting.m1delay;
+      end;
+    fxdelay := max(setting.m0delay, min(fxdelay, setting.m0delay*10));
+    fydelay := max(setting.m1delay, min(fydelay, setting.m1delay*10));
+  end;
+
   dx := abs(dx);
   dy := abs(dy);
   while (dx > 0) or (dy > 0) do
@@ -191,6 +208,7 @@ begin
     ddy := min(10, dy);
     for i := 0 to 18 do
     begin
+
       if drivermatrix[ddx, i] = 1 then
       begin
         digitalwrite(motx_step, HIGH); delaymicroseconds(fxdelay);

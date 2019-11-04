@@ -17,6 +17,7 @@
   to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
   MA 02111-1307, USA.
 }
+
 unit adxl345;
 
 {$mode objfpc}
@@ -31,9 +32,9 @@ const
 
 type
   adxl345_rec = packed record
-    x: longint;
-    y: longint;
-    z: longint;
+    x: double;
+    y: double;
+    z: double;
   end;
 
 function adxl345setup: longint;
@@ -44,8 +45,14 @@ implementation
 
 procedure adxl345_init(fd: longint);
 begin
+//Register 0x31—DATA_FORMAT (Read/Write)
+// (31dec -> 0000 1011 binary) Bit FULL-RANGE, D0 and D1
   wiringpii2cwritereg8(fd, $31, $0b);
+
+// Register 0x2D—POWER_CTL (Read/Write)
+// (8dec -> 0000 1000 binary) Bit D3 High for measuring enable
   wiringpii2cwritereg8(fd, $2d, $08);
+
 //wiringpii2cwritereg8(fd, $2e, $00);
   wiringpii2cwritereg8(fd, $1e, $00);
   wiringpii2cwritereg8(fd, $1f, $00);
@@ -70,19 +77,21 @@ end;
 
 function adxl345_read(fd: longint): adxl345_rec;
 var
-  x0, y0, z0: byte;
-  x1, y1, z1: byte;
+  x0, y0, z0: longint;
+  x1, y1, z1: longint;
 begin
-  x0 := $ff - wiringpii2creadreg8(fd, $32);
-  x1 := $ff - wiringpii2creadreg8(fd, $33);
-  y0 := $ff - wiringpii2creadreg8(fd, $34);
-  y1 := $ff - wiringpii2creadreg8(fd, $35);
-  z0 := $ff - wiringpii2creadreg8(fd, $36);
-  z1 := $ff - wiringpii2creadreg8(fd, $37);
+  // Start with register 0x32 (ACCEL_XOUT_H)
+  // Read 6 registers total, each axis value is stored in 2 registers
+  x0 := wiringpii2creadreg8(fd, $32);
+  x1 := wiringpii2creadreg8(fd, $33);
+  y0 := wiringpii2creadreg8(fd, $34);
+  y1 := wiringpii2creadreg8(fd, $35);
+  z0 := wiringpii2creadreg8(fd, $36);
+  z1 := wiringpii2creadreg8(fd, $37);
 
-  result.x := longint(x1 << 8) + longint(x0);
-  result.y := longint(y1 << 8) + longint(y0);
-  result.z := longint(z1 << 8) + longint(z0);
+  result.x := ((x1 shl 8) or x0)/32; // X-axis value
+  result.y := ((y1 shl 8) or y0)/32; // Y-axis value
+  result.z := ((z1 shl 8) or z0)/32; // Z-axis value
 end;
 
 function adxl345setup: longint;
