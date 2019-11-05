@@ -40,6 +40,7 @@ type
     // 0-motor
     fm0min:    longint;
     fm0max:    longint;
+    fm0dec:    longint;
     fm0inc:    longint;
     fm0delay:  longint;
     fm0dir:    longint;
@@ -48,6 +49,7 @@ type
     // 1-motor
     fm1min:    longint;
     fm1max:    longint;
+    fm1dec:    longint;
     fm1inc:    longint;
     fm1delay:  longint;
     fm1dir:    longint;
@@ -56,6 +58,7 @@ type
     // z-motor
     fmzmin:    longint;
     fmzmax:    longint;
+    fmzdec:    longint;
     fmzinc:    longint;
     fmzdelay:  longint;
     fmzdir:    longint;
@@ -88,6 +91,7 @@ type
 
     property m0min:          longint  read fm0min;
     property m0max:          longint  read fm0max;
+    property m0dec:          longint  read fm0dec;
     property m0inc:          longint  read fm0inc;
     property m0delay:        longint  read fm0delay;
     property m0dir:          longint  read fm0dir;
@@ -96,6 +100,7 @@ type
 
     property m1min:          longint  read fm1min;
     property m1max:          longint  read fm1max;
+    property m1dec:          longint  read fm1dec;
     property m1inc:          longint  read fm1inc;
     property m1delay:        longint  read fm1delay;
     property m1dir:          longint  read fm1dir;
@@ -104,6 +109,7 @@ type
 
     property mzmin:          longint  read fmzmin;
     property mzmax:          longint  read fmzmax;
+    property mzdec:          longint  read fmzdec;
     property mzinc:          longint  read fmzinc;
     property mzdelay:        longint  read fmzdelay;
     property mzdir:          longint  read fmzdir;
@@ -158,6 +164,7 @@ begin
 
   fm0min        := ini.readinteger('X-AXIS',  'MIN',    0);
   fm0max        := ini.readinteger('X-AXIS',  'MAX',    0);
+  fm0dec        := ini.readinteger('X-AXIS',  'DEC',    0);
   fm0inc        := ini.readinteger('X-AXIS',  'INC',    0);
   fm0delay      := ini.readinteger('X-AXIS',  'DELAY',  0);
   fm0dir        := ini.readinteger('X-AXIS',  'DIR',    0);
@@ -166,6 +173,7 @@ begin
 
   fm1min        := ini.readinteger('Y-AXIS',  'MIN',    0);
   fm1max        := ini.readinteger('Y-AXIS',  'MAX',    0);
+  fm1dec        := ini.readinteger('Y-AXIS',  'DEC',    0);
   fm1inc        := ini.readinteger('Y-AXIS',  'INC',    0);
   fm1delay      := ini.readinteger('Y-AXIS',  'DELAY',  0);
   fm1dir        := ini.readinteger('Y-AXIS',  'DIR',    0);
@@ -174,6 +182,7 @@ begin
 
   fmzmin        := ini.readinteger('Z-AXIS',  'MIN',    0);
   fmzmax        := ini.readinteger('Z-AXIS',  'MAX',    0);
+  fmzdec        := ini.readinteger('Z-AXIS',  'DEC',    0);
   fmzinc        := ini.readinteger('Z-AXIS',  'INC',    0);
   fmzdelay      := ini.readinteger('Z-AXIS',  'DELAY',  0);
   fmzdir        := ini.readinteger('Z-AXIS',  'DIR',    0);
@@ -212,6 +221,7 @@ begin
 
     writeln(format('  X-AXIS::MIN    = %12.5u', [fm0min    ]));
     writeln(format('  X-AXIS::MAX    = %12.5u', [fm0max    ]));
+    writeln(format('  X-AXIS::DEC    = %12.5u', [fm0dec    ]));
     writeln(format('  X-AXIS::INC    = %12.5u', [fm0inc    ]));
     writeln(format('  X-AXIS::DELAY  = %12.5u', [fm0delay  ]));
     writeln(format('  X-AXIS::DIR    = %12.5u', [fm0dir    ]));
@@ -220,6 +230,7 @@ begin
 
     writeln(format('  Y-AXIS::MIN    = %12.5u', [fm1min    ]));
     writeln(format('  Y-AXIS::MAX    = %12.5u', [fm1max    ]));
+    writeln(format('  Y-AXIS::DEC    = %12.5u', [fm1dec    ]));
     writeln(format('  Y-AXIS::INC    = %12.5u', [fm1inc    ]));
     writeln(format('  Y-AXIS::DELAY  = %12.5u', [fm1delay  ]));
     writeln(format('  Y-AXIS::DIR    = %12.5u', [fm1dir    ]));
@@ -228,6 +239,7 @@ begin
 
     writeln(format('  Z-AXIS::MIN    = %12.5u', [fmzmin    ]));
     writeln(format('  Z-AXIS::MAX    = %12.5u', [fmzmax    ]));
+    writeln(format('  Z-AXIS::DEC    = %12.5u', [fmzdec    ]));
     writeln(format('  Z-AXIS::INC    = %12.5u', [fmzinc    ]));
     writeln(format('  Z-AXIS::DELAY  = %12.5u', [fmzdelay  ]));
     writeln(format('  Z-AXIS::DIR    = %12.5u', [fmzdir    ]));

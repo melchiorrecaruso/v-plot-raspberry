@@ -184,20 +184,24 @@ begin
       digitalwrite(moty_dir,  LOW);
   end;
 
-  if enabledebug then
+  // detect vibrations
+  if fzcount = setting.mzmin then
   begin
-    if fzcount = setting.mzmin then
-      if (digitalread(vbr_on) > 0) then
-      begin
-        fxdelay := 10*setting.m0delay;
-        fydelay := 10*setting.m1delay;
-      end else
-      begin
-        fxdelay := fxdelay-setting.m0delay;
-        fydelay := fydelay-setting.m1delay;
-      end;
-    fxdelay := max(setting.m0delay, min(fxdelay, setting.m0delay*10));
-    fydelay := max(setting.m1delay, min(fydelay, setting.m1delay*10));
+    if (digitalread(vbr_on) > 0) then
+    begin
+      fxdelay := fxdelay+setting.m0inc;
+      fydelay := fydelay+setting.m0inc;
+    end else
+    begin
+      fxdelay := fxdelay-setting.m0dec;
+      fydelay := fydelay-setting.m0dec;
+    end;
+    fxdelay := max(setting.m0min, min(fxdelay, setting.m0max));
+    fydelay := max(setting.m1min, min(fydelay, setting.m1max));
+  end else
+  begin
+    fxdelay := setting.m0min;
+    fydelay := setting.m1min;
   end;
 
   dx := abs(dx);
